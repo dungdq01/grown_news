@@ -28,6 +28,7 @@ from pathlib import Path
 
 import db
 import rank
+import tin_hieu
 
 R = Path(__file__).resolve().parents[2]
 ASSETS = R / "core" / "assets"
@@ -179,7 +180,8 @@ class Cua(BaseHTTPRequestHandler):
             duong = self.path.split("?")[0]
             if duong != "/truy-hoi":
                 return self._tra(404, {"loi": "không có đường này"})
-            if self._tu_ai() is None:
+            tu = self._tu_ai()
+            if tu is None:
                 return None
             try:
                 b = self._doc_than()
@@ -194,9 +196,16 @@ class Cua(BaseHTTPRequestHandler):
                     kq = rank.truy_hoi(con, **ts)
                 except ValueError as e:
                     return self._tra(400, {"loi": str(e)})
-                return self._tra(200, kq)
             finally:
                 con.close()
+            # AC-7.1 · hai tín hiệu vận hành — đếm và ghi cạnh index (T13-6). Phiên = `x-phien`
+            # của người gọi, không có thì (dịch vụ gọi, địa chỉ) — đủ để đo "gõ lại", không định danh người.
+            th = tin_hieu.TinHieu(db.duong_index().parent)
+            phien = self.headers.get("x-phien") or f"{tu}:{self.client_address[0]}"
+            th.ghi_truy_van(ts["cau_hoi"], phien)
+            if kq["tong"] == 0:
+                th.ghi_0_ket_qua(ts["cau_hoi"], phien)
+            return self._tra(200, kq)
         except Exception as e:  # noqa: BLE001
             return self._tra(500, {"loi": f"{type(e).__name__}: {e}"})
 

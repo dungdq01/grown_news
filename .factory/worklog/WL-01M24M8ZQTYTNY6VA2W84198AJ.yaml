@@ -1,0 +1,46 @@
+entry: ban-giao
+ulid: 01M24M8ZQTYTNY6VA2W84198AJ
+ngay: 2026-09-10
+module: M13_truyhoi
+don_vi: [T13-6]
+fr: AC-7.1 · AC-6.1 · AC-6.2 · AC-6.3 (soft) · spec §6 · §7
+nhanh: m13 (worktree ../gn-m13)
+tieu_de: >-
+  T13-6 — truyhoi/src/tin_hieu.py (hai bo dem truy_van_0_ket_qua · go_lai ghi FILE canh index, atomic, cua so
+  go-lai 120s/3 cau khac nhau o muc tien trinh) + hooks trong api.py sau /truy-hoi. check_tin_hieu_van_hanh XANH.
+  check_golden_du_ca CON DO 1 ve: LOI THAT :8787 chua co GET /api/kho-delta (server dang chay ma main cu, T08-35
+  con tren nhanh m13) — golden 7 ca Viet CHUA DO DUOC tren kho that; zh soft (kho 0 bai Han).
+
+object:
+  - truyhoi/src/tin_hieu.py
+  - truyhoi/src/api.py               # +import tin_hieu · sau truy_hoi: ghi_truy_van(phien) · tong==0 ⇒ ghi_0_ket_qua; phien = x-phien | <tu>:<ip>
+  - .factory/worklog/WL-01M24M8ZQTYTNY6VA2W84198AJ.yaml
+
+quyet_dinh_trong_luot:
+  - "Cua so go-lai o muc TIEN TRINH (_CUA_SO module-level): moi request tao mot TinHieu moi nen giu o instance thi mat — lan chay dau go_lai 0→0 vi dung loi nay; sua trong ma (khong phai cong)."
+  - "jsonl khong ghi cau hoi nguyen van — chi do dai + phien: tin hieu la DEM, khong phai nhat ky noi dung."
+  - "go_lai dem MOT lan cho moi cua so 3 cau khac nhau roi mo cua so moi; cau y het khong tinh khac."
+
+do_do:
+  - lenh: ".venv/Scripts/python truyhoi/tests/check_tin_hieu_van_hanh.py   (TRUOC: `ĐỎ · CHƯA CÓ MÃ — truyhoi/src/tin_hieu.py chưa tồn tại`)"
+    ket_qua: |
+      LAN 1 (cua so o instance): FAIL `ba câu khác nhau liên tiếp cùng phiên ⇒ go_lai +1   0 → 0` — loi MA, sua tin_hieu.py.
+      LAN 2: §1 ok doc hai bo dem · ok truy van la ⇒ 200 tong 0 · ok truy_van_0_ket_qua +1 · ok co file tin-hieu* canh index (khong o kb/)
+             §2 ok ba cau khac nhau cung phien ⇒ go_lai +1 · ok go LAI Y CAU CU o phien khac khong tinh
+             §3 ok sau khoi dong lai hai so bang truoc · ok /health song
+      XANH · exit 0
+  - lenh: ".venv/Scripts/python truyhoi/tests/check_golden_du_ca.py"
+    ket_qua: |
+      §1 ok golden.yaml du 7 ca Viet + 4 ca Trung, 0 entry expect diem (tu-kiem 5/5: bo mot ca ⇒ neu ten; expect_diem ⇒ do; dem bai Han phon+gian=2, kana khong tinh)
+      §2 FAIL `LÕI thật :8787 trả /api/kho-delta   ma=404` — server that dang chay ma main (chua co T08-35 cua nhanh m13) ⇒ 7 ca Viet CHUA DO DUOC tren kho that.
+      ĐỌ — 1 vế (dung: day la DIEU KIEN BAN GIAO T13-6, khong phai trang thai hop le; khong doi cong cho xanh).
+      AC-6.3 zh: kho that co 0 bai chu Han (do 2026-09-10 tren kb/_kho.sqlite) ⇒ khi chay duoc se in `soft — kho có 0 < 2 bài tiếng Trung` va exit 0.
+
+đỏ_do: "check_golden_du_ca: LOI that :8787 chua co /api/kho-delta — chu la TRINH TU MERGE (T08-35 tren m13 chua merge/deploy), khong phai ma M13. Lat xanh khi: merge m13 → main, restart web (rule.md 6, memory 'server cache asset luc nap'), chay lai cong. 7 ca golden expect anchor tinh tu heading THAT cua kb/repo/ruflo-…md nen se do duoc ngay khi LOI moi song."
+
+cho_NGUOI:
+  - "Chu du an / PM: merge m13 → main + restart :8787 roi chay `truyhoi/tests/check_golden_du_ca.py` — day la ve cuoi de dong T13-6."
+  - "Chu du an: nap ≥2 video/bai tieng Trung (phon hoac gian) ⇒ AC-6.3 lat hard; toi dien expect_trong_top_k cho 4 ca zh khi do."
+
+keo_theo:
+  - "T04-9 CI: vong `truyhoi/tests/check_*.py` — check_golden_du_ca goi LOI :8787 that: tren CI khong co server ⇒ se DO. Can quyet: (a) CI bo qua golden (danh dau `--khong-loi-that` in 'chưa đo được' exit 0) hay (b) CI dung LOI that (web/server.mjs + kho mau). Ghi o worklog T04-9."
