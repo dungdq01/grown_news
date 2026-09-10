@@ -1,0 +1,60 @@
+id: WL-01K9PBWO030
+at: 2026-08-29
+by: claude
+buoc: WO-030 — màn Danh mục không bao giờ gọi API vì phép đọc buộc vào mốc màn khác
+loai: bàn giao WO-030
+wo: WO-030-doc-danh-muc-buoc-vao-moc-man-khac.md
+
+object:
+  wo:
+    - .factory/wo/WO-030-doc-danh-muc-buoc-vao-moc-man-khac.md
+  task:
+    - 07_plan/M03_web/tasks/T03-68-test-doc-dm-khong-can-moc.md   # test
+    - 07_plan/M03_web/tasks/T03-69-fetch-khong-can-moc.md         # code
+  code:
+    - web/plugins/multiwindow/src/scripts/multiwindow.inline.ts
+  test:
+    - web/test/moc-fe-con-that.test.js   # §5 MỚI
+
+may_xanh:
+  - "ĐỎ TRƯỚC (R5): hai vế hành vi đỏ, tiền đề (0 mốc `[data-dm]`) xanh"
+  - >
+    TRÌNH DUYỆT THẬT trên kho tạm (cổng 8799, `KB_DIR` riêng — KHÔNG đụng kho
+    người dùng): `#cchua` = "0 bài Talkshow talkshow sửa xoá" · `#catlist` =
+    "0 bài AI - talkshow aitalkshow · talkshow sửa xoá" · `#ccount` = "0/1 đang
+    dùng" · và `[data-dm]` trên trang = **0** ⇒ fetch chạy KHÔNG cần mốc
+  - "quét web 75/76 (chỉ `he-kinh`) · dọn sạch kho tạm và server 8799 sau khi đo"
+
+chan_doan:
+  - >
+    Dữ liệu ĐÚNG ở mọi tầng — yaml có, DB có, `GET /api/concepts` trả
+    `{tong:1}`. Lỗi là FE **không hỏi**
+  - >
+    `[data-dm]` chỉ có trên các màn NẠP, và `catNap()` CẮT các màn nạp khỏi mọi
+    trang khác để tiết kiệm byte. Nên trên màn Danh mục không còn mốc nào, cả
+    `napLoaiDanhMuc` lẫn `napMotDanhMuc` thoát sớm, và API không được gọi lần nào
+  - >
+    Màn Danh mục cần CHÍNH DỮ LIỆU, không cần ô tích của màn nạp. Buộc phép đọc
+    vào mốc của một màn KHÁC là buộc nó vào thứ có thể bị cắt đi — và đã bị
+  - >
+    KPI vẫn đúng vì nó do SSR dựng từ DB: hai đường hoàn toàn khác nhau trên
+    cùng một màn. Chính sự lệch đó là manh mối rõ nhất
+
+cach_do:
+  - >
+    Hỏi thẳng server ĐANG CHẠY của người dùng bằng `curl` (chỉ GET): API trả
+    đúng. Rồi đếm `[data-dm]` trên hai trang — `/khai-niem/` 0, `/bai-viet/nap/`
+    4. Hai phép đo đó khoanh vùng lỗi trong vài phút, không phải đọc mã đoán
+  - >
+    Chốt bằng Playwright trên KHO TẠM, không phải kho thật — bài học đã ghi từ
+    C6b: một bản ghi thử từng đi vào kho thật vì tôi trỏ server vào `kb/`
+
+đỏ_do: chưa quy được chủ  # lỗ có từ lúc `catNap()` cắt màn nạp khỏi các trang khác
+
+do_do:
+  - cong: he-kinh.test.js
+    do_do_boi: ảnh 724662 byte người dùng thêm — `python core/tools/toi_uu_anh_nen.py`
+  - cong: check_frozen.py
+    do_do_boi: chờ NGƯỜI ký sau khi FR-039 duyệt
+  - cong: check_danh_muc.py · check_skill.py · check_running.py
+    do_do_boi: agent khác · và hệ quả của hai cổng trên

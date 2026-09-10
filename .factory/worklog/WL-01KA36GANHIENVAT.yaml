@@ -1,0 +1,107 @@
+id: WL-01KA36GANHIENVAT
+khi: 2026-09-04T19:05:00+07:00
+loai: ban_giao
+tac_nhan: claude-code
+viec: T08-30 — cửa HẸP gắn hiện vật vào bản ghi (lối 1 chủ dự án chọn) + worker dùng nó
+module: M08_api · M12_chungcat
+
+nguoi_quyet: |
+  Chủ dự án 2026-09-04: "Chọn lối 1 đi" — một cửa LÕI mới chỉ để gắn hiện vật
+  vào bản ghi. Hai lối kia bị bác: qua bảng nháp (một hiện vật máy sinh phải
+  chờ người duyệt để đính vào chính bản ghi nó dẫn xuất từ) · nới PUT cho THỢ
+  (mở lại đúng cửa M05-R1/FR-047 §0 vừa đóng).
+
+object:
+  - path: 07_plan/M08_api/tasks/T08-30-test-cua-gan-hien-vat.md
+  - path: web/api/articles.mjs                     # ganHienVat
+  - path: web/api/router.mjs                       # route 5 đoạn
+  - path: web/test/hien-vat-gan.test.js            # MỚI — 17 vế
+  - path: web/package.json                         # đăng ký npm test
+  - path: chungcat/src/worker.py                   # gắn qua cửa hẹp
+  - base_sha: 8535a26
+
+r5_do_truoc:
+  - luc: 2026-09-04T18:54:39+07:00
+    trang_thai: DO
+    lenh: node web/test/hien-vat-gan.test.js
+    ra: |
+      9 lỗi — mọi vế trả 400 (chưa có route, cổng cấu trúc bốn đoạn bắt trước)
+        FAIL gắn ⇒ 200 · media[] THÊM một entry · entry mang đúng sha256
+        FAIL gọi lần hai ⇒ 200 · payload trường lạ ⇒ 200
+        FAIL sha lạ ⇒ 422 · kieu_moc lạ ⇒ 422
+    ghi_chu: cổng viết XONG; `articles.mjs`/`router.mjs` chưa đụng dòng nào
+  - luc: 2026-09-04T19:00:00+07:00
+    trang_thai: XANH
+    lenh: node web/test/hien-vat-gan.test.js
+    ra: "pass · cửa gắn hiện vật: hẹp · bất động · lột mọi trường lạ"
+
+do_do:
+  - lenh: cd web && npm test
+    ket_qua: 2899 ok · exit 0
+  - lenh: 29 cổng chungcat/tests/*.py
+    ket_qua: 29/29 exit 0
+  - lenh: python -m pytest core/tests -q
+    ket_qua: 45 passed
+  - lenh: python core/tests/check_frozen.py
+    ket_qua: pass — mọi file frozen khớp baseline đã ký
+  - lenh: python core/tests/check_g6b.py
+    ket_qua: 30 lỗi (không tăng)
+
+do_do_boi: chua-quy-duoc-chu
+
+quyet_dinh:
+  - |
+      CỬA HẸP TỚI MỨC CHỈ LÀM ĐƯỢC MỘT VIỆC. Không dùng `PUT` sẵn có vì nó nhận
+      CẢ frontmatter và thân: `suaBai` lột `review_status`/`origin`, nhưng KHÔNG
+      lột `category`, `concepts`, `credibility_max`, thân bài — và `M01-R2` cấm
+      MÁY điền `credibility_max`. Bề mặt hẹp là thứ duy nhất làm câu "THỢ không
+      sửa được bản ghi" còn đúng sau khi mở một cửa cho THỢ.
+  - |
+      Trường lạ bị LỘT, không bị TỪ CHỐI. Cửa xây `fm = {...cu.fm, media: [...]}`
+      nên không khoá nào của payload tới được bản ghi — kể cả khoá chưa ai nghĩ
+      ra. Từ chối biến một trường bị lột thành một lỗi người dùng thấy, còn hợp
+      đồng chỉ nói *nó không được tin*. Cổng gieo BẢY trường (review_status ·
+      trang_thai · credibility_max · category · concepts · one_liner · body)
+      rồi ĐỌC LẠI bản ghi.
+  - |
+      BẤT ĐỘNG trả 200, không 409. Gọi lại sau một lỗi mạng là chuyện thường, và
+      một cửa trả lỗi cho retry là một cửa buộc người gọi đoán. Cổng đo bằng
+      cách gọi hai lần rồi đếm `media[]`.
+  - |
+      `sha256` phải ĐÃ CÓ trong bảng `media` ⇒ 422. Gắn một con trỏ vào hư không
+      là dựng hiện vật mồ côi NGƯỢC CHIỀU — `M09-R1` canh chiều còn lại (byte
+      không bị xoá), chiều này trước đó không ai canh.
+  - |
+      `kieu_moc`/`model_asr` KHÔNG vào `media[]` của frontmatter:
+      `frontmatter.schema.json` khai `additionalProperties: false` và bốn trường
+      bắt buộc. Chỗ của chúng là CỘT trong bảng `media` (`T01-45`) — và đó là chỗ
+      đúng: chúng nói về BYTE, không nói về bản ghi trỏ tới byte.
+  - |
+      KHÔNG bump `ban`, và đó là một quyết định. `FR-054 §9.1` bump `ban` cho
+      lối THAY (sinh lại transcript ⇒ snapshot frontmatter cũ). Cửa này là lối
+      THÊM: không hiện vật nào bị thay, nên không có bản cũ nào để snapshot.
+      AC1/AC2 của task file đã sửa cho khớp — một AC nói "ban bump" mà cổng
+      không đo là một AC nói dối.
+  - |
+      HAI LỖI CỦA TÔI trong lượt này, cả hai ở CỔNG chứ không ở mã:
+      (1) fixture đọc `ds.json.dong` — khoá thật là `items`. Cổng đỏ vì nó đoán
+          tên khoá thay vì đọc phản hồi thật.
+      (2) cửa dùng `docBody(req, res)` như thể nó trả object — nó trả BUFFER.
+          `docPayload` thì parse nhưng đòi `{frontmatter, body}`, đúng hình dạng
+          cửa BẢN GHI mà cửa này cố ý không nhận ⇒ parse tại chỗ.
+  - |
+      `web/test/hien-vat-gan.test.js` KHÔNG khai trong `phạm_vi_ghi` của T08-30:
+      `web/test/**` thuộc boundary M03_web (`fe`), không thuộc M08_api. Cùng
+      tiền lệ `T08-27`/`T08-29`. `check_g6b` bắt đúng khi tôi khai nó.
+
+keo_theo:
+  - |
+      Lối THAY hiện vật chưa có đường — ô backlog M08 đã mở. Chỗ khó không phải
+      một endpoint thiếu: `article_versions` hôm nay CHỈ được nạp TỪ FILE
+      (`dung_lai_db.py:202` đọc `<slug>.v<n>.md`), tức *version là FILE* đúng
+      `B-C1`. Một cửa API ghi thẳng vào bảng đó là dựng nguồn chân lý thứ hai
+      cho lịch sử bản ghi. Ba câu phải trả lời trước khi thi công, ghi ở ô đó.
+  - |
+      `doc-byte` của `sinh-transcript` VẪN dừng: không ai chạy
+      `tai_nguon.lenh_tai()`. Lệnh đã dựng và có cổng; thiếu người gọi nó qua
+      `egress.gui()`. Ô backlog M12 đã mở.

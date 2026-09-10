@@ -1,0 +1,29 @@
+id: WL-01K9M5FR034B
+at: 2026-08-26
+by: claude
+buoc: s8 — FR-034 giai doan B4 + B5 (flip API + intake sang DB) — XONG
+fr: FR-034-db-nguon-chan-ly.md
+plan: .claude/plans/ph-ng-n-b-l-n-sorted-swan.md
+
+da_xong:
+  B4_flip_api:
+    - "dungchung.mjs VIET LAI: moKho (guard mat-du-lieu: DB thieu + kho co file ⇒ NEM huong dan dung_lai_db; kho moi tinh ⇒ tao tu kho.schema.sql) · doc/giaoDich (BEGIN IMMEDIATE, mo-dung-dong) · khoDoc/docBai/demSoBai/docDanhMucDb SELECT · ghiSauValidate compose-tmp→validate(+snapshot 2 yaml danh muc tu DB, vietDanhMucTam)→UPSERT version+1→banXuat · themVaoDanhMuc/suaDanhMuc/ghiNhatKyDanhMuc (audit_log)/chuyenSangRac (txn INSERT recycle+DELETE)/phucHoi (validate snapshot→txn) · banXuat AWAIT trong request (tra loi = export xong; ~300ms/ghi, khai trong FR) · dungLaiTrang chi con trong banXuat"
+    - "XOA: vanTay/quetKho(export)/quetKhoIndex/quenIndex/banIndex/capNhatIndex/doc1/doiTenBenBi/ghiHopDong/duongHopDong/kyLaiBaseline/chayCong/traLaiDanhMuc"
+    - "articles.mjs: etag tu cot DB; docDanhMuc → docDanhMucDb. danhmuc.mjs VIET LAI: het khoVaSchemaLech/ghi schema/rollback tay/cong-sau-ghi; audit hanh_dong ma khong dau THEM/SUA/XOA/EP-XOA. recycle.mjs: recycle_path = slug.stt.md. status.mjs: khong doi."
+    - "_api.mjs: dungKho → napLaiDb (dung_lai_db sync) + xuatKho (canonical hoa seed); helper napLaiDb/xuatKho export cho test gieo file giua chung; dungSchema het bom enum (vo hai)"
+    - "test sua: api-recycle (recycle_path/stt) · canh-bao (napLaiDb sau gieo) · api-index-khong-can-build (napLaiDb; export xoa mo coi ⇒ PHAI nap truoc POST) · luong-day-du (datTrang + napLaiDb) · danh-muc-them (muc 10/11 viet lai theo mot-bang; nhat ky doc audit; kho rong napLaiDb) · api-guard (muc 2: khong renameSync, SQL chi o dungchung, moi giaoDich kem banXuat; muc 6: dungLaiTrang trong banXuat)"
+    - "RETIRE: hai-duong-doc-khop.test.js (stub exit 0, van trong chuoi vi meta-test doi moi file duoc goi) · check_index_dan_xuat.py (stub) · sinh_index.py (stub exit 1 co chu dich) — xoa vat ly o C7 (lenh rm bi sandbox chan)"
+    - "xuat_kho.py fix CRLF: ghi_ben_bi so+ghi BYTES (\\n co dinh) — write_text Windows dich \\n→\\r\\n lam moi export 'doi'; danh muc in FLOW style [a, b] + ORDER BY rowid (noi vao cuoi, diff sach)"
+    - "check_export_dan_xuat rang 2 tinh chinh: chi bat dong spawn/require/import, khong bat chuoi huong dan trong Error"
+  B5_intake:
+    - "gate.py: gac() KHONG doi mot dong (hardcode draft :123 nguyen). chay(): SELECT trung khoa → tra lai; INSERT BEGIN IMMEDIATE; _mo_kho_db cung guard mat-du-lieu; cuoi lo goi xuat_kho.xuat() (DB→file, hop le — khac dung_lai_db bi cam)"
+    - "test_gate 0 sua ma xanh (assert qua file export van dung); luong-nap-bai e2e xanh"
+
+trang_thai: "npm test 44/44 XANH · 12 cong python + pytest 32 + 6 test module XANH · FROZEN ky lai lan 2 (M03 spec + M08 rules sua sau lan ky dau)"
+
+luu_y_van_hanh:
+  - "SERVER 8787 dang chay CODE CU — phai restart `npm run api` de an kien truc DB"
+  - "kb/_index.sqlite cu con tren dia (gitignore) — xoa tay o C7"
+  - "web/site/ van la ban build cu — SSR (giai doan C) chua lam"
+
+con_lai: "Giai doan C (C1 port render → C7 don) theo plan; T03-8 khai san"

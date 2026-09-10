@@ -1,0 +1,10 @@
+at: 2026-08-18T01:50Z
+agent: human+claude
+step: adopt / bootstrap
+did: >
+  Áp khung Factory vào dự án đã có code. Vào từ giữa theo ADOPT §5 —
+  bỏ G1-G3 vì core/ và kb/ đã chạy và có test trước khi áp khung.
+  Khởi tạo project_map.yaml từ code hiện có, kiểm nhất quán bằng máy:
+  3 module, 2 entity, 3 flow, 0 lỗi — path tồn tại, depends_on không vòng,
+  used_by trỏ module có thật.
+object: project_map.yaml

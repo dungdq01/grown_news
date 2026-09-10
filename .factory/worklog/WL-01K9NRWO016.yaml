@@ -1,0 +1,158 @@
+id: WL-01K9NRWO016
+at: 2026-08-28
+by: claude
+buoc: WO-016 — bốn chiều nhãn (phân loại · loại nguồn · chủ đề · khái niệm)
+loai: bàn giao WO-016
+wo: WO-016-bon-chieu-nhan-va-gan-tu-db.md
+
+object:
+  wo:
+    - .factory/wo/WO-016-bon-chieu-nhan-va-gan-tu-db.md
+    - .factory/wo/WO-017-ba-khung-nap-rieng.md   # MỞ, chưa làm
+  task:
+    - 07_plan/M03_web/tasks/T03-44-bon-chieu-facet-va-danh-muc.md   # code
+    - 07_plan/M03_web/tasks/T03-45-test-bon-chieu-facet.md          # test
+    - 07_plan/M08_api/tasks/T08-16-test-nhan-bat-buoc.md            # test
+    - 07_plan/M08_api/tasks/T08-17-nhan-bat-buoc.md                 # code
+    - 07_plan/M03_web/tasks/T03-46-test-o-nhan-tren-nap.md          # test
+    - 07_plan/M03_web/tasks/T03-47-o-nhan-tren-nap.md               # code
+  code:
+    - web/render/trang.mjs         # bangLoc bốn tầng · component loại nguồn · MỘT lần đọc bảng khai
+    - web/render/shell.html · web/plugins/home-pages/shell.html   # tab thứ tư + hai cặp ô nhãn
+    - web/styles/prototype.css     # .dm-tabs 4 cột · .t-nguon
+    - web/api/cong-module.mjs      # nhanDu() · congLoai()
+    - web/api/articles.mjs         # cổng module cũng chấm ở PUT
+    - web/plugins/multiwindow/src/scripts/multiwindow.inline.ts   # napDanhMuc theo [data-dm] · nhanCua()
+  test:
+    - web/test/bon-chieu-facet.test.js   # MỚI — 7 mục
+    - web/test/nhan-bat-buoc.test.js     # MỚI — 6 mục
+    - web/test/o-nhan-nap.test.js        # MỚI — 4 mục
+    - web/test/man-danh-muc.test.js      # con số cứng 3 tab → BẤT BIẾN
+    - web/test/route-theo-module.test.js · o-media-sua.test.js · nap-video.test.js  # fixture thêm nhãn
+    - web/test/WORKLOG.md · web/WORKLOG.md · web/styles/WORKLOG.md
+    - web/plugins/WORKLOG.md · web/package.json
+
+may_xanh:
+  - "cd web && node test/bon-chieu-facet.test.js  ->  pass"
+  - "cd web && node test/nhan-bat-buoc.test.js  ->  pass"
+  - "cd web && node test/o-nhan-nap.test.js  ->  pass"
+  - "quét từng file: 65/66 xanh (chỉ `he-kinh` đỏ — xem `do_do`)"
+  - "gn.css 94819 / 102400 byte — dư 7581"
+  - "gn.js 102253 / 102400 byte — dư **147**"
+  - >
+    trình duyệt, kho TẠM, `/tai-lieu/nap/`: `tv-cat` 3 ô · `tv-cpt` 6 ô, đổ từ DB
+  - >
+    trình duyệt, `/video/nap/`: `vd-cat` 3 · `vd-cpt` 6; bấm Gửi khi chưa chọn
+    nhãn ⇒ chặn TẠI CHỖ, đúng câu, không đi vòng 422
+  - >
+    trình duyệt, `/tat-ca/`: bốn tầng `pl · nguon · cat · cpt`, nhãn "phân loại |
+    loại nguồn | chủ đề | khái niệm"; bấm `cat=fx-hau-truong` ⇒ 2 thẻ hiện, ô đếm
+    nói "2 bản", URL nhận `?cat=`
+
+dinh_chinh_phep_do_dau_tien:
+  - >
+    `cat` KHÔNG thiếu mã. `bangLoc` đã phát `nhom("chủ đề", "cat", …)` từ trước;
+    nó vắng vì `nhom()` trả rỗng khi không có mục — tức KHÔNG BẢN GHI NÀO có
+    `category`. Kho thật `category: []`, kho mock không khai trường này
+  - >
+    Gốc sâu hơn: `categories` **0 hàng** · `concepts` **0 hàng** · `nhan` chỉ 5
+    dòng `proposed`. Bảng rỗng ⇒ ô nạp từ DB cũng rỗng ⇒ không ai gán được ⇒
+    facet rỗng vĩnh viễn. Tôi KHÔNG tự gieo nhãn (M02-R3) — chỉ làm đường
+  - >
+    `/khai-niem/` đã có hai trong ba (khái niệm + chủ đề, kèm thêm/sửa). Thiếu
+    đúng loại nguồn, và nó phải CHỈ ĐỌC
+  - >
+    `/tat-ca/` thiếu `nguon` là lỗi mã thật: `bangLoc` dùng `if/else` nên màn trộn
+    nhận `pl`, màn loại nhận `nguon`, không màn nào cả hai
+
+loai_nguon_giu_o_bang_khai:
+  - >
+    Người dùng viết *"cần làm bảng DB lưu trữ nếu chưa có"*. `concepts` và
+    `categories` ĐÃ có bảng. Loại nguồn thì tôi GIỮ ở `loai-nguon.json` và nói rõ
+    vì sao: file đó sinh ra chính các ràng buộc `CHECK` của DDL, nên một bảng DB
+    là HAI nguồn sự thật cho một enum; và `coFileBai()` cùng phép kiểm `type` của
+    route phải chạy KHI DB CHƯA TỒN TẠI. Muốn bảng thật ⇒ FR trên
+    `kho.schema.sql` (FROZEN), tôi không tự làm
+
+kiem_hai_chieu:
+  - "R5 ĐỎ TRƯỚC có thật: bon-chieu 3 lỗi · nhan-bat-buoc 8 lỗi · o-nhan-nap 12 lỗi"
+  - "bon-chieu · 7 răng, cả 7 đỏ đúng lời; phục nguyên sha256 BẰNG hết"
+  - "nhan-bat-buoc · 6 răng, cả 6 đỏ đúng lời; phục nguyên BẰNG hết"
+
+tu_bat_duoc:
+  - >
+    CỔNG XANH KHI TÔI XOÁ TAB. §7 bản đầu chỉ hỏi `vKn.includes("loại nguồn")` và
+    chuỗi đó CÒN trong đoạn văn giải thích ngay dưới ⇒ xoá `data-dmtab="nguon"`
+    mà cổng vẫn xanh. Nay đo COMPONENT: tab · panel · mốc đổ danh sách
+  - >
+    BA "ok" XANH VÌ LÝ DO SAI trong `nhan-bat-buoc`: `"chủ đề".length` và
+    `"cả hai".length` đều là 6 ⇒ hai ca trùng slug, ca sau được **409 xung đột**
+    và tôi đọc con số ≥400 đó thành "luật đã nổ". Và PUT ba đoạn ⇒ **404 sai
+    chỗ**, không phải luật nổ. Đặt mã slug tường minh + đường PUT bốn đoạn
+  - >
+    `sv.dong?.()` — TÊN SAI, và `?.` làm nó im lặng không làm gì: mọi phép kiểm
+    xanh mà tiến trình TREO (exit 124). Tên đúng là `dung()`. `?.` trên một thứ
+    BẮT BUỘC biến lỗi thành im lặng
+  - >
+    `demNguon` trùng tên với một nghĩa KHÁC của chữ "nguồn" (`origin`: máy dựng /
+    bạn viết / nguồn ngoài) ⇒ `SyntaxError`. Hai khái niệm cùng tên trong một file
+    là đúng sự nhầm lẫn người dùng vừa chỉ ra, ở tầng biến số
+  - >
+    `nhanDu` chèn VÀO TRONG object literal `CONG` ⇒ `SyntaxError`, và nó chỉ lộ
+    khi server không dậy nổi (test báo "server không dậy sau 10s")
+  - >
+    ĐOẠN CHÚ THÍCH CỦA TÔI PHÁ CỔNG CŨ: 189 ký tự vượt trần 80 của
+    `chu-giao-dien`, lại dùng chữ nội bộ (`enum` · `schema` · `module`) — đúng thứ
+    FR-029 cấm. Bỏ hẳn đoạn đó: tooltip và nhãn đếm đã nói cùng một điều
+  - >
+    `man-danh-muc` ghim `=== 3` tab và `=== 2` panel đóng. Không bump số — đổi
+    sang BẤT BIẾN: mỗi tab đúng một panel, đúng một panel mở. Và thêm `t-nguon`
+    vào vòng audit màu, vì một tab không được liệt kê thì không được canh
+  - >
+    Escaping #29: `\\r\\n` qua heredoc thành xuống dòng THẬT hai lần, và một
+    `\\\\n` nữa làm `sv-tam2.mjs` lỗi cú pháp. Cách đi được: viết script bằng
+    Write, hoặc dựng ký tự bằng `chr()`/`String.fromCharCode`
+  - >
+    Mốc gõ LF trong script kiểm hai chiều khớp **0 lần** (`trang.mjs` là CRLF) nên
+    một ca kiểm bị BỎ QUA — và nó không kêu. Script nay lấy dấu dòng TỪ FILE
+
+sieet_khong_noi_tran:
+  - >
+    Thêm ô nhãn làm `gn.js` **102651 / 102400 — vượt 251 byte**. `page-weight` vẫn
+    nói "100 KB · ok" vì nó so KB làm tròn; cổng mới của tôi đo BYTE nên nó bắt
+  - >
+    SIẾT, không nới (tiền lệ `page-weight.test.js:85-89`): ba câu lỗi xuất hiện
+    5/3/3 lần được hợp về một khai báo, và câu nhắc nhãn thành một hàm khác nhau
+    đúng một chữ. Về 102253 — dư **147 byte**
+  - >
+    CÒN 147 BYTE là quá chật cho WO-017. Đường đã đo: mã nạp/form là **20941 byte
+    (23%)** của `gn.js` và `catNap()` đã cắt các view nạp khỏi 7/10 trang, nên nó
+    là tải chết ở phần lớn trang ⇒ TÁCH BUNDLE là đơn vị việc kế tiếp
+
+hau_qua_noi_ra:
+  - >
+    Cổng `congLoai` chấm cả ở PUT, nên một bản `tai-lieu`/`video` CŨ không nhãn sẽ
+    bị chặn KHI SỬA cho tới khi được gán nhãn. Kho thật hiện 1 bản (một bài viết)
+    nên tác động hôm nay bằng 0 — nhưng đây là thứ phải ghi, không phải thứ để
+    phát hiện sau
+  - >
+    Ba fixture (`route-theo-module` · `o-media-sua` · `nap-video`) gieo bản không
+    nhãn nên đỏ ngay khi luật vào. Đã thêm nhãn + `dungSchema(chuDe)` cho cả ba —
+    `CAT_FX` chỉ dùng được khi caller CŨNG dựng schema tạm
+
+do_do:
+  - cong: he-kinh.test.js
+    do_do_boi: >
+      KHÔNG phải tôi. `public/alexander-slattery-LI748t0BK8w-unsplash.jpg` 724662
+      byte (trần 500 KB), untracked, mtime 20:33 — SAU lần ghi cuối của tôi
+      (20:31), và tôi không chạm `public/`. Cổng tự nêu cách chữa:
+      `python core/tools/toi_uu_anh_nen.py`. Không tự chạy: đó là ảnh người dùng
+      vừa thêm
+  - cong: check_skill.py
+    do_do_boi: agent khác
+  - cong: check_danh_muc (bản schema thứ hai core/skill-src/)
+    do_do_boi: agent khác
+
+con_lai:
+  - "WO-017 — ba khung nạp riêng + nút nạp theo ngữ cảnh (cần TÁCH BUNDLE trước)"
+  - "spec ba module · wireframe màn mới · memory/decisions.md · FROZEN.lock chờ NGƯỜI ký"

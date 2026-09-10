@@ -1,0 +1,26 @@
+at: 2026-08-18T11:20Z
+agent: claude
+step: s5 / đóng bước — FROZEN v1
+did: >
+  Cập nhật toàn bộ artifact s5 cho khớp prototype app-v20.
+
+  tokens.css: viết lại, trích THẲNG từ app-v20 — 113 token. Đây là nguồn duy
+  nhất cho s6; tài liệu khác chỉ giải thích.
+
+  DESIGN.md: viết lại hoàn toàn. Bản cũ còn serif Fraunces và mô hình "tờ giấy
+  nổi". Bản mới ghi 10 mục: design read, màu (3 quyết định đo được), chữ (3
+  luật), chất liệu, bố cục, multi-window, ảnh nền, motion, biểu đồ, giới hạn.
+
+  wireframes/SCR-00-app-shell.md: MỚI. Ba wireframe cũ vẽ theo mô hình một tờ
+  giấy giữa màn hình — không có chỗ cho dashboard và multi-window. Đánh dấu
+  chúng là bản v1, nội dung từng khối vẫn đúng, khung chứa đã thay.
+
+  README.md: MỚI — bảng tra "cần gì đọc file nào", 4 hợp đồng cho s6, bảng kiểm
+  chứng bằng máy, và 7 lượt bị bác kèm điều học được.
+
+  project_map v2 → v3: thêm khối ui_frozen (9 file, đã kiểm tồn tại), screens
+  thêm SCR-00, thêm 2 gap mới (gap-quartz, gap-content).
+
+  decisions.md: 3 quyết định mới — tokens.css là nguồn duy nhất, phân cấp bằng
+  weight, prototype vanilla chưa port Quartz.
+object: 05_uiux/ + project_map.yaml v3

@@ -1,0 +1,36 @@
+{
+  "$comment": "LOẠI NGUỒN ↔ BẢNG chứa nó. Khai ở ĐÂY vì NĂM người cần: core/tools/xuat_kho.py (vòng lặp thư mục loại + reap mồ côi), core/tools/dung_lai_db.py (định tuyến INSERT theo tên thư mục), 05_intake/gate.py (đường nạp _inbox — đường ghi THỨ BA vào kho, nằm ngoài dungchung.mjs nên api-guard không thấy nó), web/api/dungchung.mjs (enum route + định tuyến ghi), và FE qua define __NHOM__. Trước FR-038 tập 7 giá trị này gõ tay ở BỐN nơi: kho.schema.sql:33-36 · xuat_kho.py:37 · dung_lai_db.py:42 · dungchung.mjs:50-51.",
+
+  "$comment_ddl": "core/assets/kho.schema.sql mang bản THỨ HAI dưới dạng CHECK — SQL không đọc được JSON nên không tránh được. Nó là bản CƯỠNG CHẾ, file này là bản TRA CỨU. core/tests/check_khai_mot_noi.py §3 so hai bản khớp nhau; lệch một giá trị là đỏ. frontmatter.schema.json (FROZEN) mang bản thứ ba dưới dạng enum, và cổng đọc TỪ ĐÓ làm chân lý thay vì gõ lại.",
+
+  "$comment_file": "PHẢI là file, KHÔNG phải một bảng trong DB. `dungchung.mjs:120-129 coFileBai()` và phép kiểm route `type` chạy KHI DB CHƯA TỒN TẠI — kho mới tinh là trạng thái hợp lệ (dungchung.mjs:133-136). Map trong DB thì kho mới tinh không định tuyến được.",
+
+  "$comment_rui_ro": "RỦI RO SỐ MỘT của cả FR-038 nằm ở chỗ file này khớp với VIEW `ban_ghi`: `xuat_kho.py:141-146` lặp `for loai in LOAI` rồi xoá mọi `.md` không có trong `can_co` (dựng từ ban_ghi). Nếu view thiếu một nhánh mà file này vẫn liệt loại đó ⇒ export coi MỌI `.md` của loại đó là mồ côi và XOÁ SẠCH — và `banXuat()` chạy tự động sau mỗi lần ghi (dungchung.mjs:358-374) nên nó xảy ra KHÔNG cần ai gõ lệnh gì. Cổng bắt buộc: mỗi loại INSERT vào bảng của nó phải XUẤT HIỆN trong ban_ghi.",
+
+  "module": [
+    {
+      "ten": "bai-viet",
+      "bang": "bai_viet",
+      "nhan": "Bài viết",
+      "ho_so": "phan-tich",
+      "$ho_so_la": "thân bài theo khung 5 mục — đủ cổng mục/dẫn nhập/tinh túy/locator",
+      "loai": ["repo", "paper", "article", "docs", "announcement"]
+    },
+    {
+      "ten": "tai-lieu",
+      "bang": "tai_lieu",
+      "nhan": "Tài liệu",
+      "ho_so": "thu-vien",
+      "$ho_so_la": "hiện vật + nhãn — miễn cổng khung, ÁP cổng nhãn 5/5b; đòi `media`",
+      "loai": ["tai-lieu"]
+    },
+    {
+      "ten": "video",
+      "bang": "video",
+      "nhan": "Video",
+      "ho_so": "thu-vien",
+      "$ho_so_la": "đăng ký URL — đòi `url_normalized`, KHÔNG byte vào kho",
+      "loai": ["video"]
+    }
+  ]
+}

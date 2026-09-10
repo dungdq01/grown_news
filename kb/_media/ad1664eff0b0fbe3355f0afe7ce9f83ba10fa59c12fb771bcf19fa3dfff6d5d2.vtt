@@ -1,0 +1,520 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:01.480
+Hermes Agent is one of the most powerful
+
+00:10:00.057 --> 00:10:01.487
+are in a file called skill.md.
+
+00:10:01.707 --> 00:10:09.947
+They have a Yamo front matter, which is basically just like a little front matter that that tells the agent, hey, this skill does this, so use it for X Y and Z.
+
+00:10:10.057 --> 00:10:19.347
+And that's basically a concept called progressive disclosure, which helps make sure that you're not loading full skills, full context bloat into a session if you don't actually need to use that skill.
+
+00:10:19.467 --> 00:10:22.847
+So Hermes will understand the use case for the skill.
+
+00:10:22.957 --> 00:10:28.570
+It will then invoke the skill and read it, and then it will ship that information into the session and then invoke the skill and do what you need.
+
+00:10:28.917 --> 00:10:37.767
+And what's cool about the Hermes agent is that if you're doing things frequently, if you forget, hey, let's build a skill out of this, it will analyze conversations, it will analyze your workflow, and it will turn things into skills.
+
+00:10:37.897 --> 00:10:41.527
+And then of course, as you use skills more and more, if you're giving feedback, it's going to update those skills as well.
+
+00:10:41.697 --> 00:10:46.127
+As you can see, these exdraw diagrams keep messing up right here, which is basically just the beginner nuance.
+
+00:10:46.407 --> 00:10:51.137
+So memory equals what to remember, skill equals how to do it again.
+
+00:10:51.527 --> 00:10:54.387
+Hermes can create or patch skills after real work.
+
+00:10:54.767 --> 00:10:55.727
+So super cool.
+
+00:10:56.407 --> 00:10:57.657
+And of course, there's a skills hub.
+
+00:10:57.927 --> 00:11:02.570
+So any skills you've already built can be used in Hermes, or you can go to the skills hub.
+
+00:11:02.570 --> 00:11:06.867
+And you can see that there's over 520 community skills.
+
+00:11:06.867 --> 00:11:08.307
+There's different categories.
+
+00:11:08.517 --> 00:11:13.807
+So you can definitely search through here to see what you can add to your Hermes to make it even more powerful.
+
+00:11:14.057 --> 00:11:20.997
+It looks like there's actually 16 right here that are anthropic um official skills.
+
+00:11:21.347 --> 00:11:23.157
+We have canvas design, front-end design.
+
+00:11:23.507 --> 00:11:25.347
+We have a skill creator skill.
+
+00:11:25.807 --> 00:11:28.627
+So you can pull all of these into your Hermes agent.
+
+00:11:28.947 --> 00:11:30.627
+Super, super easily.
+
+00:11:30.627 --> 00:11:34.337
+You just have to basically run this command or, you know, you could drop in this URL
+
+00:11:34.907 --> 00:11:37.437
+to your Hermes agent and say, hey, install this skill right now.
+
+00:11:37.667 --> 00:11:38.777
+All right, so that's pillar two.
+
+00:11:39.197 --> 00:11:40.997
+Pillar three is the soul.
+
+00:11:41.407 --> 00:11:45.777
+Now, Soul MD basically shapes the assistant.
+
+00:11:45.977 --> 00:11:48.977
+This shapes your Hermes agent.
+
+00:11:48.977 --> 00:11:53.687
+So that if you have six different Hermes agents, they all have basically a different vibe.
+
+00:11:54.007 --> 00:11:55.397
+Some can be concise, some can be rude.
+
+00:11:55.757 --> 00:11:58.847
+Some can be I don't know.
+
+00:11:58.847 --> 00:12:06.967
+But anyways, the soul that MD is another markdown file that gets put into the context of the agent.
+
+00:12:07.147 --> 00:12:09.577
+And now it's able to just have a bit of a personality.
+
+00:12:09.577 --> 00:12:16.197
+So if you're also letting other people interact with your Hermes, they will feel the personality if your Hermes is, you know, commenting on YouTube videos like mine.
+
+00:12:16.757 --> 00:12:18.387
+There will be some sort of personality.
+
+00:12:18.897 --> 00:12:21.677
+The one in my YouTube comments, I told it to be like very sarcastic, but not rude.
+
+00:12:21.877 --> 00:12:26.407
+And by the way, guys, it's not super, super important that you need to like know what a skill file looks like or know exactly what a markdown file looks like.
+
+00:12:26.607 --> 00:12:28.167
+But don't get intimidated.
+
+00:12:28.427 --> 00:12:29.877
+Here is a skill.
+
+00:12:30.317 --> 00:12:31.787
+So this is skill.md.
+
+00:12:32.017 --> 00:12:33.477
+This one's called generate image.
+
+00:12:33.867 --> 00:12:36.467
+So everything in between these two lines up here, that is the the Yamo front matter that I was talking about.
+
+00:12:36.777 --> 00:12:37.997
+This is what your agent reads.
+
+00:12:38.217 --> 00:12:41.467
+In order to understand, okay, should I use this skill or not?
+
+00:12:41.767 --> 00:12:45.737
+If it then decides, yes, I should use this skill, then it's going to read all of this other stuff,
+
+00:12:45.917 --> 00:12:48.127
+which is just markdown, and markdown just basically means that it's using like
+
+00:12:48.517 --> 00:12:53.847
+headers and bullets, and it's just a way for agents to read structure within a block of text.
+
+00:12:53.847 --> 00:12:55.057
+Like this means bold.
+
+00:12:55.487 --> 00:12:58.687
+Anyways, that's what a markdown file is, and that's what a skill file looks like.
+
+00:12:58.917 --> 00:13:02.257
+So a soul file would look like that, but there wouldn't be that Yamo front matter.
+
+00:13:02.527 --> 00:13:08.197
+But as you might have guessed, the soul file will also evolve over time based on the feedback that you're giving your Hermes.
+
+00:13:08.767 --> 00:13:10.247
+So what is pillar number four?
+
+00:13:10.547 --> 00:13:16.407
+This is where it gets super cool, and this is one of the main value props for me over something like cloud code,
+
+00:13:16.887 --> 00:13:22.947
+is the fact that I can just say, hey, spin up a cron job to do this at this time, and it just does it.
+
+00:13:23.027 --> 00:13:26.587
+Cloud code obviously you have your routines, you have your loops, but that usually requires you to leave some sort of infrastructure on.
+
+00:13:26.967 --> 00:13:30.867
+Unless you're using like that that new cloud routine, but you're only limited to 15 of those, at least on the the Max plan,
+
+00:13:31.237 --> 00:13:32.567
+15 of those a day.
+
+00:13:32.837 --> 00:13:37.417
+So once again, Hermes doesn't replace cloud code for me, but it's kind of my on-the-go
+
+00:13:37.417 --> 00:13:40.157
+spin-up things really quick, and that's why I love it.
+
+00:13:40.157 --> 00:13:44.227
+So cron's turn on Hermes from reactive into a proactive scheduled automation.
+
+00:13:44.587 --> 00:13:46.547
+And you're still getting that full agentic loop if you want it.
+
+00:13:46.797 --> 00:13:52.007
+So you could say in natural language, hey, every morning at 6:00 a.m., I want you to do X, Y, and Z.
+
+00:13:52.327 --> 00:13:56.427
+It will go ahead and use a skill and use its tools to create that cron job.
+
+00:13:56.657 --> 00:14:02.497
+And then when that time hits, it will basically invoke like a fresh isolated session.
+
+00:14:02.747 --> 00:14:05.507
+It doesn't inherit any of the context that you're currently, you know, having that conversation about.
+
+00:14:05.897 --> 00:14:07.967
+And then it will just run that skill.
+
+00:14:08.177 --> 00:14:12.007
+After that happens, it will send that result back to the original chat, and it will
+
+00:14:12.487 --> 00:14:17.657
+maybe update any local files or do whatever it needs to do based on the skill requirements.
+
+00:14:17.947 --> 00:14:24.447
+So some useful pieces of advice down here, context_from is to pass one job output into another.
+
+00:14:24.847 --> 00:14:31.327
+Workdir is, you know, work directory, and it runs tools from a project folder.
+
+00:14:31.697 --> 00:14:36.547
+And then you can do this flag for no agent, which is just a script, so hey, I just want you to run this python script.
+
+00:14:36.907 --> 00:14:40.447
+I don't want the agentic harness loop inside of that.
+
+00:14:40.447 --> 00:14:41.997
+I just want the script to be ran.
+
+00:14:42.167 --> 00:14:45.807
+So if you think back to the WAT framework, workflow, agent, tools,
+
+00:14:45.957 --> 00:14:49.477
+you'd basically just be deploying the workflow on something like modal, you're not deploying the agent as well.
+
+00:14:49.757 --> 00:14:53.457
+So safety nuance, cron sessions cannot recursively create more cron jobs.
+
+00:14:53.857 --> 00:14:55.667
+So the prompts need to be self-contained.
+
+00:14:55.967 --> 00:15:02.507
+And if any of this is starting to feel a little bit overwhelming, I just want you to understand this terminology so that when we hop into the setup and the onboarding,
+
+00:15:02.737 --> 00:15:03.967
+it all clicks a little bit better.
+
+00:15:04.537 --> 00:15:05.577
+So just stick with me.
+
+00:15:05.747 --> 00:15:12.817
+All right, and then the last pillar here is the self-improving loop Hermes improves when useful experience gets persisted as memory, skills, and searchable history.
+
+00:15:13.257 --> 00:15:17.067
+So if you think about the loop like this, you do the work, the agent learns,
+
+00:15:17.477 --> 00:15:21.787
+you save things to memory or to agents.md or to, you know, user.md.
+
+00:15:22.097 --> 00:15:26.657
+And then you turn those repeatable steps into skills or your preferences into more memory.
+
+00:15:26.977 --> 00:15:31.327
+And then, the agent's able to search past sessions when old context matters.
+
+00:15:31.577 --> 00:15:34.347
+And then you basically just go in that loop over and over.
+
+00:15:34.507 --> 00:15:38.407
+So the more you use your Hermes agent, the better it's going to get and the more it's going to understand you.
+
+00:15:38.657 --> 00:15:44.477
+So the nuance here is that automatic does not mean magic. The loop works best when the user corrects Hermes,
+
+00:15:44.897 --> 00:15:50.237
+asks it to save things to memory, and lets it create and update skills after you've done some complex work.
+
+00:15:50.457 --> 00:15:56.547
+And there is one more kind of honorable mention, which is the context file, so agents.md.
+
+00:15:56.967 --> 00:16:01.647
+If you're using codex, you know what that is, if you're using cloud code, this is the cloud.md,
+
+00:16:02.017 --> 00:16:07.657
+which is kind of just like the overall project goal, kind of like the structure of the project.
+
+00:16:07.657 --> 00:16:14.067
+So this is something that you're more so going to use if you're like coding in different projects with Hermes.
+
+00:16:14.397 --> 00:16:17.937
+And I would say more so if you're in like the terminal using Hermes.
+
+00:16:18.187 --> 00:16:21.717
+In today's video, I'm not going to focus too hard on the terminal, I am going to talk about the difference between using it in the terminal or using it through Telegram or whatever other channel you use.
+
+00:16:22.167 --> 00:16:26.137
+But this is not going to be a deep dive on Hermes in the terminal because once again, any terminal style work that I'd be doing, I would just be doing that in cloud code.
+
+00:16:26.727 --> 00:16:28.587
+That's the way that my workflow currently exists.
+
+00:16:28.947 --> 00:16:33.997
+But anyways, this honestly works pretty similar to the way like the memory or the soul file works,
+
+00:16:34.137 --> 00:16:36.117
+but those are all global, and this one's more of like a local project.
+
+00:16:36.537 --> 00:16:40.127
+This is what we're working on in this contained environment.
+
+00:16:40.417 --> 00:16:43.497
+So anyways, hopefully, you guys aren't too bored yet.
+
+00:16:43.747 --> 00:16:47.417
+Let's actually go ahead and get your guys's hands on.
+
+00:16:47.697 --> 00:16:52.357
+I am going to say before we jump into this, all of this video, I'm going to have broken down into a resource guide,
+
+00:20:00.050 --> 00:20:01.770
+in the actual
+
+00:20:01.830 --> 00:20:03.790
+different docker containers.
+
+00:20:03.870 --> 00:20:10.610
+So for the sake of the video, I'm going to be doing the docker container approach because it's just a one click install and it's much simpler, but even the root VPS is very, very simple.
+
+00:20:10.990 --> 00:20:19.330
+Now, here is something that I am very, very strong on that some people might disagree with me and think that it's over engineering, but I think it's like, why would you not do this?
+
+00:20:19.830 --> 00:20:24.630
+For all of my VPS agents, I have created a my own cloud code project to help me manage them.
+
+00:20:24.970 --> 00:20:27.630
+So right here you can see this is called Up it agents.
+
+00:20:27.810 --> 00:20:34.050
+If I click on VPS agents, you can see that I have my bull, which is my trading bot, I have my main Hermes, I have my Up it OS and I have Klaus, which was like my main personal assistant.
+
+00:20:34.410 --> 00:20:43.070
+And so for each of these, I can see my passwords and my environment variables and I can see, you know, like what's the IP address of this VPS and how do we have this set up in the docker or at the root?
+
+00:20:43.190 --> 00:20:50.810
+And it has information about security and integration. And basically now, I have one clean place to manage all of my different agents because I've got a lot of different VPS's running.
+
+00:20:59.950 --> 00:21:03.950
+And I'm actually going to do this live with you guys here to show you what I mean.
+
+00:21:03.950 --> 00:21:05.570
+So, all right.
+
+00:21:05.670 --> 00:21:11.390
+We are going to go ahead and set up a new VPS and we're going to do a new Hermes agent.
+
+00:21:11.690 --> 00:21:16.510
+So in the VPS_ agents folder, create a new sub folder called YouTube Hermes.
+
+00:21:16.710 --> 00:21:23.330
+And then we're going to go ahead and set up like, you know, like the passwords and the configuration and stuff just so that you can help me make sure we maintain this project well.
+
+00:21:23.670 --> 00:21:30.750
+Now, the reason I like to do this is because do you think that I like understanding VPS's and terminal commands and CLIs? Not at all.
+
+00:21:30.870 --> 00:21:31.950
+And I'm not very good at it.
+
+00:21:31.950 --> 00:21:33.370
+So who's better at that than me?
+
+00:21:33.750 --> 00:21:35.330
+Hermes agent and Cloud Code.
+
+00:21:36.670 --> 00:21:40.850
+And sometimes if you're running random commands and you don't know what you're doing, your Hermes agent might like shut down.
+
+00:21:41.190 --> 00:21:45.150
+And now I have Cloud Code to help me boot it back up if I need to.
+
+00:21:45.150 --> 00:21:51.970
+And this may sound scary and overwhelming, but trust me, it is so, so simple. This is just a good best practice to keep yourself organized.
+
+00:21:52.190 --> 00:21:58.890
+Okay, so switching back over to our hostinger dashboard, you can now see that we have our VPS ready.
+
+00:21:58.990 --> 00:22:01.210
+So if I click on manage VPS,
+
+00:22:01.570 --> 00:22:03.150
+this opens up our main dashboard.
+
+00:22:03.750 --> 00:22:05.790
+A couple of things to look at.
+
+00:30:00.000 --> 00:30:01.760
+What you'll notice right now is that it's not working.
+
+00:30:01.760 --> 00:30:02.540
+There's no typing.
+
+00:30:03.020 --> 00:30:06.840
+So what I'm going to do is go back into our Hermes right here and say, "Hey,
+
+00:30:06.840 --> 00:30:12.320
+for some reason the Telegram connection doesn't seem to be working.
+
+00:30:12.320 --> 00:30:16.580
+I just shot the message off and said hello and I'm not getting anything back."
+
+00:30:16.580 --> 00:30:18.000
+And look at that, it's already invoking
+
+00:30:18.000 --> 00:30:21.000
+a Hermes agent skilled to understand what's going on.
+
+00:40:00.000 --> 00:40:01.440
+And now that should be set.
+
+00:40:01.440 --> 00:40:09.470
+I'm going to go back into Hermes and say, Awesome, the new GitHub token that you see in that.env file should be the updated one.
+
+00:40:09.470 --> 00:40:12.630
+So go ahead and create that private repo for us now.
+
+00:40:12.630 --> 00:40:17.650
+And what you see here is even in Telegram, it can ask you for access to things or permissions.
+
+00:40:17.820 --> 00:40:19.970
+So you can allow it once, you can allow it for the session,
+
+00:40:19.970 --> 00:40:21.650
+or you can always allow something.
+
+00:40:21.650 --> 00:40:29.830
+So in this case, when it is creating a repo or it's going to be like committing to a repo, I'm just going to go ahead and do always allow.
+
+00:40:30.140 --> 00:40:32.760
+So that in our skill we're about to set up, where it does a daily sync,
+
+00:40:33.190 --> 00:40:34.620
+it just does it with no problem.
+
+00:40:34.620 --> 00:40:36.170
+Okay, so that has been created.
+
+00:40:36.170 --> 00:40:38.350
+It gave us a link, if I click on this,
+
+00:40:38.350 --> 00:40:41.560
+it should pull up a private repo right here.
+
+00:40:41.560 --> 00:40:43.830
+You can see this is Hermes's personal AI assistant, it's private.
+
+00:40:44.110 --> 00:40:48.060
+And here are all the files that it already pushed into what we're doing in this project.
+
+00:40:48.060 --> 00:40:49.910
+So if you wanted to dig in, you could take a look at what is here.
+
+00:40:49.910 --> 00:40:52.020
+Now that that's created, let's go ahead and make a skill.
+
+00:40:52.880 --> 00:40:58.260
+Awesome. So I'm going to be using you a lot and you're going to be creating different skills and different memories about me and stuff like that.
+
+00:40:58.640 --> 00:41:02.770
+So what we need to do is set up our first cron job, and I want you to build a skill around this.
+
+00:41:03.260 --> 00:41:10.360
+Basically, every single night at 12:00 a.m., so midnight central time, I want you to push changes
+
+00:41:10.970 --> 00:41:13.000
+to this GitHub repo.
+
+00:41:13.000 --> 00:41:16.540
+This is going to be kind of our, you know, our source of truth.
+
+00:41:16.840 --> 00:41:18.580
+So if you have any questions about that, please ask.
+
+00:41:18.890 --> 00:41:22.260
+But otherwise just go ahead and set up the skill and set up the cron.
+
+00:41:23.900 --> 00:41:26.850
+And it's really just as simple as that in natural language, you say, hey,
+
+00:41:26.850 --> 00:41:28.660
+every night at 12:00 a.m.
+
+00:41:28.940 --> 00:41:35.770
+or you can even do things like what I do for my YouTube videos is I I drop a video and then I give it the link to that YouTube video.
+
+00:41:35.770 --> 00:41:45.770
+And I say, hey, for the next 12 hours, run a cron every 10 minutes to go check on comments and respond to them.
+
+00:41:46.330 --> 00:41:51.410
+So you can set up basically the same way that like the slash loop works in Claude code.
+
+00:41:51.410 --> 00:41:56.590
+You can say, hey, for the next 24 hours, just do this every 5 minutes.
+
+00:41:56.590 --> 00:41:59.550
+And then once 24 hours has passed, go ahead and kill that cron.
+
+00:50:00.000 --> 00:50:01.760
+Sync, build, research, automate.
+
+00:50:01.760 --> 00:50:05.400
+Nate, I'm your action engine.
+
+00:50:05.400 --> 00:50:08.040
+So for a 5 second video, not too bad.
+
+00:50:08.040 --> 00:50:10.220
+I turned messy goals into finished actions.
+
+00:50:10.600 --> 00:50:12.280
+Yes, you absolutely do, Hermes.
+
+00:50:12.280 --> 00:50:15.680
+And I didn't even give this poor thing a name yet.
+
+00:50:15.680 --> 00:50:17.520
+So from here, I'm going to start building up the soul.
+
+00:50:21.400 --> 00:50:22.920
+And that's exactly what you guys should be doing now.

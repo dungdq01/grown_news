@@ -1,0 +1,137 @@
+id: WL-01K9N1FR036A4
+at: 2026-08-27
+by: claude
+buoc: s8 — FR-036 A4 (trạm m-fe + m-test), sau A1/A2/A3
+loai: refactor hợp đồng hình dạng thân bài — đường PATCH đủ 10 bước của /factory:go
+fr: FR-036-khung-than-bai-5-muc.md
+
+object:
+  task_khai_truoc_code:
+    - 07_plan/M01_core/tasks/T01-6-khung-khai-mot-noi.md      # CODE khung
+    - 07_plan/M01_core/tasks/T01-7-test-khung-khai.md         # TEST khung (R1)
+    - 07_plan/M03_web/tasks/T03-9-khung-8-o.md                # CODE FE
+    - 07_plan/M03_web/tasks/T03-10-test-khung-8-o.md          # TEST FE (R1)
+  s5_wireframe:
+    - 05_uiux/wireframes/SCR-05-form-viet-bai.md
+    - .factory/fr/FR-020-form-viet-bai.md                     # dấu bị thay thế
+    - .factory/fr/FR-036-khung-than-bai-5-muc.md
+  fe_code:
+    - web/build-fe.mjs
+    - web/plugins/multiwindow/src/scripts/multiwindow.inline.ts
+    - web/render/shell.html
+    - web/plugins/home-pages/shell.html
+    - web/styles/prototype.css
+  test:
+    - web/test/four-screens.test.js
+    - web/test/cua-so-doc.test.js
+    - web/test/khung-8-o.test.js                              # MỚI
+
+# ══ CỔNG BẮT TÔI BA LẦN TRONG MỘT LƯỢT, VÀ CẢ BA ĐỀU ĐÚNG ══════════════════
+# Phần đáng ghi nhất của entry này: tôi định sửa một file ngoài phạm vi, và
+# `check_g6b` chặn được — không phải bằng kỷ luật của tôi.
+g6b_chan:
+  lan_1:
+    bat: "T03-9: thiếu phạm_vi_ghi"
+    that_su_la: >
+      Tôi để comment dấu thăng ngay SAU khoá `phạm_vi_ghi:` và trước item đầu.
+      Cổng parse block tới dòng không-phải-list nên thấy block rỗng. Chú thích
+      trong file hợp đồng phải nằm NGOÀI block nó nói về.
+  lan_2:
+    bat: "T03-9: ghi core/assets/khung-than-bai.json ngoài boundary M03_web"
+    that_su_la: >
+      Dựng form mới lộ ra `nang: true` đang đặt ở §3 (mục cha) trong khung khai,
+      còn SCR-05 chốt mục nặng là §3.2 và §3.4. Tôi NỚI phạm_vi_ghi của T03-9 để
+      sửa — đó là "nới tại chỗ", đúng thứ /factory:go cấm. File khai khung thuộc
+      M01_core (be = core/**), không phải M03_web.
+    lam_gi: "tách T01-6; T03-9 phụ_thuộc T01-6"
+  lan_3:
+    bat: "T01-6: chạm file test mà không phải đơn vị test (R1)"
+    that_su_la: "Tôi gộp fixture + hai cổng canh vào cùng task với code."
+    lam_gi: "tách T01-7"
+  ket: "G6B đóng — 5 điều kiện đạt trên 30 task"
+
+# ══ BƯỚC 5 (test đỏ trước) THOẢ SẴN, không phải bỏ qua ═════════════════════
+test_do_truoc: >
+  `check_khung.py` — cmd của AC1 trong T03-9 — ĐANG ĐỎ 6 chỗ trước khi viết một
+  dòng FE nào (hai shell còn "9 ô" / "nạp khung 9 mục" / id f-muc9). Sau A4b nó
+  xanh và in "khung 5 mục: khai báo · 2 file mẫu · 2 shell cùng nói một khung".
+
+quyet_dinh:
+  form_8_o_khong_5:
+    vi_sao: >
+      SCR-05:11 khai nguyên tắc "mỗi ràng buộc của cổng phải có một ô nhập tương
+      ứng", và :83 nêu lỗi phải chữa: "một textarea buộc người viết tự nhớ tên
+      mục + cú pháp". Cổng mới đòi 8 mục LÁ. Plan đầu tôi ghi 5 ô — tức §3 là
+      một ô lớn và người viết tự gõ các tiêu đề mục con đúng chính tả, dựng lại
+      đúng lỗi SCR-05 sinh ra để chữa, chỉ lùi một cấp tiêu đề.
+    nguoi_dung_chot: "8 ô — một ô cho mỗi mục LÁ"
+  id_bo_so: >
+    f-muc9 thành f-o-muc. Một id mang số là một tập gõ tay nữa: lần đổi khung
+    sau lại phải rename ở shell + CSS + test. Cổng đếm số ô DẪN XUẤT từ len(LA).
+  lot_comment_truoc_khi_nhung: >
+    build-fe.mjs lột mọi khoá dạng $comment khỏi JSON trước khi define.
+    Đo: 2913 -> 1456 byte (giảm 50%). Lý do: page-weight cho gn.js trần 100 KB,
+    và trang lớn nhất mock/nap/ 66 KB trên trần 74 — chỉ ~8 KB dư. Sau khi
+    nhúng: gn.js 84 KB. Bình luận là để NGƯỜI đọc file khai.
+  throw_khong_canh_bao: >
+    Thiếu khung-than-bai.json thì build-fe.mjs THROW. Cảnh báo rồi đi tiếp nghĩa
+    là __KHUNG__ thành undefined lúc chạy, form dựng 0 ô, và không cổng nào đỏ.
+  tinh_tuy_h3_h4: >
+    Mục tinh túy tụt từ cấp h2 xuống h3, item từ h3 xuống h4. Vòng quét phải
+    DỪNG ở H3 LẪN H2 — mục tinh túy là mục con CUỐI của §3, nên ranh giới trước
+    nó là §3.3 và sau nó là §4. Chỉ chặn H2 thì mọi h4 sau nó cũng thành tinh túy.
+  hai_khe_state: >
+    Người dùng chốt sửa luôn. Nút gửi nhận disabled + aria-busy trong lúc POST
+    (đo được: Ctrl+Enter hai lần bắn HAI POST, bài thứ hai trả 409 "đã có bài
+    cùng tên" — một lỗi cho một việc người dùng tưởng mình làm một lần). Ô kết
+    quả nhận role=status + aria-live=polite. Mở lại nút trong finally, không
+    cuối hàm: mọi nhánh return sớm (422/412/mạng đứt) đều phải mở lại — nút khoá
+    vĩnh viễn tệ hơn một POST trùng.
+
+rang_mat_rang:
+  o_dau: web/test/four-screens.test.js
+  van_de: >
+    Bản cũ khẳng định "bundle KHÔNG chứa `## 1. B`" — chặn chuỗi "## 1. Bối
+    cảnh", tên mục 1 của khung 9 mục. FR-036 đổi mục 1 thành "Overview", nên
+    điều kiện thành HIỂN NHIÊN ĐÚNG: cổng vẫn xanh nhưng thôi kiểm gì cả. Không
+    ai thấy, vì mất răng không làm ai đỏ.
+  ban_moi: "mốc dẫn xuất từ khung — đổi khung thì mốc đổi theo"
+
+# ══ SÁU LẦN TẦNG ESCAPING CẮN TÔI TRONG MỘT LƯỢT ═══════════════════════════
+# Ghi lại vì đây là lớp lỗi tôi đã viết thành luật ở FR-033 §6 rồi vẫn vi phạm.
+escaping:
+  ca_1: "regex xuống dòng qua heredoc thành CR thật + newline thật, phá regex qua HAI dòng ⇒ esbuild 'Unterminated regular expression'"
+  ca_2: "vá tay lần một: mất một dấu ngoặc và xoá mất một dòng else — tự làm hỏng thêm"
+  ca_3: "search string dùng LF không khớp file CRLF ⇒ AssertionError; phải đọc/ghi text mode"
+  ca_4: "escape unicode trong regex JS viết qua heredoc thành MỘT backslash ⇒ regex khớp chữ u, giải escape không chạy, và nó ĐỎ OAN cho code đúng"
+  ca_5: "escape unicode trong chuỗi Python -> SyntaxError truncated escape"
+  ca_6: "esbuild escape chữ có dấu thành CẢ hai dạng (u và x); giải một dạng vẫn đỏ oan dạng kia"
+  ca_7: "heredoc vỡ khi nội dung mang dấu nháy — phải dùng Write, không dùng shell"
+  luat_da_biet_ma_van_vi_pham: >
+    Không viết regex chứa escape ký tự qua bash heredoc. Dùng Edit/Write (không
+    tầng escaping), hoặc dựng backslash bằng chr(92).
+  lop_loi_thu_hai: >
+    Ba dấu thăng là CHUỖI CON của bốn dấu thăng, nên phép kiểm "bundle không
+    chứa ba dấu thăng" luôn đỏ oan khi code đúng. Neo bằng ký tự mở chuỗi.
+
+do_duoc:
+  T03_9_AC1: "check_khung.py XANH"
+  T03_9_AC2: "markup-matches-css · luong-nap-bai · chu-giao-dien · page-weight · cac-man-con-lai đều xanh"
+  T03_10: "four-screens · cua-so-doc · khung-8-o đều xanh"
+  npm_test: "exit 0 · 46 file, chạy riêng từng file 0 đỏ"
+  page_weight: "gn.js 84 KB / trần 100 · gn.css 90 KB / trần 100"
+  pytest: "34 passed"
+  cong_python: >
+    12/14. Một đỏ là ĐƠN VỊ SAU: check_running (validate.py kb/ — hermes-agent
+    còn thân 9 mục, A5 di trú). check_worklog đã trả trong entry này (3 số liệu
+    + tài liệu cho test mới).
+
+khong_lam:
+  - "KHÔNG chạm web/test/** trong T03-9 (R1) — hai file test đỏ vì khẳng định FE CŨ, chúng thuộc T03-10"
+  - "KHÔNG sửa nguyên tắc SCR-05 (một ràng buộc một ô · chế độ thô là đường thoát) — đó là hợp đồng, chỉ con số đổi"
+  - "KHÔNG ký lại FROZEN.lock: A4 không chạm file frozen nào; phần frozen (M01/M03 spec) ở A6"
+  - "không commit, không push"
+
+con_lai: >
+  A5 (di trú hermes-agent) · A6 (tài liệu + FROZEN + 5 bản sao khung trong
+  ~/.claude/skills/source-distiller/, gồm bản validator thứ tư đã lạc hậu)

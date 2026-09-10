@@ -1,0 +1,174 @@
+id: WL-01K9X4FR048
+at: 2026-09-02
+by: claude
+buoc: "FR-048 + s6 cho M18_nguoidung (9 artifact) + giu cho M19_baihoc; project_map v25->v26"
+loai: s6 module moi; chay PHEP THU cua s6 tren 18 AC
+gate: G6A du 9 artifact cho M18; CHUA KY — nguoi ky
+
+object:
+  - .factory/fr/FR-048-chu-cho-tai-khoan-va-cho-cho-bai-hoc.md   # CHO DUYET
+  - 06_modules/M18_nguoidung/spec.md
+  - 06_modules/M18_nguoidung/rules.md
+  - 06_modules/M18_nguoidung/diagram_flow.md
+  - 06_modules/M18_nguoidung/data_flow.md
+  - 06_modules/M18_nguoidung/ui_flow.md
+  - 06_modules/M18_nguoidung/model_flow.md
+  - 06_modules/M18_nguoidung/testcases.md
+  - 06_modules/M18_nguoidung/workflow.md
+  - 06_modules/M18_nguoidung/backlog.md
+  - project_map.yaml                  # v25->v26: +M18 module, +6 entity
+  - 03_docs/spec_overview.md          # 2 dong bang module + 2 dong truy nguoc
+  - 04_system/adr.md                  # ADR-06 bang chu: sua 2 dong
+  - 06_modules/M03_web/backlog.md     # +1 o keo theo (bon so SCR dung nhau)
+
+evidence:
+  - "check_g6a · check_ba · check_rule_surfaces · check_map · check_mermaid · check_worklog => xanh"
+  - "pytest core/tests -q => 42 passed"
+  - "check_g6a: M18_nguoidung 6/6 artifact · 4 rule · AC 15 hard/3 soft"
+  - "project_map parse OK, 18 module, 10 entity (truoc: 17 module, 5 entity)"
+  - "grep 'entities|owner' core/tests/check_map.py => 0 dong (do truc tiep)"
+
+# ══ CAU HOI CUA CHU DU AN ══════════════════════════════════════════════
+cau_hoi: >
+  "co ve chung ta dang thieu module quan ly nguoi dung hay bai giang - khoa hoc
+  nhi ... la module moi hay o module nao" + "khi them 2 module nay thi co can
+  bat dau tu factory S1 de bo sung them khong? hay chi S6 la du"
+
+# ══ PHAT HIEN CHINH — BON BANG TAI KHOAN KHONG CO CHU ═════════════════
+lo_da_do: >
+  project_map.entities co dung NAM entity: Analysis, Concept, Category,
+  SkillDraft, F0_toan_canh. Bon bang tai khoan KHONG nam trong do — chung chi
+  ton tai duoi dang MOT KHOI COMMENT o project_map.yaml:83-90, va khoi do nam
+  trong phan cua M17_cong, tuc module ma data_flow cua chinh no khai
+  "M17 khong so huu mot entity nao".
+
+  NGUYEN NHAN: FR-045 viet "bon bang, LOI so huu". LOI la mot VUNG TIN CAY,
+  khong phai mot module. entities.*.owner can mot MODULE vi owner la thu
+  pham_vi_ghi cua task neo vao.
+
+  VI SAO KHONG CONG NAO BAO: check_map.py KHONG DOC khoa entities mot lan nao
+  (grep => 0 dong). No chi doi chieu modules <-> thu muc 06_modules/, hai chieu.
+  Mot entity khong chu KHONG PHAI thu bo cong biet nhin.
+  => Day la LO TRONG BO CONG, khong phai mot lan ai do quen.
+
+hau_qua_thuc: >
+  No chan FR-047 NGAY HOM NAY. FR-047 mo bay cua thao tac tren bon bang khong
+  co chu. Chia task bay gio thi moi task khai pham_vi_ghi: web/api/** — KHONG
+  PHAN BIET DUOC voi CRUD bai viet. scope-check khong thay hai task tranh nhau
+  vi tren giay chung cung mot pham vi; check_g6b khong co module de neo.
+  R1 do o MUC NHANH nen hai concern trong mot boundary la R1 mat dia chi.
+  WL-01K9X2S6DONG da ghi "FR-047 chan ba module (M12 M15 M17)". Nay do nguoc:
+  thieu chu chan FR-047.
+
+# ══ TOI TU SUA HAI LOI CUA CHINH MINH ════════════════════════════════
+loi_1_ADR06_tu_gan_chu: >
+  ADR-06 (viet cung phien, luot truoc) co mot bang ghi chu bon bang la M08_api.
+  TOI TU GAN, trong mot ADR, cho entity chua co trong project_map. M08_api khai
+  purpose "ban bien tap local — CRUD BAI VIET qua HTTP". Tai khoan khong nam
+  trong cau do. M08 la noi THI HANH (DDL + bay cua), khong phai CHU.
+  Da sua ADR-06 + them mot khoi noi ro vi sao phan biet nay quan trong.
+
+loi_2_lap_lai_dung_loi_do_20_phut_sau: >
+  Khi sua ADR-06 toi doi dong nhap_chung_cat tu M08_api sang M12_chungcat —
+  VA LAI TU GAN, vi NhapChungCat cung KHONG co trong project_map.entities.
+  FR-046 cung khong gan chu cho no. Tuc la toi vua phe binh mot loi xong thi
+  lap lai no trong cung mot luot chinh sua.
+  => Da them entity NhapChungCat (owner M12_chungcat, vi M12 SINH va SUA no —
+  AC-5.4/5.5 checkpoint + lan_gui) TRUOC khi de cau do dung trong ADR.
+  Va da thu hep M18 AC-5.1 tu BA bang ve HAI bang cua M18: bang thu ba thuoc
+  M12, cung chinh sach nhung khac chu, nen M18 KHONG khai ho.
+  Ghi ra vi day la mot lop loi lap lai: khi sua mot con tro, rat de tao mot con
+  tro moi cung kieu ma khong kiem lai.
+
+# ══ PHEP THU CUA s6 — 18 AC, 3 PHAI SUA ══════════════════════════════
+phep_thu: >
+  15/18 viet duoc testcase ngay. 3 khong: AC-3.1, AC-4.1, AC-6.1.
+  CA BA ROI VAO MOT LOP: phep do SU VANG MAT cua mot chuoi trong ma nguon —
+  dung lop loi B8b da tra gia mot lan (kiem "khong chua hang so X" XANH OAN
+  ngay khi X di qua mot bien).
+    AC-3.1 cu "khong tim thay allowlist"  -> moi DEM cho INSERT = 1
+    AC-4.1 cu "M14 khong nhac ten bang"   -> moi KHA NANG, tien trinh M14 khong
+           co duong toi file .db (env / argv / thu vien)
+    AC-6.1 cu "khong co if (vai === ...)" -> moi HANH VI, hai vai khac nhau cung
+           thao tac ghi => cung ket qua
+  Ba phep do moi deu do thu CO MAT: mot con so dem duoc, mot kha nang co/khong,
+  mot cap ket qua so duoc voi nhau.
+
+ti_le_cao_gap_doi_luot_truoc_va_ly_do_doc_duoc: >
+  M12-M17: 11/123 = 9%. M18: 3/18 = 17%.
+  Ly do: M18 co nhieu AC dang CAM hon bat ky module nao khac (mot-cho-ghi,
+  khong-co-duong, khong-dung-lam-cong), va AC CAM la loai de viet thanh phep do
+  vang mat nhat.
+  BAI HOC DUNG DUOC: moi khi mot AC bat dau bang "KHONG", hoi ngay "toi se do
+  cai CO MAT nao de chung minh cai khong-co-mat nay?". Khong tra loi duoc =>
+  AC con mo ho, du cau chu nghe rat ro.
+
+# ══ TRA LOI CAU HOI s1-hay-s6 ════════════════════════════════════════
+M18_s6_la_du: >
+  prd.md:8 da khai "MOT chu du an + 5 tai khoan doc" (sua 2026-09-01, FR-045).
+  FR-045 DA DUYET. FROZEN.lock KHONG chua project_map.yaml, khong chua 03_docs.
+  TIEN LE QUYET DINH: M17_cong CUNG KHONG QUA s1-s5 — no khong co muc
+  "## M17_cong" nao trong spec_overview, chi BA DONG BANG (:429 :580 :609).
+  No sinh tu FR-045 roi di thang s6, va G6A cua no da xanh.
+  => M18 la GIAY TO DUOI THEO mot FR da duyet, khong phai pham vi moi.
+
+M19_s6_CHUA_du_nhung_cung_KHONG_can_s1: >
+  s1 DA PHU: research_summary §3.1 nguyen ly ① "pham vi truy hoi la control
+  HIEN THI" — dung y niem notebook. NotebookLM la 1 trong 4 ban khao da chung.
+  s2 CHUA: proposal dot hai KHONG co scope-in nao ten "gom nhom".
+  s3 CHUA: prd.md khong co "bai hoc".
+  Luat rieng s2: "Proposal duyet xong = pham vi tho CHOT. Doi => FR, khong am
+  tham phinh o s3."
+  => Duong dung khi upgrade 2 khoi dong: FR mo rong pham vi -> proposal + PRD
+  -> s6. KHONG quay ve s1.
+  FR-048 chi GIU CHO: entity BaiHoc, owner M19_baihoc, status planned, KHONG co
+  thu muc 06_modules/M19_baihoc/. Da de mot dong HO (danh dau ❌) trong bang
+  truy nguoc scope-in cua spec_overview — de no khong lang le tro thanh hop le.
+
+vi_sao_giu_cho_NGAY_thay_vi_doi: >
+  M14_chatbot AC-8.4 (da viet, G6A xanh) hua "dung MOT ham giai bot -> tap
+  doc_id". Hom nay KHONG CO BANG NAO dung sau loi hua do. AC-8.1 nhan bot hoac
+  nguon[]; AC-8.5 CAM nhan tap nguon tu caller => server PHAI giai duoc bot
+  thanh mot tap, bang cai gi thi M14 khong noi vi khong co gi de noi.
+  BaiHoc chinh la cai bang do. Khong khai hinh dang thi ba module (M13 M14 M03)
+  moi ben tu nghi ra mot hinh dang, va hop nhat ve sau dat hon nhieu.
+
+vi_sao_M19_KHONG_o_M12: >
+  M12 chung MOT nguon thanh MOT nhap (1->1). Bai hoc la nhieu-nhieu CO THU TU
+  giua ba bang da co. Va no khac concepts/category o mot diem DO DUOC: THU TU
+  KHONG SUY RA DUOC — concepts la mot TAP, bai hoc la mot DANH SACH. Khong phep
+  tinh nao lay concepts ra thu tu bai 1 -> bai 2 -> bai 3.
+  => chieu phan loai THU TU, khong phai mot cach nhin cua ba chieu da co.
+
+# ══ O DAT O MODULE KHAC ══════════════════════════════════════════════
+o_M03_bon_so_SCR_dung_nhau: >
+  Phat hien khi viet M18/ui_flow §0. project_map.screens va 05_uiux/wireframes/
+  dung CHUNG mot day so cho HAI thu khac nhau, va BON so dang dung:
+    SCR-06  map man Tai lieu (M10)  | file SCR-06-ba-man-nap.md
+    SCR-07  map nap tai lieu (M10)  | file SCR-07-chung-cat.md     (M12)
+    SCR-08  map man Video (M11)     | file SCR-08-tra-cuu-kho.md   (M13)
+    SCR-09  map nap video (M11)     | file SCR-09-hoi-kho.md       (M14)
+  BA trong bon khong chi khac man — chung tro sang MODULE KHAC HAN.
+  Khong cong nao bat duoc: check_map khong doc `screens` va khong biet
+  05_uiux/wireframes/ ton tai. CUNG LOP LO voi entities-khong-chu ma FR-048 vua
+  va — hai lan trong mot luot, cung mot nguyen nhan: check_map chi nhin
+  modules <-> thu muc.
+  O dat o M03 (so huu 05_uiux/** tu FR-042), khong o M18: s6 doi backlog module
+  SACH de dong G6A.
+  Chan ngay: M18 can mot man admin va da phai khai screens rong + DUNG.
+
+do_do:
+  khong_co_do_moi: "sau cong tren xanh; pytest 42"
+  check_frozen: "cho NGUOI ky — 3 file, khong lien quan luot nay"
+  check_skill: "AGENT KHAC so huu core/skill-src"
+
+no_con_lai:
+  - "FR-048 CHO DUYET — chua ky gate; agent chuan bi evidence chu khong ky"
+  - "FR moi CHUA mo: rate limit + entropy >=128 bit + log that bai (lo trong FR-045 da duyet). Nay CO CHU de gui toi: M18"
+  - "FR moi CHUA mo: 'vai nao lam duoc gi' — cot nguoi_dung.vai van la cot trong"
+  - "FR moi CHUA mo: du lieu ca nhan vao git truoc lan push dau tien (ADR-06 he qua 3)"
+  - "FR moi CHUA mo: chong vong reap xoa file export cua ba bang moi (ADR-06 he qua 4)"
+  - "check_db_dung_cho.py CHUA CAI — M08-R6 va M18-R2 cung tro toi, ca hai hien la van ban chua co rang"
+  - "check_map CHUA doc entities va CHUA doc screens — hai lo cung nguyen nhan, lo ra trong luot nay"
+  - "FR-047 van CHUA thi cong: DDL + bay cua C1-C7. Nay da co chu de neo pham_vi_ghi"
+  - "M18 khai screens rong — s5 chua chay cho man admin"

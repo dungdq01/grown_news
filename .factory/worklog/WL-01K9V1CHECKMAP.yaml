@@ -1,0 +1,63 @@
+id: WL-01K9V1CHECKMAP
+at: 2026-09-01
+by: claude
+buoc: "PATCH nguong rut gon — sua mot khang dinh SAI trong docstring check_map"
+loai: chi doi chu, khong doi hanh vi
+duong: >
+  /factory:go nguong "chi doi chu, khong doi hanh vi => sua + verify + worklog;
+  bo buoc 1 (WO) va 4 (task file)". Cham core/tests/** = M01, khong frozen,
+  khong >=2 module.
+
+object:
+  - core/tests/check_map.py            # docstring §"VI SAO CONG NAY TON TAI" — thay cau liet ke bang bang 8 lenh do lai
+  - 06_modules/M01_core/backlog.md     # tick o "check_map.py:7 khai sai", kem object
+
+# ══ PHAN DANG GIA NHAT ═════════════════════════════════════════════════
+loi_la_gi: >
+  check_map.py:7 xep <worklog-check> vao nhom "da co". SAI.
+  core/tests/check_worklog.py canh web/**/WORKLOG.md (tai lieu — so dong CSS, so
+  test) va KHONG doc .factory/worklog/*.yaml mot dong nao. Trung ten, khac viec.
+  Hau qua da do: 121 file .factory/worklog/*.yaml — 7 khong parse duoc YAML,
+  48 thieu khoa `object`. Suot ca du an khong ai bao.
+
+vi_sao_no_nguy_hiem_hon_THIEU_cong: >
+  Day la mot khang dinh CHUA KIEM nam trong phan GIAI THICH cua mot cong.
+  Thieu cong thi cung lam khong ai bao. Nhung mot cau noi "da co" thi ai doc
+  check_map.py de biet cong nao da co se TIN NHAM — no khong chi im lang, no
+  noi sai. Va no nam dung trong file duoc viet ra de chong lech.
+
+do_CA_BON_khang_dinh_truoc_khi_sua_MOT: >
+  Cau cu liet bon lenh la "da co". Toi kiem tung cai thay vi sua chi cai minh
+  nghi la sai:
+    <freeze-check>       -> check_frozen.py         CO
+    <rule-surface-check> -> check_rule_surfaces.py  CO
+    <pin-check>          -> check_version_pin.py    CO
+    <worklog-check>      -> khong co                KHONG
+  Dung ba, sai mot. Neu chi sua cai thu tu ma khong kiem ba cai dau thi co the
+  phai sua cau nay lan hai — va lan hai thi khong ai con tin ca cau.
+
+thay_cau_LIET_KE_bang_BANG: >
+  Ban cu la mot cau van xuoi tron ba trang thai (da co / khong ap dung / chua
+  cai) — de doc nhanh, de sai am tham. Thay bang bang 8 dong, moi dong mot lenh
+  + file thi hanh + trang thai. Bang thi thieu mot dong la nhin thay duoc.
+
+o_backlog_KHONG_doi_cong_khac: >
+  O nay truoc ghi "sua cung luc voi viec cai <worklog-check>". Bo cach do:
+  sua mot khang dinh sai la NGUONG RUT GON (khong WO), con cai cong la doi hanh
+  vi (can WO). Gop hai viec la de cai RE cho cai DAT.
+
+evidence:
+  - "grep ls core/tests/ => check_frozen.py · check_rule_surfaces.py · check_version_pin.py CO THAT"
+  - "grep 'WORKLOG|factory/worklog' check_worklog.py => chi WORKLOG.md, khong co .factory"
+  - "python core/tests/check_map.py => exit 0 sau khi sua"
+  - "22/26 cong Python xanh — khong doi so nao truoc/sau"
+
+do_do:
+  check_danh_muc + check_skill: "agent khac — hai ban schema core/skill-src lech core/assets"
+  check_frozen: "cho NGUOI ky (no FR-034 + FR-036 + FR-041 + FR-042)"
+  check_running: "he qua; va CHINH NO la mot o backlog moi — no GHI vao repo khi kiem"
+
+no_con_lai:
+  - "Ba o backlog M01 con lai can WO vi chung doi HANH VI: <worklog-check> chua cai · Z6 chua cai · check_running ghi vao repo"
+  - "FR-044 va FR-045 cho NGUOI duyet"
+  - "G4 cho NGUOI ky (project_map + security_baseline)"

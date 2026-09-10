@@ -1,0 +1,22 @@
+{
+  "$comment": "T12-25 · PRESET chỉ dẫn cho UI. Thêm một dòng ở đây là chip mới mọc trên màn — FE đọc qua API, KHÔNG gõ cứng. Cùng khuôn model.json / cua.json: một nguồn khai, mọi tầng đọc.",
+  "$vi_sao_co_preset": "Người dùng đối diện một ô trống thì phần lớn bỏ trống, và số ít điền thì điền mỗi lần một kiểu. Preset làm hai việc: hạ ngưỡng bắt đầu, và DẠY cái ô này nhận loại yêu cầu nào — 'tóm cho dev' là một yêu cầu về GIỌNG, không phải một lệnh đổi khung mục.",
+  "phien_ban": 1,
+  "mau": [
+    {
+      "ten": "Tóm cho dev",
+      "chi_dan": "Viết cho lập trình viên: ưu tiên chi tiết kỹ thuật, đánh đổi và con số đo được; bỏ phần dẫn nhập chung chung.",
+      "$vi_sao": "Ca thường gặp nhất — bản chưng mặc định viết cho người đọc rộng."
+    },
+    {
+      "ten": "Tập trung rủi ro",
+      "chi_dan": "Nhấn vào rủi ro, giới hạn và điều kiện thất bại; nêu rõ cái gì CHƯA được chứng minh trong tài liệu.",
+      "$vi_sao": "Mục 5 hay bị viết như một lời hứa; chỉ dẫn này kéo nó về phía đo được."
+    },
+    {
+      "ten": "So sánh thực tiễn VN",
+      "chi_dan": "Đối chiếu với bối cảnh Việt Nam: chi phí, hạ tầng, quy mô đội ngũ thường gặp; nói rõ chỗ nào không áp dụng được.",
+      "$vi_sao": "Tài liệu nguồn phần lớn viết cho bối cảnh khác."
+    }
+  ]
+}

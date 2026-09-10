@@ -1,0 +1,81 @@
+id: WL-01K9W2WO040
+at: 2026-09-01
+by: claude
+buoc: "WO-040 — cua ghi phan giai dia chi vao kho dang hoat dong; va va mot lo cua chinh C1"
+loai: bug fix; PATCH; ba don vi tach theo R1
+wo: WO-040-cua-ghi-khong-chay-cong-dia-chi.md
+task: [T08-18-cua-ghi-phan-giai-dia-chi.md, T03-89-test-fixture-citations-dan-xuat.md, T01-44-spot-check-doc-so-dan-xuat.md]
+
+object:
+  - web/api/dungchung.mjs           # :654 +["--fix","--kho",KB] (M08 · T08-18)
+  - web/test/_api.mjs               # +vaSoDanXuat() truoc napLaiDb (M03 · T03-89)
+  - core/src/source_distiller/validate.py  # §8 bo qua khi da khai co (M01 · T01-44)
+  - core/tests/check_dia_chi.py     # +ca E va F (M01 · pham vi T01-42)
+  - .factory/wo/WO-040-*.md
+  - 07_plan/M08_api/tasks/T08-18-*.md, 07_plan/M03_web/tasks/T03-89-*.md, 07_plan/M01_core/tasks/T01-44-*.md
+
+evidence:
+  - "web: 80/80 xanh, chay TUNG CAI (truoc do 79/80, do la api-crud §7)"
+  - "pytest core/tests -q => 42 passed"
+  - "29 cong Python => 25 xanh; 4 do la 4 do CU (danh_muc, frozen, running, skill)"
+  - "check_dia_chi => 15/15 xanh (them ca E va F)"
+  - "do truoc khi sua: cua ghi 0 loi / them --kho 3 loi, tren dung ban ghi that"
+
+# ══ PHAN DANG GIA NHAT ═════════════════════════════════════════════════
+mot_do_hoa_ra_BA_nguyen_nhan_o_BA_module: >
+  `api-crud.test.js` §7 do. Toi tuong mot cho: cua ghi thieu `--kho`. Sua roi VAN
+  DO. Do tiep: test GHI THANG fixture (`_api.mjs:159-173`) roi `napLaiDb()`, nen
+  bon ban ghi seed khong di qua cua ghi. Sua tiep => mot test KHAC do:
+  `danh-muc-phan-trang-ep-xoa` 422 o `phucHoi`.
+  Ba nguyen nhan, ba module (M08 · M03 · M01), mot trieu chung.
+  Bai hoc: "sua do" khong phai mot don vi viec — phai do lai SAU MOI lan sua, va
+  chay CA bo chu khong chi test dang do. Neu toi chi chay `api-crud` roi bao xong
+  thi da de lai mot do moi cho nguoi khac tim.
+
+lo_trong_chinh_C1_ma_C1_khong_the_tu_thay: >
+  §8 cu: `verified < sampled => loai ca ban`. Dung khi hai so la LOI KHAI — khai
+  verified<sampled la tu nhan that bai. C1 bien chung thanh so MAY DEM, va luc do
+  `verified < sampled` la ca BINH THUONG cua moi bai trich nguon ngoai kho.
+  C1 da xu mot nua (khi `kho` bat thi dung `dem_gay`). Nhung nhanh `elif` — khi
+  `kho` TAT — van doc so dan xuat bang luat cu. Nen ban ghi co `4/0` bi loai o
+  duong PHUC HOI, dung cho du an so nhat.
+  C1 KHONG the tu thay lo nay: no chi lo ra khi mot buoc khac (`--fix` o seed)
+  bat dau DIEN so may dem vao file ma `kho` dang tat. Hai thay doi dung thi vo
+  hai; ghep lai moi thanh loi.
+
+khong_xoa_luat_cu_ma_thu_hep_dieu_kien: >
+  De nhat la xoa han §8. Nhung no van bat duoc ca GOC: mot ban viet tay khai `2/5`
+  ma khong khai gi them. Nen chi bo qua khi ban ghi DA KHAI
+  `unverifiable_citations: true` — luc do verified<sampled la dieu no da NOI RA,
+  khong phai dieu bi phat hien.
+  Da them CA HAI ca vao check_dia_chi (E: khong co co => van loai · F: co co =>
+  khong loai), va F DO TRUOC khi sua. Neu lan sau ai xoa han luat cu thi E do.
+
+AC_rong_toi_tu_viet_va_tu_bat: >
+  T01-44 AC2 khai "luat cu con rang", cmd `check_dia_chi.py` — ma cong do CHUA
+  kiem ca ay. Mot AC tro vao mot lenh khong kiem dieu no noi la AC rong, dung thu
+  toi lien tuc canh bao nguoi khac. Da them ca E/F vao cong TRUOC khi sua ma, nen
+  AC2 gio do duoc that.
+
+KHONG_cham_phucHoi_va_ly_do: >
+  `:834` (`phucHoi`) cung goi chayValidate. KHONG them `--kho` o do:
+    - `--kho` khong `--fix` => restore 422 khi so cu lech => chan duong LAY LAI du lieu
+    - `--kho --fix` khong doc lai => validate xanh tren ban tam, ban COMMIT van so
+      cu => cong xanh gia (phucHoi INSERT tu `fm` trong bo nho, khong doc lai file)
+  Ca hai te hon hien trang. Ghi thanh o backlog, khong noi vao day.
+
+phep_kiem_nay_phu_thuoc_TRANG_THAI_KHO_va_do_la_co_y: >
+  Bai A trich [slug-B]; xoa B thi lan validate sau bao citations_verified lech.
+  Khong phai hoi quy — trich dan cua A THAT SU da gay. Du an da co dung khai niem
+  nay o tang byte: `tham_chieu_media` + M09-R1 chan xoa byte ma ban ghi khac dang
+  tro vao. Neu ve sau viec nay gay kho, duong dung la kiem luc XOA (cung khuon
+  media), KHONG phai bo cong o cua ghi.
+
+do_do:
+  check_danh_muc + check_skill: "nguyen nhan FR-039 cua toi; cho sua o core/skill-src (agent khac so huu)"
+  check_frozen: "cho NGUOI ky"
+  check_running: "he qua hai muc tren"
+
+no_con_lai:
+  - "CI buoc :43 (`validate kb/ --strict`) VAN exit 1 — do la T02-4, boundary M02, chua chay."
+  - "`phucHoi` khong co phep kiem citations nao (kho tat). Muon co thi phai cho no doc lai file sau --fix — mot don vi M08 rieng."

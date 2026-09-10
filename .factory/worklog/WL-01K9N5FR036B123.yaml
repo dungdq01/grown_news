@@ -1,0 +1,174 @@
+id: WL-01K9N5FR036B123
+at: 2026-08-27
+by: claude
+buoc: s8 — FR-036 nhánh B đơn vị B1 (DDL) · B2 (hồ sơ thu-vien) · B3 (kho hiện vật)
+loai: bàn giao ba đơn vị của nhánh B
+fr: FR-036-khung-than-bai-5-muc.md
+
+object:
+  task:
+    - 07_plan/M01_core/tasks/T01-8-ddl-media-va-ho-so.md      # B1 code
+    - 07_plan/M01_core/tasks/T01-9-test-media-ddl.md          # B1 test
+    - 07_plan/M01_core/tasks/T01-10-ho-so-thu-vien.md         # B2 code
+    - 07_plan/M01_core/tasks/T01-11-test-ho-so-thu-vien.md    # B2 test
+    - 07_plan/M08_api/tasks/T08-6-kho-hien-vat.md             # B3 code
+    - 07_plan/M03_web/tasks/T03-10-test-kho-hien-vat.md       # B3 test
+  b1_khai_bao:
+    - core/assets/kho.schema.sql            # + 'tai-lieu' vào CHECK · + bảng media
+    - core/assets/media-mime.json           # MỚI — mime · magic · trần · host video · loai_thu_vien
+    - core/assets/frontmatter.schema.json   # + ho_so + media · source_type 6->7 · allOf 5->7
+    - core/skill-src/frontmatter.schema.json  # bản gương — check_danh_muc so từng key + len(allOf)
+    - core/tests/check_media_ddl.py          # MỚI — 13 phép kiểm trên BẢN SAO của DB
+  b2_ho_so_thu_vien:
+    - core/src/source_distiller/validate.py  # nhánh ho_so, một cửa ghi không đổi
+    - core/assets/khung-than-bai.json        # + tran_tu_thu_vien: 400
+    - core/src/source_distiller/khung.py     # + TRAN_TU_THU_VIEN
+    - core/tests/test_gates.py               # +8 test (viết TRƯỚC code, đỏ trước)
+    - core/tests/check_ci_teeth.py           # + ca âm "ho so thu-vien dat sai"
+  b3_kho_hien_vat:
+    - web/api/dungchung.mjs                  # TRAN_MEDIA · docBodyMedia · luuHienVat · docHienVat · kiểm con trỏ
+    - web/test/thu-vien.test.js              # MỚI — 24 phép kiểm
+    - web/test/api-guard.test.js             # + §7 (M09-R5): hai trần RIÊNG
+    - web/package.json                       # chuỗi npm test
+    - web/test/WORKLOG.md                    # ba chỗ dễ sập của test mới
+  keo_theo:
+    - 06_modules/M03_web/backlog.md          # ci.yml lạc hậu 6 file test
+
+may_xanh:
+  - "pytest core/tests -q  ->  42 passed"
+  - "cd web && npm test    ->  exit 0 (48 file)"
+  - "16/18 cổng check_*.py xanh"
+  - "6/6 răng mới của B3 ĐỎ được khi phá, và dungchung.mjs khôi phục nguyên byte
+     (sha256 4069739e35f6678fed11366fd8c800ee77be18be72957f5c9a82aa823ce4f291)"
+
+do_do:
+  - cong: core/tests/check_skill.py
+    do_do_boi: agent khác (đang làm core/skill-src/** + core/tools/dong_goi_skill.py)
+    quy_chu: >
+      `find core web 07_plan .factory -newermt "-25 minutes"` — mọi file đổi trong
+      cửa sổ đều thuộc B2/B3 của tôi; `check_skill.py` KHÔNG có trong danh sách đó.
+
+# ══ B1 · Bảng media — vì sao KHÔNG cột metadata nào ══════════════════════════
+#
+# `mime`, `ten_goc`, `so_byte` sống trong `articles.frontmatter.media`. Đặt chúng
+# thành cột nữa là hai bản khai cùng một sự thật, và bản thứ hai luôn là bản sẽ
+# lệch. `so_byte` là cột GENERATED từ `length(byte)` — máy tính, không ai gõ.
+#
+# Không FK từ `articles` sang `media`: một blob HỢP LỆ khi chưa có bản ghi tham
+# chiếu — đúng khoảng thời gian người dùng đang điền form. Toàn vẹn do LUẬT MỒ
+# CÔI giữ (M09-R1), và luật đó là việc của B4.
+#
+# `la_dan_xuat` khai NGAY v1 dù chưa ai set: nó là chỗ ngồi cho bản PDF chuyển
+# đổi từ ppt/word. Thêm cột sau = một lần dựng lại DB huỷ diệt nữa (SQLite không
+# ALTER được CHECK), và lần này kho không còn rỗng.
+#
+# `check_media_ddl.py` chạy trên BẢN SAO của DB, không trên DB thật: một cổng
+# muốn chứng minh "constraint có bắn" phải THỬ vi phạm, và thử vi phạm trên kho
+# thật là đúng thứ CẤM "sửa file thật để thử một cổng".
+
+# ══ B2 · Ca âm bắt được một lỗ trong THIẾT KẾ của tôi ════════════════════════
+#
+# Tôi viết nhánh `thu-vien` cho MỌI `source_type`. Ca âm của `check_ci_teeth`
+# dán một dòng `ho_so: thu-vien` vào bản đạt chuẩn 202 từ (`source_type: paper`)
+# — và nó thoát CẢ BỐN cổng hình dạng: 202 < trần 400, và `paper` không phải
+# `tai-lieu`/`video` nên không cổng thư viện nào bắn.
+#
+# Tức MỘT DÒNG frontmatter miễn hết cổng cho một bản phân tích.
+#
+# Sửa bằng mệnh đề về NGHĨA, không bằng ngưỡng đoán: `loai_thu_vien:
+# ["tai-lieu","video"]` khai ở `media-mime.json`. Một `paper`/`repo`/`article`/
+# `docs`/`announcement` LÀ bản phân tích theo định nghĩa của chính loại nó.
+# Nếu tôi hạ trần 400 xuống thay vì thế, tôi đã vá bằng một con số đoán và lỗ
+# vẫn còn cho bài 50 từ.
+#
+# Hai chỗ KHÔNG cần sửa, và biết vì sao mới đáng tin: cổng 6 và 7 đã `if tt:` /
+# `if khoi and …` nên với `secs, subs = {}, {}` chúng tự bỏ qua — đúng theo CẤU
+# TẠO, không nhờ tôi nhớ.
+#
+# TikTok: `@handle` KHÔNG phải danh tính, id mới là — hai handle cùng một video
+# chuẩn hoá về một, không thì hệ số kiểm chứng chéo bị thổi bằng một lần đổi tên
+# tài khoản. `vm.tiktok.com` là redirect phía server, KHÔNG giải được offline ⇒
+# trả host+path và NÓI RA, không bịa id.
+
+# ══ B3 · Kho hiện vật — bốn hàm, và lý do từng cái đứng ở đâu ════════════════
+#
+# `TRAN_MEDIA` đọc `tran_byte` từ `media-mime.json`. `TRAN` (1 MB) KHÔNG đổi:
+# nó là chặn bù của MỌI lần ghi bài (FR-010), nới nó để chứa một PDF là nới cả
+# cửa kia (M09-R5). Hai trần riêng là cách giữ một cửa ghi mà không hạ một lớp.
+#
+# `docBodyMedia` chặn HAI lớp: `content-length` để từ chối SỚM (không tốn RAM,
+# không tốn thời gian), rồi đếm byte đã nhận để không TIN nó. Header là dữ liệu
+# của người gửi — khai 10 byte rồi bơm 30 MB phải chết ở lớp thứ hai.
+#
+# `luuHienVat` là LỚP THỨ SÁU của intake. Năm lớp hiện có (bind 127.0.0.1 · trần
+# kích cỡ · tên file whitelist · đích cố định · spawn cổng thật) KHÔNG lớp nào
+# soi byte. Không có magic-byte thì một file HTML-có-script dán nhãn
+# `application/pdf` được phục vụ lại SAME-ORIGIN dưới content-type đó.
+# `sha256`/`so_byte` gửi kèm bị BỎ QUA — khoá lưu trữ đến từ client là để client
+# chọn nó nằm ở đâu.
+#
+# Kiểm con trỏ treo đặt TRƯỚC `validate`: `validate.py` kiểm được DẠNG của
+# `media.sha256` (schema: 64 hex) nhưng chạy trên file tmp ngoài repo nên không
+# biết bảng `media`. Một bản ghi trỏ vào byte không tồn tại là bản ghi mà
+# `phucHoi()` sau này vẫn báo THÀNH CÔNG — nó chạy lại validate, mà validate
+# không bao giờ thấy blob. Mất dữ liệu im lặng với bộ test xanh.
+
+# ══ Ba lần bộ máy chặn tôi, và mỗi lần chặn đúng ═════════════════════════════
+#
+# 1 · `check_g6b` §3 — `phụ_thuộc: T01-8, T01-10`. Parser đọc CẢ DÒNG làm một
+#     tên, nên nó báo "phụ thuộc T01-8, T01-10 không tồn tại". Không task nào
+#     trong repo dùng dấu phẩy ⇒ ngữ pháp là MỘT phụ thuộc. Sửa task, KHÔNG sửa
+#     parser: `core/tests/check_g6b.py` là file test và đơn vị này không phải
+#     đơn vị test (R1). Ghi lại ở đây vì nó là giới hạn thật, không phải bug của
+#     tôi: một task cần hai phụ thuộc hôm nay chưa khai được.
+#
+# 2 · `check_worklog` — "test thu-vien khong duoc nhac trong test/WORKLOG.md".
+#     Đúng: một file test không ai giải thích là một file mà người sau sẽ sửa
+#     sai. Ba thứ dễ sập của nó (thứ tự env/import · `nap()` · hẹn giờ 300ms) đã
+#     ghi vào đó.
+#
+# 3 · `nut-song §5` — test ngoài chuỗi `npm test` là test không tồn tại. Nên
+#     `web/package.json` phải vào phạm_vi_ghi của đơn vị TEST, và nó ở đó.
+
+# ══ Kiểm hai chiều: xanh không chứng minh gì ═════════════════════════════════
+#
+# Sáu răng mới, mỗi răng phá một chỗ rồi đòi ĐỎ + đòi lời đỏ NÓI RA chỗ sai:
+#   magic-byte bị gỡ · INSERT OR IGNORE thành INSERT · kiểm con trỏ treo bị gỡ ·
+#   content-length đo SAU khi đăng ký listener · TRAN_MEDIA gõ tay ·
+#   TRAN bị nới lên 25 MB
+# Sau mỗi ca, khôi phục và so sha256 — không để lại vết.
+#
+# HAI ca đầu tiên "đỏ=True nói-ra=False", và đó là phát hiện thật về TEST của
+# tôi, không về code:
+#   · mất `OR IGNORE` ⇒ SQLite NÉM ⇒ ngoại lệ không bắt giết cả file test ở lời
+#     gọi thứ hai, trước khi in được dòng nào. Sửa: MỌI lời gọi qua `nap()`.
+#   · gỡ chặn-ở-header ⇒ hàm ngồi chờ byte mãi ⇒ test TREO thay vì báo. Sửa:
+#     `Promise.race` với hẹn giờ 300ms.
+# Cả hai là cùng một bệnh: một phép kiểm phải SỐNG SÓT qua đúng thứ nó đang
+# chấm. Một màu đỏ không nói ra chỗ sai là màu đỏ người ta sẽ bỏ qua.
+
+# ══ Kéo theo — ghi ngay lúc phát hiện ════════════════════════════════════════
+#
+# `.github/workflows/ci.yml` liệt MỘT STEP CHO MỖI file test, gõ tay, và đã lạc
+# hậu SÁU file: `cua-so-doc` · `nut-song` · `danh-muc-phan-trang-ep-xoa` ·
+# `khung-8-o` · `chu-giao-dien` · `thu-vien`. Chúng xanh trên máy và không hề
+# chạy trên CI. `nut-song §5` dựng răng cho phía `package.json`; phía `ci.yml`
+# chưa có răng nào.
+#
+# KHÔNG sửa tại chỗ: `ci.yml` thuộc M04_ci, ngoài boundary M03/M08 — nới ở tầng
+# CHIA VIỆC, không nới tại chỗ. Ô mở ở `06_modules/M03_web/backlog.md`.
+# Ghi chú: ô backlog nằm ngoài `phạm_vi_ghi` của cả hai đơn vị, cố ý — PHẢI GHI
+# là bề mặt sổ sách, không phải phần việc của đơn vị code.
+
+con_lai:
+  - >
+    B4 — khớp nối export/import cho byte. ĐƠN VỊ QUYẾT ĐỊNH của cả plan này:
+    luật mồ côi phải hợp UNION BA bảng (articles + article_versions + recycle);
+    `bam_cay()` phải hash `_media`; `bam_noi_dung()` thêm
+    ("media","sha256","sha256") hash KHOÁ chứ không hash byte; `dung_lai_db.py`
+    phải sys.exit báo to khi một .md khai sha256 mà thiếu byte. Không xanh được
+    thì xét lại "lưu trong DB" TRƯỚC khi viết một dòng FE nào.
+  - >
+    B5..B10 — route POST /api/articles/media · sáu đầu đề an toàn · FE nạp (tab
+    thứ tư) · FE xem trước (iframe PDF, video click-to-load, thẻ ppt/word) ·
+    tổng hợp All (số đếm trên tatCa, chất lượng chỉ trên phan-tich) · tài liệu.

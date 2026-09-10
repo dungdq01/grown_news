@@ -1,0 +1,75 @@
+ulid: 01K9SBFECHUNGCAT
+khi: 2026-09-04T00:35+07:00
+tac_nhan: agent-thi-cong (Claude, phiên 6c7880c5)
+loai: ban-giao
+module: M03_web · M08_api · M12_chungcat
+don_vi: FE của M12 — T03-92 · T12-10 · T08-21 · T03-101 · T03-102 · T03-93
+
+viec: |
+  M12 lên giao diện và DÙNG ĐƯỢC THẬT, đo trên trình duyệt:
+  ① T03-92 · nút CHƯNG CẤT trên thanh tiêu đề mọi cửa sổ đọc → phiếu chọn model
+     (HIỆN `khu_vuc` cạnh từng model — FR-053 §1.4) → gửi → toast mang
+     `?job=<ulid>`. Bấm lần một chỉ mở phiếu; lần hai mới gửi (một cú bấm là
+     một lần toàn văn rời máy).
+  ② T12-10 · `GET /viec` ở THỢ: đòi khoá, sắp theo ULID (không theo mtime),
+     `n` là trần có khai, file JSON hỏng không làm sập danh sách.
+  ③ T08-21 · `GET /api/job` + `GET /api/viec/<id>` ở LÕI, khuôn `tho-cua.mjs`.
+  ④ T03-101 · cắt bình luận JS lúc ghép (khuôn FR-027f đã duyệt cho CSS).
+  ⑤ T03-102 · CHUNK theo màn + `page-weight` đổi sang đo TỔNG tải đầu từng trang.
+  ⑥ T03-93 · màn `/chung-cat/`: 4 KPI · thẻ việc · lọc trạng thái · chi tiết ·
+     deep-link `?job=` · poll CHỈ khi có việc đang chạy.
+
+object:
+  - web/plugins/multiwindow/src/scripts/multiwindow.inline.ts
+  - web/plugins/chungcat/src/chungcat.inline.ts        # chunk mới
+  - web/render/assets.mjs · trang.mjs · server.mjs
+  - web/render/shell.html · web/plugins/home-pages/shell.html
+  - web/styles/prototype.css                           # icon rail (245 byte)
+  - core/assets/man-hinh.json                          # +màn `chung-cat`
+  - web/api/tho-cua.mjs · router.mjs
+  - chungcat/src/vong.py · api.py
+  - chungcat/tests/check_liet_ke_viec.py               # cổng mới
+  - web/test/chung-cat-ui.test.js · loi-tho-cua.test.js · cat-binh-luan-js.test.js
+  - web/test/page-weight.test.js · nut-song.test.js · no-write-path.test.js
+  - web/test/_render.mjs · web/package.json
+  - 07_plan/M03_web/tasks/T03-101-…md · T03-102-…md
+  - 07_plan/M12_chungcat/tasks/T12-10-…md · 07_plan/M08_api/tasks/T08-21-…md
+
+bang_chung:
+  - "cd web && npm test → exit 0 · 2734 ok · 0 FAIL"
+  - "gn.js 100947/102400 · gn.css 102391/102400 · trang chủ 61431/61440"
+  - "tổng tải đầu nặng nhất 272879/280576 (mock/bai-viet/nap)"
+  - "đúng 1 MÀN xin chunk — `/` không có thẻ gn-chungcat.js"
+  - "check_liet_ke_viec.py xanh · 19 cổng M12 xanh"
+  - "Playwright: bấm CHƯNG CẤT → toast 'Đã nhận việc b91ba101… · model
+     gemini-2.5-flash' · URL không đổi · người ở lại chỗ đang đọc"
+  - "Playwright /chung-cat/: 8 thẻ việc, bấm một thẻ ⇒ chi tiết + ?job=<ulid>"
+
+do_do: khong-co-do-moi
+
+hoc_duoc: |
+  BA lỗi chỉ hệ ĐANG CHẠY mới lộ, không cổng nào bắt:
+
+  1 · `.rise` giữ `opacity:0` cho thẻ tạo bằng JS — IntersectionObserver chỉ
+      quét panel có sẵn trong shell. Màn nằm đúng chỗ, cao 813px, và VÔ HÌNH.
+      `innerHTML` 3450 ký tự, `getBoundingClientRect()` trả số thật,
+      `display:block` — mọi thứ nói "có", chỉ `opacity` nói "không".
+      **Chỉ ẢNH CHỤP mới thấy.** Ô nợ M03.
+  2 · cửa vào THỨ HAI tới `/dot-hai/`: `cat_khi_khac: true` làm nó mọc trong
+      cụm `+ nạp`. `cmp` hai shell và `markup-matches-css` đều xanh trong khi
+      cửa đó còn đó, vì nó do `trang.mjs` SINH lúc render.
+  3 · web phải khởi động VỚI `CHUNGCAT_KHOA_LOI`; thiếu nó thì nút báo 403 qua
+      toast — đúng hành vi, nhưng khoá nên vào chỗ sống qua restart.
+
+  Và một lỗi ĐO của chính tôi, ba lần trong phiên: heredoc làm sập `\n` thành
+  xuống-dòng THẬT ⇒ hỏng một regex JS, cắt một khối `>` Markdown, hỏng một gate
+  Python. Viết `\n` vào file thì dùng công cụ Write/Edit, đừng qua heredoc.
+
+keo_theo:
+  - "M03 backlog +3 ô: trang chủ/gn.css còn 9 byte (CHẶN T03-95) · cổng
+     dinh-dang-mo FLAKY · bẫy `.rise` cho màn dựng-bằng-JS"
+  - "T03-94 vẫn CHẶN ở T08-22 (cửa đọc + 4 hành động bảng nháp) — chưa có đơn vị"
+
+chua_xong: |
+  T03-94 · T03-95 chưa dựng, mỗi cái chặn một lý do khác nhau (ghi ở ô nợ).
+  Gate G6C do NGƯỜI ký. Chưa commit, chưa PR, chưa gọi factory-reviewer.

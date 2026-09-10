@@ -1,0 +1,88 @@
+id: WL-01K9J4OPENCARD
+at: 2026-08-19
+by: claude
+buoc: s8 (M03_web)
+loai: fix
+
+viec: >
+  Người dùng: "/tat-ca/ và /cho-duyet/ hiện không xem được nội dung file .md —
+  đáng ra bấm vào phải xem được chi tiết bài chứ?" Đúng. Ba lỗi cùng tồn tại,
+  cả ba lọt qua 15 test.
+
+pham_vi_ghi:
+  - web/plugins/home-pages/index.ts
+  - web/plugins/multiwindow/src/scripts/multiwindow.inline.ts
+  - web/test/open-card.test.js      # MỚI
+  - web/package.json
+
+ba_loi:
+  L1_chi_approved_bam_duoc:
+    what: '`data-open` chỉ gắn khi review_status === "approved"'
+    do_duoc: 4/17 thẻ ở màn Tất cả và MỌI dòng ở màn Chờ duyệt không bấm được
+    vi_sao_sai: >
+      Hai màn đó là màn QUẢN LÝ. Đọc nội dung bản draft chính là việc người duyệt
+      cần làm — chặn đúng thứ người dùng cần nhất.
+    sua: bỏ điều kiện approved trong the()
+
+  L2_ban_mock_khong_co_chi_muc:
+    what: >
+      Plugin merge-by-source chỉ phát MỘT static/merged-index.json ở gốc. Nó đọc
+      `content` (Quartz đã lọc approved) nên không biết về hai kho real/mock.
+      JS gọi đường TUYỆT ĐỐI "/static/merged-index.json" ⇒ trang /mock/tat-ca/
+      đọc chỉ mục của kho THẬT.
+    do_duoc: '$S/open/mock/static/merged-index.json → ENOENT (không tồn tại)'
+    hau_qua: chỉ số trỏ vào kho khác ⇒ bấm mở sai bài hoặc không mở gì
+    sua: >
+      home-pages phát static/open-index.json RIÊNG cho từng bản (nó biết cả hai
+      kho). JS suy gốc từ location.pathname: /mock/ → /mock/static/...
+      Chỉ mục mới gồm MỌI trạng thái, khác merged-index.json chỉ có approved.
+
+  L3_khong_co_than_bai_de_mo:
+    what: 'tai() fetch "/" + ban.slug — nhưng Quartz chỉ sinh trang bài ở GỐC'
+    do_duoc: '$S/open/mock/article/ không tồn tại'
+    hau_qua: bấm thẻ ở /mock/ mở ra cửa sổ RỖNG
+    sua: >
+      Nhét thân bài vào chính chỉ mục (~2.3KB/bài, 15 bài ~35KB). Tự chứa theo
+      từng bản, và bớt một vòng request. Viết renderer markdown tối thiểu 40 dòng
+      thay vì thêm marked/markdown-it (~30KB) — security_baseline §7 đòi ghi lý do
+      mọi phụ thuộc mới.
+
+  L_phu_chi_so_sai:
+    what: 'chỉ số đánh bằng appr.indexOf(b) nhưng chỉ mục đã GỘP theo url_normalized'
+    hau_qua: hai bản cùng nguồn trỏ cùng chỗ, số bị trùng và lệch
+    sua: map slug → vị trí trong chính chỉ mục (iCua), slug là khoá DUY NHẤT
+
+bao_mat:
+  what: thân bài là nội dung NGOÀI, giờ render bằng JS thay vì qua Quartz sanitize
+  chan: >
+    Renderer escape HTML TRƯỚC rồi mới dựng thẻ. HTML/script nhúng trong .md
+    không chạy được. Đây là điều no-dangerous-html.test.js canh ở tầng Quartz;
+    ở tầng này phải tự giữ, nên open-card.test.js có phép kiểm riêng cho nó.
+  khong_phu: 'ảnh, link ngoài, HTML thô, code block nhiều dòng — cố ý'
+
+verify:
+  loai: hard
+  lenh:
+    - "cd web && npm run check"        # sạch
+    - "cd web && npm test"             # 17/17 (thêm open-card)
+    - "python core/tests/check_frozen.py"  # + 8 cổng + validate kb/, 10/10 OK
+  ket_qua: xanh
+  do_duoc_sau_khi_sua:
+    - "bản /mock/: 12 bài trong chỉ mục, đủ 3 trạng thái, 13/13 bản có thân bài"
+    - "màn Tất cả: 13 thẻ / 13 bấm được (trước: 13/9)"
+    - "màn Chờ duyệt: 3 dòng / 3 bấm được (trước: 3/0)"
+    - "mọi chỉ số < 12 — trong phạm vi chỉ mục của chính bản đó"
+  test_moi: >
+    web/test/open-card.test.js — canh cả ba lỗi: chỉ mục riêng theo bản, mọi
+    trạng thái bấm được, chỉ số trong phạm vi, JS không dùng đường tuyệt đối,
+    escape trước khi dựng thẻ.
+
+no:
+  - "merge-by-source vẫn phát static/merged-index.json ở gốc — giờ không ai đọc.
+     KHÔNG xoá: nó là hợp đồng của M03 §2.1.3 và expected-render.test.js neo vào
+     _expected_render qua nó. Xoá là việc riêng, cần đọc lại spec trước."
+  - "Thân bài nhân đôi: một bản trong open-index.json, một bản trong trang bài
+     Quartz sinh. Với 15 bài là 35KB dư — chấp nhận được, nhưng ở 200 bài thì
+     phải xem lại (nạp chỉ mục theo trang thay vì một file)."
+  - "Renderer markdown không phủ code block nhiều dòng. Nếu bài thật có, nó ra
+     từng dòng <p> — chưa gặp vì 9 mục của giao thức không dùng."

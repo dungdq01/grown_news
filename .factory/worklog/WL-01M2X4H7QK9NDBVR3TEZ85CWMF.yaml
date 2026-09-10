@@ -1,0 +1,128 @@
+entry: ban-giao
+ulid: 01M2X4H7QK9NDBVR3TEZ85CWMF
+ngay: 2026-09-10
+module: M12_chungcat
+don_vi: T12-38
+wo: WO-084
+tieu_de: >-
+  Chung cat hong: phan hoi BI CAT CUT, bao sai thanh "khong phai JSON"
+
+object:
+  - chungcat/src/adapter/hop_dong.py
+  - chungcat/src/adapter/openai.py
+  - chungcat/src/adapter/google.py
+  - chungcat/assets/nguong.json
+  - chungcat/tests/check_cat_cut_noi_that.py
+  - 07_plan/M12_chungcat/tasks/T12-38-cat-cut-noi-dung-that.md
+  - .factory/wo/WO-084-chung-cat-bi-cat-cut.md
+
+trieu_chung: |
+  Chu du an 2026-09-10: *"Chung cat loi (request test: Mo mang tam mat sau khi
+  xem chi Lauren xai AI.) … toi check ra thi do call model loi
+  (bee/gemini-3.5-flash-lite)"*.
+
+  Tim ra job that: HAI luot deu hong o `dang-goi-model`, cung mot ban ghi
+  (`rac/2fa9648a…` lan_gui 2, `rac/f4dce5b1…` lan_gui 1):
+
+    HinhDangSai: [chung-cat] phan hoi khong phai JSON sau khi go khung:
+    '{\n  "text": "## 1. Overview\nTai lieu ghi lai … ## 2. Boi canh\nKhi mo'
+
+chan_doan_nguoc_voi_nghi_ban_dau: |
+  Chu du an nghi model tra sai hinh dang. Do ra thi NGUOC:
+
+    `_boc` (openai.py:92) doi dung `{"text": …, "quotes": […]}`
+    => `{"text": "## 1. Overview…"}` CHINH LA hinh dang hop dong.
+
+  Va 300 ky tu dau la JSON HOP LE: sau `{` la newline that (JSON cho phep),
+  con `\n` trong gia tri la escape DUNG. Cho vo nam o CUOI — chuoi bi cat
+  truoc khi `"` dong va truoc khi `quotes` xuat hien.
+
+  => Phan hoi BI CAT vi het token. Khong sai hinh dang.
+
+ba_cho_ho_da_bit_o_loi_transcript_ma_khong_mang_sang: |
+                        asr_cua.py (transcript)   adapter/* (chung cat)
+    max_tokens          TRAN_CHU = 65536 (:516)   KHONG gui — nhan mac dinh
+                                                  cua cua, IM LANG
+    doc finish_reason   co, :574-579, them         KHONG doc
+                        2026-09-08 cho DUNG lop
+                        loi nay
+    cau bao loi         "cua bao finish_reason:    "phan hoi khong phai JSON"
+                        length"                   — sai dia chi
+
+  `hop_dong.py:go_khung` da tu ghi bai hoc nay: *"ban dau toi sua MOT cho =>
+  loi transcript chet dung cung mot JSONDecodeError muoi phut sau"*. Lan nay
+  lech theo chieu nguoc: transcript duoc bit, chung cat thi khong.
+
+  Va `google.py:_boc` con te hon — no dung `json.loads` TRAN, chua tung di qua
+  `doc_json`, nen mot phan hoi hong o loi do chi noi "Expecting value line 1
+  column 1".
+
+vi_sao_vo_dung_luc_nay: |
+  `WO-077` (khuon linh dong) vua doi `_PROMPT`: khung 5 muc thanh muc TOI
+  THIEU, moi model them `## 6.`, `## 7.` va dung bang Markdown. Output dai ra,
+  ma khong ai nang tran chu — vi loi nay CHUA BAO GIO khai tran chu.
+
+sua: |
+  1 `nguong.json` khai `tran_chu_chung_cat: 16384` + `$vi_sao_`.
+  2 `hop_dong.tran_chu()` — mot nguon cho CA HAI adapter; bang thieu khoa thi
+    NEM, khong `or 4096` lang le (mot mac dinh lang le o day dung lai dung cai
+    benh vua chua).
+  3 `hop_dong.ly_do_dung(tra)` — boc `finish_reason`; thieu truong KHONG phai
+    loi (khong phai cua nao cung tra).
+  4 `hop_dong.doc_json(..., ly_do=)` — `length` => cau noi phan hoi BI CAT,
+    kem so ky tu nhan duoc va chi ro cho sua (nang tran, hay bot yeu cau
+    trong prompt). `stop` + JSON hong that => VAN noi "khong phai JSON".
+  5 `_hai_dau()` — cau loi mang DAU VA DUOI. Ban cu in `noi[:300]`; voi mot
+    phan hoi bi cat cut thi 300 ky tu DAU la cua so vo dung nhat co the chon:
+    phan dau luon hop le, cho vo luon o cuoi.
+
+vi_sao_16384: |
+  DO, khong doan: ban chung cat dai nhat dang co trong kho la 12814 byte
+  (~4.3-5.1k token), va WO-077 lam output dai ra => 16384 cho ~3x du.
+  Loi transcript khai 65536 — khac, vi mot transcript dai gap nhieu lan.
+  Bang chung cua an toan: chu thich `asr_cua.py:525` ghi cung cua nay da tra
+  14.382 completion token voi max_tokens 65536, nen 16384 chac chan duoc nhan.
+
+cong:
+  them: chungcat/tests/check_cat_cut_noi_that.py — 18 ve
+  cach_do: |
+    CHAY that: bom phan hoi GIA vao `_boc` (khuon `check_thu_lai_ngam.py`) roi
+    doc CAU di ra. 0 mang · 0 model. `grep "finish_reason"` se xanh ngay ca khi
+    ma doc roi bo day.
+  do_duoc: chay truoc khi sua => 9 ve DO
+  ve_am: |
+    Ve 3/3a nang ngang ve 2: `stop` + JSON hong that (mot trang HTML 502) VAN
+    phai duoc goi dung ten. Sua qua tay thi moi JSONDecodeError bi quy cho
+    "bi cat", va lan sau cau bao lai chi sai huong, chi theo chieu nguoc.
+    Ve 5/5a/5b chong do oan: phan hoi lanh + `stop`, va ca ca cua KHONG tra
+    `finish_reason`, deu phai di qua nhu cu.
+  neo_sai_da_sua: |
+    Ve 1b ban dau neo vao chu `tran_chu_chung_cat` co trong nguon adapter —
+    `google.py` di qua `hop_dong.tran_chu()` (duong TOT HON) nen ve do oan.
+    Da sua thanh ba ve chat hon: co gui `max_tokens` · lay tu bang (khoa
+    truc tiep HOAC cua chung) · va KHONG go cung con so.
+    Cung bo chu thich truoc khi do — mot ve doc ca van xuoi la ve xanh oan.
+
+do_do: |
+  M12: 57/57 xanh (56 cu + cong moi).
+  E2E --mock: xanh — nguyen lieu → model → verify → nhap · 1 dong egress · 0 token.
+  Da restart ca ba tang bang `chay.sh`; LOI 200, THO song, `tran_chu()` = 16384.
+
+chua_nghiem_thu_duoc: |
+  KHONG chay lai job that — mot luot chung cat that la egress + tien, va no la
+  quyet dinh cua chu du an. Nen day la SUA THEO CHAN DOAN + cong chay that tren
+  phan hoi gia. Ghi ra thay vi noi da chay.
+
+  Neu chay lai ma VAN hong: cau loi bay gio se noi dung benh — hoac
+  `finish_reason: length` (=> nang `tran_chu_chung_cat`, 16384 chua du) hoac
+  "khong phai JSON" kem DUOI phan hoi (=> that su sai hinh dang). Truoc dot
+  nay hai ca do khong phan biet duoc.
+
+ngoai_pham_vi: |
+  - `_hinh_dang` luon tra `json_object` bat ke `kieu_structured` — no da khai
+    trong chu thich cua chinh no, khong phai bug nay.
+  - Noi tiep/chay lai khi bi cat (kieu WO-080): mo sau, khi do duoc tran moi
+    van khong du.
+  - Ten model: chu du an viet `bee/gemini-3.5-flash-lite`, egress log ghi
+    `gemini-2.5-flash-lite`. Khong dung o WO nay — no khong doi chan doan, va
+    mot `-lite` bat ky deu co tran output nho.

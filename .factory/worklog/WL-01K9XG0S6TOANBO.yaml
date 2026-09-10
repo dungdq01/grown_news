@@ -1,0 +1,152 @@
+ulid: 01K9XG0S6TOANBO
+ngay: 2026-09-03
+tac_nhan: claude-opus-5
+loai: ban_giao
+gate: G6A
+pham_vi: M01…M11 (bổ sung bộ 9 artifact)
+
+viec: >
+  s6 cho TẤT CẢ module theo chỉ đạo "hoàn thiện đến s6 cho tất cả module".
+  M12–M18 đã đủ 9 artifact từ trước; lượt này viết `testcases.md` +
+  `workflow.md` + `backlog.md` cho M01–M11.
+
+dao_quyet_dinh_cu: >
+  Chủ dự án chốt 2026-09-02, nhắc HAI lần: "module đợt hai thôi, M1 - M11 không
+  cần làm quá kỹ vì cơ bản phase 1 triển khai khá ổn". `check_g6a` docstring dẫn
+  nguyên văn câu đó làm lý do bỏ ba artifact. Chỉ đạo 2026-09-03 ĐẢO nó.
+  ⇒ Đã cập nhật docstring `check_g6a`, vì một cổng ghi nguyên văn một quyết định
+  hết hiệu lực là nơi quyết định đó sống tiếp và được dẫn lại như luật.
+
+object:
+  - 06_modules/M01_core/{testcases,workflow}.md
+  - 06_modules/M02_kb/{testcases,workflow,backlog}.md
+  - 06_modules/M03_web/{testcases,workflow}.md + backlog.md (+5 ô)
+  - 06_modules/M04_ci/{testcases,workflow}.md + backlog.md (+5 ô)
+  - 06_modules/M05_intake/{testcases,workflow,backlog}.md
+  - 06_modules/M06_skillgen/{testcases,workflow,backlog}.md
+  - 06_modules/M07_curate/{testcases,workflow,backlog}.md
+  - 06_modules/M08_api/{testcases,workflow}.md + backlog.md (+7 ô)
+  - 06_modules/M09_thuvien/{testcases,workflow,backlog}.md
+  - 06_modules/M10_tailieu/{testcases,workflow,backlog}.md
+  - 06_modules/M11_video/{testcases,workflow,backlog}.md
+  - core/tests/check_g6a.py  (docstring — KHÔNG đổi logic; cổng vẫn XANH)
+  - core/tests/check_worklog.py xanh lại (web/WORKLOG.md 84→85 · test/WORKLOG.md +cai-dat)
+  - 07_plan/M08_api/tasks/T08-17-bang-cai-dat.md (task file, chưa thi công)
+  - web/test/cai-dat.test.js (đơn vị TEST, ĐỎ chủ ý — R5)
+  - 04_system/env-theo-service.md §8 (ghi HOÃN theo chỉ đạo ".env để sau")
+
+do_da_chay:
+  cong_s6: check_g6a · check_map · check_ba · check_rule_surfaces · check_mermaid — 5/5 XANH
+  g6a_chi_tiet: "18 module · 6/6 artifact mỗi module · 255 AC (242 hard / 13 soft)
+    — con số DẪN XUẤT từ output check_g6a, không đếm tay. Bản đầu tôi ghi
+    288/256/14 (đếm tay, SAI cả ba) — đúng lớp lỗi mà tám ô backlog vừa mở."
+  pytest: 45 passed
+  lenh_hard_da_chay_that: >
+    M01 4/4 · M02 4/5 (một ĐỎ OAN, xem dưới) · M03 21/22 (một VẮNG FILE) ·
+    M04 5/6 (một ĐỎ THẬT) · M05 6/6 · M06 5/5 · M07 6/6 · M08 9/9 ·
+    M09 12/12 · M10 3/3 · M11 3/3
+
+phat_hien_lon_nhat: >
+  `check_g6a:76` dùng `re.search(r"cmd:|cùng lệnh", blk)` — nó đo "AC có VIẾT
+  chữ cmd" chứ không đo "lệnh có CHẠY ĐƯỢC". R3 đòi vế thứ hai.
+  Hệ quả đo được: `M03 AC-2.2.1` khai `hard` với
+  `cmd: node web/test/no-archived.test.js` và FILE ĐÓ KHÔNG TỒN TẠI — G6A vẫn
+  xanh. Theo R3, AC đó ĐANG LÀ `soft` trong một spec đã frozen.
+  Đây CHÍNH XÁC lớp lỗi tôi tự mắc ở FR-051 §9: đo sự TỒN TẠI của một chỗ nghẽn
+  thay vì đo có gì ĐI QUA nó. Nghiêm trọng hơn vì check_g6a là điều kiện đóng
+  G6A cho CẢ 18 MODULE.
+  ⇒ Ô backlog `06_modules/M03_web/backlog.md` (ô đầu). CHƯA SỬA — cần chủ dự án
+  duyệt, vì nó sửa một cổng đang chấm 18 module.
+
+hai_do_that_khong_phai_cua_toi:
+  - lenh: bash .githooks/test-hook.sh
+    ac: M04 AC-2.5.1
+    bao: "FAIL · hook chặn cả file ĐẠT CHUẨN — đỏ giả, người ta sẽ tắt hook"
+    nguyen_nhan: >
+      `core/tests/fixtures/dat-chuan.md` KHÔNG còn đạt chuẩn — 4 lỗi khi thả vào
+      một BẢN COPY của kb/paper/. `kb/concepts.yaml` co lại (704 byte) và mất hai
+      id fixture dùng (`walk-forward-validation`, `data-leakage`).
+      Bài học: "đạt chuẩn" KHÔNG phải thuộc tính của một file — nó là QUAN HỆ
+      giữa file và DANH MỤC nó rơi vào. Nên `pytest -k ban_dat_chuan` XANH (nền
+      riêng) trong khi `test-hook.sh` ĐỎ (nền kb/ thật).
+    đỏ_do: >
+      chưa quy được chủ — kb/concepts.yaml mtime 08-29 13:54 · fixture 08-27
+      18:33 · test-hook.sh 08-19 02:11; cả ba TRƯỚC phiên 2026-09-02/03, và
+      phiên này không chạm .githooks/**, core/tests/fixtures/**, kb/concepts.yaml
+  - lenh: python core/src/source_distiller/validate.py kb/ --strict
+    ac: M02 AC-2.1.1 + AC-2.1.2
+    bao: 'in "3 file · 0 lỗi · 1 cảnh báo" nhưng exit 1'
+    nguyen_nhan: >
+      validate.py:770 `sys.exit(1 if n_err or (a.strict and n_warn) else 0)` —
+      `--strict` biến CẢNH BÁO thành exit khác 0. Cảnh báo là "3 khái niệm chờ
+      duyệt danh mục", một trạng thái BIÊN TẬP, không phải vi phạm schema. Hai AC
+      chỉ khẳng định "parse + đạt schema" ⇒ LỆNH ĐO RỘNG HƠN AC ⇒ đỏ oan.
+    đỏ_do: chưa quy được chủ (kho có sẵn khái niệm chờ duyệt trước phiên này)
+
+tam_lop_loi_lap_lai_qua_8_MODULE:
+  con_so_tu_khai_lech: >
+    TÁM module liền, TÁM con số trong artifact lệch thực tế:
+    M01 ("19 test" rồi "30", thực 45) · M02 ("0 bài", thực 3) ·
+    M04 ("31 bước", thực 71) · M05 ("Bốn việc", bảng 5 hàng) ·
+    M06 (sample "v2"/"v3", đĩa có v1…v5) · M07 ("kho hiện 0 bài", thực 3) ·
+    M08 ("enum 6 giá trị", loai-nguon.json khai 7) ·
+    M03 ("9 bài lên site" vs AC nói 8 — TEST khẳng định 8; và "7 test node",
+    thực 85).
+    ⇒ TÁM lần ở TÁM chỗ độc lập KHÔNG phải tám lỗi — là MỘT CỔNG CÒN THIẾU.
+    Ô tổng ở 06_modules/M07_curate/backlog.md.
+  ten_bang_khong_con_ton_tai: >
+    BỐN spec + MỘT file mã còn gọi `articles`/`documents`/`videos`. Bảng thật:
+    bai_viet (:44) · tai_lieu (:70) · video (:94).
+    M10 (9 chỗ, thuần tên cũ) · M11 (3 chỗ, TRỘN hai hệ tên trong một file) ·
+    M08 (§2.1 §2.3) · M03 · web/api/dungchung.mjs (6 chỗ — CẢ SÁU trong chú
+    thích, nên mã CHẠY ĐÚNG và KỂ SAI).
+    Và dungchung.mjs:637 nói "union BA nhánh", :649 — tám dòng dưới — nói "NĂM
+    nhánh (FR-038)".
+  trang_thai_khai_sai_HAI_CHIEU: >
+    M04 §2.3 + M06 §2.5 nói "đang ĐỎ" khi đã XANH.
+    M08 §5 ("planned") + M10 §5 + M11 §5 ("chưa dựng") khi ĐÃ DỰNG và mọi lệnh
+    xanh. NĂM module, một bệnh, hai chiều.
+
+phat_hien_nang_nhat_ve_kien_truc: >
+  M09 §1 mang tiêu đề "Vì sao MỘT bảng, không phải ba" và bảo vệ nó bằng SỐ ĐO
+  THẬT. Lập luận đó ĐÚNG lúc viết. Sau đó FR-038 chốt BA BẢNG và đã thi công.
+  ⇒ Người đọc M09 hôm nay đọc một LẬP LUẬN CHỐNG LẠI THỨ ĐANG CHẠY, kèm số đo để
+  tin nó. Và `AC-2.1.3` viết "union BA bảng" trong khi cổng của chính nó
+  (check_media_dan_xuat.py) XANH trên cấu trúc NĂM nhánh ⇒ AC LẠC HẬU HƠN CỔNG
+  CỦA CHÍNH NÓ.
+
+rui_ro_an_ninh_dang_van_ban: >
+  M08 §4 + M08-R1 viết "không có auth — localhost LÀ lớp bảo vệ". Sau
+  FR-047/049/051 có: bảy cửa khoá dịch vụ · phân quyền hai vai · rate-limit hai
+  chiều · audit có `boi`. localhost là MỘT lớp, không còn là LỚP DUY NHẤT.
+  Một câu như thế trong artifact frozen là câu người sau dùng để quyết "chỗ này
+  không cần kiểm quyền".
+
+hai_khoang_trong_cua_CONG:
+  - "api-guard KHÔNG thấy 05_intake/gate.py — đường ghi THỨ BA vào kho.
+     AC-2.4.1 khai 'MỌI ghi kb/ đi qua đúng MỘT hàm'; câu đó đúng TRONG PHẠM VI
+     cổng quét (web/api/**). Một cổng khai 'mọi' mà chỉ quét một thư mục là cổng
+     NÓI QUÁ PHẠM VI CỦA MÌNH — nguy hiểm hơn một cổng thiếu, vì nó tạo cảm giác
+     đã phủ."
+  - "check_export_dan_xuat gieo chỉ `repo` + `article` — CẢ HAI vào MỘT bảng
+     (bai_viet) ⇒ cổng XANH trên một bản cài đặt làm 1/3 việc."
+
+cho_NGUOI_ky_hoac_duyet:
+  - "check_frozen ĐỎ: 06_modules/M18_nguoidung/spec.md lệch baseline (§10 thêm ở
+     lượt trước). 56 file frozen · lock có 56. Ba artifact mới KHÔNG nằm trong
+     lock nên chúng không gây đỏ này."
+  - "Sửa check_g6a để nó kiểm LỆNH TỒN TẠI, không chỉ kiểm chuỗi `cmd:`
+     — ảnh hưởng 18 module, nên không tự sửa."
+  - "M02 AC-2.1.1/2.1.2: đổi LỆNH sang vế chỉ đếm lỗi, HOẶC khai 'kho không được
+     có khái niệm chờ duyệt' thành AC riêng. Hôm nay nó là hệ quả phụ của một cờ."
+  - "M03: đánh lại số bốn AC trùng id (AC-2.3.9 ×2, AC-2.3.10 ×2)."
+  - "Break-glass FR (từ lượt trước, chưa mở)."
+
+khong_lam:
+  - "KHÔNG sửa spec.md nào — cả 11 đều frozen. Mọi phát hiện vào backlog, ô trỏ
+     FROZEN chỉ tick bằng FR id."
+  - "KHÔNG sửa logic check_g6a — chỉ docstring. Cổng vẫn XANH."
+  - "KHÔNG thi công T08-17 (§10 cai_dat) — test đã ĐỎ đúng R5, code là đơn vị
+     riêng."
+  - "KHÔNG commit, KHÔNG push (chỉ đạo thường trực)."
+  - ".env §2/§5 HOÃN theo chỉ đạo 'lúc dev code sẽ làm luôn'."

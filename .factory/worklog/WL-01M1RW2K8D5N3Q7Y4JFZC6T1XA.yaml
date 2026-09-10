@@ -1,0 +1,135 @@
+ulid: 01M1RW2K8D5N3Q7Y4JFZC6T1XA
+thoi_diem: 2026-09-05T23:20+07:00
+tac_nhan: claude-opus-5
+loai: ban_giao
+module: M12_chungcat
+don_vi: T12-23 · worker song song N tiến trình × M luồng
+
+viec: >
+  2 tiến trình × 4 luồng = tối đa 8 việc cùng lúc. Trước đó mỗi lần đúng MỘT
+  việc, phần còn lại ngồi chờ.
+
+r5_do_truoc:
+  - don_vi: T12-23 AC1/2/4
+    lenh: python chungcat/tests/check_worker_song_song.py
+    ket_qua: "ĐỎ — `worker` chưa có `chay_song_song`"
+    đỏ_do: claude-opus-5
+  - don_vi: T12-23 AC5
+    lenh: python chungcat/tests/check_worker_giet_giua_chung.py
+    ket_qua: "ĐỎ 3/5 vế — chưa nhặt lại được việc của pid đã chết"
+    đỏ_do: claude-opus-5
+
+bon_loi_dua_song_song_lam_lo:
+  - id: 1 · cửa sổ giữa `rename` và đóng dấu lease
+    goc: >
+      `nhan_viec` chiếm bằng `os.rename` rồi MỚI ghi `nhan_luc`. Giữa hai bước
+      đó, file đã nằm ở `cur/` mà chưa có dấu ⇒ `_nhan_lai_bo_roi` của luồng
+      khác đọc là "bỏ rơi" và chiếm luôn. Hai luồng ôm một job.
+    sua: >
+      MỘT primitive (`O_CREAT|O_EXCL`) cho CẢ HAI đường chiếm, và lấy TRƯỚC mọi
+      thay đổi trạng thái. Hai primitive khác nhau thì không loại trừ được nhau.
+    ghi_chu: >
+      Bản sửa ĐẦU của tôi vẫn sai: tôi tạo dấu SAU `rename`, tức vẫn để hở đúng
+      cửa sổ ấy. Chỉ khi dời dấu lên TRƯỚC mới hết.
+  - id: 2 · file tạm dùng chung
+    goc: >
+      `_ghi_nguyen_tu` ghi qua `tmp/<ulid>.json` — một tên CHUNG cho mọi lần
+      ghi của cùng một việc. Hai bên ghi cùng lúc là đụng nhau, và trên Windows
+      nó nổ `WinError 32` ngay giữa một phép được đặt tên là "ghi NGUYÊN TỬ".
+      Cái làm nên tính nguyên tử là `os.replace` từ một bản nháp KHÔNG ai khác
+      chạm — một file tạm dùng chung thì phép ghi không còn nguyên tử.
+    sua: "tên tạm mang `pid` + `thread ident`"
+  - id: 3 · việc CHẠY XONG bị báo HỎNG
+    goc: >
+      Chuyển `cur/ → done/` gặp `WinError 32` vì một luồng khác đang `read_text`
+      file đó trong lúc quét. Trên Windows một handle mở CHẶN rename — khác
+      POSIX. Kiểu sai tệ nhất: hệ thống nói dối về một việc nó làm ĐÚNG.
+    sua: "`_doi_ten_ben_bi` — thử lại có TRẦN (20×20ms) rồi mới ném"
+  - id: 4 · `os.kill(pid, 0)` không dùng được trên Windows
+    goc: >
+      Đo 2026-09-05: pid không tồn tại ném `OSError [WinError 87] tham số không
+      đúng` — CÙNG mã lỗi với một tham số thật sự sai, nên không phân biệt được
+      "chết" với "gọi hỏng".
+    sua: >
+      `OpenProcess` + `GetExitCodeProcess`, phân biệt được cả ba ca đã đo:
+      pid mình → exit 259 (STILL_ACTIVE) · pid bịa → handle NULL, lỗi 87 ·
+      pid VỪA chết → handle mở được nhưng exit code 0. Ca thứ ba là lý do phải
+      đọc exit code chứ không chỉ xem handle có mở được.
+
+gia_thuyet_cua_toi_sai_hai_lan:
+  - >
+    "Thiếu hụt tăng tốc là do phí cố định mỗi job." SAI — đo ở ba độ dài job
+    (0.3s · 1.0s · 2.0s) thì tăng tốc kẹt ~2.5-2.6× ở CẢ BA, tức không phải phí
+    cố định.
+  - >
+    "Trần là `fsync` serialize." CŨNG SAI — sau khi đóng cuộc đua ở lỗi 1,
+    tăng tốc lên 3.77× ngay tại job 0.3s. Trần thật là chính cuộc đua: các
+    luồng va nhau rồi thử lại. Nếu tôi nới bar cổng xuống cho vừa 2.5× thì đã
+    giao một hệ thống có lỗi đua kèm một cổng nói nó bình thường.
+
+do_sau:
+  - lenh: python chungcat/tests/check_worker_song_song.py
+    ket_qua: "XANH 10/10 vế"
+  - lenh: python chungcat/tests/check_worker_giet_giua_chung.py
+    ket_qua: "XANH 5/5 vế"
+  - lenh: python chungcat/tests/check_mot_cua_egress.py
+    ket_qua: "XANH — kèm 4 vế AC3 mới"
+  - lenh: python chungcat/tests/check_e2e_chung_cat.py --mock
+    ket_qua: "XANH · 1 dòng egress · 0 token"
+  - lenh: 'for f in chungcat/tests/check_*.py; do python "$f"; done'
+    ket_qua: 35/35 XANH
+  - lenh: python -m pytest core/tests -q
+    ket_qua: 49 passed
+  - lenh: python core/tests/check_g6b.py
+    ket_qua: "T12-23 ok · 12 → 2 lỗi toàn dự án"
+
+do_tang_toc:
+  cach_do: "8 job mock có `sleep` cố định, 0 mạng 0 model; so 1 luồng với 4 luồng"
+  ket_qua:
+    - "job 0.3s · 1 luồng 2.55s · 4 luồng 0.68s · 3.77×"
+    - "job 0.5s · 1 luồng 4.16s · 4 luồng 1.10s · 3.78×"
+    - "job 2.0s · 1 luồng 16.15s · 4 luồng 4.08s · 3.96×"
+  moi_lan: "8/8 việc vào `done/`, 0 `WinError`, 0 job báo HỎNG"
+
+quyet_dinh:
+  luong_khong_tien_trinh: >
+    Việc `chung-cat` chờ MẠNG, và luồng Python nhả GIL khi chờ I/O. Tiến trình
+    con thì mỗi cái nạp lại module + `.env` + bảng khai cho một việc chỉ ngồi
+    đợi socket.
+  khong_khoa_python_quanh_chon_viec: >
+    `rename` và `O_EXCL` đã nguyên tử ở tầng hệ điều hành nên chúng đúng cho
+    luồng cùng tiến trình y như cho tiến trình khác nhau. Một khoá Python chỉ
+    đúng TRONG một tiến trình — nó tạo cảm giác an toàn ở đúng chỗ đã an toàn,
+    và không giúp gì cho ca hai TIẾN TRÌNH.
+  moi_tien_trinh_mot_so_egress: >
+    `seq` do TA cấp bằng cách đọc dòng cuối. N bên cùng ghi một file là cuộc
+    đua trên chính phép cấp số, và `AC-6.2` vỡ IM LẶNG. Khoá file chéo tiến
+    trình trên Windows là ổ bug; khoá giữ qua `fsync` biến mọi lần gửi thành
+    hàng một. Đánh đổi khai thẳng: `seq` chỉ liên tục TRONG một sổ, đọc gộp
+    theo `(worker_id, seq)` — `egress.doc_moi_so()` làm sẵn.
+  tran_asr_tach_rieng: >
+    `chung-cat` chờ mạng (CPU rảnh); `sinh-transcript` local nghiến CPU và mỗi
+    bản giữ một model trong RAM. Một con số chung thì hoặc bóp nghẹt loại thứ
+    nhất, hoặc cho loại thứ hai làm nghẽn máy.
+  pid_chet_manh_hon_dong_ho: >
+    Với một worker, chờ hết `HAN_TREO_GIAY` chỉ tốn thời gian. Với 2×4 luồng,
+    một tiến trình chết lúc tám việc đang chạy KHOÁ CẢ TÁM trong nửa tiếng, và
+    người dùng nhìn màn thấy tám việc "đang chạy" mà không gì nhúc nhích.
+
+khong_noi_tai_cho: >
+  `chay.sh` ở GỐC repo, ngoài boundary `M12` (`chungcat/**`). Lệnh chạy hai
+  tiến trình ghi vào `chungcat/README.md` (đất mình) + ô nợ trong backlog cho
+  chủ đất. Không sửa `chay.sh`, nên `song_song.tien_trinh: 2` CHƯA có hiệu lực
+  khi khởi động bằng script — nói ra thay vì để người tưởng đã có.
+
+object:
+  - chungcat/src/vong.py
+  - chungcat/src/worker.py
+  - chungcat/src/egress.py
+  - chungcat/assets/nguong.json
+  - chungcat/tests/check_worker_song_song.py
+  - chungcat/tests/check_worker_giet_giua_chung.py
+  - chungcat/tests/check_mot_cua_egress.py
+  - chungcat/README.md
+  - 06_modules/M12_chungcat/backlog.md
+  - 07_plan/M12_chungcat/tasks/T12-8-test-cong-m12.md

@@ -1,0 +1,895 @@
+{
+ "nhap_chung_cat": [
+  {
+   "job_ulid": "be4b4909dfda20a7451ffb5776b638e9",
+   "nguoi_dung_id": null,
+   "ban_goc_ai": "---\nid: src_xgb2026aio\nslug: xgboost-taylor-bac-hai\nsource_type: docs\nurl: https://aivietnam.edu.vn/\nprotocol_version: '2.0'\nanalyzed_at: '2026-08-29'\ntitle: XGBoost hơn Gradient Boosting ở chỗ dùng đạo hàm bậc HAI — và đó là toàn bộ câu chuyện\none_liner: Điểm khác duy nhất đáng nhớ giữa XGBoost và GB truyền thống là khai triển Taylor bậc hai, mọi thứ còn lại là hệ quả\ncredibility_max: plausible\nconformance: B\ncitations_sampled: 15\ncitations_verified: 0\ncategory:\n- ml\nconcepts:\n- algorithm\nconcepts_proposed:\n- taylor-bac-hai-trong-boosting\n- hessian-lam-do-cong\n- dieu-chuan-trong-ham-muc-tieu\nword_count: 963\ningested_at: '2026-08-19'\nurl_normalized: aivietnam.edu.vn\norigin: external\nreview_status: approved\nunverifiable_citations: true\n---\n\n## 1. Overview\n\nTài liệu dạy XGBoost theo lối \"step-by-step\", nhưng thứ đáng giữ lại không phải\ndanh sách tính năng — mà là **một khác biệt toán học duy nhất** sinh ra mọi ưu\nthế còn lại: XGBoost xấp xỉ hàm mất mát bằng **khai triển Taylor bậc hai**, trong\nkhi Gradient Boosting truyền thống chỉ dùng bậc nhất.\n\n## 2. Bối cảnh\n\nDeep learning thống trị ảnh và ngôn ngữ, nhưng trên **dữ liệu bảng** thì không.\nTài liệu dẫn công trình của Léo Grinsztajn: trên 45 bộ dữ liệu cỡ trung (~10.000\nmẫu mỗi bộ, hơn 20.000 giờ tối ưu siêu tham số), các mô hình cây Boosting vẫn\nvượt MLP, ResNet và Transformer — và giữ độ ổn định ngay cả khi dữ liệu có đặc\ntrưng dư thừa hoặc cấu trúc bất lợi cho mạng sâu [§I].\n\nĐó là lý do một tài liệu năm 2026 vẫn dạy một thuật toán ra đời 2016: nó chưa bị\nthay thế ở chỗ nó mạnh.\n\n## 3. Nội dung\n\n### 3.1 Đầu vào\n\nTập huấn luyện `D = {(xᵢ, yᵢ)}`, một hàm mất mát `l` bất kỳ khả vi hai lần, và\nbốn siêu tham số: `η` (hệ số học), `λ` (phạt độ lớn trọng số lá), `γ` (phạt số\nlá), `max_depth`.\n\n### 3.2 Process\n\nXGBoost huấn luyện **cộng dồn**: `F_M(x) = F₀(x) + Σ η·f_t(x)` với `0 < η ≤ 1`\n[§II.6.1]. Tại mỗi vòng `t`, thay vì tối ưu hàm mất mát thật, nó **xấp xỉ hàm đó\nbằng một parabol** quanh dự đoán cũ:\n\n```\nL(t) ≈ Σ [ l(yᵢ, ŷᵢ^(t-1)) + gᵢ·f_t(xᵢ) + ½·hᵢ·f_t(xᵢ)² ] + Ω(f_t)\n```\n\nvới `gᵢ` là gradient (đạo hàm bậc nhất) và `hᵢ` là hessian (bậc hai) [§II.6.1].\n\nĐây là **chỗ toàn bộ khác biệt nằm**. GB truyền thống chỉ có `gᵢ` — nó biết\n*hướng* đi xuống nhưng không biết hàm *cong* bao nhiêu, nên bước nhảy có thể vượt\nqua cực tiểu nếu hàm cong gắt. XGBoost có thêm `hᵢ` nên ước lượng được cả độ\ncong, và chọn được bước dừng hợp lý hơn [§II.4].\n\nTài liệu ví: GB như xuống dốc chỉ nhìn độ dốc trước mắt; XGBoost vừa nhìn dốc vừa\nước lượng độ cong [§II.4].\n\nHệ quả trực tiếp là hai công thức đóng — trọng số lá tối ưu và điểm lợi khi tách\nnhánh — đều rút ra được **dạng đóng**, không phải dò tìm:\n\n```\nw*ⱼ = − Gⱼ / (Hⱼ + λ)\nGain = ½·( G²_L/(H_L+λ) + G²_R/(H_R+λ) − (G_L+G_R)²/(H_L+H_R+λ) ) − γ\n```\n\nvới `Gⱼ = Σ gᵢ`, `Hⱼ = Σ hᵢ` trong lá `j` [§II.5].\n\nThành phần điều chuẩn `Ω(f) = γT + ½λ·Σwⱼ²` nằm **trong chính hàm mục tiêu**,\nkhông phải một bước cắt tỉa hậu kỳ [§II.3]. Vì nó ở trong hàm mục tiêu nên `λ`\nxuất hiện ngay dưới mẫu của cả `w*ⱼ` lẫn `Gain` — điều chuẩn tham gia vào *quyết\nđịnh tách nhánh*, không chỉ vào kết quả cuối.\n\n### 3.3 Output\n\nMột tổ hợp cộng dồn các cây nông. Tài liệu chạy hai ví dụ tay có thể kiểm lại:\n\n**Hồi quy** (MSE, `λ=1`, `γ=0`, 6 điểm): `F₀ = 2.0`, gradient\n`g = [2, 1, 0.5, −0.5, −1, −2]`, `hᵢ = 1`. Thử 5 ngưỡng tách, gain lần lượt\n`1.3333 · 2.4000 · 3.0625 · 2.4000 · 1.3333` → ngưỡng **2.5** thắng, cho\n`w*_L = −0.875` [§II.7.1].\n\n**Phân loại nhị phân** (logistic, `η=0.5`, `λ=1`, `max_depth=1`): `pᵢ = 0.5` nên\n`gᵢ = pᵢ − yᵢ = ±0.5` và `hᵢ = pᵢ(1−pᵢ) = 0.25`. Gain:\n`0.1556 · 0.5833 · 1.2857 · 0.5833 · 0.1556` → cũng ngưỡng **2.5** [§II.7.2].\n\nPhần thực hành dùng UCI Heart Disease (~303 bệnh nhân), rút gọn còn `age → chol`\ntrên 6 bệnh nhân [§III.1].\n\n### 3.4 Tinh túy\n\n#### 3.4.1 Hessian biến \"hướng\" thành \"hướng + độ cong\"\n\n- **Không hiển nhiên vì:** danh sách tính năng XGBoost (song song hoá, xử lý dữ\n  liệu thưa, cắt tỉa, subsample) khiến người đọc tưởng ưu thế đến từ kỹ thuật hệ\n  thống. Thực ra chúng là tối ưu *tốc độ*; thứ đổi *chất lượng* là đạo hàm bậc hai.\n- **Chuyển giao:** bất kỳ bài toán tối ưu lặp nào — nếu đang chỉ dùng gradient và\n  bước nhảy hay vượt đích, hỏi xem hessian có rẻ để tính không.\n- **Tin cậy:** tài liệu chỉ *khẳng định* hội tụ nhanh hơn, không đo. Con số duy\n  nhất có là Hình 4 (Acc 0.91/0.90/0.92) — quá sát để kết luận.\n- **Bằng chứng:** [§II.4]\n- **Loại:** knowledge\n\n#### 3.4.2 Điều chuẩn đặt TRONG hàm mục tiêu thì nó tham gia quyết định tách nhánh\n\n- **Không hiển nhiên vì:** phần lớn tài liệu giới thiệu regularization như một\n  bước chống quá khớp *sau khi* dựng cây. Ở đây `λ` và `γ` nằm ngay trong công\n  thức `Gain`, nên chúng ảnh hưởng *cây được dựng ra sao*, không chỉ cây bị tỉa\n  thế nào.\n- **Chuyển giao:** khi thêm ràng buộc vào một mô hình, hỏi \"ràng buộc này tham\n  gia vào quyết định, hay chỉ dọn dẹp sau?\" — hai chỗ đặt cho hai hành vi khác nhau.\n- **Tin cậy:** đọc thẳng từ công thức, kiểm được bằng đại số.\n- **Bằng chứng:** [§II.3]\n- **Loại:** knowledge\n\n## 4. Ý nghĩa thực tế\n\nDùng để **đọc log XGBoost**: khi `Gain` của mọi ngưỡng đều âm, cây dừng — và\nnhìn công thức thì biết ngay `γ` đang quá lớn, chứ không phải dữ liệu hết tín\nhiệu [§II.5]. Ví dụ ở §II.7.1 cho thấy với `γ=0` thì gain cao nhất là 3.0625;\nđặt `γ = 3.1` là cây không tách nhánh nào cả.\n\n## 5. Rủi ro và tầm nhìn\n\nTài liệu là giáo trình, không phải nghiên cứu: nó **không tái lập** con số của\nGrinsztajn, chỉ dẫn lại [§I]. Hình 4 so ba thuật toán trên *một* bộ dữ liệu tổng\nhợp 2 đặc trưng — chênh lệch 0.90 → 0.92 không đủ để kết luận gì.\n\nHai chỗ tài liệu bỏ trống: **khi nào hessian không đáng tin** (hàm mất mát không\nlồi, `hᵢ` có thể âm), và **chi phí** của việc tính bậc hai trên dữ liệu lớn.\nMuốn dùng thật thì phải đọc bản gốc Chen & Guestrin 2016 [§V].\n",
+   "ban_hien_tai": "---\nid: src_xgb2026aio\nslug: xgboost-taylor-bac-hai\nsource_type: docs\nurl: https://aivietnam.edu.vn/\nprotocol_version: '2.0'\nanalyzed_at: '2026-08-29'\ntitle: XGBoost hơn Gradient Boosting ở chỗ dùng đạo hàm bậc HAI — và đó là toàn bộ câu chuyện\none_liner: Điểm khác duy nhất đáng nhớ giữa XGBoost và GB truyền thống là khai triển Taylor bậc hai, mọi thứ còn lại là hệ quả\ncredibility_max: plausible\nconformance: B\ncitations_sampled: 15\ncitations_verified: 0\ncategory:\n- ml\nconcepts:\n- algorithm\nconcepts_proposed:\n- taylor-bac-hai-trong-boosting\n- hessian-lam-do-cong\n- dieu-chuan-trong-ham-muc-tieu\nword_count: 963\ningested_at: '2026-08-19'\nurl_normalized: aivietnam.edu.vn\norigin: external\nreview_status: approved\nunverifiable_citations: true\n---\n\n## 1. Overview\n\nTài liệu dạy XGBoost theo lối \"step-by-step\", nhưng thứ đáng giữ lại không phải\ndanh sách tính năng — mà là **một khác biệt toán học duy nhất** sinh ra mọi ưu\nthế còn lại: XGBoost xấp xỉ hàm mất mát bằng **khai triển Taylor bậc hai**, trong\nkhi Gradient Boosting truyền thống chỉ dùng bậc nhất.\n\n## 2. Bối cảnh\n\nDeep learning thống trị ảnh và ngôn ngữ, nhưng trên **dữ liệu bảng** thì không.\nTài liệu dẫn công trình của Léo Grinsztajn: trên 45 bộ dữ liệu cỡ trung (~10.000\nmẫu mỗi bộ, hơn 20.000 giờ tối ưu siêu tham số), các mô hình cây Boosting vẫn\nvượt MLP, ResNet và Transformer — và giữ độ ổn định ngay cả khi dữ liệu có đặc\ntrưng dư thừa hoặc cấu trúc bất lợi cho mạng sâu [§I].\n\nĐó là lý do một tài liệu năm 2026 vẫn dạy một thuật toán ra đời 2016: nó chưa bị\nthay thế ở chỗ nó mạnh.\n\n## 3. Nội dung\n\n### 3.1 Đầu vào\n\nTập huấn luyện `D = {(xᵢ, yᵢ)}`, một hàm mất mát `l` bất kỳ khả vi hai lần, và\nbốn siêu tham số: `η` (hệ số học), `λ` (phạt độ lớn trọng số lá), `γ` (phạt số\nlá), `max_depth`.\n\n### 3.2 Process\n\nXGBoost huấn luyện **cộng dồn**: `F_M(x) = F₀(x) + Σ η·f_t(x)` với `0 < η ≤ 1`\n[§II.6.1]. Tại mỗi vòng `t`, thay vì tối ưu hàm mất mát thật, nó **xấp xỉ hàm đó\nbằng một parabol** quanh dự đoán cũ:\n\n```\nL(t) ≈ Σ [ l(yᵢ, ŷᵢ^(t-1)) + gᵢ·f_t(xᵢ) + ½·hᵢ·f_t(xᵢ)² ] + Ω(f_t)\n```\n\nvới `gᵢ` là gradient (đạo hàm bậc nhất) và `hᵢ` là hessian (bậc hai) [§II.6.1].\n\nĐây là **chỗ toàn bộ khác biệt nằm**. GB truyền thống chỉ có `gᵢ` — nó biết\n*hướng* đi xuống nhưng không biết hàm *cong* bao nhiêu, nên bước nhảy có thể vượt\nqua cực tiểu nếu hàm cong gắt. XGBoost có thêm `hᵢ` nên ước lượng được cả độ\ncong, và chọn được bước dừng hợp lý hơn [§II.4].\n\nTài liệu ví: GB như xuống dốc chỉ nhìn độ dốc trước mắt; XGBoost vừa nhìn dốc vừa\nước lượng độ cong [§II.4].\n\nHệ quả trực tiếp là hai công thức đóng — trọng số lá tối ưu và điểm lợi khi tách\nnhánh — đều rút ra được **dạng đóng**, không phải dò tìm:\n\n```\nw*ⱼ = − Gⱼ / (Hⱼ + λ)\nGain = ½·( G²_L/(H_L+λ) + G²_R/(H_R+λ) − (G_L+G_R)²/(H_L+H_R+λ) ) − γ\n```\n\nvới `Gⱼ = Σ gᵢ`, `Hⱼ = Σ hᵢ` trong lá `j` [§II.5].\n\nThành phần điều chuẩn `Ω(f) = γT + ½λ·Σwⱼ²` nằm **trong chính hàm mục tiêu**,\nkhông phải một bước cắt tỉa hậu kỳ [§II.3]. Vì nó ở trong hàm mục tiêu nên `λ`\nxuất hiện ngay dưới mẫu của cả `w*ⱼ` lẫn `Gain` — điều chuẩn tham gia vào *quyết\nđịnh tách nhánh*, không chỉ vào kết quả cuối.\n\n### 3.3 Output\n\nMột tổ hợp cộng dồn các cây nông. Tài liệu chạy hai ví dụ tay có thể kiểm lại:\n\n**Hồi quy** (MSE, `λ=1`, `γ=0`, 6 điểm): `F₀ = 2.0`, gradient\n`g = [2, 1, 0.5, −0.5, −1, −2]`, `hᵢ = 1`. Thử 5 ngưỡng tách, gain lần lượt\n`1.3333 · 2.4000 · 3.0625 · 2.4000 · 1.3333` → ngưỡng **2.5** thắng, cho\n`w*_L = −0.875` [§II.7.1].\n\n**Phân loại nhị phân** (logistic, `η=0.5`, `λ=1`, `max_depth=1`): `pᵢ = 0.5` nên\n`gᵢ = pᵢ − yᵢ = ±0.5` và `hᵢ = pᵢ(1−pᵢ) = 0.25`. Gain:\n`0.1556 · 0.5833 · 1.2857 · 0.5833 · 0.1556` → cũng ngưỡng **2.5** [§II.7.2].\n\nPhần thực hành dùng UCI Heart Disease (~303 bệnh nhân), rút gọn còn `age → chol`\ntrên 6 bệnh nhân [§III.1].\n\n### 3.4 Tinh túy\n\n#### 3.4.1 Hessian biến \"hướng\" thành \"hướng + độ cong\"\n\n- **Không hiển nhiên vì:** danh sách tính năng XGBoost (song song hoá, xử lý dữ\n  liệu thưa, cắt tỉa, subsample) khiến người đọc tưởng ưu thế đến từ kỹ thuật hệ\n  thống. Thực ra chúng là tối ưu *tốc độ*; thứ đổi *chất lượng* là đạo hàm bậc hai.\n- **Chuyển giao:** bất kỳ bài toán tối ưu lặp nào — nếu đang chỉ dùng gradient và\n  bước nhảy hay vượt đích, hỏi xem hessian có rẻ để tính không.\n- **Tin cậy:** tài liệu chỉ *khẳng định* hội tụ nhanh hơn, không đo. Con số duy\n  nhất có là Hình 4 (Acc 0.91/0.90/0.92) — quá sát để kết luận.\n- **Bằng chứng:** [§II.4]\n- **Loại:** knowledge\n\n#### 3.4.2 Điều chuẩn đặt TRONG hàm mục tiêu thì nó tham gia quyết định tách nhánh\n\n- **Không hiển nhiên vì:** phần lớn tài liệu giới thiệu regularization như một\n  bước chống quá khớp *sau khi* dựng cây. Ở đây `λ` và `γ` nằm ngay trong công\n  thức `Gain`, nên chúng ảnh hưởng *cây được dựng ra sao*, không chỉ cây bị tỉa\n  thế nào.\n- **Chuyển giao:** khi thêm ràng buộc vào một mô hình, hỏi \"ràng buộc này tham\n  gia vào quyết định, hay chỉ dọn dẹp sau?\" — hai chỗ đặt cho hai hành vi khác nhau.\n- **Tin cậy:** đọc thẳng từ công thức, kiểm được bằng đại số.\n- **Bằng chứng:** [§II.3]\n- **Loại:** knowledge\n\n## 4. Ý nghĩa thực tế\n\nDùng để **đọc log XGBoost**: khi `Gain` của mọi ngưỡng đều âm, cây dừng — và\nnhìn công thức thì biết ngay `γ` đang quá lớn, chứ không phải dữ liệu hết tín\nhiệu [§II.5]. Ví dụ ở §II.7.1 cho thấy với `γ=0` thì gain cao nhất là 3.0625;\nđặt `γ = 3.1` là cây không tách nhánh nào cả.\n\n## 5. Rủi ro và tầm nhìn\n\nTài liệu là giáo trình, không phải nghiên cứu: nó **không tái lập** con số của\nGrinsztajn, chỉ dẫn lại [§I]. Hình 4 so ba thuật toán trên *một* bộ dữ liệu tổng\nhợp 2 đặc trưng — chênh lệch 0.90 → 0.92 không đủ để kết luận gì.\n\nHai chỗ tài liệu bỏ trống: **khi nào hessian không đáng tin** (hàm mất mát không\nlồi, `hᵢ` có thể âm), và **chi phí** của việc tính bậc hai trên dữ liệu lớn.\nMuốn dùng thật thì phải đọc bản gốc Chen & Guestrin 2016 [§V].\n",
+   "trang_thai": "tra_lai",
+   "khang_dinh_bi_tia": null,
+   "ly_do": "thiếu địa chỉ cho hai khẳng định ở mục 3",
+   "review_status": "draft",
+   "lan_gui_duyet": 0,
+   "tao_luc": "2026-09-04 04:17:33",
+   "cap_nhat_luc": "2026-09-04 04:18:15"
+  },
+  {
+   "job_ulid": "3a0ce959fba3ea4985ce2f18960d282d",
+   "nguoi_dung_id": null,
+   "ban_goc_ai": "---\nslug: phan-tich-xgboost-stap-by-step\nsource_type: article\nho_so: phan-tich\nnguon: [tai-lieu/xgboost-stap-by-step]\nmodel_da_dung: gemini-2.5-flash-lite\ncitations_sampled: 0\ncitations_verified: 0\n---\n\nTài liệu giải thích Boosting là một kỹ thuật học máy thực hiện việc kết hợp các mô hình yếu (thường là cây quyết định nông) một cách tuần tự và phụ thuộc lẫn nhau. Mục đích của phương pháp này là xây dựng một mô hình mạnh mẽ hơn nhằm giảm sai số và tăng cường khả năng tổng quát hóa của hệ thống.",
+   "ban_hien_tai": "---\nslug: phan-tich-xgboost-stap-by-step\nsource_type: article\nho_so: phan-tich\nnguon: [tai-lieu/xgboost-stap-by-step]\nmodel_da_dung: gemini-2.5-flash-lite\ncitations_sampled: 0\ncitations_verified: 0\n---\n\nTài liệu giải thích Boosting là một kỹ thuật học máy thực hiện việc kết hợp các mô hình yếu (thường là cây quyết định nông) một cách tuần tự và phụ thuộc lẫn nhau. Mục đích của phương pháp này là xây dựng một mô hình mạnh mẽ hơn nhằm giảm sai số và tăng cường khả năng tổng quát hóa của hệ thống.",
+   "trang_thai": "nhap",
+   "khang_dinh_bi_tia": null,
+   "ly_do": null,
+   "review_status": "draft",
+   "lan_gui_duyet": 0,
+   "tao_luc": "2026-09-04 15:16:38",
+   "cap_nhat_luc": "2026-09-04 15:16:38"
+  },
+  {
+   "job_ulid": "45a09fc1421865457a4928ea60b21f03",
+   "nguoi_dung_id": null,
+   "ban_goc_ai": "---\nslug: phan-tich-xgboost-stap-by-step\nsource_type: article\nho_so: phan-tich\nnguon: [tai-lieu/xgboost-stap-by-step]\nmodel_da_dung: gemini-2.5-flash-lite\ncitations_sampled: 1\ncitations_verified: 1\n---\n\nTài liệu giải thích Boosting là một phương pháp học máy thuộc nhóm ensemble, hoạt động bằng cách kết hợp tuần tự các mô hình yếu (thường là cây quyết định nông) để tạo thành một mô hình mạnh mẽ, giúp tối ưu hóa kết quả dự đoán và tăng cường khả năng tổng quát hóa của hệ thống.",
+   "ban_hien_tai": "---\nslug: phan-tich-xgboost-stap-by-step\nsource_type: article\nho_so: phan-tich\nnguon: [tai-lieu/xgboost-stap-by-step]\nmodel_da_dung: gemini-2.5-flash-lite\ncitations_sampled: 1\ncitations_verified: 1\n---\n\nTài liệu giải thích Boosting là một phương pháp học máy thuộc nhóm ensemble, hoạt động bằng cách kết hợp tuần tự các mô hình yếu (thường là cây quyết định nông) để tạo thành một mô hình mạnh mẽ, giúp tối ưu hóa kết quả dự đoán và tăng cường khả năng tổng quát hóa của hệ thống.",
+   "trang_thai": "nhap",
+   "khang_dinh_bi_tia": null,
+   "ly_do": null,
+   "review_status": "draft",
+   "lan_gui_duyet": 0,
+   "tao_luc": "2026-09-04 15:17:35",
+   "cap_nhat_luc": "2026-09-04 15:17:35"
+  },
+  {
+   "job_ulid": "489e0093f62e43a637c2294d6e90ae48",
+   "nguoi_dung_id": null,
+   "ban_goc_ai": "---\nslug: phan-tich-xgboost-stap-by-step\nsource_type: article\nho_so: phan-tich\nnguon: [tai-lieu/xgboost-stap-by-step]\nmodel_da_dung: gemini-2.5-flash-lite\ncitations_sampled: 1\ncitations_verified: 1\n---\n\nBoosting là một kỹ thuật học máy thuộc nhóm ensemble, kết hợp nhiều weak learners (thường là shallow decision trees) theo cách tuần tự phụ thuộc lẫn nhau để tạo nên một mô hình tổng thể mạnh hơn, giúp giảm sai số dự đoán và cải thiện khả năng tổng quát hóa.",
+   "ban_hien_tai": "---\nslug: phan-tich-xgboost-stap-by-step\nsource_type: article\nho_so: phan-tich\nnguon: [tai-lieu/xgboost-stap-by-step]\nmodel_da_dung: gemini-2.5-flash-lite\ncitations_sampled: 1\ncitations_verified: 1\n---\n\nBoosting là một kỹ thuật học máy thuộc nhóm ensemble, kết hợp nhiều weak learners (thường là shallow decision trees) theo cách tuần tự phụ thuộc lẫn nhau để tạo nên một mô hình tổng thể mạnh hơn, giúp giảm sai số dự đoán và cải thiện khả năng tổng quát hóa.",
+   "trang_thai": "nhap",
+   "khang_dinh_bi_tia": null,
+   "ly_do": null,
+   "review_status": "draft",
+   "lan_gui_duyet": 0,
+   "tao_luc": "2026-09-04 18:17:32",
+   "cap_nhat_luc": "2026-09-04 18:17:32"
+  },
+  {
+   "job_ulid": "113f95f9830a1daf9df97bc61f36012f",
+   "nguoi_dung_id": null,
+   "ban_goc_ai": "---\nslug: phan-tich-xgboost-stap-by-step\nsource_type: article\nho_so: phan-tich\nnguon: [tai-lieu/xgboost-stap-by-step]\nmodel_da_dung: gemini-2.5-flash-lite\ncitations_sampled: 1\ncitations_verified: 1\n---\n\nTài liệu định nghĩa Boosting (tăng cường) là một kỹ thuật học máy thuộc nhóm ensemble (tổ hợp mô hình). Kỹ thuật này hoạt động bằng cách kết hợp tuần tự các mô hình học yếu (weak learners, thường là cây quyết định nông) có sự phụ thuộc lẫn nhau. Mục tiêu của Boosting là xây dựng một mô hình tổng thể mạnh mẽ hơn, giảm thiểu sai số trong dự đoán và tối ưu hóa khả năng tổng quát hóa.",
+   "ban_hien_tai": "---\nslug: phan-tich-xgboost-stap-by-step\nsource_type: article\nho_so: phan-tich\nnguon: [tai-lieu/xgboost-stap-by-step]\nmodel_da_dung: gemini-2.5-flash-lite\ncitations_sampled: 1\ncitations_verified: 1\n---\n\nTài liệu định nghĩa Boosting (tăng cường) là một kỹ thuật học máy thuộc nhóm ensemble (tổ hợp mô hình). Kỹ thuật này hoạt động bằng cách kết hợp tuần tự các mô hình học yếu (weak learners, thường là cây quyết định nông) có sự phụ thuộc lẫn nhau. Mục tiêu của Boosting là xây dựng một mô hình tổng thể mạnh mẽ hơn, giảm thiểu sai số trong dự đoán và tối ưu hóa khả năng tổng quát hóa.",
+   "trang_thai": "nhap",
+   "khang_dinh_bi_tia": null,
+   "ly_do": null,
+   "review_status": "draft",
+   "lan_gui_duyet": 0,
+   "tao_luc": "2026-09-04 19:02:45",
+   "cap_nhat_luc": "2026-09-04 19:02:45"
+  },
+  {
+   "job_ulid": "817cdf20f5802ae1473ae5ec4da0cd3f",
+   "nguoi_dung_id": null,
+   "ban_goc_ai": "---\nslug: phan-tich-xgboost-stap-by-step\nsource_type: article\nho_so: phan-tich\nnguon: [tai-lieu/xgboost-stap-by-step]\nmodel_da_dung: gemini-2.5-flash-lite\ncitations_sampled: 1\ncitations_verified: 1\n---\n\nBoosting (tăng cường) là một kỹ thuật học máy thuộc nhóm ensemble (tổ hợp mô hình), trong đó nhiều mô hình yếu (weak learners), thường là cây quyết định nông (shallow decision trees), được kết hợp theo cách tuần tự và phụ thuộc lẫn nhau để tạo ra một mô hình tổng thể mạnh mẽ hơn, giúp giảm sai số dự đoán và cải thiện khả năng tổng quát hóa.",
+   "ban_hien_tai": "---\nslug: phan-tich-xgboost-stap-by-step\nsource_type: article\nho_so: phan-tich\nnguon: [tai-lieu/xgboost-stap-by-step]\nmodel_da_dung: gemini-2.5-flash-lite\ncitations_sampled: 1\ncitations_verified: 1\n---\n\nBoosting (tăng cường) là một kỹ thuật học máy thuộc nhóm ensemble (tổ hợp mô hình), trong đó nhiều mô hình yếu (weak learners), thường là cây quyết định nông (shallow decision trees), được kết hợp theo cách tuần tự và phụ thuộc lẫn nhau để tạo ra một mô hình tổng thể mạnh mẽ hơn, giúp giảm sai số dự đoán và cải thiện khả năng tổng quát hóa.",
+   "trang_thai": "nhap",
+   "khang_dinh_bi_tia": null,
+   "ly_do": null,
+   "review_status": "draft",
+   "lan_gui_duyet": 0,
+   "tao_luc": "2026-09-04 19:17:46",
+   "cap_nhat_luc": "2026-09-04 19:17:46"
+  },
+  {
+   "job_ulid": "0e56875a8bf41efbb582f4b53e2e3b8e",
+   "nguoi_dung_id": null,
+   "ban_goc_ai": "---\nslug: phan-tich-xgboost-stap-by-step\nsource_type: article\nho_so: phan-tich\nnguon: [tai-lieu/xgboost-stap-by-step]\nmodel_da_dung: gemini-2.5-flash-lite\ncitations_sampled: 3\ncitations_verified: 3\n---\n\nTài liệu giải thích kỹ thuật Boosting, một phương pháp học máy thuộc nhóm ensemble. Boosting hoạt động bằng cách kết hợp tuần tự và phụ thuộc lẫn nhau nhiều mô hình yếu (thường là cây quyết định nông) để tạo ra một mô hình mạnh mẽ hơn. Mục tiêu là giảm sai số dự đoán và nâng cao khả năng tổng quát hóa của mô hình.",
+   "ban_hien_tai": "---\nslug: phan-tich-xgboost-stap-by-step\nsource_type: article\nho_so: phan-tich\nnguon: [tai-lieu/xgboost-stap-by-step]\nmodel_da_dung: gemini-2.5-flash-lite\ncitations_sampled: 3\ncitations_verified: 3\n---\n\nTài liệu giải thích kỹ thuật Boosting, một phương pháp học máy thuộc nhóm ensemble. Boosting hoạt động bằng cách kết hợp tuần tự và phụ thuộc lẫn nhau nhiều mô hình yếu (thường là cây quyết định nông) để tạo ra một mô hình mạnh mẽ hơn. Mục tiêu là giảm sai số dự đoán và nâng cao khả năng tổng quát hóa của mô hình.",
+   "trang_thai": "nhap",
+   "khang_dinh_bi_tia": null,
+   "ly_do": null,
+   "review_status": "draft",
+   "lan_gui_duyet": 0,
+   "tao_luc": "2026-09-04 19:20:19",
+   "cap_nhat_luc": "2026-09-04 19:20:19"
+  },
+  {
+   "job_ulid": "cb01b8570646c071d03eeb8f0aec882a",
+   "nguoi_dung_id": null,
+   "ban_goc_ai": "---\nslug: phan-tich-xgboost-stap-by-step\nsource_type: article\nho_so: phan-tich\nnguon: [tai-lieu/xgboost-stap-by-step]\nmodel_da_dung: gemini-2.5-flash-lite\ncitations_sampled: 1\ncitations_verified: 1\n---\n\nBoosting, một kỹ thuật học máy thuộc nhóm ensemble, kết hợp nhiều mô hình yếu (thường là cây quyết định nông) một cách tuần tự và phụ thuộc lẫn nhau để tạo ra một mô hình tổng thể mạnh mẽ hơn. Mục tiêu của boosting là giảm sai số dự đoán và cải thiện khả năng tổng quát hóa của mô hình.",
+   "ban_hien_tai": "---\nslug: phan-tich-xgboost-stap-by-step\nsource_type: article\nho_so: phan-tich\nnguon: [tai-lieu/xgboost-stap-by-step]\nmodel_da_dung: gemini-2.5-flash-lite\ncitations_sampled: 1\ncitations_verified: 1\n---\n\nBoosting, một kỹ thuật học máy thuộc nhóm ensemble, kết hợp nhiều mô hình yếu (thường là cây quyết định nông) một cách tuần tự và phụ thuộc lẫn nhau để tạo ra một mô hình tổng thể mạnh mẽ hơn. Mục tiêu của boosting là giảm sai số dự đoán và cải thiện khả năng tổng quát hóa của mô hình.",
+   "trang_thai": "nhap",
+   "khang_dinh_bi_tia": null,
+   "ly_do": null,
+   "review_status": "draft",
+   "lan_gui_duyet": 0,
+   "tao_luc": "2026-09-04 19:42:25",
+   "cap_nhat_luc": "2026-09-04 19:42:25"
+  },
+  {
+   "job_ulid": "d2bc64e88c64576cdd3432c3ee7a54d2",
+   "nguoi_dung_id": null,
+   "ban_goc_ai": "---\nslug: phan-tich-xgboost-stap-by-step\nsource_type: article\nho_so: phan-tich\nnguon: [tai-lieu/xgboost-stap-by-step]\nmodel_da_dung: gemini-2.5-flash\ncitations_sampled: 1\ncitations_verified: 1\n---\n\nTài liệu giải thích Boosting là một phương pháp học máy thuộc nhóm ensemble, hoạt động bằng cách kết hợp tuần tự các mô hình yếu (thường là các cây quyết định nông) để tạo ra một mô hình mạnh mẽ hơn, từ đó giúp giảm sai số và tăng cường khả năng tổng quát hóa của hệ thống.",
+   "ban_hien_tai": "---\nslug: phan-tich-xgboost-stap-by-step\nsource_type: article\nho_so: phan-tich\nnguon: [tai-lieu/xgboost-stap-by-step]\nmodel_da_dung: gemini-2.5-flash\ncitations_sampled: 1\ncitations_verified: 1\n---\n\nTài liệu giải thích Boosting là một phương pháp học máy thuộc nhóm ensemble, hoạt động bằng cách kết hợp tuần tự các mô hình yếu (thường là các cây quyết định nông) để tạo ra một mô hình mạnh mẽ hơn, từ đó giúp giảm sai số và tăng cường khả năng tổng quát hóa của hệ thống.",
+   "trang_thai": "nhap",
+   "khang_dinh_bi_tia": null,
+   "ly_do": null,
+   "review_status": "draft",
+   "lan_gui_duyet": 0,
+   "tao_luc": "2026-09-04 19:42:25",
+   "cap_nhat_luc": "2026-09-04 19:42:25"
+  },
+  {
+   "job_ulid": "ac93eea648266d3292a3016ea40da831",
+   "nguoi_dung_id": null,
+   "ban_goc_ai": "---\nslug: phan-tich-xgboost-stap-by-step\nsource_type: article\nho_so: phan-tich\nnguon: [tai-lieu/xgboost-stap-by-step]\nmodel_da_dung: gemini-2.5-flash-lite\ncitations_sampled: 1\ncitations_verified: 1\n---\n\nBoosting là một kỹ thuật học máy thuộc nhóm ensemble, kết hợp nhiều mô hình yếu (thường là cây quyết định nông) theo cách tuần tự phụ thuộc lẫn nhau để tạo ra một mô hình tổng thể mạnh mẽ hơn, giúp giảm sai số dự đoán và cải thiện khả năng tổng quát hóa.",
+   "ban_hien_tai": "---\nslug: phan-tich-xgboost-stap-by-step\nsource_type: article\nho_so: phan-tich\nnguon: [tai-lieu/xgboost-stap-by-step]\nmodel_da_dung: gemini-2.5-flash-lite\ncitations_sampled: 1\ncitations_verified: 1\n---\n\nBoosting là một kỹ thuật học máy thuộc nhóm ensemble, kết hợp nhiều mô hình yếu (thường là cây quyết định nông) theo cách tuần tự phụ thuộc lẫn nhau để tạo ra một mô hình tổng thể mạnh mẽ hơn, giúp giảm sai số dự đoán và cải thiện khả năng tổng quát hóa.",
+   "trang_thai": "nhap",
+   "khang_dinh_bi_tia": null,
+   "ly_do": null,
+   "review_status": "draft",
+   "lan_gui_duyet": 0,
+   "tao_luc": "2026-09-04 19:42:25",
+   "cap_nhat_luc": "2026-09-04 19:42:25"
+  },
+  {
+   "job_ulid": "5fb5ef8437158274127bd735bd479d66",
+   "nguoi_dung_id": null,
+   "ban_goc_ai": "---\nslug: phan-tich-xgboost-stap-by-step\nsource_type: article\nho_so: phan-tich\nnguon: [tai-lieu/xgboost-stap-by-step]\nmodel_da_dung: gemini-2.5-flash\ncitations_sampled: 1\ncitations_verified: 1\n---\n\nTài liệu định nghĩa Boosting là một kỹ thuật thuộc nhóm ensemble, hoạt động dựa trên nguyên lý kết hợp tuần tự các mô hình học máy yếu (thường là cây quyết định nông) nhằm mục đích nâng cao độ chính xác và khả năng tổng quát hóa cho mô hình tổng thể.",
+   "ban_hien_tai": "---\nslug: phan-tich-xgboost-stap-by-step\nsource_type: article\nho_so: phan-tich\nnguon: [tai-lieu/xgboost-stap-by-step]\nmodel_da_dung: gemini-2.5-flash\ncitations_sampled: 1\ncitations_verified: 1\n---\n\nTài liệu định nghĩa Boosting là một kỹ thuật thuộc nhóm ensemble, hoạt động dựa trên nguyên lý kết hợp tuần tự các mô hình học máy yếu (thường là cây quyết định nông) nhằm mục đích nâng cao độ chính xác và khả năng tổng quát hóa cho mô hình tổng thể.",
+   "trang_thai": "nhap",
+   "khang_dinh_bi_tia": null,
+   "ly_do": null,
+   "review_status": "draft",
+   "lan_gui_duyet": 0,
+   "tao_luc": "2026-09-04 19:42:26",
+   "cap_nhat_luc": "2026-09-04 19:42:26"
+  },
+  {
+   "job_ulid": "d0fb598f7a8fcc351aed2a48e2dea024",
+   "nguoi_dung_id": null,
+   "ban_goc_ai": "---\nslug: phan-tich-xgboost-stap-by-step\nsource_type: article\nho_so: phan-tich\nnguon: [tai-lieu/xgboost-stap-by-step]\nmodel_da_dung: gemini-2.5-flash-lite\ncitations_sampled: 1\ncitations_verified: 1\n---\n\nBoosting là một kỹ thuật học máy thuộc nhóm ensemble (tổ hợp mô hình). Kỹ thuật này hoạt động bằng cách kết hợp nhiều mô hình yếu (weak learners), phổ biến là các cây quyết định nông (shallow decision trees), theo quy trình tuần tự và phụ thuộc lẫn nhau. Việc này nhằm mục đích xây dựng một mô hình tổng thể mạnh mẽ hơn, giảm thiểu sai số dự đoán và nâng cao khả năng tổng quát hóa.",
+   "ban_hien_tai": "---\nslug: phan-tich-xgboost-stap-by-step\nsource_type: article\nho_so: phan-tich\nnguon: [tai-lieu/xgboost-stap-by-step]\nmodel_da_dung: gemini-2.5-flash-lite\ncitations_sampled: 1\ncitations_verified: 1\n---\n\nBoosting là một kỹ thuật học máy thuộc nhóm ensemble (tổ hợp mô hình). Kỹ thuật này hoạt động bằng cách kết hợp nhiều mô hình yếu (weak learners), phổ biến là các cây quyết định nông (shallow decision trees), theo quy trình tuần tự và phụ thuộc lẫn nhau. Việc này nhằm mục đích xây dựng một mô hình tổng thể mạnh mẽ hơn, giảm thiểu sai số dự đoán và nâng cao khả năng tổng quát hóa.",
+   "trang_thai": "nhap",
+   "khang_dinh_bi_tia": null,
+   "ly_do": null,
+   "review_status": "draft",
+   "lan_gui_duyet": 0,
+   "tao_luc": "2026-09-04 19:42:26",
+   "cap_nhat_luc": "2026-09-04 19:42:26"
+  },
+  {
+   "job_ulid": "4f927108de9a8ff44b0dfed8d699c2e8",
+   "nguoi_dung_id": null,
+   "ban_goc_ai": "---\nslug: phan-tich-xgboost-stap-by-step\nsource_type: article\nho_so: phan-tich\nnguon: [tai-lieu/xgboost-stap-by-step]\nmodel_da_dung: gemini-2.5-flash-lite\ncitations_sampled: 1\ncitations_verified: 1\n---\n\nBoosting là một kỹ thuật học máy thuộc nhóm ensemble, hoạt động bằng cách kết hợp tuần tự các mô hình yếu (thường là cây quyết định nông) để tạo ra một mô hình mạnh mẽ hơn, giúp giảm sai số và tăng cường khả năng tổng quát hóa.",
+   "ban_hien_tai": "---\nslug: phan-tich-xgboost-stap-by-step\nsource_type: article\nho_so: phan-tich\nnguon: [tai-lieu/xgboost-stap-by-step]\nmodel_da_dung: gemini-2.5-flash-lite\ncitations_sampled: 1\ncitations_verified: 1\n---\n\nBoosting là một kỹ thuật học máy thuộc nhóm ensemble, hoạt động bằng cách kết hợp tuần tự các mô hình yếu (thường là cây quyết định nông) để tạo ra một mô hình mạnh mẽ hơn, giúp giảm sai số và tăng cường khả năng tổng quát hóa.",
+   "trang_thai": "nhap",
+   "khang_dinh_bi_tia": null,
+   "ly_do": null,
+   "review_status": "draft",
+   "lan_gui_duyet": 0,
+   "tao_luc": "2026-09-04 19:59:04",
+   "cap_nhat_luc": "2026-09-04 19:59:04"
+  },
+  {
+   "job_ulid": "f4876680c677d0e97e465542485e2ef1",
+   "nguoi_dung_id": null,
+   "ban_goc_ai": "---\nslug: phan-tich-linux-foundation\nsource_type: article\nho_so: phan-tich\nnguon: [tai-lieu/linux-foundation]\nmodel_da_dung: google/gemini-2.5-flash-lite\ncitations_sampled: 1\ncitations_verified: 1\n---\n\nTài liệu này tập trung vào việc giải thích các nguyên lý cơ bản của hệ điều hành.",
+   "ban_hien_tai": "---\nslug: phan-tich-linux-foundation\nsource_type: article\nho_so: phan-tich\nnguon: [tai-lieu/linux-foundation]\nmodel_da_dung: google/gemini-2.5-flash-lite\ncitations_sampled: 1\ncitations_verified: 1\n---\n\nTài liệu này tập trung vào việc giải thích các nguyên lý cơ bản của hệ điều hành.",
+   "trang_thai": "nhap",
+   "khang_dinh_bi_tia": null,
+   "ly_do": null,
+   "review_status": "draft",
+   "lan_gui_duyet": 0,
+   "tao_luc": "2026-09-04 20:17:09",
+   "cap_nhat_luc": "2026-09-04 20:17:09"
+  },
+  {
+   "job_ulid": "a939eeff08656fc6bdea6157d9c92c19",
+   "nguoi_dung_id": null,
+   "ban_goc_ai": "---\nslug: phan-tich-linux-foundation\nsource_type: article\nho_so: phan-tich\nnguon: [tai-lieu/linux-foundation]\nmodel_da_dung: gemini-2.5-flash\ncitations_sampled: 1\ncitations_verified: 1\n---\n\nTài liệu nhấn mạnh tầm quan trọng của việc nắm vững các kiến thức nền tảng và cơ chế hoạt động cốt lõi của một hệ điều hành.",
+   "ban_hien_tai": "---\nslug: phan-tich-linux-foundation\nsource_type: article\nho_so: phan-tich\nnguon: [tai-lieu/linux-foundation]\nmodel_da_dung: gemini-2.5-flash\ncitations_sampled: 1\ncitations_verified: 1\n---\n\nTài liệu nhấn mạnh tầm quan trọng của việc nắm vững các kiến thức nền tảng và cơ chế hoạt động cốt lõi của một hệ điều hành.",
+   "trang_thai": "nhap",
+   "khang_dinh_bi_tia": null,
+   "ly_do": null,
+   "review_status": "draft",
+   "lan_gui_duyet": 0,
+   "tao_luc": "2026-09-04 20:34:45",
+   "cap_nhat_luc": "2026-09-04 20:34:45"
+  },
+  {
+   "job_ulid": "5f4105f9140faf9518e65bf57bd15eaf",
+   "nguoi_dung_id": null,
+   "ban_goc_ai": "---\nslug: phan-tich-linux-foundation\nsource_type: article\nho_so: phan-tich\nnguon: [tai-lieu/linux-foundation]\nmodel_da_dung: gemini-2.5-flash-lite\ncitations_sampled: 1\ncitations_verified: 1\n---\n\nTài liệu này cung cấp một đoạn văn bản ngắn gọn, chỉ đề cập đến việc \"hiểu nguyên lý cơ bản của hệ điều hành\". Nội dung còn lại rất hạn chế, không có thông tin chi tiết để phân tích sâu hơn.",
+   "ban_hien_tai": "---\nslug: phan-tich-linux-foundation\nsource_type: article\nho_so: phan-tich\nnguon: [tai-lieu/linux-foundation]\nmodel_da_dung: gemini-2.5-flash-lite\ncitations_sampled: 1\ncitations_verified: 1\n---\n\nTài liệu này cung cấp một đoạn văn bản ngắn gọn, chỉ đề cập đến việc \"hiểu nguyên lý cơ bản của hệ điều hành\". Nội dung còn lại rất hạn chế, không có thông tin chi tiết để phân tích sâu hơn.",
+   "trang_thai": "nhap",
+   "khang_dinh_bi_tia": null,
+   "ly_do": null,
+   "review_status": "draft",
+   "lan_gui_duyet": 0,
+   "tao_luc": "2026-09-04 20:36:52",
+   "cap_nhat_luc": "2026-09-04 20:36:52"
+  },
+  {
+   "job_ulid": "d72535a1f7dc29f457348bf358615482",
+   "nguoi_dung_id": null,
+   "ban_goc_ai": "---\nslug: phan-tich-linux-foundation\nsource_type: article\nho_so: phan-tich\nnguon: [tai-lieu/linux-foundation]\nmodel_da_dung: gemini-2.5-flash-lite\ncitations_sampled: 1\ncitations_verified: 1\n---\n\nTài liệu này đề cập đến việc hiểu nguyên lý cơ bản của hệ điều hành.",
+   "ban_hien_tai": "---\nslug: phan-tich-linux-foundation\nsource_type: article\nho_so: phan-tich\nnguon: [tai-lieu/linux-foundation]\nmodel_da_dung: gemini-2.5-flash-lite\ncitations_sampled: 1\ncitations_verified: 1\n---\n\nTài liệu này đề cập đến việc hiểu nguyên lý cơ bản của hệ điều hành.",
+   "trang_thai": "nhap",
+   "khang_dinh_bi_tia": null,
+   "ly_do": null,
+   "review_status": "draft",
+   "lan_gui_duyet": 0,
+   "tao_luc": "2026-09-04 20:49:31",
+   "cap_nhat_luc": "2026-09-04 20:49:31"
+  },
+  {
+   "job_ulid": "109b650a291e7e7d97ef664c22c6045d",
+   "nguoi_dung_id": null,
+   "ban_goc_ai": "---\nslug: phan-tich-linux-foundation\nsource_type: article\nho_so: phan-tich\nnguon: [tai-lieu/linux-foundation]\nmodel_da_dung: deepseek/deepseek-v4-flash\ncitations_sampled: 1\ncitations_verified: 1\n---\n\nTài liệu đề cập đến mục tiêu hiểu nguyên lý cơ bản của hệ điều hành, làm nền tảng để nắm bắt cách hệ điều hành quản lý tài nguyên và vận hành hệ thống.",
+   "ban_hien_tai": "---\nslug: phan-tich-linux-foundation\nsource_type: article\nho_so: phan-tich\nnguon: [tai-lieu/linux-foundation]\nmodel_da_dung: deepseek/deepseek-v4-flash\ncitations_sampled: 1\ncitations_verified: 1\n---\n\nTài liệu đề cập đến mục tiêu hiểu nguyên lý cơ bản của hệ điều hành, làm nền tảng để nắm bắt cách hệ điều hành quản lý tài nguyên và vận hành hệ thống.",
+   "trang_thai": "nhap",
+   "khang_dinh_bi_tia": null,
+   "ly_do": null,
+   "review_status": "draft",
+   "lan_gui_duyet": 0,
+   "tao_luc": "2026-09-04 21:51:36",
+   "cap_nhat_luc": "2026-09-04 21:51:36"
+  },
+  {
+   "job_ulid": "b41ebbb38923e83ac2302b5bfab2af20",
+   "nguoi_dung_id": null,
+   "ban_goc_ai": "---\nslug: phan-tich-linux-foundation\nsource_type: article\nho_so: phan-tich\nnguon: [tai-lieu/linux-foundation]\nmodel_da_dung: gemini-2.5-flash-lite\ncitations_sampled: 1\ncitations_verified: 1\n---\n\nTài liệu này xác định mục tiêu học tập cốt lõi là nắm vững các nguyên tắc nền tảng vận hành của hệ điều hành trên nền tảng Linux.",
+   "ban_hien_tai": "---\nslug: phan-tich-linux-foundation\nsource_type: article\nho_so: phan-tich\nnguon: [tai-lieu/linux-foundation]\nmodel_da_dung: gemini-2.5-flash-lite\ncitations_sampled: 1\ncitations_verified: 1\n---\n\nTài liệu này xác định mục tiêu học tập cốt lõi là nắm vững các nguyên tắc nền tảng vận hành của hệ điều hành trên nền tảng Linux.",
+   "trang_thai": "nhap",
+   "khang_dinh_bi_tia": null,
+   "ly_do": null,
+   "review_status": "draft",
+   "lan_gui_duyet": 0,
+   "tao_luc": "2026-09-04 21:53:12",
+   "cap_nhat_luc": "2026-09-04 21:53:12"
+  },
+  {
+   "job_ulid": "5c878c4b34ad1693b882599a936cf124",
+   "nguoi_dung_id": null,
+   "ban_goc_ai": "---\nslug: phan-tich-linux-foundation\nsource_type: article\nho_so: phan-tich\nnguon: [tai-lieu/linux-foundation]\nmodel_da_dung: gemini-2.5-flash-lite\ncitations_sampled: 1\ncitations_verified: 1\n---\n\nTài liệu này xác định mục tiêu học tập cốt lõi là nắm vững các nguyên tắc nền tảng vận hành của hệ điều hành.",
+   "ban_hien_tai": "---\nslug: phan-tich-linux-foundation\nsource_type: article\nho_so: phan-tich\nnguon: [tai-lieu/linux-foundation]\nmodel_da_dung: gemini-2.5-flash-lite\ncitations_sampled: 1\ncitations_verified: 1\n---\n\nTài liệu này xác định mục tiêu học tập cốt lõi là nắm vững các nguyên tắc nền tảng vận hành của hệ điều hành.",
+   "trang_thai": "nhap",
+   "khang_dinh_bi_tia": null,
+   "ly_do": null,
+   "review_status": "draft",
+   "lan_gui_duyet": 0,
+   "tao_luc": "2026-09-04 21:55:14",
+   "cap_nhat_luc": "2026-09-04 21:55:14"
+  },
+  {
+   "job_ulid": "5c410c7b715fde89d6bd55b573c51871",
+   "nguoi_dung_id": null,
+   "ban_goc_ai": "---\nslug: phan-tich-linux-foundation\nsource_type: article\nho_so: phan-tich\nnguon: [tai-lieu/linux-foundation]\nmodel_da_dung: deepseek/deepseek-v4-flash\ncitations_sampled: 1\ncitations_verified: 1\n---\n\nTài liệu này chỉ gồm một câu ngắn gọn, nhấn mạnh mục tiêu hiểu nguyên lý cơ bản của hệ điều hành.",
+   "ban_hien_tai": "---\nslug: phan-tich-linux-foundation\nsource_type: article\nho_so: phan-tich\nnguon: [tai-lieu/linux-foundation]\nmodel_da_dung: deepseek/deepseek-v4-flash\ncitations_sampled: 1\ncitations_verified: 1\n---\n\nTài liệu này chỉ gồm một câu ngắn gọn, nhấn mạnh mục tiêu hiểu nguyên lý cơ bản của hệ điều hành.",
+   "trang_thai": "nhap",
+   "khang_dinh_bi_tia": null,
+   "ly_do": null,
+   "review_status": "draft",
+   "lan_gui_duyet": 0,
+   "tao_luc": "2026-09-04 21:55:53",
+   "cap_nhat_luc": "2026-09-04 21:55:53"
+  },
+  {
+   "job_ulid": "160674a04c209410212460f1bf8d036a",
+   "nguoi_dung_id": null,
+   "ban_goc_ai": "---\nid: src_linuxfoundation\nslug: phan-tich-linux-foundation\nsource_type: article\nho_so: phan-tich\nurl: kho://article/phan-tich-linux-foundation\nurl_normalized: article/phan-tich-linux-foundation\nprotocol_version: \"2.0\"\nanalyzed_at: 2026-09-05\none_liner: \"## 1\"\ncredibility_max: claimed\nconformance: C\nreview_status: draft\norigin: pipeline\nnguon: [tai-lieu/linux-foundation]\nmodel_da_dung: gemini-2.5-flash-lite\n---\n\n## 1. Overview\nTài liệu này nhấn mạnh tầm quan trọng của việc nắm vững các khái niệm cốt lõi vận hành hệ điều hành (OS).\n\n## 2. Bối cảnh\nTrong môi trường phát triển phần mềm và hệ thống tại Linux Foundation, việc hiểu rõ các nguyên lý nền tảng là bước đầu tiên và thiết yếu để làm việc với các hệ thống mã nguồn mở.\n\n## 3. Nội dung\n### 3.1. Đầu vào\nKiến thức về các khái niệm hoạt động của hệ điều hành.\n### 3.2. Process\nQuá trình học tập và đúc kết các lý thuyết chuyên môn.\n### 3.3. Output\nKhả năng vận dụng kiến thức hệ điều hành vào thực tiễn kỹ thuật.\n### 3.4. Tinh túy\nViệc hiểu sâu sắc cách thức một hệ điều hành hoạt động là chìa khóa để kiểm soát và phát triển hệ thống.\n\n## 4. Ý nghĩa thực tế\nGiúp người học có nền tảng tư duy vững chắc để xử lý các vấn đề từ cấp thấp (low-level), tối ưu hóa tài nguyên và bảo mật hệ thống.\n\n## 5. Rủi ro và tầm nhìn\nRủi ro lớn nhất là kiến thức hời hợt dẫn đến lỗi hệ thống; tầm nhìn là tạo ra các chuyên gia có khả năng làm chủ hoàn toàn môi trường Linux/Unix.\n\n## Trích dẫn\n\n- [linux-foundation:p.1]\n",
+   "ban_hien_tai": "---\nid: src_linuxfoundation\nslug: phan-tich-linux-foundation\nsource_type: article\nho_so: phan-tich\nurl: kho://article/phan-tich-linux-foundation\nurl_normalized: article/phan-tich-linux-foundation\nprotocol_version: \"2.0\"\nanalyzed_at: 2026-09-05\none_liner: \"## 1\"\ncredibility_max: claimed\nconformance: C\nreview_status: draft\norigin: pipeline\nnguon: [tai-lieu/linux-foundation]\nmodel_da_dung: gemini-2.5-flash-lite\n---\n\n## 1. Overview\nTài liệu này nhấn mạnh tầm quan trọng của việc nắm vững các khái niệm cốt lõi vận hành hệ điều hành (OS).\n\n## 2. Bối cảnh\nTrong môi trường phát triển phần mềm và hệ thống tại Linux Foundation, việc hiểu rõ các nguyên lý nền tảng là bước đầu tiên và thiết yếu để làm việc với các hệ thống mã nguồn mở.\n\n## 3. Nội dung\n### 3.1. Đầu vào\nKiến thức về các khái niệm hoạt động của hệ điều hành.\n### 3.2. Process\nQuá trình học tập và đúc kết các lý thuyết chuyên môn.\n### 3.3. Output\nKhả năng vận dụng kiến thức hệ điều hành vào thực tiễn kỹ thuật.\n### 3.4. Tinh túy\nViệc hiểu sâu sắc cách thức một hệ điều hành hoạt động là chìa khóa để kiểm soát và phát triển hệ thống.\n\n## 4. Ý nghĩa thực tế\nGiúp người học có nền tảng tư duy vững chắc để xử lý các vấn đề từ cấp thấp (low-level), tối ưu hóa tài nguyên và bảo mật hệ thống.\n\n## 5. Rủi ro và tầm nhìn\nRủi ro lớn nhất là kiến thức hời hợt dẫn đến lỗi hệ thống; tầm nhìn là tạo ra các chuyên gia có khả năng làm chủ hoàn toàn môi trường Linux/Unix.\n\n## Trích dẫn\n\n- [linux-foundation:p.1]\n",
+   "trang_thai": "nhap",
+   "khang_dinh_bi_tia": null,
+   "ly_do": null,
+   "review_status": "draft",
+   "lan_gui_duyet": 0,
+   "tao_luc": "2026-09-05 09:22:38",
+   "cap_nhat_luc": "2026-09-05 09:22:38"
+  },
+  {
+   "job_ulid": "62bf14a3df9f990ce624f6f7782049fd",
+   "nguoi_dung_id": null,
+   "ban_goc_ai": "---\nid: src_linuxfoundation\nslug: phan-tich-linux-foundation\nsource_type: article\nho_so: phan-tich\nurl: kho://article/phan-tich-linux-foundation\nurl_normalized: article/phan-tich-linux-foundation\nprotocol_version: \"2.0\"\nanalyzed_at: 2026-09-05\none_liner: \"## 1\"\ncredibility_max: claimed\nconformance: C\nreview_status: draft\norigin: pipeline\nnguon: [tai-lieu/linux-foundation]\nmodel_da_dung: gemini-2.5-flash-lite\n---\n\n## 1. Overview\n\n(model chưa viết mục này)\n\n## 2. Bối cảnh\n\n(model chưa viết mục này)\n\n## 3. Nội dung\n\n(model chưa viết mục này)\n\n### 3.1 Đầu vào\n\nTài liệu này nhằm cung cấp kiến thức về nguyên lý cơ bản của hệ điều hành. [linux-foundation:p.1]\n\n### 3.2 Process\n\nNội dung tài liệu tập trung vào việc giải thích các khái niệm cốt lõi liên quan đến hoạt động của hệ điều hành, giúp người đọc nắm vững cách thức mà các thành phần của hệ điều hành tương tác và vận hành để quản lý tài nguyên phần cứng và cung cấp môi trường cho các ứng dụng chạy. [linux-foundation:p.1]\n\n### 3.3 Output\n\nSau khi đọc tài liệu này, người đọc sẽ có khả năng hiểu rõ và diễn giải được các nguyên lý cơ bản đằng sau hoạt động của một hệ điều hành. [linux-foundation:p.1]\n\n### 3.4 Tinh túy\n\nNguyên lý cơ bản của hệ điều hành là trọng tâm. [linux-foundation:p.1]\n\n## 4. Ý nghĩa thực tế\n\n(model chưa viết mục này) [linux-foundation:p.1]\n\n## 5. Rủi ro và tầm nhìn\n\n(model chưa viết mục này) [linux-foundation:p.1]\n",
+   "ban_hien_tai": "---\nid: src_linuxfoundation\nslug: phan-tich-linux-foundation\nsource_type: article\nho_so: phan-tich\nurl: kho://article/phan-tich-linux-foundation\nurl_normalized: article/phan-tich-linux-foundation\nprotocol_version: \"2.0\"\nanalyzed_at: 2026-09-05\none_liner: \"## 1\"\ncredibility_max: claimed\nconformance: C\nreview_status: draft\norigin: pipeline\nnguon: [tai-lieu/linux-foundation]\nmodel_da_dung: gemini-2.5-flash-lite\n---\n\n## 1. Overview\n\n(model chưa viết mục này)\n\n## 2. Bối cảnh\n\n(model chưa viết mục này)\n\n## 3. Nội dung\n\n(model chưa viết mục này)\n\n### 3.1 Đầu vào\n\nTài liệu này nhằm cung cấp kiến thức về nguyên lý cơ bản của hệ điều hành. [linux-foundation:p.1]\n\n### 3.2 Process\n\nNội dung tài liệu tập trung vào việc giải thích các khái niệm cốt lõi liên quan đến hoạt động của hệ điều hành, giúp người đọc nắm vững cách thức mà các thành phần của hệ điều hành tương tác và vận hành để quản lý tài nguyên phần cứng và cung cấp môi trường cho các ứng dụng chạy. [linux-foundation:p.1]\n\n### 3.3 Output\n\nSau khi đọc tài liệu này, người đọc sẽ có khả năng hiểu rõ và diễn giải được các nguyên lý cơ bản đằng sau hoạt động của một hệ điều hành. [linux-foundation:p.1]\n\n### 3.4 Tinh túy\n\nNguyên lý cơ bản của hệ điều hành là trọng tâm. [linux-foundation:p.1]\n\n## 4. Ý nghĩa thực tế\n\n(model chưa viết mục này) [linux-foundation:p.1]\n\n## 5. Rủi ro và tầm nhìn\n\n(model chưa viết mục này) [linux-foundation:p.1]\n",
+   "trang_thai": "da_duyet",
+   "khang_dinh_bi_tia": null,
+   "ly_do": null,
+   "review_status": "draft",
+   "lan_gui_duyet": 0,
+   "tao_luc": "2026-09-05 09:24:44",
+   "cap_nhat_luc": "2026-09-05 09:25:14"
+  }
+ ],
+ "lan_thu": [
+  {
+   "stt": 1,
+   "khi": "2026-09-04 04:17:33",
+   "ip": "127.0.0.1",
+   "ma_bam": null
+  },
+  {
+   "stt": 2,
+   "khi": "2026-09-04 15:16:38",
+   "ip": "127.0.0.1",
+   "ma_bam": null
+  },
+  {
+   "stt": 3,
+   "khi": "2026-09-04 15:17:35",
+   "ip": "127.0.0.1",
+   "ma_bam": null
+  },
+  {
+   "stt": 4,
+   "khi": "2026-09-04 18:17:32",
+   "ip": "127.0.0.1",
+   "ma_bam": null
+  },
+  {
+   "stt": 5,
+   "khi": "2026-09-04 19:02:45",
+   "ip": "127.0.0.1",
+   "ma_bam": null
+  },
+  {
+   "stt": 6,
+   "khi": "2026-09-04 19:17:46",
+   "ip": "127.0.0.1",
+   "ma_bam": null
+  },
+  {
+   "stt": 7,
+   "khi": "2026-09-04 19:20:19",
+   "ip": "127.0.0.1",
+   "ma_bam": null
+  },
+  {
+   "stt": 8,
+   "khi": "2026-09-04 19:42:25",
+   "ip": "127.0.0.1",
+   "ma_bam": null
+  },
+  {
+   "stt": 9,
+   "khi": "2026-09-04 19:42:25",
+   "ip": "127.0.0.1",
+   "ma_bam": null
+  },
+  {
+   "stt": 10,
+   "khi": "2026-09-04 19:42:25",
+   "ip": "127.0.0.1",
+   "ma_bam": null
+  },
+  {
+   "stt": 11,
+   "khi": "2026-09-04 19:42:26",
+   "ip": "127.0.0.1",
+   "ma_bam": null
+  },
+  {
+   "stt": 12,
+   "khi": "2026-09-04 19:42:26",
+   "ip": "127.0.0.1",
+   "ma_bam": null
+  },
+  {
+   "stt": 13,
+   "khi": "2026-09-04 19:59:04",
+   "ip": "127.0.0.1",
+   "ma_bam": null
+  },
+  {
+   "stt": 14,
+   "khi": "2026-09-04 20:17:09",
+   "ip": "127.0.0.1",
+   "ma_bam": null
+  },
+  {
+   "stt": 15,
+   "khi": "2026-09-04 20:34:45",
+   "ip": "127.0.0.1",
+   "ma_bam": null
+  },
+  {
+   "stt": 16,
+   "khi": "2026-09-04 20:36:52",
+   "ip": "127.0.0.1",
+   "ma_bam": null
+  },
+  {
+   "stt": 17,
+   "khi": "2026-09-04 20:49:31",
+   "ip": "127.0.0.1",
+   "ma_bam": null
+  },
+  {
+   "stt": 18,
+   "khi": "2026-09-04 21:51:36",
+   "ip": "127.0.0.1",
+   "ma_bam": null
+  },
+  {
+   "stt": 19,
+   "khi": "2026-09-04 21:53:12",
+   "ip": "127.0.0.1",
+   "ma_bam": null
+  },
+  {
+   "stt": 20,
+   "khi": "2026-09-04 21:55:14",
+   "ip": "127.0.0.1",
+   "ma_bam": null
+  },
+  {
+   "stt": 21,
+   "khi": "2026-09-04 21:55:53",
+   "ip": "127.0.0.1",
+   "ma_bam": null
+  },
+  {
+   "stt": 22,
+   "khi": "2026-09-05 09:22:38",
+   "ip": "127.0.0.1",
+   "ma_bam": null
+  },
+  {
+   "stt": 23,
+   "khi": "2026-09-05 09:24:44",
+   "ip": "127.0.0.1",
+   "ma_bam": null
+  }
+ ],
+ "audit_loi": [
+  {
+   "stt": 1,
+   "khi": "2026-09-04 03:36:11",
+   "hanh_dong": "tao-job-khong-chu",
+   "doi_tuong": "tai-lieu/xgboost-stap-by-step",
+   "nguoi_dung_id": null,
+   "boi": null,
+   "ok": 1
+  },
+  {
+   "stt": 2,
+   "khi": "2026-09-04 03:36:11",
+   "hanh_dong": "tao-job-khong-chu",
+   "doi_tuong": "tai-lieu/xgboost-stap-by-step",
+   "nguoi_dung_id": null,
+   "boi": null,
+   "ok": 1
+  },
+  {
+   "stt": 3,
+   "khi": "2026-09-04 04:17:33",
+   "hanh_dong": "tao-nhap-chung-cat",
+   "doi_tuong": null,
+   "nguoi_dung_id": null,
+   "boi": null,
+   "ok": 1
+  },
+  {
+   "stt": 4,
+   "khi": "2026-09-04 04:18:15",
+   "hanh_dong": "tra-lai-nhap",
+   "doi_tuong": "be4b4909dfda20a7451ffb5776b638e9",
+   "nguoi_dung_id": null,
+   "boi": null,
+   "ok": 1
+  },
+  {
+   "stt": 5,
+   "khi": "2026-09-04 11:41:03",
+   "hanh_dong": "tao-job-khong-chu",
+   "doi_tuong": "tai-lieu/xgboost-stap-by-step",
+   "nguoi_dung_id": null,
+   "boi": null,
+   "ok": 1
+  },
+  {
+   "stt": 6,
+   "khi": "2026-09-04 11:41:06",
+   "hanh_dong": "tao-job-khong-chu",
+   "doi_tuong": "tai-lieu/xgboost-stap-by-step",
+   "nguoi_dung_id": null,
+   "boi": null,
+   "ok": 1
+  },
+  {
+   "stt": 7,
+   "khi": "2026-09-04 11:49:34",
+   "hanh_dong": "tao-job-khong-chu",
+   "doi_tuong": "tai-lieu/xgboost-stap-by-step",
+   "nguoi_dung_id": null,
+   "boi": null,
+   "ok": 1
+  },
+  {
+   "stt": 8,
+   "khi": "2026-09-04 15:10:10",
+   "hanh_dong": "tao-job-khong-chu",
+   "doi_tuong": "tai-lieu/xgboost-stap-by-step",
+   "nguoi_dung_id": null,
+   "boi": null,
+   "ok": 1
+  },
+  {
+   "stt": 9,
+   "khi": "2026-09-04 15:16:38",
+   "hanh_dong": "tao-nhap-chung-cat",
+   "doi_tuong": null,
+   "nguoi_dung_id": null,
+   "boi": null,
+   "ok": 1
+  },
+  {
+   "stt": 10,
+   "khi": "2026-09-04 15:17:35",
+   "hanh_dong": "tao-nhap-chung-cat",
+   "doi_tuong": null,
+   "nguoi_dung_id": null,
+   "boi": null,
+   "ok": 1
+  },
+  {
+   "stt": 11,
+   "khi": "2026-09-04 18:16:35",
+   "hanh_dong": "tao-job-khong-chu",
+   "doi_tuong": "tai-lieu/xgboost-stap-by-step",
+   "nguoi_dung_id": null,
+   "boi": null,
+   "ok": 1
+  },
+  {
+   "stt": 12,
+   "khi": "2026-09-04 18:17:32",
+   "hanh_dong": "tao-nhap-chung-cat",
+   "doi_tuong": null,
+   "nguoi_dung_id": null,
+   "boi": null,
+   "ok": 1
+  },
+  {
+   "stt": 13,
+   "khi": "2026-09-04 19:02:24",
+   "hanh_dong": "tao-job-khong-chu",
+   "doi_tuong": "tai-lieu/xgboost-stap-by-step",
+   "nguoi_dung_id": null,
+   "boi": null,
+   "ok": 1
+  },
+  {
+   "stt": 14,
+   "khi": "2026-09-04 19:02:45",
+   "hanh_dong": "tao-nhap-chung-cat",
+   "doi_tuong": null,
+   "nguoi_dung_id": null,
+   "boi": null,
+   "ok": 1
+  },
+  {
+   "stt": 15,
+   "khi": "2026-09-04 19:17:38",
+   "hanh_dong": "tao-job-khong-chu",
+   "doi_tuong": "tai-lieu/xgboost-stap-by-step",
+   "nguoi_dung_id": null,
+   "boi": null,
+   "ok": 1
+  },
+  {
+   "stt": 16,
+   "khi": "2026-09-04 19:17:46",
+   "hanh_dong": "tao-nhap-chung-cat",
+   "doi_tuong": null,
+   "nguoi_dung_id": null,
+   "boi": null,
+   "ok": 1
+  },
+  {
+   "stt": 17,
+   "khi": "2026-09-04 19:20:12",
+   "hanh_dong": "tao-job-khong-chu",
+   "doi_tuong": "tai-lieu/xgboost-stap-by-step",
+   "nguoi_dung_id": null,
+   "boi": null,
+   "ok": 1
+  },
+  {
+   "stt": 18,
+   "khi": "2026-09-04 19:20:19",
+   "hanh_dong": "tao-nhap-chung-cat",
+   "doi_tuong": null,
+   "nguoi_dung_id": null,
+   "boi": null,
+   "ok": 1
+  },
+  {
+   "stt": 19,
+   "khi": "2026-09-04 19:42:25",
+   "hanh_dong": "tao-nhap-chung-cat",
+   "doi_tuong": null,
+   "nguoi_dung_id": null,
+   "boi": null,
+   "ok": 1
+  },
+  {
+   "stt": 20,
+   "khi": "2026-09-04 19:42:25",
+   "hanh_dong": "tao-nhap-chung-cat",
+   "doi_tuong": null,
+   "nguoi_dung_id": null,
+   "boi": null,
+   "ok": 1
+  },
+  {
+   "stt": 21,
+   "khi": "2026-09-04 19:42:25",
+   "hanh_dong": "tao-nhap-chung-cat",
+   "doi_tuong": null,
+   "nguoi_dung_id": null,
+   "boi": null,
+   "ok": 1
+  },
+  {
+   "stt": 22,
+   "khi": "2026-09-04 19:42:26",
+   "hanh_dong": "tao-nhap-chung-cat",
+   "doi_tuong": null,
+   "nguoi_dung_id": null,
+   "boi": null,
+   "ok": 1
+  },
+  {
+   "stt": 23,
+   "khi": "2026-09-04 19:42:26",
+   "hanh_dong": "tao-nhap-chung-cat",
+   "doi_tuong": null,
+   "nguoi_dung_id": null,
+   "boi": null,
+   "ok": 1
+  },
+  {
+   "stt": 24,
+   "khi": "2026-09-04 19:58:47",
+   "hanh_dong": "tao-job-khong-chu",
+   "doi_tuong": "tai-lieu/xgboost-stap-by-step",
+   "nguoi_dung_id": null,
+   "boi": null,
+   "ok": 1
+  },
+  {
+   "stt": 25,
+   "khi": "2026-09-04 19:59:04",
+   "hanh_dong": "tao-nhap-chung-cat",
+   "doi_tuong": null,
+   "nguoi_dung_id": null,
+   "boi": null,
+   "ok": 1
+  },
+  {
+   "stt": 26,
+   "khi": "2026-09-04 20:08:48",
+   "hanh_dong": "tao-job-khong-chu",
+   "doi_tuong": "video/thien-duong-chuot-tuong-lai-nhan-loai-giai-ma-loi-tien-tri-d",
+   "nguoi_dung_id": null,
+   "boi": null,
+   "ok": 1
+  },
+  {
+   "stt": 27,
+   "khi": "2026-09-04 20:11:54",
+   "hanh_dong": "tao-job-khong-chu",
+   "doi_tuong": "video/thien-duong-chuot-tuong-lai-nhan-loai-giai-ma-loi-tien-tri-d",
+   "nguoi_dung_id": null,
+   "boi": null,
+   "ok": 1
+  },
+  {
+   "stt": 28,
+   "khi": "2026-09-04 20:14:54",
+   "hanh_dong": "tao-job-khong-chu",
+   "doi_tuong": "video/thien-duong-chuot-tuong-lai-nhan-loai-giai-ma-loi-tien-tri-d",
+   "nguoi_dung_id": null,
+   "boi": null,
+   "ok": 1
+  },
+  {
+   "stt": 29,
+   "khi": "2026-09-04 20:17:05",
+   "hanh_dong": "tao-job-khong-chu",
+   "doi_tuong": "tai-lieu/linux-foundation",
+   "nguoi_dung_id": null,
+   "boi": null,
+   "ok": 1
+  },
+  {
+   "stt": 30,
+   "khi": "2026-09-04 20:17:09",
+   "hanh_dong": "tao-nhap-chung-cat",
+   "doi_tuong": null,
+   "nguoi_dung_id": null,
+   "boi": null,
+   "ok": 1
+  },
+  {
+   "stt": 31,
+   "khi": "2026-09-04 20:34:25",
+   "hanh_dong": "tao-job-khong-chu",
+   "doi_tuong": "tai-lieu/linux-foundation",
+   "nguoi_dung_id": null,
+   "boi": null,
+   "ok": 1
+  },
+  {
+   "stt": 32,
+   "khi": "2026-09-04 20:34:45",
+   "hanh_dong": "tao-nhap-chung-cat",
+   "doi_tuong": null,
+   "nguoi_dung_id": null,
+   "boi": null,
+   "ok": 1
+  },
+  {
+   "stt": 33,
+   "khi": "2026-09-04 20:36:47",
+   "hanh_dong": "tao-job-khong-chu",
+   "doi_tuong": "tai-lieu/linux-foundation",
+   "nguoi_dung_id": null,
+   "boi": null,
+   "ok": 1
+  },
+  {
+   "stt": 34,
+   "khi": "2026-09-04 20:36:52",
+   "hanh_dong": "tao-nhap-chung-cat",
+   "doi_tuong": null,
+   "nguoi_dung_id": null,
+   "boi": null,
+   "ok": 1
+  },
+  {
+   "stt": 35,
+   "khi": "2026-09-04 20:49:26",
+   "hanh_dong": "tao-job-khong-chu",
+   "doi_tuong": "tai-lieu/linux-foundation",
+   "nguoi_dung_id": null,
+   "boi": null,
+   "ok": 1
+  },
+  {
+   "stt": 36,
+   "khi": "2026-09-04 20:49:31",
+   "hanh_dong": "tao-nhap-chung-cat",
+   "doi_tuong": null,
+   "nguoi_dung_id": null,
+   "boi": null,
+   "ok": 1
+  },
+  {
+   "stt": 37,
+   "khi": "2026-09-04 21:51:28",
+   "hanh_dong": "tao-job-khong-chu",
+   "doi_tuong": "tai-lieu/linux-foundation",
+   "nguoi_dung_id": null,
+   "boi": null,
+   "ok": 1
+  },
+  {
+   "stt": 38,
+   "khi": "2026-09-04 21:51:36",
+   "hanh_dong": "tao-nhap-chung-cat",
+   "doi_tuong": null,
+   "nguoi_dung_id": null,
+   "boi": null,
+   "ok": 1
+  },
+  {
+   "stt": 39,
+   "khi": "2026-09-04 21:52:58",
+   "hanh_dong": "tao-job-khong-chu",
+   "doi_tuong": "tai-lieu/linux-foundation",
+   "nguoi_dung_id": null,
+   "boi": null,
+   "ok": 1
+  },
+  {
+   "stt": 40,
+   "khi": "2026-09-04 21:53:12",
+   "hanh_dong": "tao-nhap-chung-cat",
+   "doi_tuong": null,
+   "nguoi_dung_id": null,
+   "boi": null,
+   "ok": 1
+  },
+  {
+   "stt": 41,
+   "khi": "2026-09-04 21:54:59",
+   "hanh_dong": "tao-job-khong-chu",
+   "doi_tuong": "tai-lieu/linux-foundation",
+   "nguoi_dung_id": null,
+   "boi": null,
+   "ok": 1
+  },
+  {
+   "stt": 42,
+   "khi": "2026-09-04 21:55:14",
+   "hanh_dong": "tao-nhap-chung-cat",
+   "doi_tuong": null,
+   "nguoi_dung_id": null,
+   "boi": null,
+   "ok": 1
+  },
+  {
+   "stt": 43,
+   "khi": "2026-09-04 21:55:40",
+   "hanh_dong": "tao-job-khong-chu",
+   "doi_tuong": "tai-lieu/linux-foundation",
+   "nguoi_dung_id": null,
+   "boi": null,
+   "ok": 1
+  },
+  {
+   "stt": 44,
+   "khi": "2026-09-04 21:55:53",
+   "hanh_dong": "tao-nhap-chung-cat",
+   "doi_tuong": null,
+   "nguoi_dung_id": null,
+   "boi": null,
+   "ok": 1
+  },
+  {
+   "stt": 45,
+   "khi": "2026-09-05 09:22:34",
+   "hanh_dong": "tao-job-khong-chu",
+   "doi_tuong": "tai-lieu/linux-foundation",
+   "nguoi_dung_id": null,
+   "boi": null,
+   "ok": 1
+  },
+  {
+   "stt": 46,
+   "khi": "2026-09-05 09:22:38",
+   "hanh_dong": "tao-nhap-chung-cat",
+   "doi_tuong": null,
+   "nguoi_dung_id": null,
+   "boi": null,
+   "ok": 1
+  },
+  {
+   "stt": 47,
+   "khi": "2026-09-05 09:24:41",
+   "hanh_dong": "tao-job-khong-chu",
+   "doi_tuong": "tai-lieu/linux-foundation",
+   "nguoi_dung_id": null,
+   "boi": null,
+   "ok": 1
+  },
+  {
+   "stt": 48,
+   "khi": "2026-09-05 09:24:44",
+   "hanh_dong": "tao-nhap-chung-cat",
+   "doi_tuong": null,
+   "nguoi_dung_id": null,
+   "boi": null,
+   "ok": 1
+  },
+  {
+   "stt": 49,
+   "khi": "2026-09-05 09:25:14",
+   "hanh_dong": "duyet-nhap-vao-kho",
+   "doi_tuong": "article/phan-tich-linux-foundation",
+   "nguoi_dung_id": null,
+   "boi": null,
+   "ok": 1
+  },
+  {
+   "stt": 50,
+   "khi": "2026-09-05 12:01:44",
+   "hanh_dong": "tao-job-khong-chu",
+   "doi_tuong": "video/thien-duong-chuot-tuong-lai-nhan-loai-giai-ma-loi-tien-tri-d",
+   "nguoi_dung_id": null,
+   "boi": null,
+   "ok": 1
+  }
+ ]
+}

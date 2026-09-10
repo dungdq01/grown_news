@@ -1,0 +1,133 @@
+id: WL-01K9S3FR041B
+at: 2026-08-29
+by: claude
+buoc: s8 (M03_web T03-80/81) — FR-041 LUOT 2, cung FR cung task, chi dao moi de len luot 1
+loai: man Kho ve BON tong hop — bo tin cay · uu tien · origin; them phan loai + theo ngay
+fr: .factory/fr/FR-041-kho-moi-cau-hoi-mot-hinh-dang.md (§Luot 2)
+
+object:
+  - web/render/trang.mjs            # bars3->kf-nhom (bar phan loai, doc BANG_MODULE) · xoa kf-nguon · kf-uutien->kf-ngay (cot doc 30 ngay lui tu bai MOI NHAT)
+  - web/plugins/home-pages/shell.html · web/render/shell.html   # dong bo BYTE — thu-vien-nap canh
+  - web/plugins/home-pages/index.ts # emitter CHET nhung markup-matches-css van doi chieu chen<->moc => go 3 chen
+  - web/plugins/multiwindow/src/scripts/multiwindow.inline.ts   # i18n kho.bycred -> kho.bynhom
+  - web/styles/prototype.css        # xoa khoi .fn · them .ct/.ct-x
+  - web/test/{kho-hinh-dang,thu-vien-tong-hop,cac-man-con-lai}.test.js
+  - 06_modules/M03_web/spec.md      # FROZEN — §pane chat luong: ba -> MOT (mball); CHUA KY
+  - 07_plan/M03_web/tasks/T03-{80,81}* · .factory/fr/FR-041*
+
+bon_tong_hop_nguoi_dung_chot:
+  thoi_gian: "kf-ngay (cot doc, truc lui tu bai moi nhat — lui tu hom nay thi kho nghi mot tuan doc ra nhu kho chet) + kf-thang (duong vung)"
+  phan_loai: "kf-nhom — bar 3 mang doc BANG_MODULE tu loai-nguon.json, khong go tay danh sach"
+  loai_nguon: "luoi o (giu)"
+  trang_thai: "donut (len site/chua len/da loai) + vong doi (draft/approved/edited/rejected) — giu"
+roi_man: "bars3 (tin cay) · kf-uutien (uu tien) · kf-nguon (origin — khong nam trong bon tong hop)"
+
+spec_frozen_cham_nhung_CHUA_ky: >
+  spec §pane chat luong khai "BA pane: mball · kf-uutien · bars3" — sua con MOT
+  (mball) qua FR-041 luot 2. KHONG chay --ky: baseline dang lech san o
+  frontmatter.schema.json (viec do cua phien kia) — ky luc nay la ky ho ho.
+  Viec ky: MOT lan sau khi ho dong schema, cho ca hai thay doi.
+
+# ══ PHAN DANG GIA NHAT ═════════════════════════════════════════════════
+hai_shell_mot_bai_hoc: >
+  Co HAI shell.html (plugins/ va render/) va toi sua mot ban — thu-vien-nap
+  canh byte-identical nen do ngay, khong lot. Cong ton tai vi ai do DA doan
+  truoc duong troi nay. Dong bo bang copy byte, khong sua tay ban thu hai.
+emitter_chet_van_co_rang: >
+  plugins/home-pages/index.ts khong con ai import (Quartz da nho) nhung
+  markup-matches-css van doi chieu moi chen() cua no voi moc trong shell.
+  Go moc bars3 khoi shell lam 3 chen cua file chet dangle => do. Xu ly: go 3
+  chen + comment tro FR. NO CON LAI: index.ts nen duoc khai tu (xoa han hay
+  giu lam tai lieu port) — viec cua chu no, ghi ra day.
+slice_khong_phai_nguong: >
+  page-weight cam `.slice(0, N)` so cung (nguong hien thi phai qua NGUONG).
+  `toISOString().slice(0, 10)` cua toi la CAT CHUOI NGAY, khong phai nguong —
+  nhung cong khong phan biet duoc va cong dung hon toi tien: doi sang
+  split("T")[0], khong noi cong.
+loi_tu_gay_500_ca_cay: >
+  Chen `, ngayKho: 30` thanh dong bat dau bang dau phay => SyntaxError => MOI
+  trang SSR 500, ~45 test do chum. Mot dau phay. Sua xong moi thay: khi ca
+  cay do dong loat thi nghi NGAY den loi nap module, dung doc tung test.
+
+evidence:
+  - "node web/test/kho-hinh-dang.test.js => pass (7 hinh x1 · fn/tp-b khong quay lai · 3 mang phan loai · chot reduced)"
+  - "77/79 test web xanh; 2 do KHONG cua toi: he-kinh (anh 708KB, 08-28) + nut-song (form-van-xuoi.test.js phien kia tao 17:56, 1 phut truoc luc chay)"
+  - "cac-man-con-lai: 2 pane/2 tab, bat bien 'moi pane mot tab' thay con so cung"
+  - "check_g6b => 148 task xanh"
+  - "page-weight qua (bo 3 pane nang hon them 2 pane moi)"
+
+no_con_lai:
+  - "NGUOI CHOT: mo /kho/ sau khi RESTART `npm run api` — Phan tich kho: phan loai · loai nguon · trang thai; Dong chay: theo ngay ⇄ theo thang"
+  - "KY FROZEN.lock mot lan cho ca spec.md (toi) + schema (phien kia) sau khi ho dong"
+  - "index.ts emitter chet — khai tu hay giu, chu so huu quyet"
+  - "anh 708KB — toi_uu_anh_nen.py, viec cua chu anh"
+
+# ── LUOT 3 · 2026-08-29 toi — hai bug nguoi dung chi bang anh ─────────────
+luot_3:
+  bug_1_loai_nguon_sai:
+    trieu_chung: "waffle hien `docs · tai-lieu · video` — hai cai sau la TEN BANG, khong phai loai nguon"
+    nguyen_nhan: "dem `b.source_type` — voi thu vien do la ten bang; loai nguon THAT (pdf/youtube) nam o phep suy `nguonCua()`"
+    sua: >
+      dem bang nguonCua(), nhan tu DS_NGUON — CUNG phep suy + CUNG bang ma tab
+      Loai nguon cua man Danh muc dung; mau theo NHOM (3 token vien ln-c).
+      Do sau sua: legend = paper · repo · article · pdf · youtube — khop anh 2.
+    keo_theo: "bay-man hoc map TINH->nhom tu loai-nguon.json + media-mime.json (khong go tay danh sach)"
+  bug_2_dong_chay_trong:
+    trieu_chung: "panel phinh ~500px trong; kho thua nhin nhu khong co gi"
+    hai_nguyen_nhan:
+      - "svg .sl width:100% GIU TI LE viewBox 260x84 => panel 1600px keo cao ~517px; pane thang xep chong grid-area 1/1 nen chieu cao do de len ca pane ngay. Sua: preserveAspectRatio=none + cap height 9*s-md + vector-effect non-scaling-stroke"
+      - "29/30 cot cao 0 la VO HINH => them duong nen (border-bottom truc) + SO tren dinh cot co bai (attr data-n) — kho thua thi con so la thu doc duoc duy nhat"
+  quy_chu_dot_do_moi: >
+    form-van-xuoi · khung-8-o · four-screens (nut o/tho) · gn.js 103244/102400:
+    multiwindow.inline.ts sua 20:59 — SAU lan cham cuoi cua toi (17:58, mot dong
+    i18n). La viec khung-8-o dang do cua phien kia; bundle phinh la code ho.
+    Bo cua toi chay rieng: 8/8 xanh.
+
+luot_4_va_cham_ten_class:
+  trieu_chung: "cua so doc vo UI — thanh tieu de cao ~150px, nut −□× troi lung chung (anh nguoi dung)"
+  nguyen_nhan: >
+    class bieu do cot toi dat la `.ct` — TRUNG voi `.ct` co san cua cua so doc
+    (cum nut −□× trong multiwindow). Luat moi nam CUOI file, cung dac hieu =>
+    thang, va cum nut an height 96px + border-bottom.
+  sua: "doi .ct/.ct-x -> .cot/.cot-x o render + CSS + 2 test; ghi ly do doi ten ngay tren luat CSS"
+  bai_hoc: >
+    Luot nay toi CO kiem va cham cho dn/wf/lc/sl truoc khi dat ten (grep trong
+    shell + multiwindow) — nhung .ct sinh o LUOT SAU (kf-ngay) va toi quen lap
+    lai phep kiem do. Ten class moi phai grep va cham MOI LAN dat, khong chi
+    lan dau cua FR.
+  evidence: "grep class=ct trong multiwindow = 1 (cua so); .cot trong kho = 1; kho-hinh-dang · cac-man-con-lai · bay-man · cua-so-doc · nut-song xanh"
+
+luot_5_animation_hang_cao:
+  hai_bug_chan_animation:
+    quan_sat_khong_thay_chinh_minh: >
+      Observer quan sat THANG .wf/.lc/.sl nhung ba ham ve query
+      scope.querySelectorAll(...) — chi tim HAU DUE, khong tim CHINH MINH =>
+      khong bao gio them .ve, moi chart ket o opacity 0 (nguoi dung: "toi yeu
+      cau co animation co ma"). veDonut thoat nan TINH CO vi no query .dn-c la
+      hau due cua moc .dn-w. Sua: timCaMinh() = matches(sel) ? [self,...] : [...].
+      Do bang Playwright THAT: truoc .wf/.lc khong .ve, sau = "wf ve"/"lc ve" opacity 1.
+    server_giu_module_cu: "SSR import trang.mjs mot lan — moi lan sua render PHAI restart; do hai lan cung so lieu y het moi nho ra"
+  nang_cap_world_class:
+    donut: "sweep ease-out 1.15s + glow drop-shadow theo mau cung (filter thuong, khong cham nguong backdrop-filter)"
+    luoi_o: "spring overshoot cubic-bezier(.34,1.56,.64,1), xoay -8deg vao cho"
+    vong_doi: "ke chuyen: node nay vao -> connector TU VE (scaleX) -> node ke, delay qua --d (12 luat go tay ~700B nen thanh 6 luat calc)"
+    duong_vung: "gradient defs #slg + trinh tu truc->duong->vung dang->cham nay"
+    cot_ngay: "moc tu day scaleY + so le --i, so tren dinh"
+    van_mot_nhip: "khong setInterval/rAF moi; reduced-motion tra thang trang thai hien du"
+  hai_meo_hinh_hoc_lien_tiep_cua_sparkline: >
+    (1) width:100% giu ti le => panel 1600px keo svg cao ~517px, panel toan
+    trong; (2) sua bang preserveAspectRatio=none + cap cao => cham tron bi keo
+    thanh ELIP (nguoi dung chup duoc). Sua DUNG: giu ti le + CHAN BE RONG
+    (max-width 30*s-md) — ca hai trieu chung cung khoi. Do: cao 229px, cham tron.
+  gn_css_kich_tran_va_toi_tra:
+    ai: "hom nay +80/-29 dong prototype.css chua commit ~ phan toi => vuot 1735B la toi"
+    sua_nho: "gop 12 luat delay -> var --d; bo hover trang tri; gop mau+glow (~465B)"
+    sua_goc: >
+      catBinhLuan() them CAT THUT DAU DONG — van la phep BO (so dong giu nguyen,
+      DevTools van tro dung, dung triet ly da ghi trong assets.mjs; khoang trang
+      TRONG dong giu nguyen vi calc can no). 103670 -> 101500/102400.
+  evidence:
+    - "Playwright: wf ve/lc ve/sl ve/cot ve · opacity 1 · legend 3 cot · donut dash dung · sl cao 229px"
+    - "screenshot kho-phan-tich.png + kho-dong-chay.png (repo root, don sau khi xem)"
+    - "78/79 test xanh — do duy nhat he-kinh (anh 708KB, no cu)"
+  cham_them_file: "web/render/assets.mjs (khai vao scope T03-80 truoc khi sua)"

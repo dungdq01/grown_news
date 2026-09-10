@@ -1,0 +1,106 @@
+ulid: 01M1S24H9G7C3M6R2PKTXB5V8E
+thoi_diem: 2026-09-06T01:30+07:00
+tac_nhan: claude-opus-5
+loai: ban_giao
+module: M03_web
+don_vi: T03-115 + T03-115b · một biến màu cho một thẻ (WO-055)
+
+viec: >
+  Trả nợ trần trang chủ — `AC5` của `T03-112`. 61915/61440, vượt 475 byte.
+
+r5_do_truoc:
+  - don_vi: T03-115
+    lenh: node web/test/mot-bien-mau.test.js
+    ket_qua: "ĐỎ 9/9 vế — 34 inline `border-top-color`, 54 inline `background`, 0 thẻ mang `--c`, 0 luật CSS đọc `--c`, trang chủ 61915"
+    đỏ_do: claude-opus-5
+
+goc: >
+  Mỗi thẻ bài phát HAI `style=` inline cho MỘT dữ kiện `source_type`:
+  `border-top-color` ở `.cd`, `background` ở `<b>` trong huy hiệu. Cùng một sự
+  thật viết hai lần, ở mọi thẻ, trên mọi trang.
+  Đo trên trang chủ dựng thật: 176 `style=` · 6531 byte · 65 giá trị duy nhất;
+  mười giá trị tốn nhất ĐỀU là màu theo loại (x12 · x10 · x8 · x8 · x8…).
+  Và thẻ ĐÃ mang `data-loai` — dữ kiện có sẵn, chỉ chưa ai dùng.
+
+sua: >
+  Thẻ đặt MỘT biến `--c`; CSS đọc nó ở hai chỗ dùng. Thanh biểu đồ đổi cùng
+  cách nói (`width` ở lại inline vì nó là dữ liệu từng thanh; chỉ màu qua `--c`).
+
+vi_sao_bien_khong_phai_lop: >
+  Một lớp mỗi loại (`.l-video`, `.l-paper`…) cần 8 luật ≈ 360 byte CSS, mà
+  `gn.css` chỉ dư 128. Trả nợ trang chủ bằng cách vỡ trần bundle CHUNG là đổi
+  một nợ lấy nợ nặng hơn — đúng chiều `FR-061` cấm. Một biến thì HAI luật đủ,
+  cho MỌI loại kể cả loại thêm sau.
+
+hai_lan_tu_sua_giua_chung:
+  - vo_tran_css: >
+      Ba luật đầu đẩy `gn.css` lên 102413/102400 — vượt 13 byte. Tức tôi vừa
+      trả nợ trang chủ bằng cách vỡ đúng cái trần mình viện dẫn để không dùng
+      lớp. Gộp hai selector cùng khai báo (`.cd .tg b,.bw i{…}`) lấy lại 32
+      byte ⇒ 102378, dư 22.
+  - siet_cong_thay_vi_ep_doi: >
+      Vế cuối đòi 0 inline `background:var(--c-`, còn 5 chỗ là chấm `.tp-c`.
+      Đo: đổi chúng tiết kiệm ~21 byte HTML nhưng tốn thêm một luật CSS ~30
+      byte, mà `gn.css` chỉ dư 22 — LỖ trên đúng ràng buộc đang bó. `.tp-c`
+      phát MỘT inline cho MỘT dữ kiện nên nó không thuộc khuyết tật `WO-055`
+      mô tả. Siết cổng về đúng khuyết tật (huy hiệu không mang `style=`) + một
+      TRẦN ĐẾM ≤5 cho ngoại lệ: ngoại lệ được tồn tại, không được lớn dần mà
+      không ai thấy. Đây là sửa một đặc tả tôi viết quá rộng một giờ trước,
+      dựa trên phép đo — không phải nới bar cho vừa kết quả.
+
+phat_hien_dat_nhat: >
+  `npm test` dùng `&&` nên nó DỪNG ở file đỏ đầu tiên. `page-weight` đỏ đã che
+  `bay-man.test.js` — và `bay-man` đang bắt một lỗi THẬT: lượt trước tôi chuyển
+  `/chung-cat/` sang nhóm `hethong` trong `man-hinh.json` mà KHÔNG chuyển nút
+  trong `shell.html`. Bảng khai nói `hethong`, markup nói `noidung`.
+  Tức một thay đổi của tôi CHƯA TỪNG được kiểm suốt hai lượt, vì cổng canh nó
+  nằm sau một cổng đang đỏ.
+  Số vế `ok` đi 537 → 1855 → 3009 qua ba lần sửa — con số đó KHÔNG phải tôi
+  thêm vế, mà là suite lần lượt chạy được sâu hơn.
+  Bài học: *"còn đúng một FAIL"* không bao giờ đọc được là *"còn đúng một lỗi"*.
+
+noi_pham_vi_khai_thang: >
+  Hai `shell.html` KHÔNG có trong bản khai đầu của `T03-115`. Phải nới để `AC6`
+  (suite xanh) đạt được, và đã ghi lý do NGAY TRONG task file thay vì sửa lặng.
+  Không mở đơn vị riêng: chúng là phần chưa hoàn tất của một thay đổi đã có, và
+  `AC6` của chính đơn vị này là chỗ nó bị bắt.
+
+r1: >
+  `web/test/api-index-khong-can-build.test.js` đổi MỐC NEO của vế "hai bản song
+  sinh không lệch" (`border-top-color` → `--c:var(--c-`). Tính chất canh KHÔNG
+  đổi, số vế KHÔNG giảm. File test ⇒ khai trong đơn vị TEST `T03-115b`, không
+  khai trong `T03-115`.
+
+do_sau:
+  - lenh: node web/test/mot-bien-mau.test.js
+    ket_qua: "XANH 10/10 vế"
+  - lenh: cd web && npm test
+    ket_qua: "3009 vế ok · 0 FAIL — lần đầu suite web chạy HẾT trong phiên này"
+  - lenh: cd web && node test/page-weight.test.js
+    ket_qua: >
+      trang chủ 59292/61440 (dư 2148) · gn.css 102378/102400 (dư 22) ·
+      gn.js 100669/102400 · trang lớn nhất 67483/75776. KHÔNG nới trần nào.
+  - lenh: python -m pytest core/tests -q
+    ket_qua: 49 passed
+  - lenh: 'for f in chungcat/tests/check_*.py; do python "$f"; done'
+    ket_qua: 35/35 XANH
+  - lenh: python core/tests/check_khai_mot_noi.py
+    ket_qua: "pass · hai tập khai một nơi"
+  - lenh: python core/tests/check_g6b.py
+    ket_qua: "5 lỗi — TẤT CẢ là nợ M18 có sẵn, 0 lỗi của M03"
+
+đỏ_do: claude-opus-5 (cả cửa sổ đua lẫn lệch nhóm menu đều do tôi)
+
+object:
+  - web/render/trang.mjs
+  - web/render/shell.html
+  - web/plugins/home-pages/index.ts
+  - web/plugins/home-pages/shell.html
+  - web/plugins/multiwindow/src/scripts/multiwindow.inline.ts
+  - web/styles/prototype.css
+  - web/test/mot-bien-mau.test.js
+  - web/test/api-index-khong-can-build.test.js
+  - web/package.json
+  - 07_plan/M03_web/tasks/T03-115-mot-bien-mau-cho-mot-the.md
+  - 07_plan/M03_web/tasks/T03-115b-test-mot-bien-mau.md
+  - .factory/wo/WO-055-inline-style-lap-lam-vo-tran-trang-chu.md

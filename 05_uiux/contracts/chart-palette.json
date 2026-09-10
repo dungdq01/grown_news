@@ -1,0 +1,20 @@
+{
+  "note": "Palette biểu đồ. Validate bằng dataviz/scripts/validate_palette.js — KHÔNG eyeball.",
+  "validated": "2026-08-18",
+  "rule": "Thứ tự cố định, không cycle. Series thứ 5 gộp vào 'khác', không sinh hue mới.",
+  "light": {
+    "surface": "#FCFCFB",
+    "order": ["#C81E1E", "#0D7D63", "#1D63C7", "#8A6D00"],
+    "names": ["repo", "paper", "video", "article"],
+    "result": "ALL PASS — CVD worst 10.4 deutan, normal-vision worst 19.4"
+  },
+  "dark": {
+    "surface": "#141518",
+    "order": ["#D15C56", "#008FD7", "#00A276", "#A08400"],
+    "names": ["repo", "video", "paper", "article"],
+    "result": "ALL PASS — CVD worst 8.9 deutan, normal-vision worst 17.3",
+    "note_order": "Thứ tự KHÁC light: đỏ↔xanh-lá kề nhau fail CVD ở dark (ΔE 5.1). Map theo TÊN, không theo index."
+  },
+  "sequential": {"hue": "brand red", "light": ["#FDE8E8","#F5B5B5","#E06E6E","#C81E1E","#8F1515"]},
+  "status": {"ok": "#15803D", "warn": "#854D0E", "danger": "#C81E1E"}
+}

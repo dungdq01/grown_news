@@ -1,0 +1,166 @@
+entry: ban-giao
+ulid: 01M2Y3K8QW5RTN6BVDXH92ZFCM
+ngay: 2026-09-10
+module: M03_web
+don_vi: T03-139 + T03-141 + T03-142
+wo: WO-086 + WO-088 + WO-089
+scr: SCR-26
+tieu_de: >-
+  /chung-cat/ ve lai: dong bai + duong ong, moc ngay, chi ban cuoi, mau + nhip,
+  icon theo loai nguon
+
+object:
+  - 05_uiux/wireframes/SCR-26-hang-viec-duong-ong.md
+  - web/plugins/chungcat/src/chungcat.inline.ts
+  - web/plugins/multiwindow/src/scripts/multiwindow.inline.ts
+  - web/styles/prototype.css
+  - web/test/chung-cat-nhom-theo-bai.test.js
+  - web/test/tran-hien-thi-luoi.test.js
+  - web/test/the-viec-noi-ro-loai.test.js
+  - .factory/wo/WO-086-hang-viec-duong-ong.md
+  - .factory/wo/WO-088-hang-viec-ban-cuoi-va-mau.md
+  - .factory/wo/WO-089-icon-nguon-tren-dong-bai.md
+  - 07_plan/M03_web/tasks/T03-139-hang-viec-duong-ong.md
+  - 07_plan/M03_web/tasks/T03-141-hang-viec-ban-cuoi-va-mau.md
+  - 07_plan/M03_web/tasks/T03-142-icon-nguon-dong-bai.md
+
+vi_sao_mot_entry: |
+  Ba WO nhung MOT y do thiet ke (`SCR-26`) va MOT luot ve. Tach ba entry thi ba
+  ban ghi cung tro ve cung mot wireframe va cung mot ham `ccNap`.
+
+trieu_chung_va_ba_lan_bi_bac: |
+  1 `WO-085` (sang) gop viec theo bai bang mot `<h3>` chen vao luoi phang, VA
+    them hang nut thu ba. Chu du an: *"design khong on: ve lai wireframe, toi
+    ko chap nhan kieu list menu design co hu nhu the"*.
+  2 Ban ve lai (3 huong) chu du an chon **A+C**.
+  3 Ban dung A+C bi bac tiep HAI y: *"Sinh thumbnail la cai gi? … nhac rac vao
+    cac trang thai cua tao a?"* va *"can them mau sac va hieu ung, lam co ban
+    the cho nguoi co dai dung a?"*.
+
+  Ca ba lan chu du an dung. Ghi ra vi day la thu de quen: cai sai khong phai
+  mot bug, no la mot MENH DE thiet ke sai.
+
+menh_de_cua_ban_ve_lai: |
+  **Moi hang nut la mot chieu du lieu chua duoc dua vao bo cuc.** Khi hinh dang
+  khong noi duoc gi thi moi thu phai leo len thanh loc, va man thanh mot thanh
+  cong cu co danh sach dinh kem.
+
+    trang thai -> mau cua chang
+    thoi gian  -> tieu de moc ngay
+    bai goc    -> chinh cai hang
+
+  => thanh loc con KHONG hang nut nao. Kha nang loc trang thai khong mat: ba so
+  tong ket (`xong 24 · can xu ly 1 · cho 0`) tro thanh cho bam — no la ban tom
+  tat VON DA o do, khong phai hang nut thu tu.
+
+hai_lop_viec: |
+  Do duoc, va day la cai chu du an bat dung:
+
+    sinh-transcript      14  NGUOI dat
+    chung-cat-mot-nguon   3  NGUOI dat
+    sinh-thumbnail        7  MAY tu xep (tho-cua.mjs:203, WO-071 loi (a))
+    tai-video             1  MAY, buoc tien de
+
+  Duong ong = viec cua NGUOI. Viec cua may xuong hang meta, va CHI noi thanh
+  chip do khi HONG — loc tron la giau mot loi that.
+
+  `ccViecNguoi` la DANH SACH CHO PHEP, khong loai tru — cung bai hoc `WO-087`:
+  ke ten thu bi loai thi viec nen THU BA se tu chen len ong.
+
+chi_ban_cuoi: |
+  25 viec / 15 cap (bai,chang). `ecomerce-skill-claude` mot minh co BON lan
+  chay transcript dung thanh bon the.
+
+  `ccBanCuoi` giu mot viec moi nhat moi cap, chon theo `tao_luc` KHONG theo
+  trang thai. Ve 16b canh dung bay do: mot `xong` CU canh mot `dang chay` MOI
+  ma uu tien `xong` thi man bao "xong" trong luc may dang chay — sai theo cach
+  nguoi tin ngay va khong nghi ngo.
+
+icon_theo_nguon: |
+  `data-i` truoc dat bang TIEN TO SLUG (`video`), ma bang icon khai theo LOAI
+  NGUON (`youtube`/`pdf`/…) => o bia trong tron.
+
+  `nhanTuBan(ban, MB)` thuan: video khop HOST -> `nhan`; tai lieu -> duoi hien
+  vat dau; khong khop -> lui `source_type`.
+
+  KHONG dung `idVideo`: no tra `null` khi `id_tu` khong khop, nen
+  `youtube.com/playlist?list=…` mat icon du host dung ranh ranh. Icon noi
+  NGUON, khong noi "da boc duoc id chua". Ve 19b canh dung ca do.
+
+  Hai khoa tach bach: `data-n` (mau cot song) theo NHOM, `data-i` (icon) theo
+  NGUON — hai cau khac nhau.
+
+tran_byte_dung_HAI_lan_va_khong_noi_lan_nao: |
+  1 Mau + nhip ton ~2 KB ma `gn.css` chi du 5 byte.
+    => Chuyen TOAN BO CSS cua man sang tiem tu chunk (`ccCss`), dung loi
+    `TX_CSS`. gn.css 106491 -> **104852, du 1644**. Moi trang khac nhe di 2 KB;
+    chi `/chung-cat/` tai phan cua no.
+  2 Dat `nhanTuBan` vao `gn.js` lam no vuot **279 byte**.
+    => Phep SUY ve chunk, cau chi dua DU LIEU (`banTheoSlug` + `mediaBang`).
+    gn.js **105229, du 243**.
+
+  Ca hai lan deu KHONG nới trần, khong FR. `FR-061a §3` da goi dung ten no:
+  duong dung la dua ma cua mot man ve chunk cua man ay.
+
+cong:
+  gop: web/test/chung-cat-nhom-theo-bai.test.js — 41 ve (ve 1-8 WO-085,
+    9-14 WO-086, 15-18 WO-088, 19 WO-089)
+  cach_do: |
+    Trich ham khoi CHUNK DA BUILD roi CHAY tren du lieu dung hinh dang
+    `/api/job`. Keo theo ca HANG `CC_VIEC_NGUOI` tu bundle thay vi go lai trong
+    cong — go lai la cong do con so cua chinh no.
+  do_duoc: WO-086 do 13 ve · WO-088 do 5 ve · WO-089 do 3 ve truoc khi sua
+  ve_am_dang_ke: |
+    · ve 3/3a — tra truot tieu de thi LUI VE SLUG, khoi VAN hien. Ban ghi bi
+      xoa / doi slug / chi muc chua nap la ca THUONG; nuot khoi la cat duong
+      toi mot viec dang chay, te hon cai bug dang sua.
+    · ve 15a3 — loai viec LA mac dinh KHONG len ong (fail-closed).
+    · ve 16b — `dang chay` moi thang `xong` cu.
+    · ve 19b — youtube ma `id_tu` khong khop VAN ra icon youtube.
+    · ve 19d2 — `ban`/`MEDIA` thieu thi KHONG nem.
+
+bon_neo_cong_hong_da_siet: |
+  Bon cong do vi MA DA DOI, khong vi he sai. Ca bon duoc DOI PHEP DO:
+
+  1 `mot-phieu-chung-cat` ve 3b — cat 1400 ky tu sau mot moc roi tim markup
+    NGAY trong cua so ay, tuc do "nut nam canh nhanh". WO-081 tach nut ra ham
+    rieng => do. Neo lai vao HAI mat xich that.
+  2 `the-viec-noi-ro-loai` ve 2 — (a) doc `.ts` nen chu thich moi day `tenLoai`
+    ra ngoai cua so 1800; doi sang ban BUILD. (b) neo `"function ccThe"` khop
+    NHAM `ccTheoNgay` — ten do CHINH TOI vua dat; siet thanh `"function ccThe("`.
+  3 `chung-cat-nhap` — neo chuoi `kieu !== "nhap"`; doi sang CHAY that dieu kien.
+  4 `tran-hien-thi-luoi` ve 9 — neo chuoi `.cd.qua{display:none}`; gop selector
+    de lay byte lam no do du luat y nguyen. Doi mau nhan ca dang gop.
+
+  Chung minh do duoc cho tung cai truoc khi dong.
+
+ba_loi_cua_toi_trong_dot_nay: |
+  1 `ccBanCuoi` lot mot byte NUL vao dau noi khoa => file thanh "binary" voi
+    moi cong cu. Doi sang `"::"`.
+  2 Cong neo CSS vao `prototype.css` sau khi CSS da doi cho; va `tach` dem
+    ngoac nen vap chinh `{}` cua CSS => cat theo MOC DONG cho ham do.
+  3 `border-radius:99px` va `font-size:.95rem` go tay => token.
+
+do_do: |
+  Web: 7 do, dung bang baseline dau phien, KHONG mot do moi:
+    api-guard · man-tai-lieu · man-video · moc-fe-con-that · mot-bien-mau ·
+    opacity-khong-pha-contrast · page-weight
+  `chua quy duoc chu` cho ca 7 — chung do truoc phien nay.
+  gn.css 104852 (du 1644) · gn.js 105229 (du 243).
+  Da rebuild + restart; `/chung-cat/` 200, chunk mang du `ccBanCuoi` ·
+  `ccViecNguoi` · `nhanTuBan` · `cc-song`.
+
+chua_nghiem_thu_duoc: |
+  Chua tu bam thu tren trinh duyet. Cong chay ham that tren du lieu dung hinh
+  dang va do markup + CSS + noi day; nhung "mau co de nhin khong", "nhip co
+  chuong mat khong" thi phai mat nguoi. Chu du an mo `/chung-cat/` la thay.
+
+  Luu y: anh chup chu du an gui luc 2026-09-10 la ban TRUOC lan restart cuoi —
+  no hien `sinh-thumbnail` tren ong va 3 chip TRANSCRIPT chua gop. Da kiem lai:
+  server dang phuc vu `gn-chungcat.js?v=gksw9k` co du ma moi.
+
+con_mo: |
+  WO-090 — tab `Ket qua`: ve lai + sua chip `tat ca` noi doi.
+  Do duoc: `GET /api/nhap-chung-cat` -> tong 3; `?trang_thai=da_bo` -> 5;
+  DB that 8 (da_bo 5 · nhap 2 · da_duyet 1). Cua mac dinh luoc `da_bo`, nen
+  `tat ca` ra 3 trong khi co 8 — loi o NGHIA cua "tat ca", khong o cua.

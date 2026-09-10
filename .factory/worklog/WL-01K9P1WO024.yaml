@@ -1,0 +1,77 @@
+id: WL-01K9P1WO024
+at: 2026-08-29
+by: claude
+buoc: WO-024 — dải tab màn nạp khai cứng ba cột, hai màn chỉ có một tab
+loai: bàn giao WO-024
+wo: WO-024-np-tabs-dem-cung-ba-cot.md
+
+object:
+  wo:
+    - .factory/wo/WO-024-np-tabs-dem-cung-ba-cot.md
+  task:
+    - 07_plan/M03_web/tasks/T03-57-test-np-tabs.md   # test
+    - 07_plan/M03_web/tasks/T03-58-np-tabs.md        # code
+  code:
+    - web/styles/prototype.css        # .np-tabs + truy vấn hẹp
+  test:
+    - web/test/format-chung.test.js   # §6 MỚI
+
+may_xanh:
+  - >
+    ĐỎ TRƯỚC (R5), đúng lời: `.np-tabs khai 3 cột — màn nap-tai-lieu ·
+    nap-video chỉ có 1 tab, phần còn lại BỎ TRỐNG`
+  - "sau khi vá: `node test/format-chung.test.js` -> pass"
+  - >
+    KIỂM HAI CHIỀU cho vế truy vấn hẹp: phá (`grid-auto-flow:row` ->
+    `grid-template-columns:1fr`) ⇒ ĐỎ đúng lời; phục hồi ⇒ sha256
+    `405c005ee3aaf394` **y hệt trước khi phá**, và cổng xanh lại
+  - "quét web 72/73 (chỉ `he-kinh`) · gn.css 96 KB · gn.js 99 KB · trang chủ 58/60"
+
+bug:
+  - >
+    `.np-tabs{grid-template-columns:repeat(3,1fr)}` — ba cột CỨNG. Đếm thật:
+    nap-bai-viet 3 tab · nap-tai-lieu **1** · nap-video **1**. Nên trên hai màn
+    sau, tab duy nhất bị nhét vào 1/3 đầu và **2/3 bỏ trống** — đúng dải trống
+    bên phải người dùng kêu ở WO-021
+
+vi_sao_WO021_khong_bat:
+  - >
+    WO-021 chữa CỘT FORM (`.np-p{max-width:52rem;margin-inline:auto}`) và
+    `format-chung` §5 đo đúng cái đó. Dải tab nằm NGOÀI `.np-p` nên nó không
+    trong phạm vi phép đo. **Chữa một nửa màn rồi đo đúng nửa đã chữa** — cùng
+    lớp với `#acount` đếm sai phạm vi (BUG-2 của WO-015)
+
+ban_chua_da_co_san_trong_repo:
+  - >
+    `.dm-tabs` từng mắc y hệt và đã đổi sang `grid-auto-flow:column;
+    grid-auto-columns:1fr`. `auto-flow` sinh đúng số cột bằng số phần tử CÓ MẶT
+    nên không bao giờ lệch với markup; `repeat(N)` là con số gõ tay ở tầng thứ
+    hai, và lệch của nó IM LẶNG vì CSS không báo gì
+
+cai_bay_thu_hai:
+  - >
+    Với `auto-flow: column` thì `grid-template-columns` VÔ HIỆU. Truy vấn hẹp cũ
+    đổi đúng thuộc tính đã bị vô hiệu ⇒ ba tab vẫn nằm ngang trên điện thoại,
+    "đã sửa" trên giấy. Phải đổi chính `grid-auto-flow` sang `row`
+
+tu_bat_duoc:
+  - >
+    Cổng CHẾT thay vì BÁO — lần thứ tư trong dự án. Tôi cắt một template literal
+    giữa chừng qua HAI chuỗi backtick, nên `${...` đóng sớm và `.filter(...)`
+    thành phép nối chuỗi ⇒ `TypeError` lúc chạy. Sửa bằng cách dựng câu lỗi
+    trong MỘT biến trước. Và lần vá sau để lại một dòng `ok(` mồ côi — `node
+    --check` bắt, không phải mắt tôi
+  - >
+    §6 tự kiểm phạm vi trước khi kết luận: đòi phép đếm PHÂN BIỆT được ba màn
+    (`{bai-viet:3, tai-lieu:1, video:1}`). Ra cùng một số cho cả ba nghĩa là tôi
+    đang đếm sai phạm vi, và §6 sẽ xanh vì MÙ
+
+đỏ_do: chưa quy được chủ  # `repeat(3,1fr)` có từ lúc dựng ba màn nạp (C6)
+
+do_do:
+  - cong: he-kinh.test.js
+    do_do_boi: ảnh 708 KB người dùng thêm — `python core/tools/toi_uu_anh_nen.py`
+  - cong: check_frozen.py
+    do_do_boi: chờ NGƯỜI ký sau khi FR-039 duyệt
+  - cong: check_danh_muc.py · check_skill.py · check_running.py
+    do_do_boi: agent khác · và hệ quả của hai cổng trên

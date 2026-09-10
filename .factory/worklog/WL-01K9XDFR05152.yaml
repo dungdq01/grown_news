@@ -1,0 +1,133 @@
+id: WL-01K9XDFR05152
+at: 2026-09-02
+by: claude
+buoc: "FR-050 dong · FR-051 (c) + FR-052 (d) thi cong · s6 dot hai DONG 0 soft"
+loai: T08-16 (phan quyen) + T09-8 (media thanh mang); do TRUOC (R5)
+gate: G6A xanh 18 module; bay module dot hai 0 soft
+
+object:
+  - 07_plan/M08_api/tasks/T08-16-phan-quyen-hai-vai.md
+  - 07_plan/M09_thuvien/tasks/T09-8-media-thanh-mang.md
+  - core/assets/frontmatter.schema.json       # FROZEN — media -> array (FR-052)
+  - core/assets/nguong-loi.json               # (FR-049, luot truoc)
+  - core/tests/check_media_mang.py            # MOI — Z3/Z4
+  - core/tests/check_g6a.py                   # so 7 go cung -> len(co); +PHAM VI
+  - core/tests/check_dinh_dang_mo.py          # duong doc schema mime
+  - core/tests/test_gates.py                  # fixture mang + 3 ca
+  - core/src/source_distiller/validate.py     # +_hien_vat, 2 cho
+  - core/tools/xuat_kho.py · core/tools/dung_lai_db.py · core/tools/sinh_kb_mock.py
+  - web/api/loi.schema.sql                    # vai enum dong NOT NULL
+  - web/api/dungchung.mjs                     # QUYEN + duocLam + hienVat + 3 cho media
+  - web/api/articles.mjs · cong-module.mjs · render/data.mjs · render/trang.mjs
+  - web/plugins/multiwindow/src/scripts/multiwindow.inline.ts
+  - web/test/phan-quyen.test.js               # MOI — Y1..Y7
+  - web/test/loi-cua.test.js                  # AC-6.1 doi nghia + X4/X6/X7
+  - 41 cho fixture/doc media trong web/test/**
+  - 06_modules/M18_nguoidung/{spec,rules,backlog}.md
+  - 06_modules/M17_cong/spec.md               # AC-4.2 soft -> hard
+  - 04_system/env_plan.md · 04_system/adr.md  # X6
+
+evidence:
+  - "npm test => exit 0 (84 file)"
+  - "pytest core/tests -q => 45 passed (truoc: 42)"
+  - "check_g6a: 18 module; M17 17 hard/0 soft · M18 21 hard/0 soft"
+  - "check_media_mang --tu-kiem 7/7; tren repo that: xanh"
+  - "5 do: 4 co san (danh_muc/skill agent khac · g6b T03-90 · running he qua) + check_frozen cho NGUOI ky"
+
+# ══ FR-051 — mot AC CAM thanh mot AC LAM ═══════════════════════════
+AC_6_1_doi_nghia_khong_bi_xoa: >
+  AC-6.1 cu cuong che "vai KHONG co tac dung" — dung khi `vai` la cot TRONG.
+  FR-051 cho no tac dung => AC cu PHAI DO, va no do bang cach NEM vi CHECK moi
+  tu choi gia tri bia ma no gieo.
+  SUA AC, KHONG XOA CONG. Xoa mot cong vi no do la cach mot luat bien mat ma
+  khong ai quyet dinh go no. Ve ban cu giu duoc ("cung vai => cung ket qua")
+  nay la mot trong nam ca cua nghia moi.
+
+ba_thu_dat_vao_CAU_TRUC_khong_vao_phep_kiem: >
+  1. `vai NOT NULL DEFAULT 'dong_nghiep'` + CHECK enum => ca `vai = null` cua
+     CVE-2026-47713 KHONG DUNG DUOC NUA. Mac dinh la vai IT quyen nhat.
+  2. `duyet-bai` KHONG trong bang QUYEN => khi chi dao "setting on/off sua duoc
+     tren web" thi cong, bang do thanh DU LIEU sua duoc tu form, va B-B1 KHONG
+     nam trong do.
+  3. DENY mac dinh => them thao tac moi ma quen khai quyen thi no KHONG CHAY
+     DUOC, chu khong phai AI CUNG CHAY DUOC.
+
+# ══ FR-052 — dat hon toi khai luc mo, va toi da noi TRUOC khi lam ══
+pham_vi_that: >
+  FR-052 khai "di tru re vi kho nho" — DUNG cho DU LIEU (1/3 ban ghi co media).
+  Nhung CHI PHI THAT la 23 cho doc media trong 7 file, cong 41 cho fixture/test.
+  Da do va BAO TRUOC khi sua gi, va chu du an tra loi "ok".
+  Hai con so toi tung ghi SAI, da sua: gn.js du 19.918 byte (khong phai 86 —
+  so do tu plan cu), va media co BON cot khong phai ba.
+
+ba_bay_IM_LANG_cung_mot_hinh_dang: >
+  articles.mjs · render/data.mjs · cong-module.mjs — CA BA chu dong chan mang
+  (`!Array.isArray(m) ? m : null`). Quen bat ky cai nao thi `media` thanh `null`
+  IM LANG: khong loi, khong canh bao, chi la hien vat bien mat khoi API/render.
+
+bay_KHAC_HANG_o_dungchung_132: >
+  Dong do doc `media.properties.mime` de dung DANG_MIME. Sau khi `mime` xuong
+  `items`, duong do la `undefined`, va `new RegExp(undefined)` KHOP MOI CHUOI
+  => phep kiem mime BIEN MAT ma moi test van xanh.
+  Day la bay te nhat trong ba: hai cai kia lam du lieu mat (thay duoc), cai nay
+  lam mot PHEP KIEM mat (khong thay duoc).
+
+hai_cho_CHET_NGUOI_da_bit: >
+  xuat_kho.py:182 + dung_lai_db.py:81 — `isinstance(m, dict)`. Voi mang, ca hai
+  tra False => tap con tro RONG => xuat_kho.py:194-199 coi MOI file trong
+  kb/_media/ la mo coi va XOA SACH. Va no chay TU DONG sau moi phep ghi
+  (banXuat o dungchung.mjs:375).
+  Da dung check_media_mang.py TRUOC khi sua gi, va no do dung 3 cho.
+
+hai_tang_khac_nhau_CO_CHU_Y: >
+  Moi ham DOC chap nhan CA HAI hinh dang; SCHEMA chi ep mang cho ban ghi MOI.
+  Neu doc cung ep mang thi doi schema thanh mot NGAY CO — moi ban ghi phai di
+  tru cung luc voi moi doan ma, va thu tu nao cung co mot khoang thoi gian he
+  thong TU CHOI DU LIEU CUA CHINH NO.
+  Va co mot ca test khang dinh chieu nguoc: hinh dang cu BI TU CHOI khi ghi moi
+  — de no khong song mai.
+
+# ══ NAM LAN toi viet cong do HINH DANG thay vi do BAT BIEN ═════════
+lop_loi_lap_lai_cua_toi: >
+  1. V3b   — do bang VI TRI ky tu (slice i, i+400) + regex `quaCong(req, res)`
+  2. X6    — mot regex ba nhanh khop ca cau; do oan vi mot dau sao
+  3. Y3    — danh sach TOAN TU (`vai ===`, `WHERE vai =`); ra 0 cho trong khi
+             cai dat dung `cho.includes(h.vai)`
+  4. ve1   — do PHAM VI FILE ("file nay co isinstance(list) khong?") cho mot
+             bat bien PHAM VI DONG; xuat_kho.py DAT oan vi dong 126 khac han
+  5. ve1   — dem `isinstance(m, dict)` trong BINH LUAN cua chinh toi
+  Ca nam deu la: toi khop mot CU PHAP cu the thay vi do dieu LUAT noi.
+  Hai hau qua nguoc nhau va deu xau: DO OAN tren cai dat dung (1,2,4,5) va
+  XANH OAN tren cai dat sai viet bang cu phap khac (3).
+  LUAT cho lan sau: truoc khi viet mot cong, viet ra thanh chu "bat bien la gi",
+  roi hoi "phep do nay con dung neu ai do viet lai bang cu phap khac khong?".
+
+# ══ s6 — PHAM VI da ghi vao cho BEN ════════════════════════════════
+s6_dot_hai_DONG: >
+  Bay module dot hai (M12..M18): 9/9 artifact, 0 AC soft, 0 o backlog mo.
+  M17 AC-4.2 la cai cuoi cung promote soft -> hard, mo duoc vi FR-051 chot
+  ma tran. Day la chieu NGUOC cua T04-6: o do ha hai rule S3->S4 vi lenh chua
+  co; o day nang mot AC vi quyet dinh da co. Cung luat R3, hai chieu.
+M01_M11_KHONG_phai_thieu_sot: >
+  Chu du an chot lan thu HAI: "module dot hai thoi, M1 - M11 khong can lam qua
+  ky vi co ban phase 1 trien khai kha on".
+  Da ghi vao DOCSTRING cua check_g6a.py — cho nguoi ta doc khi thay "7/18
+  module co testcases.md" va tuong do la mot khoang trong.
+  Ly do do duoc: M01-M11 DA THI CONG va dang chay, 84 test web + 45 pytest canh
+  chung. Viet testcase NGUOC cho ma da chay la mo ta cai da co, khong phai mot
+  phep thu — gia tri cua phep thu s6 nam o cho no chay TRUOC khi co ma.
+
+con_so_7_GO_CUNG_trong_check_g6a: >
+  Phat hien khi tra loi cau "s6 xong chua": dong tong ket in
+  "6 dieu kien dat tren ca 7 module" — con so 7 la CHUOI GO CUNG, va vong lap
+  ben tren chay tren MOI thu muc trong 06_modules.
+  No noi doi tu luc du an co module thu 8. Dung thu CLAUDE.md cam ("dem tay roi
+  chep so"). Da doi thanh f"{len(co)}" => nay in 18.
+
+no_con_lai:
+  - "check_frozen DO: frontmatter.schema.json doi theo FR-052 (da chot) — NGUOI ky"
+  - "check_media_mang.py chua vao RUNNING.md / CI"
+  - "FR-051 va FR-052 chua ghi §dong (thi cong xong, chua khai DA DONG)"
+  - "49 o backlog mo o M01(31) M03(14) M04(2) M08(2) — no THAT nhung khong chan dot hai"
+  - "FR chua mo: 'Quan ly va cai dat he thong' (setting on/off) — can s1 research + s2"
+  - "Chuyen 22 rule GRANDFATHER sang bo ba lenh/do_khi/xanh_khi"

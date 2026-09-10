@@ -1,0 +1,134 @@
+id: WL-01K9KKNUTBIENTAP
+at: 2026-08-26
+by: claude
+buoc: s8 — sua bug + FR-035 (tu dung lai trang)
+loai: bug fix (co test tai hien, R5) + mot FR moi khong dung file frozen
+fr: FR-035-tu-dung-lai-trang-sau-khi-ghi.md
+
+viec: >
+  Nguoi dung, hai luot, cung mot cau: "cac nut loai sua bo khoi kho ... click vao
+  nhu khong?" roi "nut loai ko hoat dong. noi chung test ky ca button va sua den
+  khi nao pass het thi thoi."
+
+# ══ BA LAN SUA CHO CUNG MOT TRIEU CHUNG — day la phan dang ghi lai ══════════
+ba_lan:
+  lan_1_FR031:
+    trieu_chung: bon nut bien tap click vo dung
+    goc: FE dung `/api/articles/<slug>`, route doi `<type>/<slug>` -> 404
+    sua: them helper `duongBai(b)` = `source_type + "/" + slug`
+    tai_sao_chua_xong: >
+      Toi kiem HINH DANG loi goi fetch, khong kiem GIA TRI chay ra.
+  lan_2:
+    trieu_chung: y nguyen, nguoi dung bao lai
+    goc: >
+      `/api/index` (`chiMucMo`) da tra `slug` KEM tien to loai. `duongBai` cong
+      them lan nua -> `repo/repo/hermes-agent` -> 404. Hinh dung, gia tri sai.
+    sua: >
+      guard bat bien — `slug.includes("/")` roi moi cong `source_type`,
+      nen ap bao nhieu lan cung ra mot duong
+    rang_moi: duong-api-khop-route §2c-bis — lay slug THAT tu /api/index, ap
+              cong thuc cua FE, GET ket qua, va doi `duongBai` ap hai lan ra mot duong
+  lan_3_lan_nay:
+    trieu_chung: van "nut loai ko hoat dong" — anh chup o trang 03/09 va 06/09
+    goc_1: >
+      `w.cur` MANG HAI NGHIA. `tai()` dat no la chi so BAN (`bans[cur]`);
+      `dongBo()` — chay MOI LAN CUON than bai — ghi de bang chi so MUC H2, dung
+      con so "03 / 09" o chan cua so. Cuon toi muc 3 => `bans[2] === undefined`
+      => ca bon nut bien tap `return` KHONG NOI GI.
+    goc_2: >
+      `.bk-f button` lay THEO VI TRI. Sau khi chan cua so tach hai hang, `.bk-f`
+      chua ca hang nut bien tap (`[data-bt]` dung TRUOC hang meta), nen `f[0]` la
+      nut **Loai**: `f[0].disabled = (muc === 0)` khoa dung nut Loai o muc 1,
+      `f[1]` khoa nut Sua o muc cuoi, con ‹truoc/tiep› khong bao gio bi khoa.
+    ca_hai_deu_do_toi: >
+      goc_2 sinh ra tu chinh viec toi tach `.bk-f` thanh hai hang (FR-011 A4).
+      Toi doi CAU TRUC DOM ma khong tim ai dang danh so vao cau truc do.
+
+# ══ VI SAO KHONG PHEP KIEM NAO BAT — va bai hoc that ═══════════════════════
+vi_sao_44_test_xanh:
+  moi_ben_tu_dung: >
+    api dung (va `vong-doi-bai` chung minh bang duong tu go) · markup CO nut (va
+    `buttons.test.js` chung minh) · duong FE khop route (va
+    `duong-api-khop-route` chung minh)
+  khong_ai_hoi: >
+    "bam cai nut nay thi TOI DAU". Ca hai bug nam dung o day.
+  che_khuat_boi_su_trung_hop: >
+    Bai MOT ban + dung o muc 1 thi `cur` va `muc` TRUNG nhau. Moi phep thu tay
+    deu xanh. Bug chi hien khi nguoi ta CUON — tuc khi nguoi ta that su doc bai.
+    Anh chup cua nguoi dung o 03/09 va 06/09 la thu chi ra dieu do.
+
+lop_loi_lap_lai:
+  - ten: chi so theo VI TRI vao mot cau truc co the doi
+    lan_nay: "f[0] la nut Loai chu khong phai ‹truoc"
+    truoc_day: allow-list `renameSync` dem SO LAN thay vi dem HAM
+  - ten: mot bien mang HAI nghia
+    lan_nay: "`cur` = ban | muc"
+  - ten: tap go tay bi lac hau
+    lan_nay: >
+      `npm test` la chuoi `&&` go tay. Chinh file test moi (`nut-song`) sinh ra
+      NGOAI chuoi do: xanh khi chay rieng, `npm test` khong he goi. Mot phep kiem
+      khong ai chay la mot phep kiem khong ton tai.
+    truoc_day: enum trang thai, ma tran BANG_CHUYEN
+  - ten: return im lang
+    lan_nay: bon ham `if (!ban) return` — khong mot loi nao, nen bug vo hinh
+
+sua:
+  tach_hai_nghia: "`cur` (ban) va `muc` (muc H2) thanh HAI truong; type `Cua` dat ten"
+  mot_cho_doc: >
+    helper `banDangDoc(w)` — cho DUY NHAT doc `bans[cur]`, va no BAO LOI thay vi
+    im. Truoc: 4 cho doc, 4 cho `return` im lang.
+  chon_theo_y_nghia: "‹truoc/tiep› chon bang `[data-act=\"prev\"|\"next\"]`, khong theo vi tri"
+  chu_noi_dung: "`NHAC_BUILD` khong con bao nguoi dung chay build (FR-035)"
+
+rang_moi:
+  file: web/test/nut-song.test.js
+  do_gi:
+    - "§1 moi `data-act` duoc VE co nhanh xu ly — VA nguoc lai (nhanh mo coi giau viec nut bi xoa)"
+    - "§2 `cur` khong lan `muc`; chi MOT cho doc `bans[cur]`; helper phai KEU"
+    - "§3 khong khoa nut theo VI TRI trong `.bk-f`"
+    - "§5 moi file test deu nam trong chuoi `npm test`"
+  kiem_hai_chieu: >
+    Dung lai CA HAI bug trong ban sao bundle -> exit 1, neu dung ten ca hai.
+    Hoan tac -> sha256 khop tung byte, xanh lai. §5 cung kiem hai chieu rieng.
+  gioi_han_khai_ra: >
+    Du an khong co trinh duyet headless (khong puppeteer/playwright/jsdom), nen
+    §4 ghi thang: day la phep kiem CAU TRUC, khong phai cu bam that. No KHONG bat
+    duoc: nhanh co ma lam sai viec, CSS che nut, `pointer-events:none`, loi luc
+    chay. Nguoi chot van phai bam that. Dung doc mau xanh nay la "moi nut deu chay".
+
+quet_toan_bo_nut:
+  data_act: "11/11 co nhanh xu ly, 0 mo coi"
+  data_khac: >
+    36 `data-*` nam tren <button>/<a>. Sau cai khong ai doc trong JS: `cat`,
+    `cpt`, `loai` (mang du lieu tren the bai), `for` (muc /nap/), `mobile`,
+    `no-popover` (cua Quartz). Khong cai nao la NUT chet — nhung `data-for` va
+    `data-loai` hien khong co nguoi doc trong JS: NEU DO LA MARKUP CHET thi no
+    la no ky thuat, khong phai bug nguoi dung thay. KHONG xoa (luat 3: khong don
+    rac cu cua nguoi khac) — bao lai de nguoi dung quyet.
+
+do_duoc:
+  npm_test: "44/44 exit 0"
+  npm_check: xanh
+  pytest: "30 passed"
+  cong_python: >
+    11/14 xanh. Ba do, KHONG phai cua toi:
+      check_frozen  — `06_modules/M02_kb/spec.md` lech baseline (sua 13:47, agent DB)
+      check_g6b     — AC hard `core/tests/check_export_dan_xuat.py` CHUA TON TAI (agent DB)
+      check_running — RUNNING.md nhac `validate.py kb/ --strict`; `--strict` coi
+                      canh bao la loi, va `kb/repo/hermes-agent.md` co HAI canh bao
+                      THAT: 1580 tu > tran mem 1500, va 5 khai niem chua co trong
+                      danh muc (danh muc dang RONG do nguoi dung xoa sach).
+  server_that: "GET /gn.js tu cong 8787 co du: `.muc`, `data-act=prev`, `banDangDoc`, guard bat bien; khong con `.bk-f button`"
+
+khong_lam:
+  - "KHONG cham `06_modules/M02_kb/**`, `core/tools/sinh_index.py`, hay bang DB category/concept — nguoi dung giao agent khac"
+  - "KHONG ky lai FROZEN.lock: file frozen duy nhat dang lech la cua agent DB va dang lam giua. Ky lai la ky ho mot thay doi chua xong — dung thu deny list dinh chan. Thay doi cua toi khong cham file frozen nao nen khong co gi phai ky."
+  - "KHONG noi `--strict`, khong ha tran tu, khong bo canh bao 'khai niem cho danh muc'. Hai canh bao do la SU THAT ve noi dung."
+  - "KHONG xoa `data-for`/`data-loai` du khong tim thay nguoi doc"
+  - "khong commit, khong push"
+
+no_khai_ro:
+  - "`check_running` se DO cho MOI bai that cho tao danh muc con rong: bai nao cung de xuat khai niem, va `--strict` coi do la loi. Day la he qua cua viec xoa sach danh muc, khong phai bug moi."
+  - "1580 tu > tran mem 1500: quyet dinh noi dung, khong phai loi ma."
+  - "FR-035 la CAU TAM. FR-034 chot bo dan site tinh; khi no xong thi go `dungLaiTrang()`."
+  - "`data-for` va `data-loai` co the la markup chet — chua xac minh het (CSS co the doc `[data-loai]`)."

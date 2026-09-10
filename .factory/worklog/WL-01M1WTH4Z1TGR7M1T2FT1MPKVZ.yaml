@@ -1,0 +1,83 @@
+ulid: 01M1WTH4Z1TGR7M1T2FT1MPKVZ
+khi: 2026-09-07
+tac_nhan: claude-opus-5 (agent)
+loai: ban_giao
+don_vi: dọn nợ trước khi chủ dự án test E2E bằng tay
+tom_tat: >
+  Chủ dự án: *"Xử lý nốt để hết nợ đi, sau đó tôi sẽ tự tay test E2E"*.
+  Kiểm kê 183 ô mở toàn dự án, M12 có 18. Đóng 5 ô bằng object thật, chẻ 1 ô về
+  đúng cỡ, mở 2 ô mới cho thứ vừa phát hiện. Bắt được HAI cơ chế đang chết im
+  lặng — khoá chống worker mồ côi, và hai bên ghi chung một file nhật ký.
+object:
+  - 03_docs/spec_overview.md               # :472 tự chỏi chính nó (ô 429)
+  - project_map.yaml                       # v28 → v30
+  - core/tests/check_rule_surfaces.py      # ca G+H + nhánh tra thư mục task
+  - chay.sh                                # hai worker + vòng dừng theo glob
+  - chungcat/src/nhat_ky.py                # duong_tep(worker) theo id · duong_pid
+  - chungcat/src/worker.py                 # duong_khoa() · chiem_khoa đọc chung
+  - chungcat/tests/check_nhat_ky_mot_ben_ghi.py   # cổng MỚI, 10 vế
+  - 06_modules/M12_chungcat/backlog.md     # khối kiểm kê + 5 ô đóng
+  - .factory/fr/FR-071-nap-lai-mot-viec-tra-200-khong-201.md   # MỚI, chờ duyệt
+r5_do_truoc: >
+  check_nhat_ky_mot_ben_ghi.py viết TRƯỚC mã: lượt một ĐỎ 3/6 vế (tên file log),
+  lượt hai ĐỎ 2 vế nữa (file pid) sau khi thêm §5. Xanh 10/10 sau khi cắm mã.
+  check_rule_surfaces: ca G ĐỎ trước khi có nhánh tra thư mục task.
+đỏ_do: >
+  Không có đỏ của người khác trong lượt này. Hai vế đỏ đều do CHÍNH thay đổi
+  này và đều là bug CÓ SẴN mà thay đổi làm lộ ra — quy chủ bằng đọc mã hai
+  phía, không bằng suy đoán.
+phat_hien_nang_nhat:
+  - >
+    KHOÁ CHỐNG WORKER MỒ CÔI LÀ MÃ CHẾT. `nhat_ky.bat("worker")` GHI
+    `log/worker.pid`; `worker.chiem_khoa()` ĐỌC `log/worker-<id>.pid`. Hai nửa
+    của MỘT cơ chế gọi nhau bằng hai tên ⇒ file khoá không bao giờ được ghi,
+    phép đọc luôn thấy rỗng, luôn `return True`. Khoá này được viết ra SAU KHI
+    một worker mồ côi gây đúng lỗi *"việc xong mà thiếu ket_qua"* (ghi chú ở
+    worker.py:1174) — và nó chưa từng chặn một tiến trình nào.
+    Vá: `nhat_ky.duong_pid()` là MỘT chỗ dựng tên, cả hai nửa gọi nó.
+  - >
+    NHÂN ĐÔI WORKER LÀM LỘ MỘT ĐUA TRONG NHẬT KÝ. `_tep()` đo độ đầy bằng
+    `f.tell()` trên handle của chính tiến trình mình. Hai bên ghi chung một
+    file ⇒ mỗi bên chỉ đếm phần mình (trần 8 MiB thành ~16), và bên nào xoay
+    trước thì bên kia giữ handle cũ, ghi tiếp vào `.1` — đúng file mà lần xoay
+    sau `unlink()`. Dòng mất, không ai báo, trong khi `nhat_ky` mở đầu bằng
+    chính câu *"không nói là mình chỉ thấy một nửa"*.
+    Vá: `worker-<id>.jsonl`, cùng lối đã chọn cho sổ egress.
+  - >
+    BẢN ĐỒ NÓI SAI HAI CHỖ MÀ KHÔNG CỔNG NÀO BẮT. `depends_on` của M12 và M03
+    đều thiếu `M08_api`. `check_map` chỉ đối chiếu module ↔ thư mục, KHÔNG đối
+    chiếu quan hệ. Đo bằng lời gọi thật: chungcat/src gọi /api/articles ·
+    /api/loi · /api/nhap-chung-cat; FE gọi 14 cửa /api/*. `luat_rieng` của M12
+    đã NÓI phụ thuộc ấy bằng văn xuôi ba dòng liền — một sự thật khai bằng văn
+    xuôi thì không máy nào đọc được.
+  - >
+    CỔNG TỐ OAN: check_rule_surfaces báo M18-R5/R6 "rule mất răng" cho một cổng
+    đang ĐỖ đúng lệ `.claude/rule.md` mục 8 (`T08-26b-cai-dat.test.js`, chờ mã
+    T08-26). Checker không đọc được lệ của chính dự án. Vá bằng nhánh tra thư
+    mục task; ca H giữ vế "không ở đâu cả thì VẪN phải đỏ".
+kiem_ke_no: >
+  M12 còn 15 ô mở, và khối kiểm kê mới ở đầu backlog.md nói rõ ô nào chặn ở đâu:
+  1 ô chỉ cần công sức (khoá service-to-service) · 3 ô cần một câu của chủ dự án
+  · 11 ô chặn ở thứ KHÔNG có trong máy này (BEEKNOEE_API_KEY · M13 chưa dựng ·
+  gói [asr] chưa cài · route gateway chưa xác minh · quote model thật).
+  ⇒ "Hết nợ M12" hôm nay không phụ thuộc vào gõ thêm mã.
+cho_nguoi_quyet:
+  - "FR-071 — nạp lại một việc trả 200 + da_co thay vì 201. Đã viết, chờ duyệt."
+  - "T12-12 chạm đất T12-8, và chủ của check_nhat_ky_mot_ben_ghi.py — một câu cho cả hai."
+  - "FR-054 lối `dich_vu` nay rẻ hơn faster-whisper local — chọn lối."
+  - "M18: xếp lượt build, hay gỡ T18-1 để về trạng thái chưa-lập-plan (ô M18 backlog:116 đã chẩn đủ)."
+may_xanh: >
+  web 115/115 · chungcat 44/44 · pytest core 49 passed · check_frozen pass ·
+  check_map pass · check_rule_surfaces pass (lần đầu sau khi hết tố oan) ·
+  check_worklog pass · check_g6b còn 5 lỗi — TOÀN BỘ của M18, nợ có sẵn, đã có
+  địa chỉ ở 06_modules/M18_nguoidung/backlog.md:116.
+chay_that: >
+  bash chay.sh dựng hai worker w1/w2, mỗi bản một file pid THẬT
+  (worker-w1.pid pid=30660 · worker-w2.pid pid=40432, cả hai còn sống), :8787
+  và :8790 đều 200. Trước lượt này script dựng đúng MỘT worker, nên
+  `nguong.json → song_song.tien_trinh: 2` chưa bao giờ có hiệu lực khi chạy
+  bằng script — bảng nói 2, hệ chạy 1, và không ai báo.
+chua_cai: >
+  <docs-sync> · <backlog-check> · <scope-check> KHÔNG tồn tại trong dự án này.
+  Theo CLAUDE.md: "Chưa cài ⇒ vế gate đó không tồn tại và không ai báo." Đây là
+  nợ về CƠ CHẾ, không phải về nội dung, và nó không nằm trong 15 ô kia.

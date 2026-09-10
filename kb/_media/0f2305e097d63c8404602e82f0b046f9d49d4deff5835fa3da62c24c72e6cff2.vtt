@@ -1,0 +1,640 @@
+WEBVTT
+
+00:00:00.420 --> 00:00:07.020
+If you've been looking for a clear step-by-step guide to setting up Hermes agent on a hostinger VPS,
+
+00:00:07.430 --> 00:00:08.520
+you're in the right place.
+
+00:00:14.122 --> 00:00:20.352
+give it skills it can use again and again, and schedule jobs so it can do things for you on its own even while you sleep.
+
+00:00:20.662 --> 00:00:25.532
+We'll also cover what it actually costs to keep running and how to make sure no one else can talk to it.
+
+00:00:26.042 --> 00:00:27.602
+Quick context if you're new to Hermes.
+
+00:00:27.842 --> 00:00:32.222
+It's a free open source AI agent made by a team called Nows Research.
+
+00:00:32.652 --> 00:00:41.562
+Think of it as a personal version of Chat GPT or Claude that lives on your own server, talks to you through chat apps you already use, and gets a little better the more you use it.
+
+00:00:41.972 --> 00:00:45.412
+Unlike a regular chatbot, it runs on its own all the time.
+
+00:00:45.652 --> 00:00:49.332
+Remembers how you work and writes its own skills as you go.
+
+00:00:49.682 --> 00:00:52.482
+You don't need any coding experience to follow along.
+
+00:00:52.872 --> 00:00:54.762
+Just the ability to copy and paste.
+
+00:00:55.252 --> 00:00:56.622
+Now, the first thing we need is the server itself.
+
+00:00:56.622 --> 00:00:59.392
+So let me show you how to get that set up.
+
+00:00:59.952 --> 00:01:45.862
+The first link in the description opens a page that has Hermes agent already preselected for automatic installation, so we don't have to set that up manually.
+
+00:01:46.122 --> 00:01:55.112
+The link also stacks an extra 10% discount on top of whatever sale hostinger is currently running, which makes this the cheapest way to get a working Hermes agent online anytime.
+
+00:01:55.902 --> 00:02:02.092
+So, go ahead and use the link on screen or click the first link in the description below.
+
+00:02:02.392 --> 00:02:06.332
+When you click that link, you'll land on this page here, and if you click the choose plan button,
+
+00:02:07.352 --> 00:02:09.562
+that'll take you down to see the pricing options.
+
+00:02:09.802 --> 00:02:11.762
+You'll see a few VPS plans listed side by side.
+
+00:02:18.932 --> 00:02:22.132
+I want to be straight with you about why we're not picking the cheapest plan.
+
+00:02:22.372 --> 00:02:29.882
+Later in this video, we're going to give the agent skills that let it browse the web and the agent already runs inside a Docker container on hostinger for safety.
+
+00:02:30.312 --> 00:02:31.782
+Both of these use real resources.
+
+00:02:32.022 --> 00:02:37.652
+The smaller plan can technically run Hermes, but it can't run all of that at the same time without slowing down or freezing up.
+
+00:02:38.072 --> 00:02:41.762
+KVM 2 also happens to be the plan that hostinger themselves recommend for Hermes.
+
+00:02:42.192 --> 00:02:45.262
+So go ahead and click choose plan on the KVM 2 option.
+
+00:02:45.922 --> 00:02:50.932
+You'll be taken to the cart page and the first thing you want to do is select the period for your registration.
+
+00:02:51.322 --> 00:02:53.352
+You can choose 1 month, 12 months, or 24 months.
+
+00:02:53.662 --> 00:03:00.122
+And you generally get the best value, the lowest per month price overall if you select 24 months.
+
+00:03:00.442 --> 00:03:04.282
+But if that's too much for you for getting started, totally understand.
+
+00:03:04.662 --> 00:03:07.892
+I recommend then selecting the 12 month option.
+
+00:03:08.292 --> 00:03:12.672
+That's the lowest term they'll let you select and still take advantage of our coupon.
+
+00:03:12.942 --> 00:03:15.912
+If you select one month, they don't let you use that extra 10% discount.
+
+00:03:16.422 --> 00:03:20.752
+Next, you can see that they already have the Hermes agent auto deploy set up for this particular option, so that's great.
+
+00:03:23.252 --> 00:03:27.992
+You generally want to pick a server location closest to you or whatever has the lowest latency.
+
+00:03:28.312 --> 00:03:34.362
+Here, I'll select one of these United States Boston options, which gets me only 8 milliseconds of latency, which is fantastic.
+
+00:03:34.772 --> 00:03:38.422
+If you want to protect your setup, you could also turn on daily auto backups.
+
+00:03:38.842 --> 00:03:41.032
+By default, you get weekly auto backups.
+
+00:03:41.362 --> 00:03:44.972
+For me, that's just fine, but if you want to make sure that everything's protected, you can turn that on.
+
+00:03:45.432 --> 00:03:47.182
+Whenever you're ready, go ahead and click continue.
+
+00:03:47.812 --> 00:03:50.732
+On the next page, go ahead and register your account.
+
+00:03:51.022 --> 00:03:55.192
+On the next page, enter your billing address and your payment information to complete the checkout.
+
+00:03:55.532 --> 00:04:02.062
+And I want to point out that there is a 30-day money back guarantee, so anytime in the next 30 days, if you have any issues, you can just reach out to hostinger and get your money back.
+
+00:04:03.082 --> 00:04:05.022
+When you complete the checkout, you'll get this confirmation.
+
+00:04:06.612 --> 00:04:09.792
+Next, hostinger drops you onto a short setup form.
+
+00:04:10.052 --> 00:04:14.912
+Now, we just need to choose the admin credentials for the Hermes web terminal and let the server build itself.
+
+00:04:15.452 --> 00:04:20.672
+By default, they populate the admin username as Hermes, which works just fine.
+
+00:04:21.272 --> 00:04:25.262
+And they give you a custom generated secure password.
+
+00:04:25.862 --> 00:04:29.832
+Now, click on the eye icon to reveal the auto-generated password.
+
+00:04:30.212 --> 00:04:35.252
+I'm showing mine here because I'm going to delete this account later, but definitely make sure
+
+00:04:35.562 --> 00:04:37.822
+that you don't share this with anyone. This is how you access your agent.
+
+00:04:38.602 --> 00:04:42.722
+Go ahead and copy this username and password and save it somewhere safe.
+
+00:04:43.082 --> 00:04:44.452
+Then, simply click deploy.
+
+00:04:45.342 --> 00:04:47.562
+Hostinger is now building your server and installing Hermes on it.
+
+00:04:48.002 --> 00:04:49.042
+This takes a few minutes.
+
+00:04:49.442 --> 00:04:51.312
+So, I'll go ahead and fast forward to when it's complete.
+
+00:04:51.802 --> 00:04:53.992
+When it finishes, you'll be routed into the hostinger dashboard,
+
+00:04:53.992 --> 00:04:59.192
+and you might be presented with a survey, you can fill it out if you want or simply click skip.
+
+00:04:59.742 --> 00:05:02.402
+There's also maybe a pop-up or two, and you can simply dismiss them.
+
+00:05:02.732 --> 00:05:04.342
+Welcome to Hostinger's Docker Manager.
+
+00:05:04.662 --> 00:05:11.192
+You can see here that your Hermes agent is already running in a new Docker project, and it has traffic set up
+
+00:05:11.522 --> 00:05:15.682
+as a reverse proxy to make sure that you can access your agent from anywhere on the web, securely.
+
+00:05:16.332 --> 00:05:19.492
+Now, we need to open a window into the server so that we can talk to Hermes directly.
+
+00:05:19.962 --> 00:05:21.492
+We're going to use what's called a terminal.
+
+00:05:21.752 --> 00:05:23.552
+That's the text-only window where you type commands.
+
+00:05:24.082 --> 00:05:26.692
+Hostinger has one built right into the browser, so we don't need to install anything extra on your computer.
+
+00:05:27.242 --> 00:05:31.402
+To open it, you'll simply click the terminal button in the upper right.
+
+00:05:31.542 --> 00:05:35.782
+But before you do that, go ahead and copy the last four letters here
+
+00:05:36.062 --> 00:05:38.452
+from your Docker project name here.
+
+00:05:38.832 --> 00:05:43.912
+So it should say Hermes agent and then have four letters. Go ahead and select
+
+00:05:44.272 --> 00:05:45.892
+and then copy those four letters.
+
+00:05:46.212 --> 00:05:47.852
+All right, now go ahead and open the terminal.
+
+00:05:48.692 --> 00:05:51.492
+A new tab will open with a black terminal window, and you're already signed in.
+
+00:05:51.842 --> 00:05:57.732
+Now, if you've never used a terminal before, it can look a little bit scary or overwhelming.
+
+00:05:58.152 --> 00:06:01.322
+It feels a bit old school or even kind of hackery, right?
+
+00:06:01.642 --> 00:06:03.092
+But really, it's simple.
+
+00:06:03.452 --> 00:06:10.212
+Instead of clicking around with folders and icons to interact with a computer, instead, you're simply typing text.
+
+00:06:10.832 --> 00:06:15.462
+Kind of like interacting with a chatbot, but you need to enter very precise commands.
+
+00:06:15.872 --> 00:06:17.302
+You can't just type whatever you want.
+
+00:06:17.922 --> 00:06:24.812
+So, first what we're going to do is make sure that we have a flashing cursor here.
+
+00:06:25.082 --> 00:06:31.892
+And if this isn't flashing, go ahead and click on your terminal screen, and it should get that going.
+
+00:06:32.232 --> 00:06:39.102
+Next, we're going to type CD space Docker
+
+00:06:40.172 --> 00:06:48.822
+Hermes agent and then go ahead and paste in
+
+00:06:49.682 --> 00:06:52.352
+your four characters that you copied earlier.
+
+00:06:52.872 --> 00:06:55.772
+And then hit enter or return on your keyboard.
+
+00:06:56.142 --> 00:07:05.292
+We just did that because when you first land on the terminal, any commands you type are going to be to the VPS at the high level,
+
+00:07:05.592 --> 00:07:08.532
+almost like the desktop on your computer.
+
+00:07:08.842 --> 00:07:15.532
+To send any commands to your Hermes agent application specifically, we have to tell the terminal to access that program first.
+
+00:07:15.802 --> 00:07:17.282
+So that's what we just did.
+
+00:07:17.742 --> 00:07:21.222
+Now, we need to access the Hermes container.
+
+00:07:21.522 --> 00:07:25.662
+To do this, type docker
+
+00:07:26.422 --> 00:07:34.892
+compose exec spelled ec space-it space
+
+00:07:35.512 --> 00:07:45.172
+Hermes-agent space/bin/bash
+
+00:07:46.522 --> 00:07:47.572
+and hit enter.
+
+00:07:48.302 --> 00:07:52.012
+All right, now we're going to activate the setup wizard.
+
+00:07:52.292 --> 00:07:57.532
+To do this, type Hermes space setup.
+
+00:07:58.432 --> 00:07:59.912
+Then, press enter.
+
+00:08:00.592 --> 00:08:02.482
+This starts the setup wizard.
+
+00:08:02.792 --> 00:08:06.272
+It's a questionnaire the agent runs the first time it boots.
+
+00:08:06.602 --> 00:08:12.202
+It asks which AI provider you want to use, which model you want by default, and which messaging app you want to talk to it through.
+
+00:08:14.752 --> 00:08:18.422
+To start, the wizard will ask if you want a quick or full setup.
+
+00:08:18.812 --> 00:08:21.552
+We'll go ahead and just do the quick setup.
+
+00:08:21.902 --> 00:08:24.602
+It's already selected here, so all you have to do is hit enter.
+
+00:08:25.292 --> 00:08:27.032
+The first thing the wizard asks is which
+
+00:08:27.032 --> 00:08:29.302
+AI provider you want to use.
+
+00:08:29.582 --> 00:08:34.072
+A provider is the company that runs the actual AI model the agent uses to think.
+
+00:08:34.542 --> 00:08:36.322
+There are over 20 options here.
+
+00:08:36.852 --> 00:08:46.412
+We're going to use one called Open Router because it gives you access to many different models with a single account and a single bill.
+
+00:08:46.792 --> 00:08:51.022
+That means you can switch between AI models later without signing up anywhere else.
+
+00:08:51.792 --> 00:08:56.462
+In the wizard here, use the arrow keys on your keyboard
+
+00:08:57.132 --> 00:09:02.492
+up and down to highlight open router and then press enter.
+
+00:09:02.822 --> 00:09:07.012
+The wizard now asks for your open router API key.
+
+00:09:07.412 --> 00:09:10.562
+Leave this screen open in the terminal, we'll come back to it in a minute.
+
+00:09:10.982 --> 00:09:14.492
+Go ahead and open up a new browser tab
+
+00:09:15.202 --> 00:09:17.172
+and go to openrouter.ai.
+
+00:09:17.722 --> 00:09:20.032
+You can type that in manually or use the link in the description of the video below.
+
+00:09:28.272 --> 00:09:32.332
+Now, the wizard is asking for what's called an API key.
+
+00:09:32.762 --> 00:09:37.832
+An API key is a long secret string that tells open router that requests are coming from you.
+
+00:09:38.432 --> 00:09:42.492
+Hermes uses the key to call the AI model and open router charges your account for what gets used.
+
+00:09:42.912 --> 00:09:45.182
+Treat the key like a password.
+
+00:09:45.452 --> 00:09:46.822
+Don't share it with anyone.
+
+00:09:47.752 --> 00:09:51.952
+On this site here, go ahead and click sign up in the upper right.
+
+00:10:00.057 --> 00:10:01.487
+call it something like
+
+00:10:01.767 --> 00:10:02.217
+Hermes agent.
+
+00:10:02.507 --> 00:10:03.737
+Now, you can set a credit limit
+
+00:10:03.737 --> 00:10:04.137
+here,
+
+00:10:04.417 --> 00:10:06.847
+if you want to make sure that your account has a hard cap.
+
+00:10:07.427 --> 00:10:10.157
+For example, you could set a limit for $20
+
+00:10:10.607 --> 00:10:16.537
+and then have that reset every day, every week or every month. I'll set mine to monthly.
+
+00:10:16.897 --> 00:10:21.037
+And you can set that to expire at a certain date or leave it alone.
+
+00:10:21.367 --> 00:10:22.867
+Now, this is a cost guard rail.
+
+00:10:22.867 --> 00:10:26.547
+This is great, so it makes sure that you're never spending more than you want to spend.
+
+00:10:26.857 --> 00:10:28.327
+Now, you do
+
+00:10:28.617 --> 00:10:29.367
+have to add credits.
+
+00:10:29.367 --> 00:10:35.847
+So, this mostly works as a guard rail for if you have more credit on your account and you want to manage how it gets used over time.
+
+00:10:35.847 --> 00:10:40.067
+For example, if you've got 100 credits on your account and you only want to spend 20 a month,
+
+00:10:40.237 --> 00:10:41.517
+this is how you can manage that.
+
+00:10:41.807 --> 00:10:44.757
+You can leave this blank if you don't want to have that limit.
+
+00:10:44.977 --> 00:10:47.967
+Either way, set it up the way you'd like and then click create.
+
+00:10:48.657 --> 00:10:51.587
+Now, here you'll see a long string starting with SK.
+
+00:10:52.367 --> 00:10:54.547
+This is your API key.
+
+00:10:54.547 --> 00:10:56.407
+Again, it's like a password.
+
+00:10:56.667 --> 00:10:58.077
+Don't share it with anyone.
+
+00:10:58.427 --> 00:11:03.357
+Go ahead and copy it and save it somewhere safe because you will not be able to see this again.
+
+00:11:03.767 --> 00:11:08.647
+If you close this window without copying it, you'll need to start over and create a new key.
+
+00:11:09.317 --> 00:11:11.937
+So, just make sure you copy it before you do anything else.
+
+00:11:12.167 --> 00:11:14.457
+All right, go ahead and switch back to your terminal tab.
+
+00:11:15.147 --> 00:11:18.537
+Then click into the terminal and paste in
+
+00:11:19.407 --> 00:11:20.597
+your API key.
+
+00:11:20.897 --> 00:11:25.397
+Now, I want to point out here, you won't actually see anything happen once you paste it in.
+
+00:11:25.807 --> 00:11:30.577
+This is just for security reasons so that anybody who's watching can't see private information being entered into your terminal.
+
+00:11:31.017 --> 00:11:32.747
+But it is in there.
+
+00:11:33.387 --> 00:11:37.437
+So, once you've pasted that in, go ahead and hit enter on your keyboard.
+
+00:11:37.837 --> 00:11:39.447
+And you'll see the API key has been saved.
+
+00:11:40.167 --> 00:11:43.547
+Next, the wizard asks which AI model you want Hermes to use by default.
+
+00:11:44.167 --> 00:11:48.437
+A model is the specific AI brain the agent will use to think.
+
+00:11:48.767 --> 00:11:51.957
+Different models have different strengths and different prices.
+
+00:11:52.437 --> 00:11:55.177
+Some are very smart, but expensive.
+
+00:11:55.587 --> 00:11:59.787
+Some are cheap, but not great at the kind of structured work an agent does.
+
+00:12:00.267 --> 00:12:05.797
+For a beginner setup, I recommend DeepSeek V4.
+
+00:12:06.157 --> 00:12:07.847
+That's this one right here.
+
+00:20:00.057 --> 00:20:01.487
+aloud list
+
+00:20:01.637 --> 00:20:02.227
+or the
+
+00:20:02.227 --> 00:20:03.770
+gateway not starting properly.
+
+00:20:04.147 --> 00:20:04.707
+The quickest
+
+00:20:04.707 --> 00:20:05.427
+way to find out
+
+00:20:05.867 --> 00:20:07.370
+is to return to your terminal
+
+00:20:07.737 --> 00:20:08.797
+and type Hermes
+
+00:20:08.797 --> 00:20:10.157
+space doctor
+
+00:20:10.897 --> 00:20:11.537
+and submit it.
+
+00:20:11.837 --> 00:20:14.127
+It'll check your setup and point out what's wrong.
+
+00:20:14.397 --> 00:20:18.527
+And if that doesn't catch it, run Hermes space setup again and walk through the wizard.
+
+00:20:18.917 --> 00:20:23.367
+All right, from here, we're going to make the agent do real work for you.
+
+00:20:24.367 --> 00:20:29.847
+The two things that make Hermes more than a regular chatbot are skills and memory.
+
+00:20:30.087 --> 00:20:33.370
+A skill is a saved workflow the agent can run on its own.
+
+00:20:33.687 --> 00:20:37.957
+Some come built in, others get created when you ask the agent to do something complex.
+
+00:20:38.387 --> 00:20:44.047
+The agent saves the steps so it can run the same workflow again without thinking it through from scratch.
+
+00:20:44.757 --> 00:20:49.367
+Memory is how the agent keeps track of things about you across separate conversations.
+
+00:20:50.157 --> 00:20:53.687
+I want to show you something that makes setting up your own agent worth the effort.
+
+00:20:54.077 --> 00:21:00.107
+The agent is going to do real research for you on the open web, save what it found to a file on your server,
+
+00:21:00.107 --> 00:21:03.307
+then automate the same job to run on a schedule.
+
+00:21:04.087 --> 00:21:05.347
+Now, I make
+
+00:21:05.467 --> 00:21:07.247
+YouTube videos.
+
+00:21:07.337 --> 00:21:16.387
+So for me, I want to have my bot research the top five YouTube videos ranking right now for something like email marketing,
+
+00:21:16.997 --> 00:21:18.507
+and then present me with a report.
+
+00:21:18.747 --> 00:21:22.887
+But you can have your own bot research whatever you'd like.
+
+00:21:22.887 --> 00:21:26.827
+So think about that now, and then I'll show you a prompt you can run that you can modify
+
+00:21:27.057 --> 00:21:28.897
+to make it work better for your situation.
+
+00:21:29.267 --> 00:21:33.367
+Here, I've typed find the top five YouTube videos ranking right now for
+
+00:21:33.637 --> 00:21:36.957
+email marketing tutorial for beginners.
+
+00:21:37.357 --> 00:21:40.870
+For each one, save the title, channel, and what it covers
+
+00:30:00.816 --> 00:30:02.766
+up to something like Claude Opus 4.7.
+
+00:30:03.786 --> 00:30:11.236
+Just keep in mind that more power comes with more cost, or if you want to step down to something cheaper, you can do that too.
+
+00:30:11.756 --> 00:30:15.686
+For me, I'll go ahead and switch us back to Deep Seek.
+
+00:30:15.866 --> 00:30:18.066
+Since it's a great LLM for daily use.
+
+00:30:18.066 --> 00:30:23.366
+You can also tell the agent to use a specific model for a specific scheduled job.
+
+00:30:23.636 --> 00:30:26.966
+So your routine work stays cheap while heavier tasks get the smarter model.
+
+00:30:27.676 --> 00:30:41.760
+Now, back in the Hostinger dashboard, you can keep track of your costs by clicking on your profile in the upper right, and then clicking billing to see your past information, as well as upcoming subscriptions and the renewal price.
+
+00:30:41.836 --> 00:30:43.686
+That's what you'll pay when the introductory term ends.
+
+00:30:43.996 --> 00:30:54.196
+I recommend checking the Open Router activity page every few days while you're just getting started, that way you can see real usage and adjust the models you use before anything surprises you.
+
+00:30:54.606 --> 00:30:57.066
+Now, the research workflow we built is just one example.
+
+00:30:57.176 --> 00:30:58.756
+Hermes can do a lot more.
+
+00:30:59.206 --> 00:31:05.346
+The easiest way to find what's useful for you is to ask the agent directly.
+
+00:31:05.806 --> 00:31:08.796
+Send it something like, what kind of tasks are you good for?
+
+00:31:09.416 --> 00:31:10.826
+And then let it suggest ideas.
+
+00:31:11.136 --> 00:31:13.976
+Here, it comes back with a list of what it's good at:
+
+00:31:14.076 --> 00:31:14.966
+hands-on execution,
+
+00:31:15.296 --> 00:31:16.456
+long-running background work,
+
+00:31:16.796 --> 00:31:17.896
+scheduled recurring tasks,
+
+00:31:18.196 --> 00:31:19.916
+code generation and editing,
+
+00:31:20.126 --> 00:31:22.266
+research and synthesis, and memory across sessions.
+
+00:31:22.686 --> 00:31:26.860
+It also lists some stuff it's decent at and stuff it's not built for.
+
+00:31:27.726 --> 00:31:30.726
+All right, your agent is up and learning from how you use it.
+
+00:31:31.076 --> 00:31:39.466
+The first link in the description gets you an extra 10% off your VPS, if you haven't grabbed it yet, on top of whatever sale Hostinger is already running.

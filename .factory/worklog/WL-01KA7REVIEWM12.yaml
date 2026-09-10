@@ -1,0 +1,105 @@
+id: WL-01KA7REVIEWM12
+khi: 2026-09-07
+loai: ban_giao
+tac_nhan: claude-opus-5
+vai: review overview M12 sau khi team s7/s8 bao "co ban hoan thien" — chi do, khong sua
+gate: khong ky gi — evidence cho chu du an
+module: M12_chungcat (chinh) · M13 (lien doi qua FR-072) · cong khung
+
+viec: >
+  Chi dao "PM va dev dang review va len plan cho M13, trong luc nay ban hay review lai
+  nhung gi M12 da lam". Moc so sanh: WL-01KA40GIAMSATM12 (2026-09-06).
+
+da_do:
+  fr_053_ap_that:
+    - "verify.py:17,67-86 — dinh_vi() ba tang (chinh-xac / chuan_hoa / fuzzy >= nguong), nguong
+       la THAM SO doc tu chungcat/assets/nguong.json, khong hang trong ma. = AC-3.2 dung."
+    - "vong.py:6-14 — khai thang 'KHONG dua tren os.replace nguyen tu nua'; ULID trong ten file
+       la khoa idempotency, duy nhat theo cau tao. spec §5.0 + AC-5.2 viet lai cung y.
+       check_worker_giet_giua_chung.py XANH (AC5c khong cuop lease · AC5d 8 luong mot thang)."
+    - "=> hai o backlog toi mo o WL-01K9XK0 (AC-3.2 khong cai duoc · AC-5.2 dua tren menh de
+       sai) DA DONG bang FR-053, khong bang loi khai."
+  spec_lon_len: "AC 24 -> 35 · FR-053 (2026-09-03) · FR-054 (09-04) · FR-070/071 cua team (09-07)
+    deu da ap; FROZEN.lock:30 spec.md 94ce44c297d9ca16, check_frozen PASS => da ky lai sau khi ap."
+  spec_di_sau_ma_MOT_loai_viec:
+    - "spec §2 tieu de 'BA kieu viec'; bang §2 liet 3 (chung-cat-mot-nguon · tong-hop-chu-de ·
+       sinh-transcript). Ma: worker.py 2 · api.py 2 lan `tai-video`; T12-26 + T12-27 da lam.
+       `tai-video` xuat hien trong spec DUNG MOT LAN (§2.3 bang con tro)."
+    - "FR-069 (them tai-video) trang thai CHO CHU DU AN DUYET. => loai viec thu tu DANG CHAY
+       tren server that truoc khi spec frozen biet no. Khong phai loi cua team — ho da mo FR;
+       la o quyet dinh dang cho NGUOI."
+  fr_070_team_vs_fr_072_toi:
+    - "KHONG chong nhau, bo sung nhau: team — chung cat video lay NOI DUNG transcript (vtt->text
+       trong chungcat), chua co transcript => 409 'sinh transcript truoc', khong roi ve than.
+       Toi — M13 doc cung hien vat text/vtt qua cua xuat web (GET /api/xuat/<slug>/txt)."
+    - "DIEM CAN PM NHIN: sau FR-070 team, he co HAI bo chuyen vtt->text: chungcat (noi bo, cho
+       chung cat) va web/api/xuat-cua.mjs (vttSangTxt, cho nguoi tai + M13). Cung lop voi
+       'hai def chuan_hoa()' da ghi o WL-01KA5S1. Chua phai loi; la cho se lech neu khong co
+       cong doi chieu. Ghi day, khong mo o backlog M12 (team giu file)."
+  cong_khung_6_do_quy_chu:
+    - "check_loai_nguon_db (MOI): DO OAN. Suy 24 = bai-viet.loai 5 + media.loai 13 + mac_dinh 1
+       + video_host 4 + tai-len 1; seeder cho 16, bang that 14. media.loai nay gom video/audio/
+       vtt/md/txt la DINH DANG RENDER (FR-039 doi vai bang mime), khong phai LOAI NGUON. Phep
+       suy dung khi media.loai = 5 dinh dang tai lieu; sai tu khi FR-039/T03-111. Chu: nguoi
+       viet cong (M09/M01), khong phai M12."
+    - "check_media_ddl x2: (a) 'moi mime khai magic' — text/markdown · text/plain (T03-111) khong
+       co magic; check_dinh_dang_mo:88-97 MIEN van ban thuan nhung check_media_ddl:75 all(magic)
+       KHONG mien => cung mot luat, hai cong, mot cong duoc cap nhat. (b) 'tran hien vat 1024 MB'
+       — hau qua FR-054 nang tran; cong doc so cu. Chu: M09."
+    - "check_danh_muc: core/assets/danh-muc co `nguon` (FR-067) nhung core/skill-src copy chua.
+       Chu: agent skill (khong dong vao)."
+    - "check_db_dung_cho: ma_moi/phien (FR-045) chua co exporter. Chu: M08/M18."
+    - "check_running: he qua cua hai dong tren, RUNNING.md liet. Chu: theo hai dong tren."
+    - "check_skill: agent khac."
+    - "5 cong DO o WL-01KA40 nay XANH: check_dinh_dang_mo · check_g6b · check_khai_mot_noi ·
+       check_rule_surfaces · check_worklog. Split-brain tran (spec 1 GB vs nguong.json) DA HOP:
+       ca hai 1073741824."
+  m12_rieng: "45 cong chungcat/tests 0 do · check_cat_doan_audio 26 s (xanh, cham nhat) · pytest 49."
+  nhip_team: "35 worklog WL-01M1* · 26 entry tu 09-06 · backlog M12 14 o [ ] / 49 [x]."
+
+su_co_cua_toi:
+  - "TRUNG SO FR lan hai: toi tao FR-070 (02:02) + FR-071 (02:03); team tao FR-070 (08:23) +
+     FR-071 (09:48) cho viec khac. Ban cua team da duyet + thi cong + spec frozen + ma (chungcat/
+     web/project_map) dan => doi so ban CUA TOI: FR-072 (M13 hop dong) · FR-073 (#anchor).
+     Sua tro o adr.md:778 · decisions.md:720,722,748 · WL-01KA6ADR08FR070 (id giu)."
+  - "TRONG LUC DOI SO TOI XOA MAT HAI FILE GOC: script f\"FR-{70}-\" ra 'FR-70-' khong khop
+     'FR-070-', ten dich == ten nguon, write roi unlink => mat. Khong co ban lui (untracked).
+     DUNG LAI tu noi dung cung phien, ghi ro dau moi file. Bai hoc: doi ten dung shutil.move /
+     git mv; KIEM ten dich != ten nguon truoc khi unlink; rule.md 4 (khong xoa khi chua kiem dinh)
+     trung dung ca voi file cua chinh minh."
+
+object:
+  - path: .factory/fr/FR-072-m13-mot-hop-dong-cho-moi-client-va-doc-hien-vat.md
+    ghi_chu: "dung lai + doi so, dau file ghi ly do"
+  - path: .factory/fr/FR-073-dang-dia-chi-anchor-vao-dia-chi-json.md
+    ghi_chu: "dung lai + doi so"
+  - path: 04_system/adr.md
+    ghi_chu: ":778 FR-070 -> FR-072"
+  - path: memory/decisions.md
+    ghi_chu: ":720,722,748 tro so moi, giu so cu trong ngoac"
+  - path: .factory/worklog/WL-01KA6ADR08FR070.yaml
+    ghi_chu: "noi dung tro FR-072/073; id khong doi"
+
+do_do:
+  - lenh: "grep -cE '^> \\*\\*AC-' 06_modules/M12_chungcat/spec.md"
+    ket_qua: "35"
+  - lenh: "check_worker_giet_giua_chung.py"
+    ket_qua: "XANH"
+  - lenh: "check_frozen.py"
+    ket_qua: "pass — moi file frozen khop baseline"
+  - lenh: "python -c 'Counter FR-(\\d+) trong .factory/fr'"
+    ket_qua: "trung: [54] — chi con FR-054 (da xu bang FR-055, file team giu ten cu)"
+do_do_boi: "moi cong do da quy chu o tren; khong cai nao la cua M12"
+
+khong_lam:
+  - "KHONG sua cong nao (loai_nguon_db · media_ddl) — chu la M09/M01, viec cho dev."
+  - "KHONG sua spec M12 'BA kieu viec' — FROZEN, dang cho FR-069."
+  - "KHONG mo o backlog M12 — team giu file (bai hoc FR-054)."
+  - "KHONG cham FR-070/071 cua team, WL-01M1*, 07_plan/M12."
+  - "KHONG commit, KHONG push."
+
+cho_NGUOI_quyet:
+  - "Duyet FR-069 — `tai-video` da chay that (T12-26/27) nhung spec frozen chua biet."
+  - "Xac nhan doi so FR-072/073; bao PM ap theo so moi."
+  - "Giao cong DO OAN check_loai_nguon_db + check_media_ddl (hai cong mot luat) cho ai? (M09/M01)"
+  - "Hai bo vtt->text (chungcat · xuat-cua.mjs): can cong doi chieu hay chap nhan?"

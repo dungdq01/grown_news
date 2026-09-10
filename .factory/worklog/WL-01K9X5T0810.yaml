@@ -1,0 +1,116 @@
+id: WL-01K9X5T0810
+at: 2026-09-02
+by: claude
+buoc: "T08-10 — cai check_db_dung_cho.py, rang cho M08-R6 + M18-R2 (don vi TEST)"
+loai: don vi TEST (R1: chi don vi test duoc cham file test); do TRUOC (R5)
+gate: khong ky gate — mot don vi viec, khong phai mot gate
+
+object:
+  - 07_plan/M08_api/tasks/T08-10-cong-db-dung-cho.md   # tieu chi, viet TRUOC code
+  - core/tests/check_db_dung_cho.py                    # MOI
+  - RUNNING.md                                          # +1 dong trong khoi cong
+
+evidence:
+  - "DO KHOI DIEM: python core/tests/check_db_dung_cho.py => exit 2, 'No such file'"
+  - "--tu-kiem: 4/4 ca dung (A do, B khong do oan, C do, D khong do oan) => exit 0"
+  - "repo that: exit 0, in ra 5 ve BO QUA"
+  - "quet 27 cong: 5 do, DUNG 5 cai truoc khi toi bat dau — khong them do moi"
+  - "pytest core/tests -q => 42 passed"
+  - "check_running: van dung 4 muc do co san; dong moi cua toi KHONG nam trong danh sach do"
+
+vi_sao_lam_viec_nay_trong_luot_tu_dong: >
+  Day la NO DO CHINH TOI TAO RA trong phien nay, khong phai viec moi. ADR-06 va
+  M08-R6 (ca hai chu du an da chot) tro toi mot lenh KHONG TON TAI. Theo R3,
+  mot rule `hard` khong co lenh chay duoc THI NO LA `soft` — nen M08-R6 va
+  M18-R2 dang khai sai be mat cua chinh chung.
+  Khong cho FR-048 duyet vi cong nay chi kiem phan ADR-06 (a)(b)(c) DA CHOT.
+
+# ══ PHAT HIEN — check_rule_surfaces KHONG lam viec ten no noi ═════════
+lo_trong_bo_cong: >
+  CLAUDE.md dac ta <rule-surface-check> la "exit 0 = MOI rule S3/S4 trong
+  rules.md co `lenh:` chay duoc".
+  Doc check_rule_surfaces.py: no kiem DUNG HAI rule go cung — M01-R3 va M04-R1 —
+  va KHONG MO mot file rules.md nao. No chua bao gio kiem dieu ten no noi.
+  Do truc tiep tren 87 rule cua 18 module:
+    S3 co lenh CHAY DUOC : 11
+    S3 co lenh KHONG chay: 39
+    S3 KHONG khai `lenh:` : 22  (M01-M08 — dinh dang CU, truoc khi co bo ba
+                                 lenh/do_khi/xanh_khi)
+  Trong 39: 35 thuoc sau dich vu CHUA DUNG (chungcat/ truyhoi/ chatbot/ kenh/
+  artifact/ cong/) — cho s8, dung hang. 4 nam o core/tests/ va ca bon la CUA TOI:
+  M08-R6, M18-R1, M18-R2, M18-R3.
+  Luot nay dong 1 trong 4. Ba cai con lai (check_ma_moi, check_vai_trong) kiem
+  HANH VI RUNTIME cua bon bang CHUA DUOC TAO — viet bay gio la viet cong rong.
+
+khong_tu_them_rang_cho_check_rule_surfaces: >
+  Sua no de quet moi rules.md se lam 39 rule do ngay lap tuc va CHAN G6A.
+  Do la mot quyet dinh ve ngu nghia cong cua du an, khong phai mot sua loi —
+  chu du an quyet. Ghi ra o day + no_con_lai.
+
+# ══ TOI VIET SAI VE 2 VA NO DO OAN — da sua truoc khi giao ═══════════
+do_oan_da_bat_duoc: >
+  Luot dau ve 2 lay tap thu muc hop le tu dich-vu.json (bay dich vu co tien
+  trinh). Chay tren repo that => DO, bao kb/_kho.sqlite va kb/_index.sqlite
+  "sai cho".
+  Do la DO OAN, va sai o mo hinh chu khong o ma: `kb/` KHONG phai mot dich vu —
+  no la nha cua M02_kb, mot module DU LIEU khong co tien trinh nao. ADR-06 noi
+  THANG rang kb/_kho.sqlite la vi du cua chuyen DUNG CHO.
+  => Chu cua mot DB la mot MODULE, khong phai mot DICH VU. Nguon dung la
+     project_map.modules.*.be (kb/** la be cua M02_kb). Hop them dich-vu.json
+     de phu dich vu duoc khai truoc khi co mac trong map.
+  Va toi da KHONG sua repo cho khop cong — T08-10 khai truoc rang neu cong do
+  thi do la PHAT HIEN, di ra backlog/FR, khong sua file san pham trong cung
+  don vi. Lan nay hoa ra cong sai, nen sua cong.
+
+siet_lan_hai: >
+  Sau khi sua, tap "hop le" van chua FROZEN.lock va Makefile — vi chung la
+  `be` cua vai module nhung la FILE, khong phai thu muc. Mot cong nhan
+  "FROZEN.lock" la mot thu muc chua DB hop le thi no gan nhu khong tu choi gi.
+  Da loc: chi giu mau `be` tro toi mot THU MUC co that.
+
+ve_3_BO_QUA_co_thong_bao_—_khong_xanh_im_lang: >
+  Ca nam bang chua ton tai nen ve 3 chua kiem duoc gi. Cong IN RA tung ve bi bo
+  qua va in mot dong canh bao o cuoi, thay vi xanh im lang.
+  Ly do: mot cong xanh vi "chua co gi de kiem" ma khong noi ra la dung thu
+  M17 AC-3.4 goi la CONG XANH RONG — no te hon khong co cong, vi no lam nguoi
+  ta tin. Khi FR-047 dung DDL, nam dong BO QUA se tu bien mat.
+
+do_do:
+  khong_co_do_moi: "5 do, dung 5 cai co truoc luot nay"
+  check_danh_muc + check_skill: "AGENT KHAC so huu core/skill-src"
+  check_frozen: "cho NGUOI ky"
+  check_running: "he qua cua ba muc tren — dong moi cua toi chay xanh"
+  check_g6b: "T03-90-man-dot-hai-mock.md, AGENT KHAC (WL-01K9W3T0390, Sep 1 18:40)"
+
+no_con_lai:
+  - "FR-048 VAN CHO DUYET — chua dung gi phu thuoc no"
+  - "check_rule_surfaces.py kiem DUNG HAI rule go cung, khong mo mot rules.md nao. Them rang => 39 rule do ngay va CHAN G6A ⇒ chu du an quyet"
+  - "check_ma_moi.py + check_vai_trong.py: chua viet duoc, cho bon bang ton tai"
+  - "check_db_dung_cho ve 3 con 5 dong BO QUA — se phu khi FR-047 dung DDL"
+  - "22 rule S3 (M01-M08) khai be_mat S3 ma KHONG co `lenh:` — dinh dang cu, chua ai chuyen"
+
+# ══ BO SUNG cung ngay — sua sau cho trong M18 da thanh sai ═══════════
+sua_theo_sau:
+  object:
+    - 06_modules/M18_nguoidung/spec.md       # §8 viet lai
+    - 06_modules/M18_nguoidung/rules.md
+    - 06_modules/M18_nguoidung/data_flow.md
+    - 06_modules/M18_nguoidung/model_flow.md
+    - 06_modules/M18_nguoidung/testcases.md
+    - 06_modules/M18_nguoidung/workflow.md
+  vi_sao: >
+    Sau khi cai check_db_dung_cho.py, SAU cho trong M18 van khai "chua cai" —
+    van ban toi viet 30 phut truoc nay da sai.
+  phat_hien_them: >
+    Khi dem lai bang MAY thay §8 con SAI mot cach khac, va SAI NGAY LUC VIET
+    chu khong phai sai vi cu: toi viet "SAU lenh check_*.py CHUA CAI mot cai
+    nao". Thuc te co TAM lenh rieng biet, va check_export_dan_xuat.py DA TON TAI
+    tu truoc. Tuc con so dung luc do la 1/8, khong phai 0/6.
+    Toi dem TAY thay vi cho may dem — dung thu CLAUDE.md cam ("dem tay roi chep
+    so"). Da thay bang mot bang 2/8 + chep lenh dem vao spec de lan sau khong ai
+    phai dem tay nua.
+  bai_hoc: >
+    Cai mot cong xong thi phai quet lai moi cho NHAC toi no. Cong duoc cai la
+    mot thay doi TRANG THAI, va van ban mo ta trang thai do nam rai o sau file.
+    Lan nay grep bat het; neu chi sua cho toi nho thi bon cho con lai se noi doi
+    am tham — va chung deu la van ban NGUOI doc de quyet dinh lam gi tiep.

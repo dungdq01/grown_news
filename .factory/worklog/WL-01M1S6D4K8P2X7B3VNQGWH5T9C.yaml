@@ -1,0 +1,110 @@
+ulid: 01M1S6D4K8P2X7B3VNQGWH5T9C
+thoi_diem: 2026-09-06T03:10+07:00
+tac_nhan: claude-opus-5
+loai: ban_giao
+module: M01_core + M12_chungcat + M08_api + M03_web
+don_vi: WO-056 · T01-47/48 · T12-24 · T08-32 · nút hai chiều
+
+viec: >
+  Chủ dự án hỏi hai điều; ĐO được cả hai đều chưa đúng, và điểm ① hỏng im lặng.
+
+hai_khuyet_tat:
+  - id: ① nhãn không kế thừa
+    goc: >
+      `_dung_nhap` ghi `source_type: article` (đúng) nhưng KHÔNG ghi `category`
+      lẫn `concepts`. Không cổng nào báo vì `frontmatter.schema.json` `required`
+      có 11 trường và không có hai trường ấy — bản nháp qua `--strict` sạch,
+      `check_nhap_duyet_duoc` xanh, mà bài lên site NHÃN RỖNG.
+      Đo trên `kb/tai-lieu/linux-foundation.md`: `category:` trống, `concepts:` trống.
+    loi_cua_toi: >
+      `T12-20` task file liệt kê `category`·`concepts` phải điền; lúc thi công
+      tôi đo bằng `--strict` — mà `--strict` không đòi. ĐỂ THƯỚC QUYẾT ĐỊNH
+      PHẠM VI THAY VÌ ĐỂ YÊU CẦU QUYẾT ĐỊNH. Cổng xanh không nghĩa là yêu cầu
+      xong; nó chỉ nghĩa là cổng ấy không nói gì.
+  - id: ② hai chiều chưa có chiều nào
+    goc: >
+      `nguon: [<slug>]` có trong frontmatter từ `T12-6`, nhưng grep toàn
+      `web/api/` + `web/render/` + `web/plugins/` ra **0 nơi đọc**. Và nó không
+      khai trong schema — lọt qua vì schema cho phép trường lạ. Chiều gốc →
+      chưng cất thì không có gì cả.
+
+quyet_dinh_chu_du_an: >
+  Lối (b) chỉ mục ngược, không phải (a) suy-từ-slug. Lý do đứng vững: một bài
+  gốc chưng cất được NHIỀU lần (khác model, khác lượt), mà quy ước
+  `phan-tich-<gốc>` chỉ chứa đúng một bản — (a) là tự khoá vào một-gốc-một-bản
+  ngay từ đầu.
+
+hai_lan_phep_do_bac_thiet_ke_cua_toi:
+  - lan_1_khoa_ho_so: >
+      Bản đầu bắt buộc `nguon` khi `ho_so: phan-tich`. Đo TRƯỚC khi áp:
+      `kb/docs/xgboost-taylor-bac-hai.md` có `ho_so` vắng (⇒ `phan-tich`) nhưng
+      `origin: external` + `url: https://aivietnam.edu.vn/` — một bản phân tích
+      NẠP TỪ NGOÀI, đúng khi không có nguồn trong kho. Khoá `ho_so` sẽ tố oan
+      đúng bài đó. Đổi khoá sang `origin: pipeline`.
+  - lan_2_khoa_origin: >
+      Áp `origin: pipeline` xong thì `npm test` đỏ hai vế CRUD, truy ra SÁU chỗ
+      dùng `pipeline` với nghĩa rộng *không-do-người-gõ*: `web/test/_api.mjs` ·
+      `api-crud` · `canh-bao-khong-chan-ghi` · `route-theo-module` ·
+      `vong-doi-bai` · fixture `dat-chuan.md` (mang URL arxiv). Chỉ `worker.py`
+      dùng nó với nghĩa *chưng cất từ bản ghi trong kho*.
+      ⇒ `origin` KHÔNG mang nghĩa tôi khoá vào nó, và cái giá của việc ép là
+      sáu fixture phải đeo một `nguon` BỊA.
+    sua: >
+      GIỮ phần khai (kiểu · khuôn slug-có-tiền-tố-loại · `minItems: 1`) — đó là
+      thứ chủ dự án hỏi. BỎ nhánh `allOf` bắt buộc. CHUYỂN cưỡng chế về BÊN
+      SINH RA VẬT: `check_ke_thua_nhan` đòi `_dung_nhap` luôn ghi `nguon` đủ
+      khuôn — chỗ nghĩa không mập mờ, vì `_dung_nhap` sinh đúng một loại vật.
+    vet_de_lai: >
+      Cổng `AC2`/`AC2b` giữ quyết định ấy đứng yên: ai thêm lại nhánh `required`
+      thì đỏ và phải đọc lý do trước khi làm.
+
+lam_gi:
+  - "M01 `T01-47` — `nguon` khai trong schema: mảng, khuôn `<loai>/<ten>`, `minItems: 1`"
+  - "M12 `T12-24` — `_doc_nguon` MANG THEO nhãn (nó đã lấy cả bản ghi rồi vứt hết trừ thân); `_dung_nhap` CHÉP `category`+`concepts`. Chép chứ không hỏi model: nhãn model bịa đi thẳng vào bộ lọc mà không ai đối chiếu nổi. Gốc vắng nhãn ⇒ nháp vắng, không ghi `[]` giả vờ đầy."
+  - "M08 `T08-32` — `nguon` qua `theBai` + `chiMucMo`, vắng ⇒ `[]` không `undefined`"
+  - "M03 — `nguon` đặt trong `hoSoVaMedia()`, helper mà CẢ HAI builder của `data.mjs` đã gọi: một chỗ khai, hai đường đọc khớp. Đúng thứ chú thích `articles.mjs:55` gọi tên (bốn builder cùng hình dạng, thiếu một trường ở MỘT chỗ thì FE nhận `undefined` mà không lỗi nào nổ)."
+  - "M03 — hai nút: `↩ Xem bài gốc` (từ `nguon`) · `⚗ Bản chưng cất (N)` (chỉ mục ngược qua `/api/index`). Bấm ⇒ `mo(bai, {canh: win.id})` — CỬA SỔ MỚI cạnh cửa sổ đang đọc, không điều hướng trang."
+
+ba_ca_bien_da_xu:
+  - "gốc chưa chưng cất lần nào ⇒ KHÔNG hiện nút — nút chết là nút dạy người bỏ qua nút"
+  - "nhiều bản ⇒ nút nói số lượng, mở bản mới nhất theo `analyzed_at`"
+  - "`nguon` trỏ bài đã xoá ⇒ `moTheoSlug` báo *'không còn trong kho'*, KHÔNG mở cửa sổ trống bắt người tự đoán"
+  - "chiều ĐI vẽ SAU khi `/api/index` trả lời — không chặn thanh nút chờ mạng; mạng hỏng ⇒ không nút"
+
+do_sau:
+  - lenh: python core/tests/check_nguon_hop_dong.py
+    ket_qua: "XANH 11/11 vế"
+  - lenh: python chungcat/tests/check_ke_thua_nhan.py
+    ket_qua: "XANH 5/5 vế"
+  - lenh: 'for f in chungcat/tests/check_*.py; do python "$f"; done'
+    ket_qua: 36/36 XANH
+  - lenh: python -m pytest core/tests -q
+    ket_qua: 49 passed
+  - lenh: cd web && npm test
+    ket_qua: "3009 vế ok · 0 FAIL"
+  - lenh: python core/src/source_distiller/validate.py kb/ --strict
+    ket_qua: "4 file · 0 lỗi"
+  - lenh: python core/tests/check_frozen.py
+    ket_qua: "pass — schema đã ký lại (FR-067)"
+
+canh_bao_tran: >
+  `gn.js` sau đợt này còn dư ĐÚNG 51 byte (102349/102400). Hai nút + chỉ mục
+  ngược tốn ~1680 byte. Đơn vị FE tiếp theo gần như chắc chắn vỡ trần — phải
+  chuyển phần này sang chunk hoặc giảm béo TRƯỚC, không phải sau.
+
+đỏ_do: claude-opus-5
+
+object:
+  - core/assets/frontmatter.schema.json
+  - core/tests/check_nguon_hop_dong.py
+  - chungcat/src/worker.py
+  - chungcat/tests/check_ke_thua_nhan.py
+  - web/api/articles.mjs
+  - web/render/data.mjs
+  - web/plugins/multiwindow/src/scripts/multiwindow.inline.ts
+  - 07_plan/M01_core/tasks/T01-47-nguon-thanh-hop-dong.md
+  - 07_plan/M01_core/tasks/T01-48-test-nguon-hop-dong.md
+  - 07_plan/M12_chungcat/tasks/T12-24-ke-thua-nhan-tu-bai-goc.md
+  - 07_plan/M08_api/tasks/T08-32-nguon-qua-cua.md
+  - .factory/wo/WO-056-hai-chieu-goc-va-ban-chung-cat.md
+  - .factory/fr/FR-067-nguon-thanh-truong-nhan-dien.md

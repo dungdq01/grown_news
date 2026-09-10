@@ -1,0 +1,47 @@
+at: 2026-08-18T13:30Z
+agent: human+claude
+step: G3 bổ sung — chia lại module, 4 thành 7
+did: >
+  Brainstorm module theo yêu cầu người dùng: "mới có module chính, chưa có
+  tính năng phụ đi kèm". Đi từng câu một, mỗi câu một quyết định.
+
+  M05_intake (câu 1) — cửa cho bản .md do agent khác sinh.
+    Tách khỏi M01 vì có luật M01 không có: external không bao giờ vào thẳng
+    approved. Nhét chung thì validate.py mang hai chế độ, sửa distiller lại
+    phải nhớ kiểm đường external.
+    Nhận U2 từ M01.
+
+  M06_skillgen (câu 2) — sinh SKILL.md dạng NHÁP, không sinh đủ.
+    Trigger máy làm tốt (draft_trigger có sẵn); nội dung máy làm dở (một nguồn
+    thì chỉ chép lại nguồn đó). Sinh đủ tạo ra thứ trông như skill mà cài vào
+    làm agent tệ hơn — người dùng không phát hiện ngay.
+    Nhận U7 từ M01. Đây là module duy nhất làm M1.2 đo được.
+
+  M07_curate (câu 3) — quét kho theo nhịp, báo ba thứ hỏng dần.
+    Tôi đề xuất hoãn (lối D, ghi nợ có điều kiện) vì kho đang 0 bài nên ngưỡng
+    sẽ đoán sai. Người dùng chọn làm luôn: "A -> go đi, đến đó hẵng hay".
+    Làm theo, nhưng đặt ngưỡng vào 07_curate/thresholds.yaml thay vì rải
+    trong code — lúc có dữ liệu thật sửa một dòng, không sửa logic.
+    Chỉ đọc kb/, đề xuất chứ không tự sửa.
+
+  Build order đổi: M06 lên trước M03. M1 có ba vế và M1.2 cần M06 mới đo được;
+  xây web trước thì phải quay lại duyệt lại đúng lứa 10 bài lần hai.
+
+  Q1 đóng: giữ Quartz (F1).
+
+verify:
+  hard:
+    - "python scratchpad/g3.py  ⇒ 7/7 module có PRD, 7/7 PRD có module"
+    - "yaml.safe_load(project_map.yaml)  ⇒ hợp lệ, 7 module"
+  soft:
+    - ranh giới ghi kb/ thu về đúng 2 module (M01, M05) — khai trong boundaries,
+      chưa có bề mặt S1/S3 cưỡng chế. Nợ sang s6.
+
+ra:
+  - 03_docs/spec_overview.md   # 3 mục module mới + sơ đồ + build order
+  - project_map.yaml           # v5, boundaries.kb_writers/kb_readers
+
+no_go:
+  - M07 chưa có dữ liệu thật để chỉnh ngưỡng — 3 số trong thresholds.yaml là
+    phỏng đoán, phải chỉnh sau khi nạp 10 nguồn (bước 2 build order)
+  - kb_writers mới là lời khai trong yaml, chưa có deny rule chặn

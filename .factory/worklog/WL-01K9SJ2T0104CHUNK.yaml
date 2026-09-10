@@ -1,0 +1,72 @@
+ulid: 01K9SJ2T0104CHUNK
+khi: 2026-09-04T05:20+07:00
+tac_nhan: agent-thi-cong (Claude, phiên 6c7880c5)
+loai: ban-giao
+module: M03_web
+don_vi: T03-104 — giảm béo `gn.js` bằng chunk `napvideo`
+
+viec: |
+  `gn.js` **101743 → 98277** (bớt **3466 byte**; AC1 đòi ≥2000). Chunk
+  `gn-napvideo.js` chỉ tải trên `/video/nap/`.
+
+  CHỌN LÁT CẮT bằng phép đo, không bằng cảm giác:
+    nạp VIDEO     3637B · KHÔNG đụng `hienVatCho`/`SUA_TL`; chỉ cần `video_host`
+    nạp THƯ VIỆN  6131B · đụng cả ba ⇒ để lượt sau (ô nợ M03)
+  và `__MEDIA__` là **6590 byte** — tự khai nó trong chunk sẽ đẩy TỔNG tải đầu
+  của trang nap VƯỢT trần. Tách mà làm trang nặng lên thì tách để làm gì.
+
+  ⇒ Một ngoại lệ HẸP với luật "chunk tự chứa" của T03-102: `gn.js` công bố
+  `globalThis.__GN_MEDIA__`. Chỉ DỮ LIỆU, không hàm · chunk đọc LÚC GỌI nên thứ
+  tự nạp không thành ràng buộc · một chiều, `gn.js` không đọc gì của chunk.
+
+  Ba helper chép lại (~350B): `G` · `kqTV` · `loiMay` — giá của độc lập.
+
+object:
+  - web/plugins/napvideo/src/napvideo.inline.ts    # chunk mới
+  - web/plugins/multiwindow/src/scripts/multiwindow.inline.ts  # -5446B nguồn
+  - web/render/assets.mjs                          # CHUNK map + tenChunk()
+  - web/render/trang.mjs                           # bảng CHUNK_MAN
+  - web/test/_render.mjs                           # maFeNguon() + jsMoi
+  - web/test/page-weight.test.js                   # đo TỪNG chunk
+  - web/test/{nap-video,mo-ta-va-nut-nap,o-nhan-nap,moc-fe-con-that,man-video}.test.js
+  - 06_modules/M03_web/backlog.md                  # tick T03-104 + 2 ô
+
+bang_chung:
+  - "ĐỎ-TRƯỚC: khai chunk `napvideo` trong CHUNK map ⇒ `page-weight` báo
+     `chunk napvideo: 0/13 màn xin ⇒ mã chết: build ra rồi không ai tải`"
+  - "SAU: `gn.js 96 KB (98277 / 102400)` · `chunk napvideo: 1/13 màn xin`"
+  - "server THẬT: / · /video/ · /tai-lieu/nap/ đều 0 tham chiếu gn-napvideo.js;
+     /video/nap/ có 1"
+  - "TRÌNH DUYỆT THẬT: host sai ⇒ 'Nơi phát này không nằm trong danh sách nhận:
+     youtube.com · tiktok.com · fac…' và `vd-meta` ẩn; host đúng ⇒ 'Nhận —
+     youtube…' và `vd-meta` hiện"
+  - "cd web && npm test → exit 0 · 2796 ok · 0 FAIL"
+
+do_do: khong-co-do-moi
+
+hoc_duoc: |
+  1 · NĂM cổng cùng đo SAI CHỖ. `nap-video` · `mo-ta-va-nut-nap` · `o-nhan-nap`
+      · `moc-fe-con-that` · `man-video` đều đọc RIÊNG `multiwindow` rồi kết
+      luận về TOÀN THỂ mã FE. Dời một khối sang chunk (hành vi không đổi) làm
+      cả năm đỏ.
+      Sửa một chỗ: `maFeNguon(duoi)` + `taiSan().jsMoi`, **dẫn xuất từ thư mục**
+      `web/plugins/*/src/**`. Một danh sách gõ tay là chỗ nó lạc hậu im lặng.
+
+  2 · Một cổng từng XANH **do cửa sổ quét TRÀN**. `nap-video` cắt 2200 ký tự từ
+      `function ganNapVideo` và bắt được chuỗi `idVideo(` của HÀM KẾ BÊN — nó
+      chưa bao giờ đo thứ nó khai đo. Chỉ lộ khi hàm dời ra chunk và thành hàm
+      CUỐI (hết chỗ tràn). Đã đổi sang cắt thân bằng ĐẾM NGOẶC.
+
+  3 · CỔNG XANH KHÔNG NGHĨA LÀ CHẠY ĐƯỢC. Suite 2796 ok trong khi chunk ném
+      `ReferenceError: MEDIA is not defined` ngay lần gõ URL đầu tiên — tôi thay
+      `LOI_HOST` mà SÓT một `MEDIA.video_host` trong `hostVideoHopLe`. Chỉ mở
+      trình duyệt và gõ thật mới thấy. Mọi cổng ở đây đo VĂN BẢN MÃ.
+
+keo_theo:
+  - "M03 backlog: vùng nạp THƯ VIỆN (6131B) chưa tách — chặn ở `__MEDIA__`"
+  - "M03 backlog: rà xem còn cổng nào cắt thân hàm bằng cửa sổ cố định"
+  - "T03-95 nay có chỗ: `gn.js` dư 4123 byte (cần ~1512)"
+
+chua_xong: |
+  T03-95 · T03-94 · Xoá nháp · audit_loi vào backup — đã duyệt, chưa làm.
+  Gate G6C do NGƯỜI ký. Chưa commit.

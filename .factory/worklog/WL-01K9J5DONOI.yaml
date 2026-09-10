@@ -1,0 +1,93 @@
+id: WL-01K9J5DONOI
+at: 2026-08-19
+by: claude
+buoc: s8 (M03_web) + s5 (hợp đồng UI)
+loai: feature + amend-frozen
+fr: FR-013-thang-do-noi.md
+
+viec: >
+  Người dùng: "tôi muốn tạo độ bóng 3D nhất định cho phần core — hiển thị dữ
+  liệu", và gọi các panel là "khối lỗ trầu". Thêm thang độ nổi 4 mức.
+
+pham_vi_ghi:
+  - 05_uiux/tokens.css              # --e-1..4 + --e-top, hai bộ sáng/tối
+  - 05_uiux/DESIGN.md               # viết lại §3 mục độ nổi
+  - web/styles/prototype.css        # 6 chỗ dùng token, bỏ 3 shadow gõ tay
+  - project_map.yaml                # ui_frozen v1.1 → v1.2
+  - .factory/fr/FR-013-thang-do-noi.md
+
+hoi_truoc_khi_lam:
+  vi_sao: >
+    "Phần core — hiển thị dữ liệu" gồm nhiều lớp, và mức độ 3D quyết định có
+    đụng tinh thần thiết kế s5 hay không. Hai câu đó đổi hẳn khối lượng việc.
+  nguoi_dung_chot:
+    - "cả BA lớp: panel .pn · thẻ .cd/.kp/.brk-* · cửa sổ đọc .bk"
+    - "mức ELEVATION (nổi rõ nhưng vẫn phẳng), KHÔNG phải 3D đậm có viền đáy"
+
+dao_luat_da_chot:
+  luat_cu: 'DESIGN.md:111 — "Không shadow trừ hai chỗ: cửa sổ nổi và thẻ khi hover"'
+  vi_sao_khong_du: >
+    Luật đó viết cho hệ phân tầng bằng nền và viền. Trên nền ẢNH PHONG CẢNH nó
+    thất bại đo được: --edge là trắng 66%, nền phía sau là ảnh núi tuyết vùng
+    sáng gần trắng ⇒ viền tan vào nền. Shadow duy nhất của .pn là
+    `0 2px 16px -6px @10%` — MỘT tầng, alpha 10% ⇒ vết mờ dẹt, không ra khối.
+  nen: đây là FR, không phải chuyện thẩm mỹ tuỳ ý
+
+ba_quyet_dinh_ky_thuat:
+  hai_tang_khong_mot: >
+    Tầng gần (1-4px, sắc) bắt cạnh; tầng xa (8-64px, mềm) tạo chiều sâu.
+    Bản cũ một tầng nên ra vết mờ — đúng thứ người dùng thấy.
+  hover_nhay_hai_muc: >
+    .cd nghỉ --e-1, hover --e-3 (không phải --e-2). Nhấc translateY(-2px) mà
+    bóng chỉ đậm nhẹ thì mắt đọc ra "thẻ dịch chỗ", không phải "nhấc lên".
+  tone_toi_bo_gia_tri_rieng: >
+    Alpha cao hơn (.06 → .34 — nền tối hấp thụ bóng) và --e-top mờ hơn
+    (.55 → .07, nếu không thành vạch trắng chói). Dùng chung một bộ thì tone
+    tối gần như không thấy bóng. Kiểm: gn.css có 2 bộ, giá trị KHÁC nhau.
+
+khong_dung:
+  top_va_dock: >
+    Thanh dính mép, DESIGN.md §3 chốt "cùng lớp kính với panel". Cho shadow là
+    quay lại đúng lỗi v15: "thanh menu trông như tấm đục dán lên".
+  brk_luc_nghi: >
+    .brk-m/.brk-s chia ô bằng VIỀN DỌC, không phải thẻ rời. Gắn bóng lúc nghỉ ra
+    ba khối chồng nhau trong một panel — phá bố cục "lưới bất đối xứng"
+    (DESIGN.md §4). Chỉ hover mới nổi.
+
+bay_gap_khi_thi_hanh:
+  what: >
+    .cd · .cd:hover · .kp mỗi cái khai HAI LẦN ở cấp cao nhất prototype.css
+    (dòng ~273/~666 · ~282/~676 · ~237/~637). Bản SAU thắng cascade.
+  hau_qua: >
+    Lượt một tôi sửa đúng bản ĐẦU ⇒ token vô hiệu, và KHÔNG có gì báo lỗi:
+    type-check sạch, 17/17 test xanh, build thành công. Chỉ phát hiện khi grep
+    hết `box-shadow` còn gõ tay và thấy `0 8px 24px -8px rgb(0 0 0/18%)` ở
+    dòng 672.
+  no: >
+    Nợ này đã ghi ở FR-008 (41 selector khai trùng, 0 luật chết hoàn toàn).
+    Chưa có cổng máy nào canh "sửa bản không thắng cascade" — đó là chỗ nên có
+    test, nhưng cần định nghĩa được "selector nào là bản thắng" trước.
+
+verify:
+  loai: hard
+  lenh:
+    - "cd web && npm run check"           # sạch
+    - "cd web && npm test"                # 17/17
+    - "python core/tests/check_frozen.py" # + 6 cổng, 7/7 OK
+  ket_qua: xanh
+  do_duoc:
+    - "6/6 chỗ dùng var(--e-*), 0 shadow gõ tay ngoài focus-ring"
+    - "gn.css có đủ 5 token × 2 bộ (sáng + tối), giá trị khác nhau"
+    - "16 lần dùng var(--e- trong CSS đã build"
+  frozen: >
+    tokens.css và DESIGN.md KHÔNG nằm trong FROZEN.lock nên check_frozen vẫn
+    xanh, không cần --ky. Nhưng cả hai là hợp đồng G5 (project_map.ui_frozen
+    trỏ vào) nên vẫn mở FR + bump version — đúng luật "đổi bất kỳ giá trị nào
+    ⇒ FR + bump + worklog".
+
+no:
+  - "FR-013 (không phải FR-011 như tôi định lúc đầu): FR-011 và FR-012 đã tồn
+     tại, thuộc plan phase 2 (bàn biên tập local + external được duyệt)."
+  - "Chưa xem bằng mắt trên browser. Mọi kiểm chứng là đo trên CSS đã build —
+     token đến được trang, hai bộ khác nhau, không giá trị gõ tay. Cảm giác
+     'nổi bao nhiêu là đủ' thì cần người xem."

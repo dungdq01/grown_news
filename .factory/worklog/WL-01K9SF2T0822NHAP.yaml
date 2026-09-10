@@ -1,0 +1,79 @@
+ulid: 01K9SF2T0822NHAP
+khi: 2026-09-04T03:20+07:00
+tac_nhan: agent-thi-cong (Claude, phiên 6c7880c5)
+loai: ban-giao
+module: M08_api
+don_vi: T08-22 — năm cửa NHÁP cho trình duyệt (nguồn của T03-94)
+
+viec: |
+  Hai cửa ĐỌC + BA hành động, ở file MỚI `web/api/nhap-cua.mjs`.
+
+  CHỖ ĐẶT MÃ lệch task, và lệch có lý do đo được: task khai `loi-cua.mjs`, mà
+  `quaCong` ở đó **đòi khoá dịch vụ** — người gọi năm cửa này là TRÌNH DUYỆT
+  ⇒ 403 mọi lời gọi thật. `tho-cua.mjs` cũng sai: nó là proxy LÕI→THỢ, còn năm
+  cửa này không proxy gì (bảng nháp ở DB của chính LÕI). Vai thứ ba cần tên.
+
+  BA quyết định trong mã, mỗi cái một lý do:
+  1 · Danh sách KHÔNG trả `ban_goc_ai`/`ban_hien_tai` — chúng là thân bài, và
+      một danh sách 200 hàng sẽ nặng gấp trăm lần thứ nó cần hiện.
+  2 · Chi tiết trả CẢ HAI bản trong MỘT lời gọi. Hai lời gọi cho một phép so là
+      hai thời điểm khác nhau, và diff sẽ nói về một cặp chưa bao giờ cùng tồn tại.
+  3 · DUYỆT: **validate TRƯỚC, đổi trạng thái SAU**. Đảo lại là để một hàng nói
+      `da_duyet` trong khi kho KHÔNG có file — hai nguồn chân lý, và nguồn sai
+      là nguồn người đọc trước. Dùng lại `ghiSauValidate()`, không dựng đường
+      ghi thứ hai cho `kb/` (`B-C1`).
+
+object:
+  - web/api/nhap-cua.mjs                  # MỚI, 5 cửa
+  - web/api/dungchung.mjs                 # loiLietKeNhap + loiDoiTrangThaiNhap
+  - web/api/router.mjs                    # 3 nhánh route
+  - web/test/loi-nhap-cua.test.js         # cổng, 30 phép đo
+  - web/test/_api.mjs                     # batServer().loi() — đọc stderr server
+  - web/package.json                      # đăng ký cổng
+  - 07_plan/M08_api/tasks/T08-22-cua-nhap-chung-cat.md   # sửa phạm_vi_ghi + khối ⛔
+  - 06_modules/M08_api/backlog.md         # tick T08-22 + 2 ô mới
+
+bang_chung:
+  - "ĐỎ-TRƯỚC (rule.md mục 8), mốc 2026-09-04T03:0x: `node web/test/loi-nhap-cua.test.js`
+     → **30 lỗi**, toàn bộ vì 404 (`GET danh sách KHÔNG khoá ⇒ 200` trả 404) —
+     đỏ vì THIẾU CỬA, không vì lỗi cú pháp"
+  - "SAU: cùng lệnh → pass, 30 ok"
+  - "cd web && npm test → exit 0 · 2785 ok · 0 FAIL"
+  - "§7 đo chiều ngược: `POST /api/nhap-chung-cat` (cửa MÁY) KHÔNG khoá ⇒ vẫn
+     bị chặn — mở cửa cho NGƯỜI không nới cửa MÁY"
+
+do_do: khong-co-do-moi
+
+hoc_duoc: |
+  BỐN lần sai trước khi đúng, và ba trong bốn là FIXTURE/hạ tầng, không phải mã:
+
+  1 · `tachFm()` trả `{ fm, body }` — tôi đọc `t.than`. Thân bài vào
+      `ghiSauValidate` là CHUỖI RỖNG, và validate báo "Thiếu mục 1,2,3,4,5" —
+      một lỗi trỏ ĐÚNG mà trỏ SAI nguyên nhân. Đổi luôn tên hàm đọc thân
+      request thành `thanJson` — một tên cho hai nghĩa trong cùng file là chỗ
+      nó lệch.
+  2 · Fixture "bản nháp hợp lệ" tự nghĩ ⇒ thiếu 5 trường + 9 mục. Lấy hình dạng
+      từ một BẢN GHI THẬT (`kb/docs/xgboost-taylor-bac-hai.md`) mới qua.
+  3 · Fixture vẫn trượt hai luật NỘI DUNG: mục 1+2 phải dưới 25% toàn bài, và
+      MỌI mục phải có địa chỉ máy đọc được (`[§II.4]`). Hai luật đó đúng, và
+      chúng bắt fixture của tôi viết như một bài thật.
+  4 · `dungKho()` trả `{ kho, rac, don }`, tôi gán cả object vào `kho` ⇒ server
+      CHẾT `unable to open database file`, mà cổng chỉ báo `fetch failed`.
+      Ba hướng chẩn đoán sai trước khi thêm `sv.loi()` đọc stderr của server.
+      ⚠️ `loi-cua-http.test.js` truyền cả object y như vậy và VẪN xanh — vì nó
+      không bao giờ GHI vào kho. Một cách dùng sai chỉ lộ khi có phép ghi.
+
+  Và một bẫy công cụ lần thứ TƯ: heredoc làm sập `\n` thành xuống-dòng thật,
+  lần này hỏng chính dòng `console.log` in stderr. Viết `\n` thì dùng Edit.
+
+keo_theo:
+  - "M08 backlog: XOÁ nháp HỞ HỢP ĐỒNG — `FR-046` không có trạng thái 'đã bỏ',
+     `T03-94` đòi bốn hành động. NGƯỜI chọn: thêm `da_bo` (sửa FR) hay xoá hàng
+     thật (phá `ban_goc_ai`, và rule.md mục 4 cấm agent tự xoá)"
+  - "M08 backlog: `dungKho()` nên NÉM khi bị truyền cả object vào batServer"
+  - "T03-94 nay có nguồn dữ liệu — không còn bị chặn"
+
+chua_xong: |
+  Hành động XOÁ chưa làm (hở hợp đồng, chờ người). Ràng "tra_lai ⇒ phải có
+  ly_do" cưỡng chế ở CỬA, không ở DDL — đã ghi lý do trong mã.
+  Gate G6C do NGƯỜI ký. Chưa commit.

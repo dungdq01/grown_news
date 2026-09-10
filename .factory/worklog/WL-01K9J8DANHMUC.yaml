@@ -1,0 +1,157 @@
+id: WL-01K9J8DANHMUC
+at: 2026-08-19
+by: claude
+buoc: s8 (M02_kb + M03_web + M04_ci)
+loai: fix — dựng nguồn chân lý, bịt lệch im lặng
+fr: KHÔNG cần — không sửa file frozen nào, không mở đường ghi nào
+
+viec: >
+  Người dùng hỏi "nhãn gán từ danh mục có sẵn — muốn THÊM nhãn thì làm sao?
+  CRUD trên web được không?", và yêu cầu thấy cơ chế lưu/get trước khi nghe
+  giải pháp. Truy vết xong thì câu hỏi làm lộ ra vấn đề khác và nặng hơn:
+  `category` KHÔNG CÓ nguồn chân lý dùng được cho web, nên 6 giá trị bị khai
+  lại ở 5 nơi. Lượt này bịt lệch, CHƯA mở đường ghi (người dùng chọn GĐ 1).
+
+pham_vi_ghi:
+  - kb/categories.yaml                     # MỚI — bản đọc-được-cho-web
+  - core/tests/check_danh_muc.py            # MỚI — cổng máy 3 phép kiểm
+  - core/skill-src/frontmatter.schema.json  # bỏ khoá const draft (drift FR-012)
+  - web/api/articles.mjs · router.mjs       # GET /api/categories
+  - web/plugins/home-pages/shell.html       # 6 <label> gõ tay → mốc động
+  - web/plugins/home-pages/index.ts         # docDanhMuc(kho) + docNguong()
+  - web/plugins/multiwindow/.../multiwindow.inline.ts  # nạp 2 danh mục
+  - Makefile · .github/workflows/ci.yml · RUNNING.md   # nối cổng mới
+  # KHÔNG đụng: FROZEN.lock · .claude/settings.json · frontmatter.schema.json
+  # (bản core/assets) — đều thuộc GĐ 2, cần FR.
+
+do_duoc_truoc_khi_sua:
+  category_bi_copy_5_noi:
+    - "core/assets/frontmatter.schema.json:138-145   enum — CHÂN LÝ (frozen)"
+    - "core/skill-src/frontmatter.schema.json:138     enum — KHÔNG frozen"
+    - "web/plugins/home-pages/shell.html:319-324      6 <label> gõ tay ⇐ nguy nhất"
+    - "05_intake/gate.py:51-52 · kb/README.md:57 · project_map.yaml:217  tài liệu"
+  chi_mot_noi_doc_dong: "validate.py:53 đọc err.validator_value từ schema"
+  bat_doi_xung_trong_CUNG_MOT_FILE: >
+    shell.html:333 `#f-cpt` là <em>đang tải danh mục…</em> (fetch /api/concepts),
+    còn shell.html:319 `#f-cat` gõ tay 6 giá trị. Hai form cạnh nhau, cùng một
+    việc, hai cách trái ngược.
+  hau_qua_do_duoc: >
+    Sửa enum mà quên shell.html thì form hiện 6 giá trị cũ và KHÔNG test nào
+    bắt. Cùng họ bug word_count (FR-015): hai nơi khai một sự thật thì sẽ lệch.
+
+toi_noi_sai_va_da_sua:
+  what: >
+    Lượt trước tôi nói với người dùng "concepts vào công thức
+    corroboration_factor — hai bài khác nguồn cùng nói idempotency thì đáng
+    tin hơn", và dùng đó làm lý lẽ chính để bảo vệ rào chắn quanh concepts.yaml.
+  do_lai: "grep corroboration core/src/ 05_intake/ 06_skillgen/ 07_curate/ → 0 hit"
+  that_ra: >
+    Không mã nào TÍNH nó. Nó là số LLM tự khai (enum 0.6|1.0|1.3|1.6), suy từ
+    `independent_sources` đếm theo url_normalized (M02_kb/data_flow.md:46).
+    Công thức chỉ sống trong M06_skillgen/spec.md:114-120, không trong code.
+  hau_qua: >
+    Lý lẽ mạnh nhất bảo vệ "concepts phải chặt" không có thật. Đã nói lại với
+    người dùng trước khi đề xuất. Nếu sau này mở GĐ 2 thì FR phải nêu lý do
+    THẬT: danh mục mịn trôi thì lọc mất nghĩa — đúng cái tags đã làm trước
+    FR-009 (`quan-ly` tiếng Việt lọt giữa 11 tag tiếng Anh).
+
+chan_ly_la_schema_khong_phai_yaml:
+  quyet: "người dùng chọn — schema giữ vai chân lý"
+  nghia: >
+    kb/categories.yaml là bản DẪN XUẤT, phải khớp enum. Đối lập với
+    kb/concepts.yaml — file đó là chân lý của chính nó. validate.py KHÔNG đổi
+    hành vi: vẫn chặn bằng enum như hôm nay. Script chỉ đổi "lệch im lặng"
+    thành "cổng đỏ".
+  vi_sao_bo_aliases_khi_tao_file: >
+    concepts.yaml có `aliases` (22 mục × ~3 ≈ 60 giá trị) mà KHÔNG mã nào đọc
+    — validate.py:279 chỉ lấy {c["id"]}. Đó là code chết; nhân bản sang file
+    mới là nhân bản nợ.
+
+cong_may_moi_TU_BAT_LOI_THAT_ngay_luot_dau:
+  ba_phep_kiem:
+    - "categories.yaml ⇔ enum schema (thiếu/thừa/lệch thứ tự)"
+    - "core/assets ⇔ core/skill-src — so RÀNG BUỘC, bỏ qua $comment/description"
+    - "shell.html không còn <input value=...> nào của 6 giá trị"
+  loi_that_bat_duoc: >
+    Phép kiểm 2 ĐỎ ngay lượt đầu: core/skill-src còn `review_status: const
+    draft` ở allOf[4] mà core/assets đã bỏ theo FR-012. Hai file TỪNG được sửa
+    cho khớp một lần rồi (phiên trước, lệch 4 field) và đã lệch LẠI ở chỗ khác
+    — vì không cái nào sinh ra từ cái kia, và bản thứ hai không nằm trong
+    FROZEN.lock nên không ai canh.
+  sua_thong_bao_sau_khi_thay_no_kem: >
+    Bản đầu in "khối allOf khác nhau (assets 6 mục, skill-src 6)" — biết số
+    lượng bằng nhau mà vẫn phải mở file mới biết lệch đâu. Sửa thành in đúng
+    allOf[i] kèm điều kiện `if`. Đồng thời lọc $comment đệ quy: bản đầu báo cả
+    allOf[0] chỉ vì khác ghi chú — báo giả.
+  kiem_hai_chieu_ca_3_phep:
+    - "thêm nhãn vào yaml không sửa schema → exit 1, báo `thừa [...]`"
+    - "đổi minimum của word_count ở skill-src → exit 1, báo đúng tên property"
+    - "gõ 1 checkbox vào shell.html → exit 1, báo đúng giá trị"
+    - "phục hồi cả ba → exit 0"
+  bai_hoc_ap_dung_tu_FR015: >
+    Không `|| true`, exit code là của chính phép kiểm (check_rule_surfaces canh).
+    Đo exit code KHÔNG qua pipe — lần đầu tôi chạy `| tail` và thấy exit=0,
+    tưởng cổng nuốt lỗi; là pipe che, không phải cổng.
+
+hai_no_don_kem:
+  docDanhMuc_hardcode_kb:
+    truoc: 'join(GOC, "..", "kb", "concepts.yaml") — không tham số'
+    sau: "docDanhMuc(kho) dùng duongKho() đã có"
+    chung_minh: >
+      Thêm 1 mục vào kb-mock/concepts.yaml rồi build: bản mock đổi 10/22 →
+      10/23, bản real GIỮ NGUYÊN 0/22. Trước đó cả hai đọc kb/. Hai file trùng
+      nội dung (chỉ khác CRLF) nên chưa ra bug — đúng kiểu trùng khớp tạm thời
+      của bug word_count.
+  nguong_2_hardcode:
+    truoc: "index.ts:493 `n >= 2` gõ tay"
+    sau: 'docNguong("concept_merge_min", 2) đọc 07_curate/thresholds.yaml'
+    vi_sao: >
+      M07-R2 ghi rõ "sửa MỘT chỗ, không rải trong mã". File thresholds tự khai
+      cả ba số là PHỎNG ĐOÁN và sẽ sửa sau khi nạp 10 bài thật — sửa file mà
+      web vẫn báo theo số cũ là lệch im lặng.
+
+bay_tu_phat_hien_khi_lam:
+  what: >
+    Đổi `#f-cat` sang nạp động thì dienForm() (tick checkbox theo fm.category)
+    có thể chạy TRƯỚC khi danh mục tải xong ⇒ tick vào tập rỗng, mất category
+    của bài mà không báo gì.
+  vi_sao_truoc_day_khong_co: "6 checkbox là HTML tĩnh — tick lúc nào cũng đúng"
+  sua: >
+    Giữ promise DANH_MUC, dienForm() thành async và `await DANH_MUC` trước khi
+    tick. Không dựa vào "doTimApi chạy sớm nên chắc kịp" — đó là đoán về timing.
+  them: >
+    napMotDanhMuc bỏ qua khi items rỗng — giữ "đang tải…" thay vì để trống trơn,
+    vì trống trơn không phân biệt được với "API trả 0 mục".
+
+verify:
+  loai: hard
+  ket_qua:
+    npm_run_check: sạch
+    web_test: 18/18 file pass, exit 0, 0 fail
+    cong_may: 11/11 (gồm check_danh_muc mới, check_frozen, check_rule_surfaces)
+    test_module: 6/6
+    pytest: 30/30
+    build: exit 0, 73 file
+  kiem_tay_tren_server_that:
+    - "GET /api/categories → 6 mảng đúng thứ tự enum, label_vi đủ dấu"
+    - "POST/PUT/DELETE/PATCH /api/categories → 404 cả bốn"
+    - "KB_DIR trỏ thư mục rỗng → 200 {items:[]}, không nổ"
+    - "trang xây ra: 0 literal enum trong nap/index.html và mock/nap/index.html"
+    - "bundle gn.js gọi cả /api/concepts và /api/categories"
+  frozen: "check_frozen exit 0 — KHÔNG file frozen nào đổi trong lượt này"
+
+no:
+  - "GĐ 2 (POST /api/concepts chỉ-thêm + nút Kết nạp) người dùng chọn CHƯA làm.
+     Cần FR mức s3 vì mở deny S1. categories.yaml + cổng canh khớp là tiền đề."
+  - "`aliases` vẫn là code chết — 60 giá trị không ai đọc. Hai lối: xoá (sửa
+     file frozen ⇒ FR) hoặc dùng (validate.py nhận alias và chỉ về id chính).
+     Chưa đề xuất — cần bằng chứng từ bài thật."
+  - "`category` KHÔNG có `category_proposed`, nên nếu làm GĐ 2 thì không đòi
+     được bằng chứng như concepts. Đó là chỗ yếu nhất, phải ghi vào FR."
+  - "kb/categories.yaml CHƯA vào FROZEN.lock — cố ý: chưa có gì canh nó thì
+     đừng ký. check_danh_muc.py giờ canh nội dung, đủ cho GĐ 1."
+  - "3 bản copy còn lại (gate.py:51 comment · kb/README.md:57 · project_map:217)
+     là TÀI LIỆU, không phải ràng buộc — không nối vào cổng. Nếu muốn chặt hơn
+     thì thêm phép kiểm thứ 4, nhưng tài liệu lệch không làm form sai."
+  - "Server cổng 8787 đang chạy bản CŨ (khởi động trước lượt này) — của session
+     khác, tôi không tắt. Đã kiểm trên cổng 8791/8792 riêng."

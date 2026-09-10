@@ -1,0 +1,147 @@
+node_modules/
+.next/
+out/
+dist/
+.env*
+!.env.example
+__pycache__/
+*.pyc
+.DS_Store
+Thumbs.db
+
+# gói skill để phát hành, không phải nguồn
+*.skill
+
+# artifact build cua pip install -e — khong phai nguon
+*.egg-info/
+.pytest_cache/
+
+# Quartz upstream: clone rieng, khong phai ma cua du an. Dung lai bang
+# `git clone https://github.com/jackyzha0/quartz.git web/_quartz` — xem web/README.
+web/_quartz/
+
+# output build — dung lai tu kb/ duoc, khong backup (quyet F4)
+web/site/
+web/public/
+web/test/_site/
+web/test/_kho-tam/
+# Kho + output build tam cua tung test — sinh lai moi lan chay
+web/test/_kho-*/
+web/test/_site-*/
+*.tsbuildinfo
+
+# script sinh boi esbuild o buoc link-plugins
+# Mau cu chi bat src/scripts/ — backdrop dat script o src/ nen lot qua.
+web/plugins/**/*.inline.js
+
+# (FR-023 _index.sqlite da RETIRED theo FR-034 — giu ignore mot nhip de file
+# cu con nam tren dia khong lam ban git; xoa han o buoc don C7.)
+kb/_index.sqlite
+kb/_index.sqlite-journal
+
+# FR-034 — kb/_kho.sqlite la NGUON CHAN LY, gitignore CO CHU DICH:
+# backup nam o export .md/.yaml trong git (mot chieu DB→file, xuat_kho.py);
+# dung lai DB tu export bang core/tools/dung_lai_db.py. TUYET DOI khong
+# ignore kb/**/*.md — mat export la mat kich ban F4.
+kb/_kho.sqlite
+kb/_kho.sqlite-wal
+kb/_kho.sqlite-shm
+
+# T08-11 — DB rieng cua LOI (ADR-06). Du lieu GOC, KHONG dung lai duoc tu file.
+# Ba bang cua no (nguoi_dung, dinh_danh_kenh, nhap_chung_cat) se export ra file
+# va file DO thi commit — dung co che B-C1 cua kho. Xem ADR-06 (c).
+web/_loi.sqlite
+web/_loi.sqlite-wal
+web/_loi.sqlite-shm
+
+# ADR-06 (c) + FR-050 cach 2 — BAN LUI cua ba bang GOC KHONG vao git.
+#
+# Chu du an chot 2026-09-02: "luu backup o o, kieu nhu /_backup".
+# Ly do: hai file trong so ba chua DU LIEU CA NHAN (ten, chat_id). Cach 1
+# (remote rieng tu + ho so B-E5) QUAN mot rui ro; cach nay XOA no.
+#
+# DANH DOI, ghi ro de khong ai doc B-C1 roi tuong git da phu:
+#   MAT O BACKUP = MAT TAI KHOAN. Khong co ban thu hai o dau ca.
+#   Kho (kb/) van dung B-C1 nhu cu vi no DUNG LAI DUOC TU FILE. Hai loai du
+#   lieu, hai co che — va do la ly do ADR-06 ton tai.
+_backup/
+web/_luu/
+
+# ═══ FR-060 · dữ liệu KHÔNG vào git — chỗ ở là local, rồi Cloudflare R2 ════
+#
+# Chủ dự án 2026-09-04: "hiện tại ko commit video và ảnh lên git (lưu ở local)
+# → lưu Video mp4 ở cloudflare. Và sau này tất cả dữ liệu đẩy lên Cloudflare".
+#
+# Video/audio chặn TUYỆT ĐỐI. Đo 2026-09-04: git đang có **0 file** loại này,
+# nên đây là phép chặn TRƯỚC khi có cái đầu tiên — đúng lúc rẻ nhất. Một file
+# mp4 đã commit thì `git rm` không xoá nó khỏi lịch sử nữa.
+*.mp4
+*.mov
+*.webm
+*.mkv
+*.mp3
+*.wav
+*.m4a
+
+# Byte hiện vật của kho. `ADR-06`: kho dựng lại được TỪ FILE, nên byte không
+# cần đi cùng lịch sử. Transcript `.vtt` thì KHÁC — nó là chữ, và nó là hiện
+# vật `la_dan_xuat` mà `FR-054` cố ý đưa vào kho.
+# MỘT TẦNG (`*`), không `**`: git KHÔNG re-include được một file nếu thư mục
+# CHA của nó đã bị loại — nên `kb/_media/**` + `!kb/_media/**/*.vtt` chặn luôn
+# `.vtt` nằm trong thư mục con. Đo được: `kb/_media/abc.vtt` vào được, nhưng
+# `kb/_media/sub/abc.vtt` BỊ CHẶN. Kho đặt tên phẳng (`<sha256>.<duoi>`) nên
+# một tầng là đủ, và nếu sau này có thư mục con thì mẫu này KHÔNG phủ nó —
+# thấy được, chứ không im lặng chặn nhầm.
+kb/_media/*
+!kb/_media/*.vtt
+
+# Ảnh chụp của agent (Playwright MCP). Không ai đọc, và 6 file đã lọt vào git
+# một lần rồi.
+.playwright-mcp/
+
+# ─── ẢNH: CHỈ `public/**` được push lên GitHub ────────────────────────────
+#
+# Chủ dự án 2026-09-04: *"Chỉ ảnh trong public/** được push lên github, còn lại
+# ảnh và video, mp4 khác lưu local — DB local."*
+#
+# Chặn mọi ảnh, rồi MỞ LẠI đúng `public/**`. Viết theo chiều này (chặn-rồi-mở)
+# chứ không liệt kê từng thư mục cần chặn: thư mục mới sinh ra liên tục, và một
+# danh sách chặn gõ tay là chỗ ảnh mới lọt vào git im lặng.
+*.png
+*.jpg
+*.jpeg
+*.webp
+*.avif
+*.gif
+*.bmp
+*.tiff
+*.ico
+*.svg
+!public/**
+!public/*
+
+# `public/**` là ASSET CỦA SẢN PHẨM, không phải dữ liệu người dùng:
+# `web/render/assets.mjs#anhNen()` SERVE chúng, nên một clone mới không có
+# chúng là một clone không có ảnh nền. Đó là lý do nhóm này ở lại git.
+#
+# ⚠️ `!public/**` chỉ mở lại được vì KHÔNG có mẫu nào chặn chính thư mục
+# `public/`. Git không re-include một file nếu thư mục CHA đã bị loại — thêm
+# một dòng `public/` ở đâu đó là vô hiệu hoá cả hai dòng trên mà không báo gì.
+
+# Hàng đợi Maildir của M12 — dữ liệu RUNTIME, không phải nguồn.
+# `WO-039`: một hàng đợi trong repo làm `git status` bẩn, và công cụ quy chủ
+# ("ai vừa sửa gì") mù đi đúng lúc cần nó nhất. Đo 2026-09-04: bốn file job
+# rơi vào đây sau hai lần `POST /job` chạy thật.
+# Đường ngoài repo là `CHUNGCAT_HANG_DOI` — mặc định vẫn ở đây cho chạy tay.
+chungcat/hang-doi/
+
+# NHẬT KÝ VẬN HÀNH (chỉ đạo 2026-09-05) — số liệu của MÁY NÀY, không phải của
+# dự án. Nó lớn nhanh, đổi mỗi lần chạy, và không ai review một diff của nó.
+# Cùng luật `FR-060`: dữ liệu vận hành ở local, chỉ artifact có ý nghĩa vào git.
+/log/
+
+# PID của dịch vụ do `chay.sh` bật — dữ liệu của MÁY NÀY, như log.
+log/*.pid
+# commit M12 2026-09-07 — trạng thái chạy không vào git
+log/                     # nhật ký runtime (worker/api jsonl+out) — không phải nguồn
+chungcat/log/

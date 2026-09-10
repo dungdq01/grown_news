@@ -1,0 +1,230 @@
+id: WL-01K9KBNAMMAN
+at: 2026-08-24
+by: claude
+buoc: s8 (M03_web) + s5 (tokens · ui_frozen v1.12 -> v1.13)
+loai: redesign 5 man con lai + dong bo thang
+fr: FR-027-he-kinh-tren-anh.md (muc FR-027f)
+
+viec: >
+  Nguoi dung: "Man trang chu tam on. gio thi tat ca man con lai sua het,
+  redesign het. Man /mock/nap/ (add source) cung hoan thien luon."
+  Ba dieu kien: (1) dong bo size/font UI (2) gon gang, thong minh, bo cuc bat
+  mat nhung phai co tinh AI - tu dong, 3D o trong do (3) note ky neu dong cham
+  den DB / BE / logic FE.
+
+# ══ DIEU KIEN 3 · NOTE KY — tra loi truoc, vi do la cau hoi ve RUI RO ══════
+khong_cham_vao:
+  BE_DB:
+    - "web/api/**       0 dong"
+    - "core/src/**      0 dong"
+    - "05_intake/**     0 dong"
+    - "kb/** · schema · index SQLite   0 dong"
+  kiem_duoc_bang: >
+    grep -rln "FR-027" web/api core/src 05_intake => KHONG file nao.
+    (core/tools/sinh_contrast_audit.py co dau FR-027 nhung tu FR-027d, khong
+    phai luot nay — va no la cong cu sinh audit, khong phai duong du lieu.)
+  khong_co: "API moi · truy van moi · truong moi. Moi con so cua 5 dai deu DEM LAI tu du lieu DA nam tren ban ghi."
+
+logic_FE_doi_DUNG_HAI_CHO:
+  1_observer:
+    file: web/plugins/home-motion/src/home-motion.inline.ts
+    doi: '".kpi, .pn-w"  ->  ".kpi, .pn-w, .mb"'
+    vi_sao: "khoi 3D cua 5 man nam trong `.mb`; khong them thi cot khong bao gio dung cao"
+    dua_tren: >
+      Hanh vi chuan cua IntersectionObserver: no VAN BAN khi phan tu di tu
+      display:none sang hien. Nen khoi o man dang an dung dung luc man do duoc
+      mo — khong phai dung san roi nguoi dung thay no da cao tu dau.
+    rui_ro: "mot selector, khong doi luong dieu khien nao"
+  2_cat_binh_luan_CSS:
+    file: web/plugins/home-pages/index.ts
+    doi: "them catBinhLuan() o BUOC GOP CSS"
+    vi_sao: "58 KB / 160 KB gn.css la binh luan — 36%"
+    rui_ro: >
+      Day la buoc BUILD, khong phai ma chay tren trang. Va no la phep BO, khong
+      phai phep DOI — khong mot dong CSS nao bi sua. Rang canh: bundle phai con
+      `.mb-t-w`, `--rail-w`, `.np-au`.
+
+khong_phai_logic_ma_la_markup:
+  '#tower -> .tw-i': >
+    Khoi 3D gio dung o BON man, ma ca 6 man nam trong CUNG mot tai lieu
+    (doiView() doi man client-side). Id thu hai la HTML sai, va querySelector
+    lay dung cai dau roi ba man kia IM LANG khong xoay.
+
+# ══ DIEU KIEN 1 · dong bo size/font ═══════════════════════════════════════
+do_truoc_khi_sua:
+  font_size_go_px: 9
+  gia_tri_>=8px_go_tay: 59
+  nguyen_nhan_goc: >
+    Thang 10 bac THIEU ba bac ui_guide §3 doi (10.5 · 15.5 · 27-34). Khong co
+    bac thi nguoi viet go so. Do la nguyen nhan, khong phai su bat can.
+
+lo_o_cong_TOI_TIM_RA:
+  hien_tuong: "9 luat font-size go px nam im, token-only.test.js VAN XANH"
+  nguyen_nhan: >
+    token-only MIEN CA FILE prototype.css, ly do ghi trong test: "BE NGUYEN 437
+    dong tu app-v20.html — hop dong G5". Ly do do DUNG khi file co 437 dong.
+    File da 2046 dong, phan lon la ma ta viet.
+  he_qua: "M03-R4 (khong go lai gia tri token) KHONG CO RANG tren file CSS lon nhat du an"
+  sua: >
+    Mien theo GIA TRI, khong theo FILE: px < 8. Do la dung pham vi cua ly do goc
+    (2px vach, 3px lech, 6px goc; thang --s-* bat dau o 4px nen chung THAT SU
+    khong co token). Tu 8px tro len la NHIP BO CUC, phai qua token.
+  kiem_hai_chieu: >
+    tai tao font-size:20px / padding:26px / padding-left:78px => ca ba DO.
+    tai tao gap:3px (tinh chinh) => XANH. Mien dung pham vi.
+
+token_them_KHONG_doi_gia_tri_nao:
+  bac_chu: "--fs-nano 10.5 · --fs-card 15.5 · --fs-stat 27 · --fs-logo 17 · --fs-feat clamp(1.875-2.75rem)"
+  hang_so_bo_cuc: "--rail-w 78 · --mid-w 1440 · --mid-pad 48 · --mid-bot 120 · --pn-py/px 26/28 · --pn-gap 18 · --r-pill 999"
+  vi_sao_giu_RIENG_khoi_thang_s:
+    - "nhip --s-* la 4/8/12/16/24/32/48/64"
+    - "nhip ban tham khao la 18/26/28 — mot thang KHAC"
+    - "tron hai thang vao mot ten la cach chac nhat de sau nay ai do chon sai bac"
+  rail_w_la_quan_trong_nhat: >
+    Truoc day rail-trai.test.js phai SO hai con so 78 go o hai cho (rail va phan
+    bu cua khung noi dung). Gio ca hai doc CUNG mot token => khop do CAU TAO,
+    khong can ai kiem. Phep kiem doi vai: canh khong ai go lai so 78.
+  27_gia_tri_con_lai: >
+    Nhip rieng ban tham khao (9/10/13/14/15/20/22/30/34/36) — NEO ve bac gan
+    nhat, lech toi da 4px. Doi lai co mot thang THAT de 5 man dung theo.
+  ket_qua: "59 -> 0 gia tri >=8px go tay"
+
+# ══ DIEU KIEN 2 · mot bo tu vung, nam lan ap ══════════════════════════════
+vi_sao_khong_nam_thiet_ke_roi: >
+  "Dong bo" la chinh dieu kien (1). Nam ban mot-lan la cach chac nhat de lech.
+
+dai_may_da_lam_gi:
+  ly_do_ton_tai: >
+    Moi con so tren 5 man nay DO MAY TINH (priority, dem nhan, nguong ket nap)
+    ma khong man nao noi ra dieu do — nguoi doc khong biet cai gi tu dong, cai
+    gi minh phai lam, nen con so doc ra nhu nhan tuy y.
+  luat: "CHI noi dieu may THAT SU lam, kem so THAT. Va MOI MAN MOT SU THAT KHAC NHAU."
+  nam_su_that:
+    v_all: "may tinh priority cho MOI ban, va do LA thu tu mac dinh; ba nut chi doi thu tu DANG HIEN (M03-R5)"
+    v_queue: "may xong phan cua no; BA TRUONG M1 may KHONG duoc dien ho (B-B1 / M08-R3)"
+    v_kho: "ca dashboard dung lai tu N file .md moi lan build — khong ban sao nao giu san so; va NOI RA so file khong doc duoc"
+    v_concepts: "may DE XUAT nhan tu noi dung; du nguong concept_merge_min thi hien nut ket nap — quyet dinh van cua NGUOI"
+    v_nap: "ba loi KHONG ngang nhau ve muc tu dong (6 pass / 4 cong / 9 cong)"
+  vi_sao_phai_khac_nhau: >
+    Mot dai noi cung mot cau o ca nam man la nhan "AI-powered", khong phai
+    thong tin. Day la phep kiem quan trong nhat cua muc nay.
+
+quy_tac_chon_3D:
+  co_PHAN_BO: "khoi 3D .tw-* — Tat ca (priority) · Kho (loai nguon) · Danh muc (nhan dung nhieu nhat)"
+  co_TRINH_TU: "chieu sau perspective — Cho duyet (phan tich->doc->duyet) · Nap nguon (mot lua chon giua ba loi)"
+  vi_sao: >
+    Khoi 3D doc duoc vi mat SO CHIEU CAO ba cot. No vo nghia khi du lieu la mot
+    day buoc, va o do perspective moi noi dung dieu "cai nay truoc cai kia".
+  ba_khoi_ba_phan_bo_KHAC_nhau: "neu khong thi ba man ve cung mot bieu do ba lan"
+  so_cot_khai_o_NGUONG_cot3D: 3
+  vi_sao_ba: "tu cot thu tu tro di cot sau che cot truoc trong phoi canh nghieng — luc do khoi thanh trang tri"
+
+man_nap_nguon_hoan_thien:
+  vach_muc_tu_dong: "3/2/1 tren ba tab — THONG TIN that, tra loi cau nguoi moi thuc su hoi: 'toi nen vao loi nao'"
+  vi_sao_co_rang_canh: "ba loi cung so vach thi vach khong mang thong tin nao"
+  o_con_trong_panel_kinh:
+    van_de: ".np-form va .up-z — hai mat lon nhat man — con dung vien DUC --border tu truoc khi co he kinh"
+    trieu_chung: "trong mot panel kinh, mot khung vien dac doc ra nhu dan tu app khac vao"
+    vat_lieu_thi_DA_DUNG: "--glass-2 CHINH LA --card (tokens.css:163), tuc 'o con trong panel' cua ui_guide §2"
+    thieu: "HAI trong bon thanh phan kinh (ui_guide §4): --gloss va --e-top"
+    KHONG_them_blur: >
+      O nay nam TRONG panel da nhoe. Nhoe long nhoe la lop thu 9, ma ui_guide
+      §6a chot chi panel lon va rail duoc blur. Sau khi sua: 7 lop, nguong 8.
+  ba_so_deu_co_nguon_that:
+    6_pass: "02_proposal §S1 (giao thuc source-distiller)"
+    4_cong: "gac() cua 05_intake/gate.py"
+    9_cong: "danh so `# 1 —` .. `# 9 —` trong validate.py — test DEM LAI, khong go so"
+
+# ══ TRONG LUONG · lai tim mo that ═════════════════════════════════════════
+trong_luong:
+  tinh_the: "gn.css cham 161 KB tren tran 160"
+  duong_de: "nang tran"
+  do_truoc_khi_quyet: "58 KB / 160 KB la BINH LUAN — 36% bundle"
+  lam_gi: "cat binh luan o buoc GOP => 160 -> 83 KB, moi luat con nguyen"
+  vi_sao_khong_minify_that: >
+    Mot buoc bien dich thi phai co source map, khong thi debug CSS thanh doan
+    mo. Cat binh luan la phep BO chu khong phai phep DOI — moi dong con lai y
+    nguyen nen so dong trong DevTools van tro dung cho.
+  roi_SIET_tran: >
+    gn.css 160 -> 100. Tran 160 duoc canh khi bundle con cong 58 KB binh luan;
+    giu no nghia la tripwire chi no khi CSS TANG GAP DOI — tuc no thoi lam
+    tripwire. Day la SIET, khong phai noi.
+  tran_MOI_chua_tung_co:
+    la_gi: "trang lon nhat <= 74 KB"
+    lo_do_duoc: >
+      Chi mock/index.html bi canh. Trang lon nhat site la mock/nap/ (66 KB) va
+      KHONG AI CANH NO — ma chinh no la noi loi "CSS/JS bi nhung lai" hien ra
+      som nhat.
+    vi_sao_moi_trang_mang_ca_6_man: >
+      doiView() doi man CLIENT-SIDE (bo .on khoi moi .view, gan vao #v-<ten>).
+      Thieu mot man la doi sang no bi trang. Do la danh doi da chon — doi man
+      khong can mang — khong phai phinh.
+
+# ══ BA PHEP KIEM CUA TOI TU SAI ═══════════════════════════════════════════
+phep_kiem_toi_tu_sai:
+  1_tim_chuoi_thay_vi_so_khac_biet:
+    sai: 'phep kiem "nam dai noi su that rieng" chi hoi "cua so nay co chua tu khoa cua toi"'
+    hau_qua: >
+      Dem cau cua man Tat ca sang man Kho VAN XANH, vi man Kho con cum "khong
+      doc duoc" o cau sau. Hoi mot chuoi co mat khong thi khong tra loi duoc cau
+      "nam cau co khac nhau khong".
+    sua: "moi dai co CAU KY; kiem hai chieu: CO cau ky cua minh VA KHONG co cau ky cua bon dai kia"
+    do_bang_thi_nghiem: "truoc: exit 0 · sau: exit 1, va bao dung TEN dai bi lan"
+  2_CRLF:
+    sai: "trich than dai bang mau khop toi dong trong"
+    hau_qua: "file dung CRLF nen mau khong khop, test bao '0 dai' thay vi bao dieu no dinh do"
+    sua: "cat CUA SO tu cho goi chen(...), khong phu thuoc dong trong"
+  3_heredoc:
+    sai: "sua file bang chuoi nhieu dong qua bash heredoc"
+    hau_qua: "cung ly do CRLF — assert truot im lang; va backslash bi lop shell lam roi"
+    sua: "dung cong cu sua file khong co lop shell"
+  lop_loi_chung: "dem hoac tim mot CHUOI roi ket luan ve HANH VI — LAN THU HAI trong hai luot lien"
+  cach_ca_ba_lo_ra: "TAI TAO loi va DOI test phai do. Khong cai nao lo ra khi chi chay xanh."
+
+shadcn_ui_khong_ap_duoc:
+  ly_do: "shadcn la React + Tailwind; du an nay la Quartz + CSS/TS thuan, KHONG co React"
+  neu_keo_vao: "them mot runtime React => pha tran gn.js <= 100 KB va trai upgrade.md §Redesign"
+  lay_phan_dung_duoc: "thang co nhat quan · bien the nut · trang thai focus/disabled — ap bang token san co"
+
+evidence:
+  - "cd web && npm test => exit 0, 37/37 file (36 -> 37)"
+  - "npm run check => exit 0, sach"
+  - "14/14 cong check_* exit 0"
+  - "sinh_contrast_audit.py => 62 cap · 0 truot (KHONG doi mau nao nen audit khong doi)"
+  - "gn.css 160 -> 83 KB (tran SIET 160 -> 100) · gn.js 72 KB (tran 100)"
+  - "trang chu 54 KB (tran 60) · trang lon nhat mock/nap 66 KB (tran MOI 74)"
+  - "7 lop backdrop-filter (nguong 8) — khong them lop nao"
+  - "gia tri >=8px go tay trong prototype.css: 59 -> 0"
+  - "build tat dinh: hai lan build cho cung sha"
+  - "kiem HAI CHIEU 10 phep: 9 do dung cho, 1 (tinh chinh 3px) xanh dung cho"
+
+files:
+  - "05_uiux/tokens.css (+4 bac chu, +1 ban kinh, +6 hang so bo cuc — KHONG doi gia tri nao)"
+  - "web/styles/prototype.css (thay 59 gia tri go tay; + khoi FR-027f dung chung; + CSS 5 man)"
+  - "web/plugins/home-pages/shell.html (5 moc .mb, .qw, .np-tw, 3 vach np-au)"
+  - "web/plugins/home-pages/index.ts (+ daiMay(), + khoi3D(), + catBinhLuan(), 5 dai, NGUONG.cot3D)"
+  - "web/plugins/home-motion/src/home-motion.inline.ts (observer + '.mb')"
+  - "web/test/nam-man-con-lai.test.js (MOI, 61 phep kiem)"
+  - "web/test/token-only.test.js (mien theo GIA TRI <8px thay vi theo FILE)"
+  - "web/test/page-weight.test.js (tran gn.css SIET 160->100; tran MOI cho trang lon nhat 74)"
+  - "web/test/rail-trai.test.js (do TOKEN thay vi px; phep 'khop' thanh CAU TAO)"
+  - "web/test/trang-chu-layout.test.js (#tower -> .tw-i; clamp -> --fs-feat)"
+  - "web/package.json (37 file test)"
+  - "06_modules/M03_web/spec.md (§2.4 khoi FR-027f + AC-2.4.4)"
+  - "07_plan/M03_web/tasks/T03-5-test-api.md (+ AC12 — W5 doi task sinh ra lenh hard)"
+  - ".factory/fr/FR-027-he-kinh-tren-anh.md (muc FR-027f)"
+  - "project_map.yaml (ui_frozen v1.12 -> v1.13)"
+  - "web/{,plugins/,styles/,test/}WORKLOG.md (so lieu + 1 hang test moi)"
+
+no_con_lai:
+  - "TRANG BAI chua dung lai luoi bat doi xung; thanh tien do doc chua co"
+  - >
+    REDESIGN-PLAN §3.3 VAN CHUA DAT: var(--brand) xuat hien 65 lan, ma y dinh la
+    "do tap trung vao mot khoanh khac moi man". Do duoc nen khong can tranh
+    luan. CHUA co rang nao canh TAN SUAT — them mot cai la de, nhung nguong bao
+    nhieu thi can ban, khong tu quyet.
+  - "CANVAS HAT (ui_guide §6d/§8) chua co"
+  - "PARALLAX #hero/.tw-i theo cuon (§7) chua co — perspective da dat san o CSS nen la viec them JS, khong phai doi bo cuc"
+  - "VONG ANH NEN 7s (§5) KHONG lam — hai vong la dung ngan da duoc noi o FR-027e, khong tu noi them"
+  - "dongBoThe() chi dong bo #grid2"
+  - "FR-025 (cong 9 bo sot url_normalized THIEU) · FR-026 ve B (rejected->draft) va ve B2 (unpublish approved) — CHO NGUOI KY"

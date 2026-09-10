@@ -1,0 +1,79 @@
+ulid: 01M1REE7BEP8DF3S60YTYNBJJ4
+thoi_diem: 2026-09-05T05:40+07:00
+tac_nhan: claude-opus-5
+loai: ban_giao
+module: M12_chungcat
+don_vi: T12-20
+viec: >
+  Bản nháp do worker dựng nay DUYỆT ĐƯỢC: đủ 11 trường schema, đủ khung thân
+  bài (1·2·3 + 3.1-3.4·4·5), địa chỉ trích dẫn đúng ngữ pháp, và không tự khai
+  trường dẫn xuất.
+
+r5_do_truoc:
+  luc: 2026-09-05T05:0x+07:00
+  lenh: python chungcat/tests/check_nhap_duyet_duoc.py
+  ket_qua: >
+    ĐỎ 6 vế — thiếu 9/11 trường bắt buộc; không có credibility_max /
+    conformance / review_status / origin; validate --strict đỏ.
+  đỏ_do: claude-opus-5 (cổng viết trước mã, đúng R5)
+
+do_sau:
+  - lenh: python chungcat/tests/check_nhap_duyet_duoc.py
+    ket_qua: pass
+  - lenh: 'for f in chungcat/tests/check_*.py; do python "$f"; done'
+    ket_qua: 32/32 XANH
+  - lenh: python -m pytest core/tests -q
+    ket_qua: 49 passed
+  - lenh: cd web && npm test
+    ket_qua: exit 0
+  - lenh: "E2E THẬT — chưng cất rồi POST /api/nhap-chung-cat/<id>/duyet"
+    ket_qua: >
+      {"trang_thai":"da_duyet","path":"article/phan-tich-linux-foundation.md",
+      "etag":"8cbc3336dcf142a4"} — bài ĐÃ VÀO KHO.
+
+nam_phep_sua:
+  - >
+    ĐỦ TRƯỜNG: id (khớp `^src_[a-z0-9]{6,}$`) · url `kho://` (không bịa URL
+    ngoài) · url_normalized · protocol_version · analyzed_at · one_liner (câu
+    đầu bản chưng cất, rỗng thì `(chưa có tóm tắt)` chứ không bịa).
+  - >
+    BẬC THẤP NHẤT cho mọi trường đánh giá: `credibility_max: claimed`,
+    `conformance: C`, `review_status: draft`, `origin: pipeline`. Đây là
+    `M12-R2` chứ không phải khiêm tốn — một bản máy vừa sinh tự khai
+    `verified` là bên bị đánh giá cầm bút chấm mình.
+  - >
+    BỎ `citations_sampled`/`citations_verified` khỏi frontmatter. `validate`
+    coi chúng là DỮ LIỆU DẪN XUẤT (`B-A6`): nó đếm địa chỉ trong THÂN. `dem`
+    của `verify` đếm thứ khác (quote đối chiếu được) — hai đại lượng trùng tên.
+    Đo được: thân 7 địa chỉ, `dem` nói 1 ⇒ "khai 1 nhưng máy đếm 7". Nay
+    `--fix` của cửa tự điền; con số của ta sống ở `ket_qua` của việc.
+  - >
+    DỰNG LẠI thân theo thứ tự KHUNG thay vì chèn bù. Bản đầu nối mục thiếu vào
+    CUỐI, và trên model thật bốn mục `3.1-3.4` rơi xuống sau `## 5` — NGOÀI
+    khối của mục 3, nên `sub_sections()` không thấy. Thứ tự và lồng nhau là
+    một phần hợp đồng.
+  - >
+    CẮT tiền tố module khi VIẾT địa chỉ: `neo` của `dinh_vi()` là
+    `tai-lieu/<slug>:p.1`, còn ngữ pháp `dia-chi.json` nhận `<slug>:p.1`. Đo:
+    `tach_dia_chi("[tai-lieu/…:p.1]")` trả RỖNG ⇒ mọi mục "không có địa chỉ"
+    dù thân đầy neo. Hai dạng, hai chỗ dùng, một phép quy đổi.
+
+hai_rang_buoc_chi_model_lam_duoc:
+  - "tỉ lệ chữ mục 1+2 ≤ 25% — đo được 33% ⇒ đã xin trong `_PROMPT`"
+  - "mỗi mục từ 3.1 phải dẫn nguồn — đã xin trong `_PROMPT`"
+  - >
+    Ta dựng được KHUNG, không dựng được tỉ lệ chữ hay chỗ đặt dẫn chứng.
+    Model lơ thì cửa duyệt trả 422 kèm đúng dòng — đó là chỗ đúng để nó lộ.
+
+keo_theo:
+  - >
+    Ô backlog M08: cửa duyệt KHÔNG đổi `review_status` khi ghi vào kho. Hàng
+    nháp nói `da_duyet`, file trong kho nói `draft` — mọi màn đọc
+    `review_status` coi bài đã duyệt là chưa duyệt. M12 không được sửa
+    (`M12-R2`); quyền đó thuộc CỬA.
+
+object:
+  - chungcat/src/worker.py
+  - chungcat/tests/check_nhap_duyet_duoc.py
+  - 07_plan/M12_chungcat/tasks/T12-20-nhap-du-truong-de-duyet-duoc.md
+  - 06_modules/M08_api/backlog.md

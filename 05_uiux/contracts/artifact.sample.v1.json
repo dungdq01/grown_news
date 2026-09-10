@@ -1,0 +1,95 @@
+{
+  "$comment": "Data contract v1 — màn Artifact (M16). Bài approved -> slide/audio/video. Link quay-ngược ở tầng METADATA + sidecar. TTS cloud = text rời máy => sha256; piper local => không có gì rời máy.",
+  "version": 1,
+  "artifacts": [
+    {
+      "id": "af-01",
+      "bai_slug": "xgboost-taylor-bac-hai",
+      "loai": "slide",
+      "trang_thai": "xong",
+      "sinh_luc": "2026-09-01T08:50:00+07:00",
+      "thoi_gian_sinh_s": 41,
+      "engine": {
+        "outline": "claude-sonnet-5",
+        "render": "marp-cli",
+        "sha256_payload": "f0a2c1…33b7"
+      },
+      "files": [
+        {
+          "ten": "xgboost-taylor.pdf",
+          "loai": "pdf",
+          "kb": 412,
+          "link_nguon": "PDF link annotation #page=N"
+        },
+        {
+          "ten": "xgboost-taylor.pptx",
+          "loai": "pptx",
+          "kb": 890,
+          "link_nguon": "hyperlink http://127.0.0.1:8787/bai/…"
+        }
+      ]
+    },
+    {
+      "id": "af-02",
+      "bai_slug": "xgboost-taylor-bac-hai",
+      "loai": "audio",
+      "trang_thai": "xong",
+      "sinh_luc": "2026-09-01T09:05:00+07:00",
+      "thoi_gian_sinh_s": 220,
+      "tts": {
+        "provider": "piper-local vi_VN",
+        "ky_tu": 8940,
+        "sha256_payload": null,
+        "ghi_chu": "TTS local — 0 byte rời máy, không cần log egress"
+      },
+      "files": [
+        {
+          "ten": "xgboost-taylor.mp3",
+          "loai": "mp3",
+          "kb": 6200,
+          "link_nguon": "ID3v2 CHAP + URL sub-frame"
+        }
+      ],
+      "sidecar": [
+        {
+          "t": "00:00",
+          "url": "/bai/xgboost-taylor-bac-hai"
+        },
+        {
+          "t": "01:12",
+          "url": "/bai/xgboost-taylor-bac-hai#vi-sao-bac-hai"
+        },
+        {
+          "t": "03:40",
+          "url": "/bai/xgboost-taylor-bac-hai#trong-so-la"
+        }
+      ]
+    },
+    {
+      "id": "af-03",
+      "bai_slug": "thien-duong-chuot-tuong-lai-nhan-loai-giai-ma-loi-tien-tri-d",
+      "loai": "video",
+      "trang_thai": "dang-sinh",
+      "sinh_luc": "2026-09-01T09:42:00+07:00",
+      "thoi_gian_sinh_s": null,
+      "buoc_hien_tai": "ffmpeg ghép slide + audio (2/3)",
+      "tts": {
+        "provider": "azure vi-VN-HoaiMyNeural",
+        "ky_tu": 9350,
+        "sha256_payload": "8c1d90…e4f7",
+        "ghi_chu": "cloud TTS — text RỜI MÁY, log như bậc 4"
+      },
+      "files": [],
+      "$edge": "job chạy PHÚT — không nằm trong một HTTP request; màn phải có state đang-sinh"
+    },
+    {
+      "id": "af-04",
+      "bai_slug": "quartz-plugin-api",
+      "loai": "slide",
+      "trang_thai": "loi",
+      "sinh_luc": "2026-09-01T07:30:00+07:00",
+      "loi_hien_thi": "marp-cli exit 1 — heading cấp 4 vượt khung outline. Sửa outline rồi chạy lại.",
+      "files": []
+    }
+  ]
+}

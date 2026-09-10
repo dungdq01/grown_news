@@ -1,0 +1,87 @@
+id: WL-01K9X8T0813
+at: 2026-09-02
+by: claude
+buoc: "T08-13 — duong XUAT ba bang goc ra file (ADR-06 c). Cong check_db_dung_cho tu do, nay xanh va PHU DU."
+loai: don vi CODE + mo rong don vi TEST; cong tu do truoc, khong noi cong
+gate: khong ky gate
+
+object:
+  - web/api/dungchung.mjs        # xuatLoi() + XUAT_LOI (cot tuong minh)
+  - web/test/loi-cua.test.js     # +8 ca cho ADR-06 (c)
+  - core/tests/check_db_dung_cho.py   # ve 3 doc DUNG cho
+  - .gitignore                   # web/_luu/ COMMIT, khong ignore
+
+evidence:
+  - "xuatLoi lan 1 ghi 3 file, lan 2 ghi 0 => DIEM BAT DONG"
+  - "file ra: dinh-danh-kenh.yaml nguoi-dung.yaml nhap-chung-cat.yaml"
+  - "CO ten nguoi dung + chat_id; KHONG ma moi, KHONG phien.id, KHONG cot ma_da_dung"
+  - "check_db_dung_cho => exit 0, va KHONG con dong BO QUA nao (ve 3 nay PHU DU)"
+  - "loi-cua xanh · api-guard xanh"
+
+# ══ CONG TOI DUNG TU DO — va no dung ════════════════════════════════
+cong_tu_do: >
+  Truoc T08-11, ve 3 cua check_db_dung_cho in 5 dong "BO QUA — bang chua ton
+  tai". T08-11 dung DDL => bang co that => ve do thanh phep kiem THAT va DO:
+  ba bang PHAI xuat ma chua co duong xuat.
+  Do la DO THAT. Nua sau quyet dinh cua chu du an ("van xuat ra .md/.yaml de
+  backup") chua thi cong. Khong noi cong — dung duong xuat.
+  Day cung la bang chung thiet ke "BO QUA CO THONG BAO" (thay vi xanh im lang)
+  la dung: neu no xanh im lang thi hom nay khong ai biet thieu gi.
+
+# ══ RO THAT, va chinh phep thu cua toi bat duoc ════════════════════
+ro_ma_moi_vao_export: >
+  Ban dau xuatLoi dung `SELECT * FROM <bang>`. Chay thu: file export CHUA MA MOI.
+  Nguyen nhan: bang dinh_danh_kenh co cot `ma_da_dung` — do CHINH TOI them vao
+  DDL o T08-11 lam "vet: buoc bang ma nao" — va cot do LA chinh ma moi.
+  Vi pham thang M18-R2 + ADR-06 (c).
+  => Doi sang LIET KE COT TUONG MINH cho ca ba bang, `ma_da_dung` CO Y ngoai
+     danh sach.
+  Vi sao tuong minh chu khong phai "bo mot cot": `SELECT *` xuat BAT KY cot nao
+  bang co, nen ngay ai do them mot cot bi mat, no ra file NGAY ma khong ai sua
+  mot dong nao o day. Danh sach tuong minh bien "them cot bi mat" thanh mot viec
+  phai lam CO Y THUC.
+  Dung bai hoc S8 cua plan tach-ba-bang: "View liet ke cot tuong minh, khong
+  SELECT *" — lan do ly do la thu tu cot, lan nay la ro bi mat. Cung mot luat,
+  hai hau qua khac nhau.
+
+# ══ CONG CUA TOI DO OAN MOT LAN — sua PHEP DO, khong sua ma ════════
+do_oan_ve_3: >
+  Sau khi viet xuatLoi, cong VAN do: "ma_moi / phien KHONG duoc xuat nhung
+  xuat_kho.py co nhac toi".
+  Sai o PHEP DO: no grep ten bang tren TOAN BO noi dung file exporter.
+  dungchung.mjs co nhac `ma_moi` va `phien` — nhung o cac thao tac C6/C7, tuc
+  CUA TRA, khong phai duong XUAT.
+  "Ten xuat hien trong file exporter" KHONG dong nghia "bang duoc xuat". Voi
+  xuat_kho.py phep do do dung vi file do CHI la exporter; voi dungchung.mjs thi
+  sai vi no lam moi thu.
+  => Thu hep phep do ve dung KHOI KHAI `XUAT_LOI = [...]`.
+  Va sua nguon: ve 3 truoc chi doc core/tools/xuat_kho.py, trong khi DB cua LOI
+  la mot DB KHAC voi duong xuat rieng. Cong nhin nham file thi no do oan bat ke
+  ma dung hay sai.
+
+khong_co_vong_reap_o_day: >
+  Do truoc khi viet: xuat_kho.py:141-146 xoa moi file khong nam trong tap
+  `can_co`, nhung no chi quet kb/ va _recycle/ (KB/RECYCLE tu env) — khong voi
+  toi web/_luu/. Mot rui ro bot di.
+  Va xuatLoi CO Y khong co vong reap: no chi ghi de BA file da biet ten, khong
+  quet thu muc, khong xoa gi. Muon don file thua thi do la mot quyet dinh rieng,
+  khong phai tac dung phu cua mot lan ghi. Day la S12 noi bang ma.
+
+gitignore_nguoc_chieu: >
+  web/_loi.sqlite -> IGNORE (la DB).
+  web/_luu/*.yaml -> COMMIT (la ban lui). Khac _kho.sqlite o cho: DB nay KHONG
+  dung lai duoc tu file nao khac, nen ban lui la duong lui DUY NHAT.
+  Da ghi canh bao ngay trong .gitignore: hai file dau chua DU LIEU CA NHAN
+  (ten, chat_id); local thi khong khac gi DB, nhung `git push` dau tien la
+  CHUYEN RA NGOAI => B-E5 (ND 356/2025).
+
+do_do:
+  khong_co_do_moi: "check_db_dung_cho tu do roi tu xanh trong cung luot, do TOI"
+  bon_do_cu: "check_danh_muc + check_skill (agent khac) · check_frozen (cho nguoi ky) · check_g6b (T03-90, agent khac)"
+
+no_con_lai:
+  - "C1 (POST /api/nhap) + C2 (POST /api/nhap-chung-cat) chua lam — cham duong validate/kho"
+  - "KHOA_DICH_VU chua co trong env_plan/README — nguoi van hanh chua biet phai dat bien nao"
+  - "M18-R1 + M18-R3 van S4; bang da ton tai nen promote lai S3 duoc"
+  - "FR chua mo: du lieu ca nhan vao git truoc lan push dau tien (ADR-06 he qua 3)"
+  - "chua ai GOI xuatLoi tu dong sau moi lan ghi — hien phai goi tay"

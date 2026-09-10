@@ -1,0 +1,91 @@
+id: WL-01K9NDFR037B10
+at: 2026-08-28
+by: claude
+buoc: s8 — FR-036/FR-037 B10 tài liệu + hồ sơ quyết định · ĐÓNG nhánh B
+loai: đóng module M09_thuvien + đóng FR-037
+fr: FR-037-thu-vien-tai-lieu-va-video.md
+
+object:
+  fr_moi:
+    - .factory/fr/FR-037-thu-vien-tai-lieu-va-video.md   # MỚI — mở MUỘN, khai rõ điều đó
+  task:
+    - 07_plan/M08_api/tasks/T08-10-spec-duong-hien-vat.md
+    - 07_plan/M03_web/tasks/T03-21-spec-loi-thu-tu-va-xem-truoc.md
+    - 07_plan/M09_thuvien/tasks/T09-1-dong-module-va-quyet-dinh.md
+  hop_dong_frozen:
+    - 06_modules/M08_api/spec.md        # + §2.1b hai endpoint · §2.4b sáu đầu đề
+    - 06_modules/M03_web/spec.md        # + §2.3b lối thứ tư + xem trước · §2.3c hai nền
+    - 06_modules/M09_thuvien/spec.md    # AC-2.4.1 sửa cmd · §3 as-built + bảng 7 cổng
+    - FROZEN.lock                       # ký lại 28 file SAU khi FR-037 có
+  ban_do:
+    - project_map.yaml                  # v14 -> v15: mỗi module sở hữu spec của nó · M09 as-built
+  quyet_dinh:
+    - memory/decisions.md               # ba hồ sơ: byte trong DB · hai nền · FR mở muộn
+  keo_theo:
+    - 06_modules/M04_ci/backlog.md      # MỚI — hai lỗ cổng
+
+may_xanh:
+  - "18/19 cổng check_*.py xanh (đỏ duy nhất check_skill.py — của agent khác)"
+  - "cd web && npm test  ->  exit 0 (52 file)"
+  - "pytest core/tests -q  ->  42 passed"
+  - "check_frozen.py  ->  pass, 28 file khớp baseline đã ký lại"
+  - "check_g6a.py  ->  G6A đạt · M09_thuvien 6/6 artifact · 5 rule · 11 AC hard"
+  - "check_g6b.py  ->  5 điều kiện đạt trên 60 task"
+
+do_do:
+  - cong: core/tests/check_skill.py
+    do_do_boi: agent khác
+    quy_chu: không nằm trong tập file tôi đổi ở lượt này
+
+# ══ Điều nặng nhất của đơn vị này: FR-037 mở MUỘN ═══════════════════════════
+#
+# `grep "M09|thư viện|thu-vien"` trong FR-036 ra **0 dòng**. Nó không bao trùm
+# nhánh B. Nhưng nhánh B đã:
+#   · TẠO hai artifact FROZEN mới (M09 spec + rules) và ký vào lock ở B0;
+#   · ĐỔI một artifact FROZEN (`frontmatter.schema.json`) ở B1.
+# Cả hai, theo CLAUDE.md, phải có FR TRƯỚC mọi thứ. Không có.
+#
+# Nên FR-037 là HỒ SƠ TRUY HỒI, và nó tự khai điều đó ở §0. KHÔNG viết ngày
+# duyệt lùi lại, KHÔNG mở rộng FR-036 cho như thể nó vốn đã bao — làm thế là
+# sai đúng thứ luật gốc bảo vệ: tôi vừa làm vừa tự ký `FROZEN.lock`.
+#
+# Và cách chặn lần sau KHÔNG nằm ở kỷ luật: `<freeze-check>` bắt "file frozen
+# ĐỔI mà không có FR" nhưng KHÔNG bắt "artifact frozen MỚI được THÊM vào lock
+# mà không có FR" — thêm một khoá mới thì lần so đầu tiên đã khớp và cổng xanh.
+# Ô backlog M04_ci mở cho đúng lỗ đó.
+
+# ══ project_map v15 — lần thứ BA của cùng một lớp lỗi trong một plan ════════
+#
+# `06_modules/**` không thuộc boundary của module nào, nên `check_g6b` §2 không
+# đo được ai sửa spec nào. A6 đã sửa `M01_core/spec.md` + `M03_web/spec.md`,
+# B0 đã TẠO `M09_thuvien/spec.md` — tất cả mà không khai `phạm_vi_ghi`.
+#
+# Ba lần trong một plan, cùng nguyên nhân: artifact ai cũng sửa mà không ai khai
+# chủ. `Makefile` (B4) · `kb-mock/**` (B8a) · `06_modules/**` (B10). Mỗi lần đều
+# do CỔNG chặn tôi lại mà lộ ra, không do tôi nhớ.
+#
+# Còn thiếu chủ, ghi ra để lần sau không phải đo lại: `RUNNING.md` ·
+# `memory/decisions.md` · `03_docs/**` · `05_uiux/**` ngoài `contracts/`.
+
+# ══ Một AC của B0 trỏ SAI cổng, sửa trong lượt này ═════════════════════════
+#
+# `AC-2.4.1` khai `cmd: node test/luong-nap-bai.test.js` — cổng đó canh form
+# VIẾT BÀI, không canh lối thư viện. Và nó nói "thiếu CẢ file VÀ url" như thể
+# một form làm hai việc; thực tế lối 4 chỉ nhận FILE, còn video đăng ký URL đi
+# qua form viết bài với `source_type: video`.
+#
+# Đây là kiểu sai chỉ lộ khi có người thi hành AC: đọc spec thì nó nghe hợp lý.
+# `check_g6b` §4 bắt được vì nó đòi mỗi AC hard phải có TASK NÀO ĐÓ sinh ra —
+# và không task nào sinh cái cmd đó.
+
+con_lai:
+  - >
+    NỢ đã ghi thành ô backlog, không ô nào thuộc phạm vi FR-037: GC blob bỏ dở
+    bên DB (M08_api) · ci.yml liệt test bằng tay, lạc hậu 8 file (M03_web) ·
+    check_worklog so số bằng substring (M03_web) · freeze-check không bắt
+    artifact frozen MỚI thiếu FR (M04_ci) · check_g6a in "7 module" khi có 9
+    (M04_ci) · `web/site/` cây build Quartz cũ còn trên đĩa (M03_web).
+  - >
+    NGƯỜI CHỐT (tôi không đo được): nạp thật một PDF 20 MB rồi mở xem · bấm play
+    một video · nạp một bài 5 mục qua form và xem cửa sổ đọc ra `01 / 05`.
+

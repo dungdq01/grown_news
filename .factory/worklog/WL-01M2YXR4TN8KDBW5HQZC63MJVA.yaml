@@ -1,0 +1,135 @@
+entry: ban-giao
+ulid: 01M2YXR4TN8KDBW5HQZC63MJVA
+ngay: 2026-09-10
+module: M03_web + M12_chungcat + M01_core
+don_vi: T03-145 + T12-39 + T12-40 + T03-146
+wo: WO-092 + WO-094 + WO-093 + WO-095
+fr: FR-036a (duyet + thu hep)
+tieu_de: >-
+  Bo vong duyet chung cat; khong ep khung 5 muc; cua so cung bo viec may;
+  ban in dung HTML that
+
+object:
+  - core/src/source_distiller/validate.py
+  - core/tests/check_ci_teeth.py
+  - chungcat/src/worker.py
+  - chungcat/tests/check_khong_ep_khung.py
+  - chungcat/tests/check_khong_can_duyet.py
+  - web/api/nhap-cua.mjs
+  - web/api/xuat-cua.mjs
+  - web/plugins/multiwindow/src/scripts/multiwindow.inline.ts
+  - web/plugins/chungcat/src/chungcat.inline.ts
+  - web/plugins/cctab/src/cctab.inline.ts
+  - web/test/chung-cat-nhom-theo-bai.test.js
+  - web/test/in-pdf-dinh-dang.test.js
+  - .factory/fr/FR-036a-khung-theo-loai-nguon.md
+  - .factory/wo/WO-092-cua-so-cung-bo-viec-may.md
+  - .factory/wo/WO-093-chung-cat-khong-can-duyet.md
+  - .factory/wo/WO-094-khong-ep-khung-cho-chung-cat.md
+  - .factory/wo/WO-095-in-pdf-dung-dinh-dang.md
+  - 07_plan/M03_web/tasks/T03-145-cua-so-bo-viec-may.md
+  - 07_plan/M03_web/tasks/T03-146-in-pdf-dinh-dang.md
+  - 07_plan/M12_chungcat/tasks/T12-39-khong-ep-khung.md
+  - 07_plan/M12_chungcat/tasks/T12-40-khong-can-duyet.md
+
+WO_092_loi_cua_toi: |
+  Chu du an: *"trong multi window van con sinh thumbnail gi day? bao bo het chi
+  co sinh transcript va chung cat ma? Cang sua cang thay ngu vay?"* — dung.
+
+  `WO-088` bo viec may khoi duong ong o MAN `/chung-cat/`, nhung danh sach viec
+  trong CUA SO la mot bo ve khac (`veViecCuaBan`, chunk `cctab`) chi loc theo
+  `slug`. Mot luat, hai cho ve, toi sua mot — chinh lop loi `go_khung` da ghi,
+  va lan nay TOI tu tao ra.
+
+  Sua: phep loc DOI LEN CAU (`viecNguoi`/`vatHong`), hai chunk cung doc, khong
+  chep. Ve 20 khong do "cctab da loc chua" ma do **phep loc chi co MOT ban** —
+  do hanh vi thi lan lech thu ba lai lot.
+
+WO_094_khong_ep_khung: |
+  `FR-036a` duyet va THU HEP: *"chi can ko ap phan-tich (ep 5 muc) cho chung
+  cat, moi thu de tu nhien — nguoi va model LLM quyet"*. Nen KHONG lam nhanh
+  `theo_nguon` nhu FR de xuat — do mot nhanh cau hinh khong ai xin.
+
+  Nhan dien bang `origin: pipeline` (worker ghi cho moi ban may sinh), KHONG
+  dung `ho_so`: enum ay FROZEN va chi co hai nac, nac con lai (`thu-vien`) bo
+  luon tran 400 tu.
+
+  MIEN dung BA phep ve HINH DANG: thieu muc · tran dan nhap · locator theo muc.
+  GIU: tran tu · nhan trong danh muc · schema. `pipeline` la mien khung, khong
+  phai duong vong qua moi cong — ve 3/3a khoa dieu do.
+
+  Ve 2 nang nhat: `origin: manual` thieu muc VAN TRUOT. Khong co ve do thi mot
+  `return []` o dau ham cung lam cong xanh, va do la BO cong chu khong phai NOI.
+
+WO_093_bo_vong_duyet: |
+  Chu du an: *"chung cat khong co nhap gi nua ca, giong transcript … Logic
+  duyet nay qua ngu va ruom ra?"*
+
+  Do TRUOC khi sua: `cuaDuyetNhap` DA lam du bon thu —
+  validate → ghi kho → `da_duyet` → `donBanCu()` day ban chung cat CU cung
+  `nguon` sang thung rac, tuc *"ban moi thi ban cu an di"* co san.
+
+  => KHONG dap bang nhap, KHONG viet duong ghi thu hai. Chi thieu hai thu:
+    1 chot `409` chan lan chay thu hai (ban chung cat luon mang slug
+      `phan-tich-<ten>` nen chay lai la dung chinh no);
+    2 khong ai bam nut.
+
+  Sua: `409` re theo `origin` — `pipeline` thi THAY, khac thi CHAN. Va worker
+  tu goi `POST …/duyet`, truot thi `ViecHong`, khong nuot.
+
+  Ve 2 nang nhat: go `409` cho de thi mot luot chay TU DONG ghi de len ban
+  NGUOI da sua tay — im lang, khong cong nao khac canh.
+
+  KEO THEO: cai nay chua luon o *"vao /video/ khong thay ban chung cat"* —
+  hom nay khong thay vi ban nhap chua duyet nen CHUA TUNG co ban ghi nao trong
+  kho de ma thay.
+
+WO_095_ban_in: |
+  Chu du an: *"Dac biet la format in ra PDF (download)"*.
+
+  `xuat-cua.mjs:273` nhet ca than bai vao MOT `<pre>`: `## 2. Boi canh` in ra
+  dung chu ay, bang Markdown thanh mot rung dau `|`, `**dam**` giu nguyen hai
+  dau sao, va chu don cach xuong hang theo KY TU chu khong theo tu.
+
+  Sua: `mdSangHtml` — tieu de · doan · danh sach · BANG · trich dan · khoi ma ·
+  dam/nghieng/ma · lien ket. Kem CSS in that: `@page`, chu co chan 12pt,
+  `orphans/widows`, `break-after:avoid` cho tieu de, `break-inside:avoid` cho
+  bang va khoi ma.
+
+  Ve 2 nang NGANG ve 1: `<pre>` cu AN TOAN nho `esc2`, va than bai do MODEL
+  sinh. Doi sang dung HTML la mo dung cai cua `<pre>` dang dong. Nen THOAT
+  TRUOC, DUNG SAU — va ve 2 gieo `<script>`, `<img onerror>`, `javascript:` de
+  chung minh. Bo ve do thi WO nay doi mot ban in xau lay mot lo XSS.
+
+bon_neo_cong_hong_da_siet: |
+  1 `check_ci_teeth` — fixture `dat-chuan.md` khai `origin: pipeline`, nen sau
+    WO-094 hai rang ve khung khong con can. KHONG sua fixture (sau cong khac
+    dung chung); thay vao do hai CA them `origin: manual`, vi luat gio chi ap
+    cho ban nguoi viet. Chieu nguoc lai do `check_khong_ep_khung` ve 1 canh.
+  2 `check_frozen` — 21 file spec/rules lech baseline. Do ra la DI CHUNG CRLF
+    cua toi: cong bam `read_bytes()`, va `git diff` cho thay 0 khac biet noi
+    dung. Da doi 21 file ve CRLF; cong xanh lai — chinh dieu do CHUNG MINH lech
+    thuan tuy vi line-ending.
+  3 Ve 1a cua `check_khong_can_duyet` neo `origin[^\\n]{0,60}pipeline` — hai ve
+    cua phep re nam tren HAI dong. Doi sang `[\\s\\S]{0,240}`.
+  4 `than_ham` cat theo SO KY TU (3200) nen `/duyet` nam ngoai cua so chi vi
+    khoi chu thich o giua. Doi sang cat toi MOC (`\\ndef `) — phep do khong con
+    phu thuoc do dai van xuoi. Day la lop loi da gap ba lan hom nay.
+
+do_do: |
+  M12  : 59/59 xanh · E2E --mock xanh
+  core : 7 do — dung bang nen (`check_frozen` va `check_ci_teeth` da xanh lai)
+  Web  : 7 do nen, KHONG mot do moi
+  gn.css 104852 · gn.js 105470 (du 2) — khong noi tran nao
+
+  Trang in THAT sau restart, tren `phan-tich-cai-dat-va-thiet-lap-hermes-tren-vps`:
+    <h2> 5 · danh sach 6 · <pre> bao trum: khong · Markdown tho con lai: khong
+    @page + orphans + break-after: co
+
+chua_nghiem_thu_duoc: |
+  Chua chay MOT luot chung cat THAT (ton egress + tien, va la quyet dinh cua
+  chu du an). Nen duong `worker -> /duyet -> kho` moi duoc do o TANG NGUON va
+  qua E2E --mock; chua co mot ban ghi nao di het duong bang model that.
+
+  Chu du an bam chung cat mot ban ghi la biet ngay: ket qua phai co trong
+  `/video/` ma khong can bam duyet, va bam lai lan hai thi ban cu vao thung rac.

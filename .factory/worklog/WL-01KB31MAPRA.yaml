@@ -1,0 +1,17 @@
+id: WL-01KB31MAPRA
+luc: 2026-09-08 (phien PM)
+ai: claude (PM)
+viec: ra map v31 — 9/9 cho lech (3 luot dau + 6 theo audit dev moi)
+object:
+  - project_map.yaml (v31, check_map exit 0, yaml parse OK)
+  - 07_plan/M01_core/tasks/T01-50-hai-rang-check-map.md
+noi_dung: |
+  Luot 1 (PM tu ra): M13 depends [M02_kb]->[M08_api] · M03 status/screens ·
+  M12 status. Luot 2 (audit 9-cho cua dev moi): M08/M10/M11 planned->as-built
+  (spec §5 van no FR — o backlog giu) · S3_toolchain pytest 49 + 31 check +
+  ci.yml (no chungcat/truyhoi vao CI -> T04-8) · flows +F4 chung-cat +F5
+  transcript +F6 truy-hoi(planned) · gaps dong 3 (ci/web/content, kem object)
+  + gap-python GIU MO (vua can dev moi) · entities +Media/Transcript/BanGhi/
+  LoaiNguon · updated het lech. #7 cua dev (BaiHoc/M19) KHONG phai loi —
+  khoi giu-cho co y, da co giai thich trong map; rang (a) cua T01-49 doc
+  marker giu_cho de khong do oan.

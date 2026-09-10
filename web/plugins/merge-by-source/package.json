@@ -1,0 +1,13 @@
+{
+  "name": "merge-by-source",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "index.ts",
+  "quartz": {
+    "name": "merge-by-source",
+    "displayName": "Gộp theo url_normalized + sắp theo priority",
+    "description": "M03-R5 — nhiều bản phân tích cùng một nguồn là MỘT bài nhiều tab; sắp theo priority chứ không theo ngày",
+    "category": "emitter",
+    "defaultEnabled": true
+  }
+}

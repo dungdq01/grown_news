@@ -1,0 +1,93 @@
+id: WL-01K9NFFR038C5
+at: 2026-08-28
+by: claude
+buoc: s8 — FR-038/C5 bảy màn, thanh menu hai nhóm, bốn bảng view dẫn xuất
+loai: bàn giao C5
+fr: FR-038-tach-ba-module-noi-dung.md
+
+object:
+  task:
+    - 07_plan/M01_core/tasks/T01-21-man-hinh-chi-khai-man-da-dung.md   # code
+    - 07_plan/M01_core/tasks/T01-22-test-siet-chieu-nguoc.md           # test
+    - 07_plan/M03_web/tasks/T03-11-bay-man-hai-nhom.md                 # code
+    - 07_plan/M03_web/tasks/T03-12-test-bay-man.md                     # test
+  code:
+    - core/assets/man-hinh.json      # bỏ 3 màn nạp riêng (chưa dựng) — về C6
+    - web/render/shell.html          # nav hai nhóm + 3 khối view
+    - web/plugins/home-pages/shell.html   # byte-identical
+    - web/render/trang.mjs           # MAN dẫn xuất · 3 mount · tiêu đề tat-ca
+    - web/server.mjs                 # VIEW_SSR dẫn xuất
+    - web/build-fe.mjs               # define __MAN__ + __NHOM__
+    - web/plugins/multiwindow/src/scripts/multiwindow.inline.ts   # DUONG dẫn xuất
+    - web/styles/prototype.css       # 3 icon tab + .tbg
+    - web/plugins/WORKLOG.md · web/styles/WORKLOG.md · web/WORKLOG.md
+  test:
+    - core/tests/check_khai_mot_noi.py   # §4 siết: bình luận ≠ lệnh đọc
+    - web/test/bay-man.test.js           # MỚI — 5 mục
+    - web/test/page-weight.test.js       # demThe cắt đúng vùng
+    - web/test/nut-song.test.js          # MOUNT dẫn xuất
+    - web/test/WORKLOG.md · web/package.json
+  plan:
+    - "C:/Users/Admin/.claude/plans/c-c-users-admin-downloads-grown-news-up-bright-newt.md"
+
+may_xanh:
+  - "cd web && node test/bay-man.test.js  ->  pass (5 mục)"
+  - "cd web && npm test  ->  exit 0 (54 file)"
+  - "PYTHONIOENCODING=utf-8 pytest core/tests -q  ->  42 passed"
+  - "20/21 cổng check_*.py xanh — `check_khai_mot_noi` hết CHỜ, từ 3 mục về 0"
+  - >
+    ngân sách: gn.css 92/100 · gn.js 95/100 · trang chủ 46/60 · trang lớn nhất
+    57/74. Không nới trần nào
+
+kiem_hai_chieu:
+  - "R5 ĐỎ TRƯỚC có thật: `bay-man` 24 lỗi trên code chưa dựng ba màn"
+  - >
+    §4 của check_khai_mot_noi: nhét tên bảng khai vào một dòng BÌNH LUẬN của
+    server.mjs ⇒ vẫn CHỜ, kèm lời "bình luận không phải lệnh đọc"
+  - "đổi `module` của màn Video sang bai-viet ⇒ đỏ 'hụt: video(video)'"
+  - >
+    bỏ phép lọc của ba màn loại (hiện cả kho) ⇒ đỏ cả ba chiều âm, kèm danh sách
+    loại lẫn vào
+  - "bỏ một tab khỏi shell ⇒ đỏ 'shell có 6 tab, bảng khai có 7'"
+  - "cả bốn lượt phá hoàn tác khớp sha256 byte (dùng read_bytes/write_bytes)"
+
+do_duoc:
+  - >
+    `v-kho` khai loại qua nhãn cột `.bl` của biểu đồ, KHÔNG qua `data-loai` hay
+    `tg` — 0 và 0 trên 8476 byte. Phép đo chỉ đọc `data-loai` báo "Kho trộn 0
+    nhóm" và tôi suýt sửa MÀN thay vì sửa PHÉP ĐO
+  - >
+    ba màn loại không cắt ⇒ trang Tổng hợp mang 144 thẻ thay 24 trên kho 120 bản.
+    Cắt ở `NGUONG.moiTrang` — cùng hằng số, không gõ số mới — và NÓI RA phần bị
+    cắt thành chữ
+  - >
+    `__NHOM__` nhúng nhưng FE chưa tham chiếu ⇒ tốn 0 byte trong gn.js. esbuild
+    `define` chỉ thay ở chỗ có tham chiếu, đo trước và sau build
+
+tu_bat_duoc:
+  - >
+    `cac-man-con-lai:117` đỏ vì một BÌNH LUẬN tôi vừa viết trong shell chứa
+    literal `id="v-nap"` — ba cổng cắt vùng bằng `indexOf` trên chính chuỗi đó,
+    nên lát cắt bắt đầu ở bình luận và kéo `#mbnap` ra ngoài màn của nó. Cổng
+    đúng, chữ của tôi sai
+  - >
+    `check_worklog` đỏ hai lần: cổng mới chưa được nhắc trong `test/WORKLOG.md`,
+    và hai số liệu tài liệu (2568 dòng CSS · 41624 ký tự shell) đã lạc hậu
+  - >
+    C5 §4 của chính tôi báo "build-fe chưa đọc" khi tên file nằm trên dòng
+    `bangKhai("man-hinh.json")` — không có biểu thức đường dẫn. Đúng theo luật
+    vừa siết, nên sửa CODE cho khớp luật, không nới luật
+
+sai_sot:
+  - >
+    Phá/hoàn tác `web/server.mjs` bằng `read_text`/`write_text` trên một file
+    CRLF ⇒ KHÔNG chứng minh được byte-identical. Kiểm được: dòng bình luận biến
+    mất (0 lần), `git diff --ignore-all-space` bằng đúng `git diff` (157/4 — phần
+    việc có từ trước), không có thay đổi chỉ-khác-xuống-dòng; hành vi xanh cả bộ.
+    Từ đó về sau mọi lượt phá dùng `read_bytes`/`write_bytes`
+
+con_lai:
+  - "C6 · ba màn nạp riêng — thêm lại 3 mục vào `man-hinh.json` (chi tiết ghi sẵn trong `$comment_chi_khai_man_da_dung`), gỡ tab thứ tư, TẠO đường video (chưa có). Ngân sách gn.js còn 5 KB"
+  - "C7 · CRUD tại chỗ từng loại; form Tài liệu phải có ô `media`"
+  - "C8 · BUG-1 `[hidden]` thua `.api-only` · BUG-2 `#acount` đếm cả trang"
+  - "C9 · spec ba module · wireframe · decisions · ký lại FROZEN.lock"

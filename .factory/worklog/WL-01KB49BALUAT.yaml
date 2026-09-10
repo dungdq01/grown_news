@@ -1,0 +1,58 @@
+entry: ban-giao
+ulid: 01KB49BALUAT
+ngay: 2026-09-10
+module: xuyen module — luat cau truc ma (moi service) · FE (M03) · DB (M01/M02/M08)
+tieu_de: >-
+  Ba luat cau truc chot 2026-09-10 — rule.md muc 14 · 15 · 16 + decisions + memory,
+  va ap ngay vao ba cho cua plan M13 (BAN-GIAO-DEV §1.5 · T03-125 · T13-2)
+
+object:
+  - .claude/rule.md                                     # +muc 14 · 15 · 16
+  - memory/decisions.md                                 # +entry 2026-09-10, bon o
+  - 07_plan/M13_truyhoi/BAN-GIAO-DEV.md                 # +§1.5 bang ba luat ap vao don vi dev M13
+  - 07_plan/M03_web/tasks/T03-125-ui-tim-toan-van.md    # +multiwindow chi MOT DONG MOC, diff >5 dong => FAIL
+  - 07_plan/M13_truyhoi/tasks/T13-2-indexer-chunk-anchor.md   # +index.sqlite o KB_DIR tam
+  - .factory/worklog/WL-01KB49BALUAT.yaml
+
+chi_dao_nguyen_van: |
+  2026-09-10, ba diem:
+  1 "Moi module (services) can tao folder rieng de code (vd chungcat, /chatbot)"
+  2 "Khi apply code FE vao /web thi can tao folder rieng cho module trong do, tranh
+     truong hop nhu file multiwindow.inline.ts len den 4k dong code"
+  3 "Khi lam Database luon tao bang tmp de test ky truoc, sau khi toi chap nhan module
+     thanh cong thi tao bang DB real va clear DB tmp kia -> sach, tranh thu nghiem tren
+     DB chinh"
+
+do_truoc_khi_ghi: |
+  Luat 14: 7/7 service trong dich-vu.json co thu_muc ton tai (web · chungcat · truyhoi
+    · chatbot · artifact · kenh · cong) ⇒ luat KHANG DINH hien trang, de service thu 8
+    khong roi vao web/.
+  Luat 15: wc -l web/plugins — multiwindow.inline.ts 4 167 · cctab 2 387 · chungcat
+    1 850 · home-pages 1 567 · napvideo 494 (tong 11 435). Ba file dau ganh viec cua
+    nhieu module. Khuon dung da co: web/plugins/chungcat/ va napvideo/ (moi module mot
+    thu muc + chunk rieng).
+  Luat 16: kb/_kho.sqlite 3.6 MB, 13 ban ghi — du lieu that. Khuon KB_DIR tam DA CO
+    o core/tests (check_danh_muc :31 · check_export_dan_xuat :34-42) ⇒ luat khong doi
+    them co che, chi bat buoc dung co che san. Spike R6 cua Space da lam dung cach
+    (ban sao 276 MB) — luat ghi cach dung do thanh bat buoc.
+
+ap_ngay_vao_plan_M13: |
+  BAN-GIAO-DEV §1.5 — bang ba luat, moi luat mot cot "ap vao don vi cua ban the nao".
+  T03-125 — multiwindow.inline.ts co trong pham_vi_ghi CHI de dat MOT DONG MOC qua
+    __GN_MW__; logic o web/plugins/timkiem/. Them ve do duoc: diff multiwindow > 5
+    dong ⇒ reviewer FAIL.
+  T13-2 — index.sqlite la dan xuat (khong can nhip "chu chap nhan") nhung test dung o
+    KB_DIR tam, khong sinh trong cay repo, khong bao gio o kb/; duong doc tu cau hinh.
+
+can_bao_PM_Space_khong_tu_sua: |
+  T01-90 (ap FR-080, dai PM-Space, worktree ../gn-space) sua kho.schema.sql va di tru
+  ban_ghi — theo luat 16 phai co BA NHIP trong tieu_chi: (1) AC tren ban sao KB_DIR tam
+  (spike R6 da lam, chi can khai thanh AC), (2) AC soft "chu du an chap nhan", (3) AC
+  bang that + XOA ban tam. Toi KHONG sua task cua nhanh kia (checklist §4) — ghi day
+  de chu du an bao PM-Space. T08-90 (WHERE space) cung vay neu no cham DDL.
+
+khong_lam:
+  - "KHONG sua T01-90/T08-90 (PM-Space) — bao, khong sua."
+  - "KHONG tach multiwindow.inline.ts — luat noi tach KHI SUA, khong tach hang loat; tach 4k dong khong co WO la mot refactor khong tieu chi."
+  - "KHONG them cong kiem luat 14 (0 file service trong web/core) — ghi o decisions 'Doi thi' la cong chua cai; can WO rieng."
+  - "KHONG bump project_map — PM-Space giu but."

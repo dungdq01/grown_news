@@ -1,0 +1,81 @@
+ulid: 01M1TG7B2K9YX4P6M0RTFQNC58
+thoi_diem: 2026-09-06T20:40+07:00
+tac_nhan: claude-opus-5
+loai: ban_giao
+module: M03_web
+don_vi: T03-120 · hệ màu trạng thái + vai nút · kèm FR-068
+
+viec: >
+  `SCR-20` được chủ dự án duyệt (draft xanh dương · rejected đỏ · gạch tiêu đề
+  màu đỏ · mở trần). Thi công phần HÌNH THỨC — `T03-119` đã dựng cấu trúc.
+
+r5_do_truoc:
+  - don_vi: T03-120
+    lenh: node web/test/mau-trang-thai.test.js
+    ket_qua: "ĐỎ 10 vế — chưa có `--tt-draft`, thẻ còn `opacity`, nút một hình"
+    đỏ_do: claude-opus-5
+
+do_sau:
+  - lenh: node web/test/mau-trang-thai.test.js
+    ket_qua: pass — 17/17 vế
+  - lenh: cd web && npm test
+    ket_qua: 3134 vế ok · 0 FAIL · exit 0
+
+fr_kem_theo:
+  id: FR-068
+  vi_sao: >
+    Chủ dự án trả lời câu 3 của `SCR-20` là *"mở trần"*, mà `FR-061 §3` chốt
+    nguyên văn *"gn.css và gn.js giữ nguyên 102400 — bundle CHUNG"*. Đảo một
+    vế của FR đã duyệt thì phải là FR, không phải một dòng sửa số.
+  so: "gn.css 102400 → 104448 (+2 KB, một lần). gn.js KHÔNG đổi (còn 11.8 KB)."
+  do_that_sau_khi_lam: "gn.css 102613 / 104448 — dư 1835 byte"
+  no_khong_tick: "FR-061 §4 (giảm béo 100+ selector trùng) giữ nguyên, chưa trả"
+
+phat_hien:
+  - ten: "trần chép cứng ở SÁU file cổng"
+    do: >
+      `page-weight.test.js` · `chung-cat-hover` · `sinh-transcript-ui` ·
+      `mo-ta-va-nut-nap` · `nap-ba-khung` · `o-nhan-nap` · `tab-theo-doi-chung-cat`.
+      Nới trần phải sửa bảy chỗ, và sáu trong bảy chỗ không ai nhớ là có.
+    xu_ly: "sửa đủ, mỗi chỗ kèm chú thích trỏ FR-068; ô nợ đã mở"
+  - ten: "`--primary` === `--destructive` ở hệ TỐI"
+    do: >
+      `--primary:#F87171` và `--destructive:#F87171` — CÙNG MỘT giá trị. Ở hệ
+      sáng `--primary` là `#C81E1E`, cũng đỏ. Chụp màn lần đầu: nút CHÍNH nền
+      đỏ đặc đứng cạnh cụm NGUY viền đỏ — màn đang chỉ vào chỗ nguy hiểm nhất
+      bằng chính cái nút nổi nhất.
+    xu_ly: >
+      `.bt-chinh>button` dùng nền TRUNG TÍNH (`--ink`/`--background`), không
+      `--brand`/`--primary`. `SCR-20` chỉ khai "nền đặc, chữ nghịch đảo" —
+      không khai hue — nên đây nằm trong wireframe đã duyệt, không phải đổi
+      thiết kế. Thêm AC5 + vế 5b GHI NHẬN sự trùng token, để ngày ai đó tách
+      hai token ra thì cổng tự đỏ và nhắc bỏ vế ấy đi.
+
+chay_that:
+  cach: "server phụ cổng 8799 (không đụng phiên `npm run api` của chủ dự án)"
+  do_duoc:
+    - "draft `2.4px solid rgb(29,78,216)` · opacity 1 (trước là .72)"
+    - "approved `solid rgb(21,128,61)` · edited `solid rgb(133,77,14)`"
+    - "rejected `2.4px DASHED rgb(179,38,30)` · gạch `line-through / rgb(179,38,30) / 2px`"
+    - "hệ TỐI: draft `rgb(125,169,255)` · rejected `rgb(248,113,113)`, gạch cùng màu"
+    - >
+      thanh chân: CHÍNH nền `rgb(23,23,26)` chữ nghịch đảo · THƯỜNG nền trong
+      viền `rgb(219,211,192)` · NGUY nền trong viền + chữ `rgb(179,38,30)`
+  anh: "chụp `.bk-f` — ba cụm tách đúng, nhãn `KHO — chưa lên site` ở cuối"
+
+object:
+  - 05_uiux/tokens.css
+  - 05_uiux/wireframes/SCR-20-mau-trang-thai-va-vai-nut.md
+  - web/styles/prototype.css
+  - web/plugins/multiwindow/src/scripts/multiwindow.inline.ts
+  - web/test/mau-trang-thai.test.js
+  - web/test/page-weight.test.js
+  - web/test/chung-cat-hover.test.js
+  - web/test/sinh-transcript-ui.test.js
+  - web/test/mo-ta-va-nut-nap.test.js
+  - web/test/nap-ba-khung.test.js
+  - web/test/o-nhan-nap.test.js
+  - web/test/tab-theo-doi-chung-cat.test.js
+  - web/package.json
+  - .factory/fr/FR-068-noi-tran-gn-css-cho-token-trang-thai.md
+  - 07_plan/M03_web/tasks/T03-120-mau-trang-thai-va-vai-nut.md

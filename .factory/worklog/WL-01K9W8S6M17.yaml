@@ -1,0 +1,97 @@
+id: WL-01K9W8S6M17
+at: 2026-09-01
+by: claude
+buoc: "s6-module-spec · M16_artifact + M17_cong — hai pack cuoi; SAU module dot hai da tot nghiep"
+loai: s6; G6A cho hai module + dong muc modules_du_kien
+gate: G6A (M16, M17 — va do la hai cai cuoi cua dot hai)
+
+object:
+  - 06_modules/M16_artifact/{spec,rules,diagram_flow,data_flow,model_flow,ui_flow}.md   # 22 AC · 5 rule
+  - 06_modules/M17_cong/{spec,rules,diagram_flow,data_flow,model_flow,ui_flow}.md       # 19 AC · 6 rule
+  - project_map.yaml   # v23 -> v25: M16 + M17 sang modules; XOA muc modules_du_kien (het)
+
+evidence:
+  - "check_g6a => xanh (17 module, 17 thu muc, khop hai chieu)"
+  - "check_map · check_ba · check_rule_surfaces · check_mermaid => xanh"
+  - "pytest core/tests -q => 42 passed"
+  - "29 cong Python => 22 xanh; 7 do: 4 do CU + 3 cua agent khac"
+  - "sau pack: M12 21AC/6rule · M13 20/5 · M14 25/6 · M15 19/6 · M16 22/5 · M17 19/6"
+
+# ══ PHAN DANG GIA NHAT ═════════════════════════════════════════════════
+M16_la_module_DUY_NHAT_ghi_vao_kho_hien_vat: >
+  Nen no la module duy nhat co co hoi PHA byte (M09-R1: moi DELETE pha byte vinh
+  vien). Ranh gioi khong phai "duoc cham hay khong" ma la "chi THEM".
+  Va no can mot cap rule: M16-R1 cam xoa, M16-R2 doi khai `la_dan_xuat = 1`.
+  R2 de bi coi la "mot cot metadata cho dep" — no thuc ra la thu CUU DUOC R1:
+  nguyen lieu nguoi nap KHONG dung lai duoc; artifact DUNG LAI DUOC. Khong phan
+  biet hai loai thi mot ngay ai do don _media/ de tiet kiem cho va xoa CA HAI —
+  va ho lam DUNG, vi khong co cach nao biet cai nao la cai nao.
+
+M16-R4_co_ve_phu_dinh_phai_DO_DUOC: >
+  Duong TTS local phai sinh DUNG 0 dong log egress. Do khong phai cho du doi —
+  no la cach duong local CHUNG MINH duoc no khong gui gi, thay vi ta tin no.
+  Moi rule khac do "co lam dung khong"; rule nay con do "co im lang lam them gi
+  khong". Day la rule duy nhat trong du an co hinh dang do.
+
+nguoi_dung_bam_"tao_giong_doc"_la_bac_4: >
+  Trong nhu mot tien ich nho, nhung no gui TOAN VAN mot bai ra mot nha cung cap
+  nuoc ngoai — cung bac voi M12 gui tai lieu nguyen lieu. Day la cho de danh gia
+  THAP nhat cua ca dot hai. Da viet thanh mot canh bao rieng o spec §5 va
+  data_flow §4.
+  Va Azure (Microsoft) vs FPT.AI (Viet Nam) gan nhu chac chan KHAC khu vuc phap
+  ly ⇒ roi du phong TTS la ca ROI CHEO KHU VUC, tuc ca MAC DINH cua M16 chu khong
+  phai mot ca ly thuyet. Ke thua M12-R5: phai khai tuong minh, co nguoi ky.
+
+PPTX_cua_Marp_la_ANH_—_gioi_han_engine_la_thu_BAT_NGO: >
+  Chon Marp cho mot yeu cau "sua duoc chu" thi file mo ra TRONG DUNG va KHONG sua
+  duoc, va nguoi dung phat hien dieu do SAU KHI da gui cho nguoi khac.
+  Nen bang khai engine.json co cot `gioi_han`, va M16-R5 doi bang phai ghi ro no.
+  Cong do truoc; khong de nguoi dung phat hien sau.
+
+M17_la_module_PHU_THUOC_NHIEU_NHAT_va_tu_lam_duoc_IT_NHAT: >
+  Bay no, va SAU trong bay nam ngoai M17:
+    - bon endpoint cua LOI (tra phien · tra+danh dau ma_moi · ghi audit_log ·
+      ghi dinh_danh_kenh) — FR-045 khai BON BANG ma KHONG khai mot endpoint nao
+    - rate limit + entropy >=128 bit + log that bai — LO trong FR DA DUYET
+    - DDL bon bang trong kho.schema.sql
+    - ngon ngu cong/ chua chon (Caddy · nginx · tu viet) — s4 quyet
+    - cot `vai` CHUA AI DOC => "phan quyen" hom nay la MOT COT TRONG
+  Da ghi thanh muc rieng: s7 KHONG duoc xep M17 vao lich truoc khi LOI mo cua —
+  nguoi thi cong se doc DB truc tiep cho nhanh, va do la Z4 chet trong khi moi
+  cong van xanh.
+
+M17_la_cho_DUY_NHAT_muc_tin_doi_—_va_no_chi_doi_MOT_ve: >
+  Xac thuc xong KHONG co nghia noi dung dang tin. M17 tra loi "request nay cua
+  tai khoan nao", KHONG tra loi "noi dung nay co nen vao kho".
+  Do la ly do gate.py:133 van ep draft VO DIEU KIEN ke ca cho request da xac
+  thuc — mot tai khoan THAT van co the nap rac. Viet thanh mot so do rieng vi day
+  la cho de doc sai nhat cua ca kien truc.
+
+M15_va_M17_cung_vung_BIEN_nhung_NGUOC_NHAU_hoan_toan: >
+  M15 KEO (goi RA, cong: null, nghe_ngoai: false) · M17 NGHE (443, nghe_ngoai:
+  true, DUY NHAT). Cung vung, nguoc nhau o CHIEU KET NOI — va do chinh la ranh
+  gioi research §3.2 goi la "ranh gioi quan trong nhat cua phan tich hop": keo la
+  mot tien trinh, nghe la mot du an ha tang.
+  Lap bang sau dong so sanh o M17/model_flow §3 de khong ai gop hai module nay
+  thanh "hai adapter".
+
+XOA_muc_modules_du_kien_thay_vi_de_no_RONG: >
+  Sau khi M17 tot nghiep, `modules_du_kien:` con lai mot khoa RONG. De nguyen thi
+  no doc nhu "con module dang cho" trong khi khong con cai nao — va no la thu PHAI
+  NHO moi don. Dung lop loi bang khai sinh ra de dep (S18, bai hoc C5: khong dung
+  co `da_dung: false`).
+  Da xoa, va thay bang mot doan giai thich giu lai LY DO muc do tung ton tai +
+  cach them lai neu co dot ba.
+
+do_do:
+  check_danh_muc + check_skill: "FR-039 cua toi; cho sua o core/skill-src (agent khac so huu)"
+  check_frozen: "cho NGUOI ky"
+  check_running: "he qua hai muc tren"
+  check_g6b + check_khai_mot_noi + check_worklog: "AGENT KHAC — UI frame dot hai (T03-90 · 8 man/khai 7 · so dong prototype.css)"
+
+no_con_lai:
+  - "SAU pack xong, nhung KHONG mot lenh nao trong chungcat|truyhoi|chatbot|kenh|artifact|cong /tests/ ton tai => 34 rule S3 hien la KY LUAT, chua phai co che. s8 dung chung."
+  - "check_g6b in FAIL cho 6 module 'chua co plan' nhung KHONG cong loi (ma chi append khi co_plan or xanh) — dong FAIL do la trang thai binh thuong giua s6 va s7. Da ghi o WL-01K9W3S6M12."
+  - "Nam chan cung phai go truoc khi s7 chia task: `nguon` chua vao schema (FR-044) · POST /api/nhap chua co · bon endpoint FR-045 chua co · bang media khong co cot tro ve slug · lo rate-limit ma_moi."
+  - "chuan_hoa() ban Python chua co; dai ky tu Han chua thanh bang khai."
+  - "Buoc tiep: s7 (G6B) chia task — nhung DOC muc tren truoc, dung xep M15/M17 vao lich khi cua chua mo."

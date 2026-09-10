@@ -1,0 +1,70 @@
+at: 2026-08-19T20:15Z
+agent: claude
+step: s8 chặng B — M03_web (T03-1 → T03-4), G6C
+did: >
+  Bốn task của M03. Nối 05_uiux/ (frozen G5) với kb/. KHÔNG thiết kế lại.
+
+  T03-1 Quartz v5 + filter approvedOnly
+  T03-2 emitter mergeBySource + sắp theo priority
+  T03-3 port 363 dòng multi-window từ app-v20.html
+  T03-4 bốn màn theo wireframe + ba state
+
+  MƯỜI VẤN ĐỀ THẬT, chẩn đoán từng cái thay vì đoán:
+
+  1  ADR-01 ghi Quartz v4, npm trả 404. Quartz không phát hành qua npm và
+     bản hiện hành là v5. Kiểm CẢ tài liệu LẪN mã nguồn 4 API mà F1 dựa
+     vào — shouldPublish, emit(content[]), nav, addCleanup — còn đủ.
+     Không khẳng định nào của F1 gãy ⇒ FR-007.
+  2  Đường plugin local giải theo CWD lệnh build, không theo vị trí config.
+  3  symlink EPERM trên Windows. Kiểm: junction ĐƯỢC, symlink dir EPERM.
+     Junction thoả 3 điều kiện Quartz kiểm ⇒ link-plugins.mjs.
+     KHÔNG sửa mã Quartz: bản vá thượng nguồn sẽ âm thầm biến mất.
+  4  Filter loại 14/14 file. Filter chạy ĐÚNG, dữ liệu vào RỖNG: v5 tách
+     frontmatter transformer ra plugin ngoài, config không bật.
+  5  Build ghi vào public/ — thư mục ẢNH NGUỒN của người dùng (10 file jpg
+     commit từ s5). Quartz xoá sạch output trước mỗi build. Đổi sang site/.
+  6  Kho tạm trong web/test/ mà .gitignore ignore. Quartz bật gitignore:true
+     (glob.ts:18) ⇒ Found 0 input files. Đặt ra ngoài repo.
+  7  import từ quartz/plugins/emitters/helpers gãy lúc CHẠY (Node ESM đòi
+     đuôi .js) dù tsc chấp nhận. Tự viết mkdir+writeFile.
+  8  Component plugin local: 4 lỗi liên tiếp — import không đuôi, .scss
+     Node không hiểu, componentLoader tìm subpath "./components" chứ không
+     đọc index.ts, registry gọi ctor() nên phải export CONSTRUCTOR.
+  9  afterDOMLoaded nhận CHUỖI JS, Quartz không strip TypeScript.
+     Dịch TS→JS bằng esbuild ở bước link-plugins.
+  10 Màn "Tất cả" thiếu draft: build.ts:95 gọi filterContent() TRƯỚC
+     emitter. Màn quản lý PHẢI thấy draft ⇒ đọc thẳng từ đĩa. Vẫn CHỈ ĐỌC.
+
+  TEST BẮT LỖI THẬT CỦA TÔI: no-leak phát hiện listener "nav" gắn mà không
+  gỡ, và là handler vô danh — đúng kiểu rò addCleanup sinh ra để chặn.
+  Sửa mã, không sửa test.
+
+  BA LẦN TEST BÁO SAI TRÊN CODE ĐÚNG, sửa test không sửa code:
+  token-only quét CSS Quartz sinh (129 lỗi) · đọc chữ trong comment ·
+  cấm clamp() neo thang — thứ DESIGN.md §2 ĐÒI phải có.
+
+verify:
+  hard:
+    - "pytest core/tests -q                 => 19 passed"
+    - "9 script check_*.py                  => xanh hết"
+    - "4 script 06_skillgen/test_*.py       => xanh hết"
+    - "7 test web/test/*.test.js            => xanh hết"
+    - "npx tsc --noEmit -p tsconfig.json    => 0 lỗi"
+    - "npx quartz build                     => 67 file, 9 bài từ 13 bản ghi"
+  soft:
+    - "mọi flow P0 click được — người chốt trên bản build thật"
+    - "mở 2 cửa sổ, điều hướng, cả hai còn nguyên — hành vi tương tác"
+
+ra:
+  - web/plugins/{approved-only,merge-by-source,home-pages,multiwindow}/
+  - web/styles/custom.scss          # nhập tokens.css, 3 luật chữ của s5
+  - web/link-plugins.mjs            # junction + chép style + dịch TS→JS
+  - web/test/*.test.js              # 7 test
+  - .factory/fr/FR-007-quartz-v5.md
+  - 06_modules/M03_web/spec.md      # -> as-built
+  - project_map.yaml                # v9, stack quartz-v5, gap-quartz ĐÃ ĐÓNG
+
+no_go:
+  - Ảnh nền tự chuyển 5–7s chưa port (phần bg* của prototype) — nợ sang WO
+  - Chưa test Safari/Firefox (backdrop-filter, container-query) — nợ từ G5
+  - Kho kb/ thật vẫn RỖNG; mọi số đo trên sample v3

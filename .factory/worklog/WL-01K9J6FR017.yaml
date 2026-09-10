@@ -1,0 +1,55 @@
+id: WL-01K9J6FR017
+at: 2026-08-19
+by: claude
+buoc: s8 (M03_web) — lượt rà thứ hai trên bản chạy thật
+loai: sắc màu + tính năng nhỏ + amend UI contract
+fr: FR-017-mau-header-va-sap-xep.md
+
+viec: >
+  Bốn yêu cầu: (1) header thêm màu "nhẹ nhàng cũng được"; (2) form viết bài mặc
+  định ngày hôm nay; (3) thêm sắp xếp theo ngày cho danh sách bài; (4) chữ ở
+  thanh menu/sidebar/mục lục đậm hơn.
+
+pham_vi_ghi:
+  - web/styles/prototype.css              # khối FR-017
+  - web/plugins/home-pages/shell.html     # nhóm nút .sortb
+  - web/plugins/home-pages/index.ts       # thẻ mang data-ngay + data-pri
+  - web/plugins/multiwindow/src/scripts/multiwindow.inline.ts
+  - web/test/url-va-tuong-tac.test.js     # data-sap vào danh sách canh
+  - project_map.yaml (ui_frozen v1.5) · 3 WORKLOG · .factory/fr/FR-017
+
+rang_buoc_khong_the_bo_qua:
+  mau_chu_chi_lay_tu_audit: >
+    contrast-audit.json (frozen) có ĐÚNG ba màu đạt ngưỡng chữ 4.5:1 trên nền
+    sáng: --brand #C81E1E (5.59) · --success #15803D (4.89) · --warning #854D0E
+    (6.61). Bảng màu loại nguồn (--c-repo, --c-paper...) chỉ được audit ở vai
+    VIỀN/NỀN — dùng làm màu chữ là tự bịa bằng chứng. Nên tít tab và header màn
+    chỉ dùng ba màu trên.
+  mau_gan_voi_Y_NGHIA: >
+    đỏ ở màn có hành động GHI (Nạp nguồn) · hổ phách ở màn có việc TREO (Chờ
+    duyệt) · xanh ở màn báo TÌNH TRẠNG (Kho). Không luân phiên màu cho vui.
+  M03_R5_khong_bi_dung: >
+    Sắp xếp làm ở TRÌNH DUYỆT — đổi thứ tự các thẻ đang hiện, không đổi thứ tự
+    emitter sinh. Luật "sắp theo priority, không theo analyzed_at" nói về thứ tự
+    MẶC ĐỊNH và expected-render.test.js vẫn canh nguyên. Mở trang vẫn ra thứ tự
+    priority; người muốn xem theo ngày thì bấm — đó là câu hỏi khác.
+  ngay_mac_dinh_la_PHEP_TINH: >
+    M05-R2 cấm máy tự điền QUYẾT ĐỊNH. Đọc đồng hồ hệ thống là phép tính (cùng
+    loại word_count), và giá trị hiện rõ trong ô để người sửa trước khi gửi.
+    Đặt trong datLaiForm() chứ không ở nút mở form: form.reset() xoá ô đó.
+  phan_cap_chu: >
+    Chỉ ĐIỀU KHIỂN lên --ink (menu, sidebar lọc, mục lục, dock) + weight
+    --w-head. Thân bài và mô tả GIỮ --ink-2 — mọi thứ cùng đậm nhất thì không
+    còn phân cấp nào, và đó là đúng thứ vừa sửa ở FR-016.
+
+evidence:
+  - cd web && npm test                        # 22/22 xanh
+  - node web/test/url-va-tuong-tac.test.js    # "6 phần tử [data-sap]" + "script xử lý [data-sap]"
+  - "build: data-ngay/data-pri có trong output (pri thật: 50, 60, 65)"
+  - python core/tests/check_worklog.py        # số liệu khớp thực tế
+
+no_con_lai:
+  - Sắp xếp chỉ áp cho các thẻ TRÊN TRANG hiện tại; màn Tất cả phân trang 24
+    thẻ nên "mới nhất" là mới nhất trong trang, không phải toàn kho. Đủ dùng ở
+    quy mô hiện tại (13 bản ghi), sẽ phải tính lại khi kho vượt một trang.
+  - FR-016 và FR-017 đều trạng thái MỞ — chờ người ký.

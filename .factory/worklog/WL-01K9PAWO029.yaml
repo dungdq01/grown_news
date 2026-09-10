@@ -1,0 +1,78 @@
+id: WL-01K9PAWO029
+at: 2026-08-29
+by: claude
+buoc: WO-029 — thêm nhãn mới không bao giờ được vì hai phần tử trùng `id`
+loai: bàn giao WO-029
+wo: WO-029-trung-id-dlg-nhan.md
+
+object:
+  wo:
+    - .factory/wo/WO-029-trung-id-dlg-nhan.md
+  task:
+    - 07_plan/M03_web/tasks/T03-66-test-khong-trung-id.md   # test
+    - 07_plan/M03_web/tasks/T03-67-doi-ten-o-nhap.md        # code
+  code:
+    - web/render/shell.html
+    - web/plugins/home-pages/shell.html
+    - web/plugins/multiwindow/src/scripts/multiwindow.inline.ts
+  test:
+    - web/test/moc-fe-con-that.test.js   # §4 MỚI
+
+may_xanh:
+  - "ĐỎ TRƯỚC (R5): `dlg-nhan×2` ở CẢ HAI bản shell"
+  - "sau khi vá: cổng xanh · `cmp` hai bản shell vẫn byte-identical"
+  - >
+    ĐƯỜNG THẬT qua HTTP với đúng dữ liệu người dùng nhập:
+    `POST /api/categories {id:"fututre", label_vi:"FUTURE", gom:"talkshow"}` ⇒
+    **200**, đọc lại thấy `fututre`; và nhãn RỖNG vẫn ⇒ 422 (cổng server không bị nới)
+  - "quét web 75/76 (chỉ `he-kinh`) · gn.js 100269/102400"
+
+bug:
+  - >
+    `<dialog id="dlg-nhan">` (shell:522) và `<input id="dlg-nhan">` (shell:537)
+    cùng tồn tại. `getElementById` trả PHẦN TỬ ĐẦU TIÊN ⇒ cái dialog; dialog
+    không có `.value` ⇒ `label_vi` luôn rỗng ⇒ server trả 422 *"cần NGƯỜI khai:
+    label_vi"* dù người dùng ĐÃ điền
+  - >
+    Cùng id đó phục vụ HAI việc khác CHẠY ĐÚNG (`showModal`/`close` vốn thuộc về
+    dialog), nên lỗi chỉ lộ ở MỘT nhánh — nhìn bằng mắt thì mọi thứ hợp lý
+  - >
+    Hệ quả thứ hai, âm thầm hơn: vòng dọn form cũng trúng cái dialog, nên ô nhập
+    KHÔNG BAO GIỜ được xoá giữa hai lần mở
+  - >
+    Hệ quả rộng: **không thêm được khái niệm hay chủ đề nào qua giao diện** —
+    và đó chính là lý do các màn nạp hiện *"Danh mục đang trống"*
+
+vi_sao_cong_hom_qua_khong_bat:
+  - >
+    `moc-fe-con-that` (WO-028) hỏi *"mốc có TỒN TẠI không"*. Nó KHÔNG hỏi *"có
+    ĐÚNG MỘT không"*. Id này tồn tại — hai lần. Một cổng đúng câu hỏi nhưng hẹp
+    một bậc so với thứ cần canh
+  - >
+    Đây là lần thứ hai trong hai lượt liên tiếp một cổng tôi vừa viết bỏ lọt
+    đúng cái lớp nó tưởng đã phủ
+
+ban_sua:
+  - >
+    Đổi tên cái INPUT (`dlg-nhan-o`), giữ id của `<dialog>` — `man-danh-muc.test.js:100`
+    đang đòi `<dialog id="dlg-nhan">`. Sửa hai chỗ FE muốn input; hai chỗ muốn
+    dialog giữ nguyên
+  - >
+    Vế HÀNH VI trong cổng đo TÊN THẺ, không chỉ đo id: `<input>` chứ không phải
+    thẻ bao. Đo id thôi thì lần sau ai đó lại gắn id ấy lên một `<label>`
+
+tu_bat_duoc:
+  - >
+    Heredoc lại nuốt escape: `\n` thành xuống dòng thật và làm vỡ file cổng đang
+    sửa. `node --check` bắt ngay. Cách chạy được vẫn là ghi script ra file bằng
+    Write — tôi đã biết điều này và vẫn tái phạm
+
+đỏ_do: chưa quy được chủ  # id trùng có từ lúc dựng hộp thoại
+
+do_do:
+  - cong: he-kinh.test.js
+    do_do_boi: ảnh 724662 byte người dùng thêm — `python core/tools/toi_uu_anh_nen.py`
+  - cong: check_frozen.py
+    do_do_boi: chờ NGƯỜI ký sau khi FR-039 duyệt
+  - cong: check_danh_muc.py · check_skill.py · check_running.py
+    do_do_boi: agent khác · và hệ quả của hai cổng trên

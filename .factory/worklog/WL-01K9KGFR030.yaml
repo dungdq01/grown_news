@@ -1,0 +1,140 @@
+id: WL-01K9KGFR030
+at: 2026-08-25
+by: claude
+buoc: s8 (M03_web) — man Danh muc + dashboard Kho
+loai: dung lai mot man tu A-Z, va sua GOC mot lop loi da tai dien 4 lan
+fr: FR-030-danh-muc-va-bieu-do-dung-loai.md
+
+viec: >
+  Nguoi dung, mot tin nhan ba viec: (1) "tat ca nhung thu goi la comment / guide
+  thi dung co show ra" (2) "design lai man catalog - tu A-Z, ca pop up insert
+  khai niem / logic: kiem tra lai xem API CRUD catalog hoat dong hay khong"
+  (3) "phan kho bao lam dashboard summary ma chua lam a?". Viec (1) da thanh
+  FR-029. Day la (2) + (3).
+
+# ══ DO TRUOC KHI SUA — va so do da doi ca thiet ke ═════════════════════════
+tai_sao_BAR_thanh_HANG:
+  toi_da_do_gi: >
+    In gia tri that cua tung cot trong `#cb`. Mock: moi cot 50% hoac 100%. Real
+    `kb/`: TOAN BO 100%. Vi moi nhan chi duoc 1-2 bai dung toi.
+  ket_luan: >
+    Do dai cot khong mang tin gi. Mot bieu do ma moi cot dai bang nhau KHONG
+    PHAI bieu do — no la danh sach duoc ve to hon can thiet, va no che mat viec
+    nguoi dung den man nay de lam: TIM mot nhan roi sua/xoa no.
+  neu_khong_do: >
+    Toi da di "lam bar dep hon" — mau gradient, hieu ung dung. Cong suc do vao
+    thu khong cho thong tin nao. Chi mot lan in gia tri that la du.
+
+# ══ PHAN DANG GIA NHAT: lop loi lan thu TU, va lan nay sua GOC ═════════════
+bieu_do_trang_thai_THIEU_MOT_TRANG_THAI:
+  loi: >
+    `bars4` ("Trang thai duyet") go tay [approved, draft, rejected] — bo sot
+    `edited`. Bai da duyet roi bi sua KHONG XUAT HIEN O DAU trong bieu do trang
+    thai, du `edited` la mot trong BON gia tri enum. `maxTrang` con tinh tren
+    `choDuyet` trong khi cot ve `draft` => thang cung lech.
+  day_la_lan_thu_4: >
+    `bon-trang-thai.test.js` mo dau bang ba lan truoc (chi muc cua so · man Cho
+    duyet · luat CSS). BA LAN TRUOC DEU SUA TUNG CHO. Nen lan thu tu den.
+  lan_nay_sua_GOC: >
+    `TRANG_THAI` doc `enum` TU SCHEMA (core/skill-src/frontmatter.schema.json,
+    properties.review_status.enum). Khong ai liet ke tay duoc nua, va mot trang
+    thai thu nam se TU CO MAT o moi bieu do.
+  rang_hoi_dung_cau: >
+    §4b hoi "co liet ke tay khong", KHONG hoi "co du bon khong". Dem bon thi lan
+    thu nam van lot — dung lop loi, dung mot buoc cham hon.
+  fallback_co_chu_dich: >
+    Thieu file schema thi tra ve enum hien tai, KHONG tra ve mang rong. Ve du bon
+    cot con hon ve mot bieu do rong ma khong ai biet vi sao.
+
+# ══ SONG SINH BAT DUOC TOI ═════════════════════════════════════════════════
+song_sinh_tra_co_tuc:
+  chuyen_gi: >
+    Emitter in hang luc build; `barCptFE()` in LAI dung hang do tu API sau moi
+    lan them/sua/xoa nhan. Toi doi ban emitter ma QUEN ban FE.
+  ai_bat: "man-danh-muc.test.js §6a — do ngay lap tuc"
+  neu_khong_co_rang_do: >
+    Man se dung dung ngay sau build, roi nguoi dung them mot nhan => danh sach
+    LANG LE QUAY VE BAR. Khong crash, khong log. Chi la hinh dang doi.
+
+# ══ CLASS CHET: khong xoa, cho no viec THAT ════════════════════════════════
+r_cpt:
+  phat_hien: >
+    `markup-matches-css` do: "khong co luat: r-cpt". Grep ra: `.r-cpt`/`.r-cat`
+    TUNG KHONG CO LUAT CSS NAO — o prototype.css chi con mot COMMENT nhac ten
+    chung (dong 1461), luat that thi khong con.
+  toi_da_dinh_xoa: >
+    Class khong style gi thi bo. Nhung grep tiep: man-danh-muc.test.js:69 DEM
+    hang khai niem bang `class="rc-r r-cpt`. No la MOC NHAN DIEN dang duoc dung.
+  quyet_dinh: >
+    Cho no mot viec that: vach 2px le trai cung mau voi tab (.dm-tab.t-cpt =>
+    --brand, .t-cat => --ok). Ba tab da phan biet bang mau; hang mang cung mau
+    thi mat doc ra "hang nay thuoc tab kia" ma khong phai nho.
+  mau_lay_tu_TAB_khong_chon_moi: "ca hai da nam trong contrast-audit => 62 cap · 0 truot"
+  lop_loi_tranh_duoc: >
+    "Grep thay khong co luat => xoa class" la dung mot nua. Class con mot vai
+    NGOAI styling. Phai grep CA test va CA JS truoc khi ket luan mot ten la chet.
+
+ba_loai_chart_cho_ba_HINH_DANG_du_lieu:
+  upgrade_md_noi: "Dashboard can da dang loai chart"
+  toi_doc_the_nao: >
+    Da dang phai theo HINH DANG DU LIEU, khong theo so luong loai. Them mot loai
+    chart chi vi cho du ba loai la trang tri.
+  loai_nguon: "danh muc ROI RAC, khong thu tu => bar ngang"
+  do_tin_cay: "danh muc CO THU TU, cau hoi that la TI LE (bao nhieu phan kho da kiem) => thanh chia doan"
+  trang_thai: "bon gia tri roi rac, can SO CHINH XAC => bar ngang"
+  co_so_dem_khai_o_TUNG_MUC: >
+    Hai muc dau dem `appr` (bai da len site), muc cuoi dem `tatCa`. Ba bieu do
+    canh nhau ma khac mau so la LOI IM LANG neu khong noi ra — nguoi doc cong nham.
+
+popup_co_che_dung_CHU_thi_khong:
+  giu_nguyen: "dialog native — focus-trap · ESC · backdrop · inert do trinh duyet lo"
+  sua: >
+    `id` => "Ma nhan" · `Alias` => "Ten goi khac" · bo "kebab-case". Do la tu vung
+    cua NGUOI VIET CODE. Nhung RANG BUOC thi that (ma la khoa on dinh, bai tro vao
+    no, khong doi duoc sau) => noi ra bang tieng nguoi. `pattern` van chan.
+
+evidence:
+  - "npm test => 41/41 · chay DOC LAP tung file => 0 file do"
+  - "npm run check => sach"
+  - "14/14 cong Python"
+  - "sinh_contrast_audit.py => 62 cap · 0 truot (khong them mau nao)"
+  - "gn.css 89 KB · gn.js 82 KB (tran 100/100)"
+  - "trang chu 54 KB (tran 60) · trang lon nhat 64 KB /mock/nap/ (tran 74)"
+  - "nhan bars4 tren trang da build: draft · approved · edited · rejected (truoc: 3)"
+  - "#cb: 10 hang · 0 thanh .bw · 10 nut loc · sap giam dan"
+  - "do phu dmkpi doc ra: 10 / 30 nhan dang duoc bai dung toi"
+
+kiem_hai_chieu:
+  bars4_go_tay_lai: "do — nen ra 'thieu: edited'"
+  TRANG_THAI_go_tay: "do — §4b bat"
+  bo_ban_FE_o_dang_bar: "do — man-danh-muc §6a"
+  bo_luat_r_cpt_khoi_CSS: "do — markup-matches-css"
+
+files:
+  - "web/plugins/home-pages/index.ts (#cb bar=>hang sap giam dan; TRANG_THAI doc enum tu schema; bars4 map TRANG_THAI; bars3 thanh chia doan; dmkpi + thanh do phu; panel .pt3 gom 3 bieu do)"
+  - "web/plugins/multiwindow/src/scripts/multiwindow.inline.ts (barCptFE bar=>hang — BAN SONG SINH)"
+  - "web/styles/prototype.css (button.rc-r; .rc-r.r-cpt / .r-cat vach 2px theo mau tab; .pt3 3 cot)"
+  - "web/plugins/home-pages/shell.html (nhan popup nguoi doc duoc; .pt3 gom bars2/3/4)"
+  - "web/test/filter-counts.test.js (do .rc-r + THEM doi sap giam dan — giu y dinh khop so)"
+  - "web/test/man-danh-muc.test.js (§6a doi chieu song sinh theo hang; THEM doi khong ban nao con .bw)"
+  - "web/test/bon-trang-thai.test.js (§4b MOI: bars4 phai doc TRANG_THAI, TRANG_THAI phai lay tu enum)"
+  - ".factory/fr/FR-030-danh-muc-va-bieu-do-dung-loai.md"
+
+khong_dung_vao:
+  - "web/api/** · core/** · kb/** · schema · index SQLite — 0 dong"
+  - "co che dialog — da dung, chi sua CHU"
+  - "token · ui_frozen — FR nay khong doi hop dong s5"
+  - "co so dem `appr` cua hai panel — chi KHAI ra o nhan, khong doi Y NGHIA panel"
+  - "khong xoa .r-cpt/.r-cat — chung la moc dang duoc dung"
+
+no_con_lai:
+  - "NGUOI CHOT: mo /mock/khai-niem/ — hang sap giam dan, bam mot hang loc dung bai, popup them nhan chay va danh sach tu ve lai dang HANG (khong quay ve bar)"
+  - >
+    Bon viec ton tu bao cao truoc, chua lam, khong thuoc FR nay: REDESIGN-PLAN
+    §3.3 red-as-ink (var(--brand) ~69 cho — nguong la quyet dinh THIET KE cua
+    nguoi dung, toi khong tu chon) · canvas particles (ui_guide §6d/§8) ·
+    scroll parallax #hero/.tw-i (§7) · luoi bat doi xung trang bai.
+  - "FR-025 cho nguoi dung chot (cong 9 bo sot url_normalized THIEU)"
+  - >
+    Cong FR-029 con hai loi da bao chua sua: bo tach chuoi xu ly sai dau nhay
+    duoc escape, va thieu mien tru data-* (bao dong gia o [data-f="insight_new"]).

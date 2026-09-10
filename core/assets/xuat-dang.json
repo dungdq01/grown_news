@@ -1,0 +1,123 @@
+{
+  "$comment": "T08-33 · LOẠI BẢN GHI → DẠNG TẢI XUỐNG. Một nguồn khai; cửa API và menu FE cùng đọc, nên thêm một dạng là cả hai tự mọc.",
+  "$nguyen_tac": "CHỈ xuất được dạng mà nội dung THẬT SỰ có. Nội dung ta giữ dưới dạng VĂN BẢN (bài viết · bản chưng cất · transcript) thì xuất đa dạng được, vì mọi dạng đều dựng từ cùng một chữ. Còn file NHỊ PHÂN người tải lên (pdf · doc · ppt · mp4) thì 'tải xuống' nghĩa là TRẢ LẠI ĐÚNG BYTE ĐÃ NẠP — chuyển pdf→docx ở máy chủ là DỰNG LẠI một tài liệu mới mang tên tài liệu cũ: mất bố cục, mất bảng, mất phông, và người nhận tưởng đó là bản gốc. Đó là nói dối bằng một cái nút.",
+  "$vi_sao_pdf_di_duong_in": "PDF của nội dung văn bản KHÔNG render ở máy chủ. Hai lý do đo được: (1) mọi thư viện PDF server đều kéo theo phông nhúng, và tiếng Việt có dấu là chỗ chúng vỡ trước tiên; (2) trình duyệt đã có bộ dựng PDF hoàn chỉnh, đúng phông hệ thống, 0 phụ thuộc thêm. Nên PDF = mở một trang in sạch rồi `window.print()` — T03-117.",
+  "phien_ban": 1,
+  "dang": {
+    "md": {
+      "duoi": ".md",
+      "mime": "text/markdown",
+      "ten": "Markdown"
+    },
+    "txt": {
+      "duoi": ".txt",
+      "mime": "text/plain",
+      "ten": "Văn bản thuần"
+    },
+    "docx": {
+      "duoi": ".docx",
+      "ten": "Word",
+      "mime": "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+    },
+    "srt": {
+      "duoi": ".srt",
+      "mime": "application/x-subrip",
+      "ten": "Phụ đề"
+    },
+    "goc": {
+      "duoi": null,
+      "mime": null,
+      "ten": "Bản gốc",
+      "$la": "Với bản ghi VĂN BẢN: nguyên file `.md` như trên đĩa, CÓ frontmatter. Với bản ghi có HIỆN VẬT nhị phân: đúng byte đã nạp, trả qua cửa media — không chuyển đổi.",
+      "$khac_gi_md": "`md` trả THÂN BÀI; `goc` trả NGUYÊN FILE. Ai cần ĐỌC thì lấy `md`; ai cần NẠP LẠI ở nơi khác thì cần frontmatter — thiếu nó thì bản ghi mất `id`, `nguon`, `category`, `concepts`. Hai thứ khác nhau, nên hai tên.",
+      "$ten_that_dung_o_man": "Màn KHÔNG hiện chữ này. Nó dựng nhãn từ `media[]` của chính bản ghi: `<tên dạng> (<đuôi>) · <cỡ>` — ví dụ `PDF (.pdf) · 2.8 MB`. Bản ghi văn bản thuần (không hiện vật nhị phân) thì `Nguyên file (.md, có frontmatter)`. Lý do: `goc` là một khoá KỸ THUẬT, và người bấm nó không biết mình sắp tải 2.8 MB hay 210 MB — khác biệt ấy trên mạng yếu là khác biệt giữa 'tải' và 'hỏng cả buổi'."
+    },
+    "in": {
+      "duoi": null,
+      "mime": null,
+      "ten": "PDF (in…)",
+      "$la": "Mở trang in sạch, trình duyệt tự dựng PDF. Không phải cửa API."
+    },
+    "pdf": {
+      "duoi": ".pdf",
+      "mime": "application/pdf",
+      "ten": "PDF (Typst)"
+    }
+  },
+  "theo_loai": {
+    "article": [
+      "md",
+      "txt",
+      "docx",
+      "in",
+      "pdf",
+      "goc"
+    ],
+    "paper": [
+      "md",
+      "txt",
+      "docx",
+      "in",
+      "pdf",
+      "goc"
+    ],
+    "docs": [
+      "md",
+      "txt",
+      "docx",
+      "in",
+      "pdf",
+      "goc"
+    ],
+    "repo": [
+      "md",
+      "txt",
+      "docx",
+      "in",
+      "pdf",
+      "goc"
+    ],
+    "nhap": [
+      "md",
+      "txt",
+      "docx",
+      "in",
+      "pdf",
+      "goc"
+    ],
+    "transcript": [
+      "srt",
+      "txt",
+      "docx",
+      "goc"
+    ],
+    "tai-lieu": [
+      "goc"
+    ],
+    "video": [
+      "goc"
+    ]
+  },
+  "$vi_sao_tai_lieu_chi_goc": "`tai-lieu` là bản ghi có HIỆN VẬT nhị phân (pdf/doc/ppt). Phần văn bản ta giữ cho nó là bản CHƯNG CẤT, và bản ấy có đường xuất riêng dưới `nhap`/`article`. Bày `docx` ở đây là bày một bản dựng lại mà người dùng sẽ tưởng là tài liệu gốc.",
+  "$vi_sao_van_ban_cung_co_goc": "Chủ dự án chốt 2026-09-06. Lúc hỏi tôi cho rằng đây là *hai tên cho một thứ* — sai: `md` là thân bài, `goc` là nguyên file có frontmatter. Người muốn mang bản ghi sang một kho khác cần frontmatter, và một bản `.md` mất frontmatter là một bài mất danh tính.",
+  "$vi_sao_ten_khong_kem_duoi": "Tên KHÔNG mang đuôi file: menu đã hiện đuôi riêng ở một chip bên phải. Để cả hai thì ra \"Word (.docx).docx\" — người đọc thấy một lỗi chính tả chứ không thấy một thông tin.",
+  "mime_ten": {
+    "application/pdf": "PDF",
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document": "Word",
+    "application/vnd.openxmlformats-officedocument.presentationml.presentation": "PowerPoint",
+    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": "Excel",
+    "application/msword": "Word (cũ)",
+    "video/mp4": "Video",
+    "video/webm": "Video",
+    "audio/mpeg": "Âm thanh",
+    "audio/mp4": "Âm thanh",
+    "text/vtt": "Phụ đề",
+    "text/markdown": "Markdown",
+    "text/plain": "Văn bản thuần",
+    "image/png": "Ảnh",
+    "image/jpeg": "Ảnh"
+  },
+  "$vi_sao_mime_ten": "Một nguồn khai cho cả cửa API lẫn menu FE. Gõ cứng bảng này trong FE là dựng nguồn khai thứ hai, và hai bảng cho một thứ là hai chỗ để lệch. MIME lạ không có trong bảng ⇒ màn hiện đuôi file, KHÔNG hiện chuỗi MIME trần: `application/vnd.oasis…` không nói gì với ai.",
+  "$duoi_theo_mime": "Đuôi lấy từ `ten_goc` của chính hiện vật — nó là tên NGƯỜI đã nạp.",
+  "$vi_sao_pdf": "WO-096 · PDF dung THAT bang `typst` (mot binary, font New Computer Modern — cung ho voi mau LaTeX chu du an chi vao). Khac `in`: `in` la trang HTML de trinh duyet tu dung PDF; `pdf` la file do may chu dung san. Do 2026-09-10: NCM phu 100% dau tieng Viet (74/74 ky tu round-trip qua PDF)."
+}

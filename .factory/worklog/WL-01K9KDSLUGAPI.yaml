@@ -1,0 +1,79 @@
+id: WL-01K9KDSLUGAPI
+at: 2026-08-25
+by: claude
+buoc: s8 (M08_api) — sua bug, khong doi spec
+loai: /api/index tra slug SAI HINH DANG => bon nut sua doi chet cung luc
+fr: FR-024 (sua trong pham vi FR da mo — khong mo FR moi)
+
+viec: >
+  Nguoi dung: "Kiem tra API va DB cua cac bai viet. Toi thay trang thai duyet,
+  loai, sua, bo deu ko hoat dong" — man hinh bao "Khong doc duoc bai tu API."
+
+trieu_chung_danh_lac_huong: >
+  Bon hanh dong khac nhau chet CUNG LUC nen tuong la API chet hoac DB hong.
+  Do thu: /api/health 200, GET /api/articles 200, validate --strict xanh, file
+  .md con nguyen tren dia. Khong co gi hong o tang du lieu.
+
+nguyen_nhan_that:
+  o_dau: "web/api/articles.mjs — chiMucMo() (endpoint GET /api/index, dung o FR-024)"
+  la_gi: >
+    Endpoint tra `slug` TRAN (`nop-qua-web`) trong khi `open-index.json` do
+    emitter sinh tra slug CO TIEN TO LOAI (`article/nop-qua-web` — index.ts:144
+    lay duong dan tuong doi trong kho).
+  vi_sao_thanh_loi: >
+    FR-024 doi nap() sang "API TRUOC, file tinh sau". Ca bon cho sua doi cua FE
+    noi thang chuoi: `fetch("/api/articles/" + ban.slug)`
+    (multiwindow.inline.ts:1196 doc · 1289 status · 1323 PUT/DELETE · 2249 sua).
+    Slug tran => URL con 3 doan => router.mjs doi >= 4 doan => tra false => 404.
+  do_duoc: "3/3 slug tu /api/index deu 404 truoc sua; 3/3 tra 200 sau sua"
+
+vi_sao_sua_o_API_chu_khong_o_FE:
+  - "Hinh dang cua emitter co truoc va la hop dong that: `slug` = duong dan trong kho, DUY NHAT toan kho. Ben den sau phai khop ben da co."
+  - "Sua o API = 1 dong. Sua o FE = 4 cho noi chuoi + moi cho doc data-slug + map viTri => be mat rong hon han cho cung mot ket qua."
+  - "FE khoan dung cho hai hinh dang cung se GIAU lech thay vi chan no."
+
+bay_da_lam_bug_lot_qua_test: >
+  api-index-khong-can-build.test.js muc 1 canh "ban co truong `slug`" — `k in b0`.
+  Phep kiem do VAN XANH khi gia tri sai hoan toan hinh dang. Do la khe ma bug di
+  qua: co du truong, du kieu, sai nghia.
+  Cung lop loi da ghi ten o WL-01K9KCGOPKHO ("dem hoac tim mot CHUOI roi ket luan
+  ve HANH VI") — lan nay la bien the: KIEM SU TON TAI CUA TRUONG roi ket luan ve
+  GIA TRI cua no.
+
+cong_moi_muc_6: >
+  Khong so chuoi voi mot mau — DI LAI DUNG DUONG FE DI: lay tung slug tu
+  /api/index roi GET chinh no, do neu khong 200. Va lam the cho ca ba duong ghi
+  (PATCH status · PUT · DELETE): chung noi slug y het, nen mot cai lech la ca ba
+  lech. Phan biet "404 vi router khong nhan dang" voi "400 vi thieu lo khai" —
+  test doi KHONG-404, khong doi 200, nen no khong bien thanh test cua status.mjs.
+
+hai_server_cung_chay: >
+  Luc chan doan thay HAI tien trinh node server.mjs cung song (PID 43280, 26876).
+  Cai thu hai khong bind duoc cong 8787 nen im lang, nhung no lam moi phep thu
+  "restart roi ma van loi" tro nen kho tin. Da dung ca hai roi bat lai MOT.
+  Day la lan thu BA trong du an mot tien trinh api cu lam sai chan doan
+  (hai lan truoc: /api/categories 404 du nguon da co route).
+
+no_con_lai:
+  - >
+    GET /api/articles (danhSach) VAN tra slug tran + source_type rieng — do la
+    hop dong RIENG cua no, co test ghim, va hien khong ai o FE dung. KHONG sua
+    theo (pham vi phau thuat). Nhung day la BAY con lai: ai noi danhSach vao
+    cung duong FE se dam dung bug nay. Ghi ra day chu khong tu doi.
+  - "NGUOI CHOT: mo 127.0.0.1:8787/kho/, bam mot bai draft => Duyet · Loai · Sua · Bo phai chay that"
+
+evidence:
+  - "node web/test/api-index-khong-can-build.test.js => pass (muc 6 moi: 4 slug GET 200 + 3 duong ghi khong-404)"
+  - "cd web && npm test => exit 0, toan bo file xanh"
+  - "npm run build => Emitted 71 files, exit 0"
+  - "doi chieu server THAT: tap slug cua site/static/open-index.json == tap slug cua /api/index (3 bai, KHOP)"
+  - "truoc sua tren server that: 3/3 slug tu /api/index => 404"
+
+files:
+  - "web/api/articles.mjs (chiMucMo: slug = `${r.type}/${r.slug}` + ghi chu vi sao)"
+  - "web/test/api-index-khong-can-build.test.js (muc 6 moi)"
+
+khong_dung_vao:
+  - "kb/** · schema · core/** — 0 dong"
+  - "web/plugins/** · web/styles/** — 0 dong (FE khong phai ben sai)"
+  - "api/danhSach · api/router.mjs — giu nguyen"

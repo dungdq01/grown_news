@@ -1,0 +1,94 @@
+id: WL-01K9N9FR036B7A
+at: 2026-08-27
+by: claude
+buoc: s8 — FR-036/B7a `Ban` mang ho_so + media ở CẢ HAI nguồn
+loai: bàn giao B7a (B7 chẻ làm hai)
+fr: FR-036-khung-than-bai-5-muc.md
+
+object:
+  task:
+    - 07_plan/M03_web/tasks/T03-13-ban-mang-ho-so-media.md      # code
+    - 07_plan/M03_web/tasks/T03-14-test-hai-ban-shape.md        # test
+  code:
+    - web/render/data.mjs                # helper hoSoVaMedia, gọi ở CẢ hai hàm
+  test:
+    - web/test/hai-ban-shape.test.js     # MỚI — 20 phép kiểm
+    - web/package.json
+    - web/test/WORKLOG.md
+    - web/WORKLOG.md                     # ô "| Test | 49 |"
+  plan:
+    - "C:/Users/Admin/.claude/plans/c-c-users-admin-downloads-grown-news-up-bright-newt.md"
+
+may_xanh:
+  - "cd web && node test/hai-ban-shape.test.js  ->  pass (20 phép kiểm)"
+  - "cd web && npm test  ->  exit 0 (49 file)"
+  - "pytest core/tests -q  ->  42 passed · 18/19 cổng check_*.py xanh"
+  - >
+    5/5 răng mới ĐỎ được khi phá, data.mjs khôi phục nguyên byte
+    (3eb3959b70de04c3)
+
+do_do:
+  - cong: core/tests/check_skill.py
+    do_do_boi: agent khác
+    quy_chu: không nằm trong tập file tôi đổi ở lượt này
+
+# ══ Cổng cho một khoảng trắng do một cổng BỊ GỠ để lại ══════════════════════
+#
+# `hai-duong-doc-khop.test.js` retired ở FR-034, lý do ghi trong chính file:
+# *"chỉ còn MỘT đường đọc (SELECT), không còn hai đường để so"*.
+#
+# Điều đó CHỈ ĐÚNG CHO KHO THẬT. `duLieuMock()` vẫn quét đĩa, nên `data.mjs`
+# vẫn có HAI hàm dựng `Ban` — `banTuDb` (JSON từ DB) và `docTuDia` (parser YAML
+# tự chế) — mỗi hàm một danh sách trường GÕ TAY. Từ FR-034 tới hôm nay KHÔNG
+# cổng nào so chúng.
+#
+# Nói cách khác: một cổng bị gỡ đúng phần nó không còn canh được, và phần nó
+# CÒN canh được đã rơi xuống đất mà không ai khai. Đây là lớp lỗi riêng của
+# việc RETIRE một cổng — khác với lớp lỗi cổng mất răng.
+#
+# Hai việc, không một:
+#   · thêm răng — `hai-ban-shape.test.js` so TẬP KHOÁ, HAI CHIỀU;
+#   · bỏ chỗ để lệch — hai hàm giờ gọi CÙNG helper `hoSoVaMedia(fm)`.
+# Cách chắc nhất để hai bản song sinh không lệch là để chúng dùng chung một
+# cài đặt; cổng chỉ là lưới đỡ khi ai đó tách chúng ra lần nữa.
+
+# ══ Ba quyết định về hình dạng ══════════════════════════════════════════════
+#
+# `ho_so` VẮNG ⇒ `"phan-tich"` — khớp `validate.py` và schema. Không bản ghi cũ
+# nào phải sửa, và ba nơi cùng một mặc định.
+#
+# `media` VẮNG ⇒ `null`, KHÔNG `undefined` và KHÔNG `""`. Một hình dạng ổn định
+# là thứ FE kiểm được bằng MỘT phép thử; ba kiểu rỗng khác nhau là ba nhánh ở
+# phía FE, và nhánh thứ ba luôn là nhánh không ai viết.
+#
+# CHỈ nhận object. Parser tự chế của `docTuDia` đọc được block LIST (`- x`) và
+# flow JSON, nhưng KHÔNG đọc được block MAPPING — `media:` + hai dòng thụt vào
+# ra chuỗi rỗng. Trả `null` ở đó là NÓI THẬT, không phải che lỗi.
+# HỆ QUẢ CHO B8: bản ghi `tai-lieu` trong `kb-mock/` phải viết FLOW JSON
+# (`media: {"sha256": …}`). Viết block style là bản mock im lặng mất `media`.
+
+# ══ Hai chi tiết của cổng, mỗi cái chống một cách xanh-vô-căn-cứ ═══════════
+#
+# 1 · Lấy HỢP KHOÁ CỦA CẢ TẬP, không lấy bản ghi đầu tiên: một bản ghi lẻ có
+#     thể thiếu khoá vì giá trị `undefined` bị bỏ, và mẫu đó không đại diện.
+# 2 · So HAI CHIỀU: thiếu ở mock = FE nhận `undefined` khi người dùng bấm MOCK;
+#     thiếu ở real = điều đó xảy ra trên kho THẬT. Hai bệnh, hai dòng báo.
+# Cộng một phép kiểm "tập khoá có ≥15 trường" — nếu hàm dựng `Ban` đổi hình
+# dạng thì phép so tập khoá có thể so hai tập RỖNG và vẫn xanh.
+
+# ══ Gieo fixture: byte TRƯỚC, .md SAU ══════════════════════════════════════
+#
+# `dung_lai_db.py` chết to khi một `.md` khai `media.sha256` mà thiếu byte
+# (M09-R1, cài ở B4). Nên thứ tự hai lệnh `writeFileSync` trong cổng là HỢP
+# ĐỒNG, không phải sở thích — và đó là lần đầu luật của B4 tự canh một fixture
+# của tôi.
+
+con_lai:
+  - >
+    B7b — FE nạp: tab thứ tư trên màn Nạp nguồn + form thư viện; `build-fe.mjs`
+    nhúng bảng `media-mime.json` (như `__KHUNG__`) để FE biết mime nào nhận và
+    trần bao nhiêu. NHỚ: FE phải tự kiểm `file.size` TRƯỚC khi POST — 413 không
+    tới được client giữa lúc upload (WL-01K9N7FR036B5).
+  - "B8 — FE xem trước + bản ghi mock (media phải viết FLOW JSON, xem trên)"
+  - "B9 — tổng hợp All (M09-R4) · B10 — tài liệu"
+

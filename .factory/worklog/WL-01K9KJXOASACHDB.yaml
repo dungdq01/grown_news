@@ -1,0 +1,116 @@
+id: WL-01K9KJXOASACHDB
+at: 2026-08-26
+by: claude
+buoc: s8 — xoa sach kho de nguoi dung bat dau tu trang
+loai: thao tac du lieu (chi lui duoc bang git) + hai fixture thoi vay du lieu nguoi dung
+fr: FR-031-nut-chet-danh-muc-va-kho-rong.md   # cung mach "kho rong la trang thai hop le"
+
+viec: >
+  Nguoi dung: (1) doc muc "update chuc nang" trong upgrade.md de lam sau,
+  (2) "Sau do clear all DB. Coi nhu phan mem trang de user start."
+
+# ══ LUU TRUOC KHI XOA — bon file KHONG CO TRONG GIT ════════════════════════
+an_toan:
+  vi_sao_phai_kiem_git_truoc: >
+    `git ls-files --error-unmatch` tung file. Bon trong bay file KHONG duoc git
+    theo doi, tuc xoa la MAT VINH VIEN:
+      kb/docs/ai-agent-prototype-len-production.md   11.827 byte  <- bai THAT
+      kb/_nhat-ky-danh-muc.md                         1.461 byte
+      _recycle/article/nop-qua-web.md                 1.877 byte
+      _recycle/article/thu-nghiem-gpt.md              1.847 byte
+  ban_luu: "scratchpad/DB-truoc-khi-xoa/ + _DANH-SACH.txt (7 file, giu ca kich thuoc)"
+  vong_xoa_TU_KIEM: >
+    Truoc moi `unlink()`, assert ban luu ton tai VA cung kich thuoc. Khong tin
+    vong copy o buoc truoc — mot vong xoa doc lap voi vong luu la mot vong co the
+    xoa thu chua duoc luu.
+  giu_lai: "kb/README.md · kb/concepts.yaml · kb/categories.yaml (da rong, la hop dong voi schema)"
+
+trang_thai_sau:
+  kb: "README.md · concepts.yaml (0 muc) · categories.yaml (0 muc) · _index.sqlite (0 ban ghi)"
+  _recycle: "rong"
+  _inbox: "rong"
+  KHONG_dung_vao: "kb-mock/ — do la kho DEMO do script sinh, khong phai DB cua nguoi dung. Giu de /mock/ con cho xem giao dien khi kho that con trang."
+
+# ══ HAI FIXTURE NUA THOI VAY DU LIEU NGUOI DUNG ════════════════════════════
+fixture_thoi_vay:
+  check_index_dan_xuat:
+    truoc: "`next(sorted((kho/'article').glob('*.md')))` — cho rang kb/ luon co it nhat mot bai"
+    do_gi: "kho trang => 'kho tam co bai mau de nhan ban' DO o dong dau, khong muc nao ben duoi duoc chay"
+    sau: "dung `core/tests/fixtures/dat-chuan.md` — ban ghi mau CUA CHINH bo test, day du va khong doi vi mot thao tac cua nguoi dung"
+  cac-man-con-lai_FR031:
+    truoc: "doi thang `kf-c`/`tp-s`/`bw` trong ba moc Dong chay kho"
+    do_gi: "kho rong => emitter in cau trang thai thay vi bieu do => do, DU emitter lam DUNG"
+    sau: "moc phai co THU GI DO: bieu do khi co du lieu, hoac mot cau noi ro dang trong. Moc TRANG moi la loi."
+    tien_de_cung_phai_doi: >
+      "trang Kho chua ca vong xoay Trang chu" doc tren TRANG DA BUILD, ma pane
+      Trang chu do du lieu sinh ra => kho rong la trang khong co `data-pane` nao.
+      Doi sang doc NGUON: `data-pane` o emitter + `data-kpane` o shell — hai vong
+      cung len mot trang, do la ly do that de ten thuoc tinh phai khac.
+  day_la_lan_thu_ba: >
+    FR-031 da sua 22 cho cung lop loi nay. Hai cho nay chi lo ra khi kho RONG
+    HOAN TOAN (truoc do van con 3 bai). Nghia la "kho rong" va "danh muc rong" la
+    HAI trang thai khac nhau, va phai thu ca hai.
+
+# ══ PHAN DANG GHI NHAT: mot phep kiem KHONG CO RANG ma van xanh ════════════
+b_thanh_backspace_lan_hai:
+  chuyen_gi: >
+    Toi viet ham `trongMoc()` (dem the de lay dung phan TRONG mot moc) qua mot
+    script Python. Regex `\b` trong chuoi non-raw cua Python la BACKSPACE (0x08),
+    nen file nhan `/<(\/?)div\x08/g`.
+  he_qua: >
+    Regex khong khop gi => vong lap khong chay MOT NHIP NAO => ham tra ve CA PHAN
+    CON LAI cua trang => luon co chu => phep kiem "moc khong duoc trang" LUON
+    XANH, ke ca khi moc rong that.
+  ai_bat: >
+    KIEM HAI CHIEU. Toi lam moc rong that va phep kiem van xanh — exit 0 khi phai
+    khac 0. Khong co buoc do thi mot phep kiem vo rang da nam trong bo test, va
+    no con te hon khong co phep kiem: no bao dam mot dieu no khong kiem.
+  vi_sao_kho_thay:
+    - "0x08 KHONG HIEN: grep, Read, va terminal deu in ra `div/g` — mat thuong khong phan biet duoc"
+    - "chi `repr()` moi phoi ra `div\\x08`"
+    - "cung file con MOT ham khac co `\\b` DUNG (dong 485, viet tay) nen doc nhanh thay 'binh thuong'"
+  sua: >
+    Doi sang `(?![a-z])` — lam dung viec `\b` dinh lam (chan `<divider>`) va
+    khong co ky tu nao de tang escaping dich lai. Ghi ly do NGAY TAI CHO.
+  lan_truoc: "cung lop loi da lam hong `trang-chu-layout.test.js` (FR-027e)"
+  luat_rut_ra: "KHONG viet regex chua `\\b` qua script Python. Dung Edit, hoac dung chuoi RAW, hoac tranh `\\b`."
+
+evidence:
+  - "kiem git tung file truoc khi xoa: 4/7 khong co trong git => da luu"
+  - "vong xoa assert ban luu ton tai + cung kich thuoc cho TUNG file"
+  - "validate kb --strict => 0 file · 0 loi"
+  - "sinh_index => 0 ban ghi · e3b0c44298fc1c14"
+  - "gate.py => xanh tren kho rong (nho `or []` cua FR-031)"
+  - "npm test => 43/43 · chay DOC LAP tung file => 0 file do"
+  - "14/14 cong Python · pytest 30 passed"
+  - "contrast-audit 62 cap · 0 truot · check_frozen pass"
+  - "0 chuoi `undefined`/`NaN`/`[object Object]` tren 4 trang that"
+  - "kiem hai chieu: lam moc rong that => DO, neu dung ten moc"
+
+files:
+  - "kb/ (xoa 2 bai + nhat ky + index) · _recycle/ (xoa 2 ban) — 7 file, da luu truoc"
+  - "core/tests/check_index_dan_xuat.py (fixture tu dung bai mau tu fixtures/dat-chuan.md)"
+  - "web/test/cac-man-con-lai.test.js (moc khong duoc TRANG; tien de doc NGUON; sua regex 0x08)"
+
+doc_them_upgrade_md:
+  muc: "update chuc nang"
+  1_bo_duyet_bai_moi:
+    yeu_cau: "user tao la len chinh thuc luon"
+    CHOI_VOI_LUAT_LOI: >
+      Schema doi du BA truong M1 (insight_new, skill_installed, review_minutes)
+      khi review_status=approved (FR-001), con M08-R3/B-B1 CAM may dien ba truong
+      do. Auto-approve luc tao nghia la mot trong hai: may dien ho (bi cam), hoac
+      schema thoi doi chung — ma chung chinh la thuoc do M1 cua du an.
+    can_nguoi_dung_chot: "co — khong tu chon"
+    phan_nhe: "duyet concept/category: FR-028 da go cong nguong cho khai niem; chi con buoc `xac_nhan` cua chu de"
+  2_nut_sua_khong_hoat_dong: "DA SUA o FR-031 — FE dung URL thieu doan `type`"
+  3_xoa_dan_du_lieu_cu_thay_bang_API_DB: "trung huong voi viec xoa sach vua lam"
+
+no_con_lai:
+  - "NGUOI CHOT: mo 127.0.0.1:8787 xem 4 man that o trang thai trang, roi nap bai dau tien qua /nap/"
+  - >
+    Ban luu 7 file o scratchpad la TAM (thu muc phien). Muon giu lau thi copy ra
+    cho khac — dac biet `kb/docs/ai-agent-prototype-len-production.md` (11.8 KB,
+    KHONG co trong git).
+  - "kb-mock/ giu nguyen — noi mot cau la xoa luon neu muon phan mem trang tuyet doi"
+  - "muc 1 cua 'update chuc nang' cho nguoi dung chot huong (xem tren)"

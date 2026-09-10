@@ -1,0 +1,89 @@
+ulid: 01M1SK9D4F7T2M6P8XVNQBWH3R
+thoi_diem: 2026-09-06T07:20+07:00
+tac_nhan: claude-opus-5
+loai: ban_giao
+module: M03_web
+don_vi: T03-116 BƯỚC 2 · ô chỉ dẫn trong popup chưng cất
+
+r5_thu_tu: >
+  Giấy → DUYỆT → code, đúng thứ tự `AC0` đòi. Wireframe `SCR-18` viết trước,
+  chủ dự án duyệt (mốc `WL-01M1SH3B8W5R2Y7K4NPQVDXC6T`), rồi mới viết cổng ĐỎ,
+  rồi mới code. Không dòng mã bước 2 nào tồn tại trước mốc duyệt.
+
+r5_do_truoc:
+  - don_vi: T03-116
+    lenh: node web/test/o-chi-dan.test.js
+    ket_qua: "ĐỎ 5 vế — chưa có ô, chưa đọc trần từ API, chưa spread có điều kiện"
+    đỏ_do: claude-opus-5
+
+ba_mac_dinh_tu_chon: >
+  Chủ dự án duyệt bằng một chữ "duyệt", không trả lời ba câu tôi hỏi kèm bản
+  vẽ. Không hỏi lại để chặn tiến độ — chọn mặc định AN TOÀN HƠN và ghi ra để
+  đảo lại bằng một câu. Chi tiết ở worklog mốc duyệt.
+
+quyet_dinh_thi_cong:
+  - gap_bang_details: >
+      `<details>` của trình duyệt lo gấp/mở — 0 dòng JS, 0 byte CSS cho hành vi
+      ấy. Ô mở sẵn biến hộp thoại XÁC NHẬN thành một cái FORM: người bấm
+      "Chưng cất" đã quyết rồi.
+  - maxlength_gap_doi_tran: >
+      Đặt `maxlength` BẰNG trần thì trình duyệt CẮT ÂM THẦM đúng thứ server từ
+      chối bằng 422 kèm lời giải thích — người gõ quá tay không bao giờ biết
+      câu mình viết đã cụt. Gấp đôi cho người gõ xong, THẤY "vượt N ký tự", rồi
+      tự rút. Vẫn có trần vì một ô không giới hạn là ô dán được cả quyển sách.
+  - chip_dien_khong_gui: >
+      Chip đổ chữ vào textarea rồi để con trỏ ở cuối. Chip gửi thẳng là một nút
+      làm hai việc, và người bấm nhầm không có đường lùi.
+  - spread_co_dieu_kien: >
+      `chi_dan` chỉ vào body KHI CÓ. Gửi chuỗi rỗng thì MỌI job mang thêm một
+      trường — vào `sha256`, vào `egress` — và `T12-25 AC2` (*job không chi_dan
+      chạy y như cũ*) thành lời nói suông.
+  - fe_khong_viet_lai_cau_loi: >
+      Hiện NGUYÊN VĂN 422 của server. Hai bản của một lời là hai chỗ để lệch,
+      và bản FE sẽ nói câu cũ sau lần server đổi trần.
+  - khong_disable_nut_gui: >
+      Nút xám không nói vì sao nó xám; người bấm vào chỗ trống rồi tự đoán. Để
+      nút sống, bấm thì hiện đúng câu 422.
+  - khong_them_cot_cho_dong_meta: >
+      `veMetaChiDan` đọc `chi_dan` từ FRONTMATTER bản nháp bằng một phép quét
+      dòng, không parse YAML: cần đúng một trường, và kéo một trình phân tích
+      YAML vào chunk là trả vài KB cho một dòng.
+  - css_trong_chunk: >
+      `gn.css` dư 22 byte. Một luật chỉ dùng trong MỘT hộp thoại mà nằm ở bundle
+      chung thì mọi độc giả tải nó. Đo sau khi làm: `gn.css` KHÔNG đổi byte.
+
+vet_sua_giua_chung: >
+  Cổng `token-only` chặn `border-radius:999px` gõ cứng. Tokens đã có sẵn
+  `--r-pill` cho đúng hình viên thuốc — dùng nó. Cổng bắt đúng: một con số ma
+  trong CSS là chỗ giao diện bắt đầu trôi khỏi hệ token.
+
+do_sau:
+  - lenh: node web/test/o-chi-dan.test.js
+    ket_qua: "XANH 10/10 vế"
+  - lenh: cd web && npm test
+    ket_qua: "3032 vế ok · 0 FAIL"
+  - lenh: cd web && node test/page-weight.test.js
+    ket_qua: "gn.css 102378 (KHÔNG đổi) · gn.js 84324/102400 · trang chủ 59241"
+  - lenh: python -m pytest core/tests -q
+    ket_qua: 49 passed
+  - lenh: 'for f in chungcat/tests/check_*.py; do python "$f"; done'
+    ket_qua: 37/37 XANH
+
+chay_that:
+  - lenh: 'curl GET :8790/model'
+    ket_qua: "preset: Tóm cho dev · Tập trung rủi ro · So sánh thực tiễn VN | trần: 500"
+  - lenh: 'curl POST :8790/job với chi_dan 600 ký tự'
+    ket_qua: >
+      HTTP 422 — "`chi_dan` dài 600 ký tự, trần 500. Rút gọn rồi gửi lại — máy
+      KHÔNG cắt hộ, vì một câu bị cắt giữa chừng đổi nghĩa của chính nó."
+  - ghi_chu: >
+      Lần gọi đầu trả 403 `chỉ LÕI được tạo việc (M12-R7)` — đúng, và nó chứng
+      minh phép chặn danh tính vẫn đứng trước phép kiểm chi_dan.
+
+object:
+  - web/plugins/cctab/src/cctab.inline.ts
+  - web/test/o-chi-dan.test.js
+  - web/package.json
+  - 07_plan/M03_web/tasks/T03-110b-test-tab-theo-doi.md
+  - web/WORKLOG.md
+  - web/test/WORKLOG.md

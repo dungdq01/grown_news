@@ -1,0 +1,83 @@
+entry: ban-giao
+ulid: 01M2JK91YGB6X41Z4200RSMJ10
+ngay: 2026-09-09
+module: M12_chungcat
+don_vi: T12-33
+wo: WO-077
+tieu_de: >-
+  Khung chung cat la SAN khong phai TRAN; them `boi_canh` vao payload
+
+object:
+  - .factory/wo/WO-077-khuon-chung-cat-linh-dong.md
+  - 07_plan/M12_chungcat/tasks/T12-33-khuon-chung-cat-linh-dong.md
+  - chungcat/src/worker.py
+  - chungcat/src/api.py
+  - chungcat/tests/check_khuon_linh_dong.py
+
+viec: |
+  Chu du an: *"format chung cat nen de linh dong — hien tai dang set giong
+  format viet bai, lam giam tinh linh dong cua model"*. Dung, va goc re do duoc:
+  `worker.py:476-477` go cung `source_type: article` + `ho_so: phan-tich`, roi
+  ca day chuyen khoa lai — `_PROMPT` bat dung 5 muc, `_than_theo_khung` dung lai
+  than tu `_khung_muc()` va IM LANG vut moi muc model tu them, `_CHOT` cam
+  `chi_dan` doi khung.
+
+gia_thiet_dau_SAI: |
+  Toi tuong phai sua `core/assets/khung-than-bai.json` — entity `Source` cua
+  M01, `used_by: [M01 M02 M03 M04 M05 M06 M07]` = BAY module => BUILD + FR.
+  SAI, va toi da DO truoc khi mo FR: chep mot ban `ho_so: phan-tich` that,
+  them `## 6.` (kem bang) + `## 7.`, chay `validate.py` => **0 loi**.
+  `validate` chi hoi muc bat buoc CO MAT (`missing = [n for n in SO_MUC if n
+  not in secs]`), khong cam muc thua.
+
+  => Khung 5 muc la SAN, khong phai TRAN. Cho duy nhat ap tran la
+  `_than_theo_khung` cua chinh M12. Sua gon trong mot module, KHONG FR.
+
+  Bai hoc: do truoc khi mo FR. Mot FR khong can thiet ton dung nhu mot FR bi
+  bo qua — no keo sau module vao mot cuoc ban ve mot rang buoc khong ton tai.
+
+sua: |
+  1 `_PROMPT` — khung la muc TOI THIEU; bao model THEM `## 6.`, `## 7.` theo
+    noi dung; >=3 cap du lieu thi dung BANG Markdown (FE `md()` render san).
+  2 `_than_theo_khung` — sau khi phat khung, NOI TIEP moi muc ngoai khung theo
+    dung thu tu model viet. Noi vao CUOI, khong chen giua: `sub_sections` cua
+    validate cat muc con TRONG khoi cha, nen mot `## 6.` nam giua `## 3.` va
+    `### 3.1` se cat dut khoi 3 va lam validate bao thieu muc con.
+  3 `_CHOT` — chi con cam BO MUC BAT BUOC va PHA JSON. Cau cu (*"mau thuan
+    khung muc => lam theo khung muc"*) doc "hay them mot muc bang" thanh mau
+    thuan, tuc dong luon cua can mo.
+  4 `boi_canh` — truong MOI trong payload, tach khoi `chi_dan`: `chi_dan` noi
+    CACH VIET, `boi_canh` noi NGUON LA GI. Vao prompt (o rieng), vao
+    frontmatter, qua `lam_sach_chi_dan` de lot `«»`. `api.py` kiem kieu + tran
+    dung phep cua `chi_dan`.
+
+cong:
+  moi: chungcat/tests/check_khuon_linh_dong.py — 16 ve DO truoc, 0 sau
+  ve_dat_nhat: |
+    Ve 9a chay `validate.py` THAT tren than co muc 6 + 7 + bang. Ca phep noi nay
+    dung chung nao menh de "validate khong cam muc thua" con dung; ngay ai do
+    them phep cam ay thi ve 9a do NGAY, khong phai cho mot ban ghi hong ngoai kho.
+  hai_lan_ve_do_sai_ly_do: |
+    1 Ve 6b goi `dung_prompt` voi chu ky cu => TypeError => cong CHET, bo mat
+      moi ve dung sau. Va: boc try/except, bao TEN ve hong.
+    2 Ve 9 ban dau gieo mot than gia ti hon; validate tra 2 loi nhung la loi
+      DO DAI/dan nhap cua fixture, khong dinh gi toi muc thua. Mot ve do vi ly
+      do khac thu no canh thi no khong canh gi ca. Sua: dung THAN THAT cua mot
+      ban ghi trong kho roi them muc vao.
+
+nghiem_thu_that: |
+  POST /api/job kem `boi_canh` + `chi_dan` tren ban ghi video that => job xong.
+  Ban nhap sinh ra co:
+    - `boi_canh` va `chi_dan` trong frontmatter
+    - du muc 1-5 + 3.1-3.4 dung thu tu
+    - va **`## 6. Huong dan chi tiet chi phi va quan ly ngan sach`** — muc model
+      TU DAT TEN theo noi dung, dung thu chu du an muon.
+  `boi_canh` sai kieu => 422 "`boi_canh` phai la chuoi." (do bang curl).
+
+do_do: |
+  M12 52/52 xanh (them cong moi). core pytest 49 passed.
+
+con_lai: |
+  Bang chua xuat hien trong ban nghiem thu — nguon nay khong co danh sach >=3
+  cap nao, nen dung. Chua do tren mot nguon dang bai giang (mau ChatGPT co 3
+  bang). Do do la viec cua lan chu du an nap mot buoi giang that.

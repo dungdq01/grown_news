@@ -1,0 +1,85 @@
+entry: ban-giao
+ulid: 01KB48WO084GIAOM12
+ngay: 2026-09-10
+module: M01_core (WO-084) · M13_truyhoi (ban giao dev)
+don_vi: [T01-53, T01-54]
+wo: WO-084
+tieu_de: >-
+  WO-084 doi CHU THI CONG sang dev M12; PM/dev M13 khong dong. Go chan cho dev M13:
+  T01-52 -> T01-51 -> T13-1 chay song song, khong cho.
+
+object:
+  - .factory/wo/WO-084-check-g6b-crash-thay-vi-do.md              # header: +CHU THI CONG = dev M12
+  - 07_plan/M01_core/tasks/T01-53-g6b-do-duoc-khong-crash.md      # +chu doi, +het chen truoc T01-52
+  - 07_plan/M01_core/tasks/T01-54-test-g6b-thieu-verifiability.md # +chu doi
+  - 06_modules/M01_core/backlog.md                                # o (b): +chu thi cong dev M12
+  - 07_plan/M13_truyhoi/BAN-GIAO-DEV.md                           # §2 go chan · §1.2 bo so ghim · +§3.6
+  - .factory/worklog/WL-01KB48WO084GIAOM12.yaml
+
+quyet_dinh_chu_du_an_nguyen_van: |
+  2026-09-10: "WO 84 dev M12 fix bug , tam thoi ko dong".
+
+lam_gi: |
+  1 Khai CHU THI CONG moi o BA cho tro toi WO-084 (WO header · T01-53 · T01-54) +
+    o backlog M01 (b). Bon cho vi bon cho deu duoc doc doc lap; khai mot cho la de
+    ba cho con lai noi sai.
+  2 GIU NGUYEN ID `T01-53`/`T01-54`. Doi ID la pha 6 cho dang tro (WO-084 · o backlog
+    M01 · hai worklog · BAN-GIAO-DEV · commit message 098c97e). Doi NGUOI LAM khong
+    phai doi don vi viec.
+  3 GO CHAN cho dev M13: bo cau "chen len truoc T01-52". Ly le do duoc — cong het
+    crash tu 16:09 hom qua (chu M03 sua hai task), nen dev M13 KHONG con phu thuoc
+    WO-084. Hai viec song song: khac nguoi, khac file (`core/tests/check_g6b.py` vs
+    `core/assets/**` + `core/tests/check_dia_chi.py` + `truyhoi/tests/**`).
+    ⇒ 0 file tranh nhau giua hai ben. (check_scope chua cai — T04-90 cua PM-Space —
+    nen day la doi chieu TAY, ghi ra de sau con kiem lai.)
+
+sua_hai_cho_NOI_SAI_trong_tai_lieu_cua_chinh_toi: |
+  BAN-GIAO-DEV §1.2 ghim "14 loi" va liet danh sach task loi. Do lai hom nay: 21 loi /
+  306 task (hom qua 14 / 297) — hai nhanh dang them task moi ngay, nen mot con so ghim
+  trong tai lieu huong dan la mot cau se sai trong 24 gio.
+  Da doi: bo con so khoi dong lenh, giu PHEP DEM ("0 dong loi mang ma M13/T13/T01-5x")
+  va ghi ca hai moc de nguoi doc thay no DOI, khong phai mot hang so.
+  Bai hoc chung voi ve zh cua AC-6.3: dieu kien phai la MOT PHEP DO, khong phai mot so
+  chep tay.
+
+them_muc_3_6_cho_dev_M13: |
+  Them mot bay thu SAU vao BAN-GIAO-DEV §3: "check_g6b xanh hom nay KHONG nghia la no
+  chiu duoc du lieu xau". Ly do them cho dev M13 du WO-084 khong phai viec cua ho:
+  ho SAP TAO task moi (T13-x, T01-5x), va neu khai thieu mot muc thi ho khong chi tu
+  lam do minh — ho khoa cong plan cho CA HAI NHANH cho toi khi WO-084 xong.
+  Kem mot lenh kiem truoc khi commit task moi: `grep -c '^verifiability:' <task>` phai ra 1.
+
+do_do:
+  - lenh: "git log --oneline -1 -- 07_plan/M01_core/tasks/T01-5[34]* · git status"
+    ket_qua: "chi commit 5268cb5 cua toi; khong ai dong hai don vi ⇒ ban giao sach, khong cat ngang viec ai"
+  - lenh: "python core/tests/check_g6b.py 2>&1 | grep -cE 'TypeError|Traceback'"
+    ket_qua: "0 — cong van het crash, dev M13 khong bi chan"
+  - lenh: "python core/tests/check_g6b.py | grep -E '^1 ·|G6B'"
+    ket_qua: "'1 · 306 task' · 'G6B CHUA DONG — 21 loi' (hom qua: 297 task / 14 loi)"
+  - lenh: "doi chieu tay pham_vi_ghi hai ben"
+    ket_qua: "dev M12: core/tests/check_g6b.py + test_gates.py + fixtures || dev M13: core/assets/{dai-han,dia-chi,dich-vu}.json + validate.py + check_dia_chi.py + truyhoi/tests/** ⇒ 0 file tranh"
+mot_neo_sai_do_chinh_toi_viet: |
+  Phep dem toi viet cho dev trong BAN-GIAO-DEV §1.2 la
+  `grep -cE "T13|T01-5|M13"` — no khop luon `T01-50`, mot task CU cua nguoi khac dang
+  FAIL san, nen ra 2 thay vi 0. Dev doc so do se di sua viec khong phai cua minh.
+  Da sua thanh `T13-|T01-5[1-9]|M13`, chay lai ra 0. Ghi ra day vi day dung lop
+  `#cong-xanh-vi-neo-sai` o dang nho nhat — MOT KY TU thieu trong mot neo — va no xay
+  ra ngay trong cai tai lieu canh bao ve chinh lop loi do.
+
+đỏ_do: >
+  Khong co do moi trong luot nay. 21 loi cua check_g6b thuoc task module khac
+  (T01-50 · T03-129/130/131/136 · T08-36/38 · T12-*), tang tu 14 vi team them 9 task.
+  Ve B cua WO-084 van MO — nay la no cua dev M12.
+
+nhac_lai_dieu_de_bi_doc_nham: |
+  Cong xanh vi HET DU LIEU KICH HOAT, khong vi da chiu duoc gia tri vang. Cau nay da
+  ghi o ba cho (WO-084 §6 · o backlog M01 (b) · dau T01-53) va nay them cho thu tu
+  (BAN-GIAO-DEV §3.6). Ai nhan WO-084 ma doc mau xanh thanh "khong tai hien duoc" thi
+  se dong nham mot bug con song.
+
+khong_lam:
+  - "KHONG cham core/tests/check_g6b.py, T01-53, T01-54 — dev M12 tu moc nay."
+  - "KHONG doi ID hai don vi — 6 cho dang tro."
+  - "KHONG dong WO-084 — ve B con mo, chu moi la dev M12."
+  - "KHONG sua T03-136 (loi R1 cham file test) — chu cua no xu, ghi o WO-084 §7."
+  - "KHONG bump project_map — PM-Space giu but."

@@ -1,0 +1,29 @@
+{
+  "name": "backdrop",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "index.ts",
+  "exports": {
+    ".": {
+      "import": "./index.ts"
+    },
+    "./components": {
+      "import": "./components.ts"
+    },
+    "./package.json": "./package.json"
+  },
+  "quartz": {
+    "name": "backdrop",
+    "displayName": "Nen phong canh + tu chuyen",
+    "description": "Port phan bg* tu prototype G5 — anh nen doi moi 5-7s, dung khi tab an",
+    "category": "component",
+    "defaultEnabled": true,
+    "components": {
+      "Backdrop": {
+        "displayName": "Nen phong canh",
+        "defaultPosition": "afterBody",
+        "defaultPriority": 5
+      }
+    }
+  }
+}

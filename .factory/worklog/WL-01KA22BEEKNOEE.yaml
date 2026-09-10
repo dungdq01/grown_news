@@ -1,0 +1,131 @@
+id: WL-01KA22BEEKNOEE
+khi: 2026-09-04T15:10:00+07:00
+loai: ban_giao
+tac_nhan: claude-code
+viec: T12-18 — cửa Beeknoee (danh mục thật · default gemini-2.5-flash-lite · FR-059 adapter của CỬA)
+module: M12_chungcat
+
+nguoi_quyet: |
+  Chủ dự án 2026-09-04: "tôi đang dùng API bên trung gian, check
+  beeknoee-api-guide.md để hiểu hơn, và default model 'gemini 2.5 flash Lite'".
+
+object:
+  - path: .factory/fr/FR-059-adapter-cua-cua-khong-cua-nha.md   # ĐỀ XUẤT
+  - path: 07_plan/M12_chungcat/tasks/T12-18-test-cua-beeknoee.md
+  - path: chungcat/tools/dong_bo_model.py
+  - path: chungcat/assets/model.json                 # 238 → 112 dòng, 14 nhà
+  - path: chungcat/src/adapter/beeknoee.py           # MỚI — adapter của cửa
+  - path: chungcat/src/adapter/hop_dong.py           # adapter_cua()
+  - path: chungcat/src/dinh_tuyen.py                 # vế (b) hỏi CỬA
+  - path: chungcat/tests/check_chan_truoc_khi_goi.py
+  - path: chungcat/tests/check_mot_hop_dong.py
+  - path: chungcat/tests/check_du_phong_cung_khu_vuc.py
+  - path: chungcat/tests/check_e2e_chung_cat.py
+  - base_sha: 8535a26                                # chưa commit
+
+r5_do_truoc:
+  - luc: 2026-09-04T14:55:00+07:00
+    trang_thai: DO
+    lenh: python chungcat/tests/check_model_ngoai_bang.py
+    ra: |
+      FAIL model CÓ trong bảng (`kimi-k2.5`) ⇒ 2xx — trả 422
+           {'loi': 'nhà `alibaba` chưa có adapter'}
+      FAIL và trả về ĐÚNG model đã chọn — trả `None`
+    ghi_chu: |
+      Cổng nói ĐÚNG. 111/112 model bày trong bộ chọn bấm là 422 — mô hình
+      N-nhà-N-adapter sai với thực tế một cửa OpenAI-compatible. Đây là ĐỎ dẫn
+      tới FR-059, không phải đỏ oan.
+  - luc: 2026-09-04T15:02:00+07:00
+    trang_thai: DO
+    lenh: 21 cổng chungcat/tests/*.py
+    ra: |
+      4 ĐỎ sau khi áp FR-059 vào mã:
+        check_bang_khai_model  — "beeknoee" gõ trong LÕI (M12-R4)
+        check_engine_cam_rut   — cùng lý do
+        check_chan_truoc_khi_goi · check_mot_hop_dong — còn hỏi co_adapter(nhà)
+  - luc: 2026-09-04T15:08:00+07:00
+    trang_thai: XANH
+    lenh: 21 cổng chungcat/tests/*.py
+    ra: 21/21 exit 0
+
+do_do:
+  - lenh: curl https://platform.beeknoee.com/v1/models
+    ket_qua: 200 · 155 model · KHÔNG cần khoá
+  - lenh: curl .../v1/management/models/text
+    ket_qua: 401 invalid_api_key — cần khoá; chưa có nên chưa dùng lối đó
+  - lenh: python chungcat/tools/dong_bo_model.py --kiem
+    ket_qua: "112 dòng dùng được · khớp."
+  - lenh: 21 cổng chungcat/tests/*.py
+    ket_qua: 21/21 exit 0
+  - lenh: cd web && npm test
+    ket_qua: exit 0
+  - lenh: chạy thật — bật cả hai dịch vụ, GET /api/model
+    ket_qua: |
+      112 dòng · 14 nhà (google 30 · openai 26 · anthropic 20 · z.ai 8 ·
+      grok 7 · alibaba 4 · deepseek 4 · minimax 3 · beeknoee 2 · groq 2 ·
+      qwen 2 · xai 2 · moonshot 1 · nvidia 1)
+      mặc định = [gemini-2.5-flash-lite (vi), deepseek/deepseek-v4-flash (zh)]
+
+do_do_boi: chua-quy-duoc-chu
+
+quyet_dinh:
+  - |
+      NGUỒN DANH MỤC đổi sang Beeknoee. `T12-11` đồng bộ từ OpenRouter — sai cửa
+      hoàn toàn: ba id mặc định của lượt trước (`gemini-2.5-flash` gõ tay,
+      `deepseek-chat`, `deepseek-reasoner`) KHÔNG tồn tại ở Beeknoee. Công cụ
+      đồng bộ bắt ngay lượt chạy đầu, đúng việc nó tồn tại để làm.
+  - |
+      `kieu_structured` thành CHÍNH SÁCH, không còn dẫn xuất. Beeknoee không trả
+      `supported_parameters` trong `/v1/models`. Nói ra là chính sách
+      (`$kieu_theo_nha`, mặc định `json_mode` = mẫu số chung của cửa
+      OpenAI-compatible) thay vì đoán rồi trình bày như số đo.
+  - |
+      `$bo_mau` là REGEX chứ không phải đuôi: Beeknoee đặt tên TÁC VỤ ở GIỮA id
+      (`gpt-image-1-mini` · `gemini-3.1-flash-image-preview` ·
+      `wan-2.7-image-pro`) — phép so đuôi lọt cả ba, và một model sinh ảnh trong
+      bộ chọn chưng cất chỉ để job chết giữa đường.
+  - |
+      Danh mục có id TRÙNG (`gemini-3.5-flash-lite` 5 lần, `supports_*` khác
+      nhau — 5 route của một model). Giữ bản NHIỀU NĂNG LỰC NHẤT;
+      `$mot_model_mot_dong` đòi mỗi model đúng một dòng.
+  - |
+      `*-stt` CỐ Ý loại khỏi bảng chưng cất. `google/gemini-2.5-flash-lite-stt`
+      là đường PHIÊN ÂM — nó thuộc bảng `nguon_transcript` của `FR-054`, không
+      thuộc bảng chưng cất. Trộn hai bảng là trộn hai tác vụ.
+  - |
+      FR-059 · adapter thuộc CỬA, không thuộc NHÀ. Đo được: 111/112 model bị
+      §4.0b vế b từ chối. Guide §3 nói cửa là OpenAI-compatible, một client cho
+      mọi nhà. Hai lối bị loại (14 file `from beeknoee import goi`; `co_adapter`
+      trả True cho mọi nhà) ghi ở FR-059 §2.
+  - |
+      Tên cửa KHÔNG có default trong mã. `adapter_cua(dong, mac_dinh)` đòi
+      truyền, `dinh_tuyen` đọc `$adapter_mac_dinh` từ bảng và NÉM nếu thiếu —
+      `check_bang_khai_model` + `check_engine_cam_rut` bắt đúng khi tôi để
+      `"beeknoee"` làm default (M12-R4 cấm tên nhà/cửa trong mã).
+  - |
+      `beeknoee.py` KHÔNG gửi field sampling nào. Guide §2: Claude Opus 4.7+ trả
+      400 nếu có `temperature`; Sonnet/Haiku 4.x chỉ nhận một trong
+      `temperature`|`top_p`. Và chưng cất cần trích NGUYÊN VĂN — một
+      `temperature` cao là chỗ quote bắt đầu bị viết lại.
+  - |
+      Thiếu `BEEKNOEE_API_KEY` ⇒ ném TẠI adapter, không để cửa trả 401 sau khi
+      payload đã dựng và `egress.jsonl` đã ghi một lần gửi hỏng — cùng lập luận
+      phép chặn (c) của §4.0b.
+
+keo_theo:
+  - |
+      `spec.md` M12 cần đổi chữ NHÀ → CỬA ở `AC-3.1` và `§4.0b` vế b. Spec
+      FROZEN ⇒ NGƯỜI ký lại `FROZEN.lock`. Agent chuẩn bị evidence, không ký.
+      Đây là việc của `T12-14` (PM đã lên) — gộp vào cùng lượt ký.
+  - |
+      `stream: true` chưa bật. Guide §2.1: model reasoning think >120s ⇒
+      Cloudflare 524. `egress.gui()` là cửa một-request-một-dòng-log, và stream
+      đổi hình dạng đó. Ô backlog M12.
+  - |
+      Management API (`/v1/management/*`) chưa dùng: cần khoá + header
+      `User-Agent`. Guide §8 khuyên `check_balance()` lúc mở phiên — ví cạn giữa
+      job là một job chết mà không ai đoán được vì sao. Ô backlog M12.
+  - |
+      FR-054 lối `dich_vu` nay RẺ HƠN HẲN: Beeknoee có 23 model nhận audio +
+      các model `*-stt`. Đó là một lựa chọn THẬT cạnh `faster-whisper` local của
+      `T12-16`, và nó đổi đánh đổi egress. Chủ dự án quyết — xem báo cáo.

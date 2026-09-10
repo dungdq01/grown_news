@@ -1,0 +1,108 @@
+id: WL-01K9NWWO021
+at: 2026-08-29
+by: claude
+buoc: WO-021 — một format chung cho ba form nạp · bố cục không lệch trái
+loai: bàn giao WO-021
+wo: WO-021-mot-format-chung-va-bo-cuc-hai-cot.md
+
+object:
+  wo:
+    - .factory/wo/WO-021-mot-format-chung-va-bo-cuc-hai-cot.md
+  task:
+    - 07_plan/M03_web/tasks/T03-51-test-format-chung.md   # test
+    - 07_plan/M03_web/tasks/T03-52-format-chung.md        # code
+  code:
+    - web/render/shell.html · web/plugins/home-pages/shell.html
+    - web/styles/prototype.css
+    - web/plugins/multiwindow/src/scripts/multiwindow.inline.ts
+    - web/api/cong-module.mjs
+  test:
+    - web/test/format-chung.test.js    # MỚI — 5 mục
+    - web/test/nhan-bat-buoc.test.js   # ĐẢO hợp đồng: 422 -> 201
+
+may_xanh:
+  - "cd web && node test/format-chung.test.js  ->  pass (5 mục)"
+  - "quét từng file: 68/69 xanh (chỉ `he-kinh` — ảnh của người dùng)"
+  - "gn.css 98284 / 102400 — dư 4116 · gn.js 100658 / 102400 — dư 1742"
+  - >
+    trình duyệt, `/bai-viet/nap/`: ba nhóm còn lại là "Bài này là gì" · "Nhãn cho
+    bài" · "Nội dung"; `f-id` `f-slug` `f-cred` `f-conf` ĐÃ GỠ
+  - >
+    trình duyệt, ghi thử một bài: file được tạo với slug suy từ tiêu đề
+    (`ban-thu-may-dien-bon-truong.md`) và `url_normalized` được điền ⇒ bốn trường
+    máy điền QUA được schema. Lỗi còn lại là `Thiếu mục: 1, 2, 3` — cổng khung 5
+    mục của hồ sơ `phan-tich`, đúng việc của nó
+  - >
+    trình duyệt, `/tai-lieu/nap/`: Tiêu đề · Mô tả · Chủ đề · Khái niệm, nhãn
+    "nên có"; hết ô "Địa chỉ trong kho"; cột form căn giữa
+
+hai_quyet_dinh_cua_nguoi_dung:
+  - >
+    BỎ CHẶN. Cổng module không còn đòi chủ đề + khái niệm cho tài liệu/video.
+    Đây là ĐẢO chính quyết định của họ ở T08-17, nên tôi hỏi lại trước khi gỡ.
+    Hệ quả đã nói ra: facet Chủ đề sẽ rỗng dần nếu bỏ qua thường xuyên
+  - >
+    GỠ ĐÚNG BA NHÓM họ kể — `Mã bài` · `Tên đường dẫn` · `Tín cậy tối đa` ·
+    `Mức đầy đủ`. GIỮ `Ngày phân tích` và `Loại nguồn` vì họ không kể, và loại
+    nguồn là nội dung thật (nó quyết bản ghi vào bảng nào)
+
+format_chung:
+  - "① thứ đang nạp · ② Tiêu đề · ③ Tóm tắt · ④ Mô tả · ⑤ Chủ đề + Khái niệm"
+  - >
+    Hai màn kia CHƯA CÓ `Tiêu đề` — thêm mới. Cổng đo TẬP GIAO và TẬP HIỆU chứ
+    không đo "có ô X": thêm ô cho một màn mà quên hai màn kia thì phép kiểm
+    có-mặt vẫn xanh
+  - >
+    Bốn trường gỡ khỏi form nhưng VẪN vào payload — schema đòi cả bốn. Gỡ ô mà
+    quên tự điền thì mỗi lần bấm Ghi là 422, và 422 đó tới SAU khi người dùng gõ
+    xong cả form. `FM_GOC?.x ??` giữ địa chỉ bất biến khi SỬA (M08-R5)
+
+sai_lam_nang_nhat_cua_luot_nay:
+  - >
+    BỌC MARKUP HAI CỘT LÀM HỎNG SHELL, và mất SÁU LƯỢT vá mới về lại được.
+    Gốc: lát cắt lấy mốc chia là chuỗi ĐẦU TIÊN trong cả VIEW, nên khối mở ở
+    panel `link` và đóng ở panel `file`
+  - >
+    VÌ SAO KHÔNG PHÁT HIỆN SỚM: phép đếm thăng bằng thẻ vẫn +0. **Cân bằng đạt
+    được ở SAI CHỖ vẫn là cân bằng** — đếm thăng bằng KHÔNG chứng minh được cấu
+    trúc. Và phép đi độ sâu của tôi báo "ba view đóng sạch" vì độ sâu về 0 ở một
+    thẻ đóng khác
+  - >
+    Thứ CUỐI CÙNG bắt được nó là `chu-giao-dien`: tổng chữ 577 > 480, vì ba dòng
+    `dừng ở bản nháp` của CẢ BA màn rò ra ngoài view ⇒ hiện trên mọi trang. Một
+    cổng đếm CHỮ tìm ra một lỗi CẤU TRÚC
+  - >
+    ĐỔI HƯỚNG: bỏ hẳn wrapper, làm bố cục bằng CSS thuần (`margin-inline:auto` +
+    `max-width`). Ở CSS thì sai chỉ sai hiển thị, không hỏng DOM
+
+bo_cuc:
+  - "Đo được: `.f-row` max-width 600px trong panel 1344px ⇒ trống 715px = 53%"
+  - >
+    KHÔNG kéo ô nhập rộng 1344px — một dòng chữ dài thế thì mắt mất hàng khi
+    xuống dòng, và `max-width` tồn tại vì lý do đó. Vấn đề là chỗ TRỐNG
+  - >
+    Khối giải thích cuối màn nằm NGOÀI `.np-p` (anh em của nó trong `section`),
+    nên nếu không căn thì màn có HAI mép trái — đo được: form x=488, khối giải
+    thích x=315
+
+tu_bat_duoc:
+  - >
+    Import `server.mjs` để kiểm cú pháp làm nó LISTEN và treo 600 giây.
+    `node --check` là công cụ đúng
+  - >
+    Khối bọc cần BA thẻ đóng cho ba thẻ mở; tôi viết hai. Với tài liệu/video nó
+    TÌNH CỜ đóng đúng chỗ nên hai màn đó "xanh" trong khi cùng lỗi
+  - >
+    Escaping tiếp tục cắn qua `bash -c`: backtick trong chuỗi kép bị thay-thế-lệnh
+    (mất thân hai khai báo), `</div>` bị đọc thành chuyển hướng
+
+do_do:
+  - cong: he-kinh.test.js
+    do_do_boi: ảnh 724 KB người dùng thêm — `python core/tools/toi_uu_anh_nen.py`
+  - cong: check_frozen.py
+    do_do_boi: chờ NGƯỜI ký sau khi FR-039 duyệt
+  - cong: check_danh_muc.py · check_skill.py · check_running.py
+    do_do_boi: agent khác · và hệ quả của hai cổng trên
+
+con_lai:
+  - "WO-019: loại nguồn vào bảng DB + đường thêm/sửa/xoá + host `fb`/`douyin`"

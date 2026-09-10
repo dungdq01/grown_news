@@ -1,0 +1,103 @@
+id: WL-01K9S1WO034HV
+at: 2026-08-29
+by: claude
+buoc: s8 (M03_web T03-76 code + T03-77 test) — duong PATCH cua /factory:go
+loai: bug nguoi dung THAY duoc — phong to cua so doc, khung PDF/video khong gian theo
+wo: .factory/wo/WO-034-hien-vat-khong-gian-theo-cua-so.md
+fr: khong mo FR — khong cham file frozen nao
+
+object:
+  - web/styles/prototype.css        # --toc-w · .hv doc cqw · hai ti le theo loai
+  - web/test/cua-so-doc.test.js     # 9 phep kiem moi + 1 phep kiem cu doc qua token
+  - web/styles/WORKLOG.md           # so dong prototype.css (2846)
+  - .factory/wo/WO-034-hien-vat-khong-gian-theo-cua-so.md
+  - 07_plan/M03_web/tasks/T03-76-hien-vat-gian-theo-cua-so.md
+  - 07_plan/M03_web/tasks/T03-77-test-hien-vat-gian.md
+
+trieu_chung_nguoi_dung_gui: >
+  Hai anh: cua so doc ~1700px, khung PDF het o ~1120px va PDF hien o 28%; video
+  cung hien tuong. "Bi lech khung".
+
+nguyen_nhan: >
+  `.hv` (PDF/video/anh) nam TRONG `<article class="doc">`, ma `.doc` bi chan
+  `max-width`: 600px goc, `min(78cqw,820px)` tu 900, `min(72cqw,900px)` tu 1200.
+  Nen hien vat thua huong cai chan cua CHU.
+
+cai_bay_cua_bug_nay: >
+  Cach sua nhanh nhat la BO `max-width` cua `.doc`. Het lech khung ngay, va
+  PHA luat do dai dong (ui_guide §9) — van xuoi trai 1600px. Mot PDF 23 trang
+  va mot dong van khong co cung be rong toi uu, nen loi giai la cho HIEN VAT
+  THOAT RA, khong phai keo cot chu rong ra.
+  => cong hoi HAI CHIEU: `.hv` co doc `cqw` khong, VA `.doc` co CON chan khong.
+  Hai phep kiem chieu nguoc XANH SAN luc cong con do — do la bang chung chung
+  khong do oan.
+
+mot_nguon_cho_cot_muc_luc:
+  van_de: "`.hv` phai tru be rong cot muc luc; cot do go 150/120/200 thang vao `grid-template-columns` o ba bac"
+  chon: "`--toc-w`, ca luoi lan `.hv` cung doc"
+  vi_sao: "go lai ba con so o cho thu hai la cach chung lech nhau ngay lan sua dau — cung lop loi ma `--rail-w` da chan o rail trai"
+  cho_de_quen: "`@media(max-width:720px)` an muc luc => phai dat `--toc-w:0px`, khong thi `.hv` tru 150px khong co that va khung hut dung chung do"
+
+hai_loai_hien_vat_hai_hinh_dang:
+  vi_sao_bat_buoc_di_kem: >
+    Rong ra ma giu chung `aspect-ratio:4/3` thi khung 1600px thanh hop CAO
+    1200px — phai cuon moi thay het MOT trang, te hon bug ban dau. Nen day
+    khong phai viec them, no la phan con lai cua cung mot sua.
+  tai_lieu: ".hv:not(.vid) .hv-f{height:min(78vh,1000px)} — trang doc, cao theo man"
+  video: ".hv.vid .hv-f{aspect-ratio:16/9} — 4/3 de lai hai dai den"
+  nut_play: "keo theo 16/9 — nut chiem cho DUNG BANG khung se thay no, khong thi bam xong trang giat"
+
+hinh_hoc_kiem_bang_SO_khong_bang_mat: >
+  Khong co trinh duyet trong phien nay nen tinh tay: cua so 1700 => `.hv` =
+  1700 - 200 (muc luc) - 32 (2 le --s-md) = 1468; mep phai = 200+16+1468 = 1684,
+  container 1700, con dung 16px le. Khong tran, khong sinh thanh cuon ngang.
+  Cua so hep 800 => `.hv` = 618 trong khi `.doc` content chi 568 — no tran 50px
+  sang phai, va do CHINH LA phan `.doc` dang bo trong.
+
+phep_kiem_CU_do_vi_toi_va_no_dung:
+  do: "`grid-template-columns:200px1fr` — khop CHUOI LITERAL"
+  su_that: "y dinh (luoi bat doi xung, cot neo 200px) KHONG doi mot chut nao; chi cach viet doi"
+  chon: "sua phep kiem doc qua token, TACH thanh hai cau: cot neo 200px, VA luoi van `<cot neo> 1fr`"
+  vi_sao_khong_bump_cho_xanh: "phep kiem ghim CACH VIET thay vi ghim DIEU PHAI DUNG thi no khong con noi gi"
+
+kiem_hai_chieu:
+  - "go `width:calc(100cqw...)` khoi .hv  => 2 phep kiem DO"
+  - "tra tai lieu ve aspect-ratio:4/3     => 1 phep kiem DO"
+  - "hoan nguyen                          => XANH lai, khong de lai vet"
+
+evidence:
+  - "node web/test/cua-so-doc.test.js => pass (9 phep kiem moi deu xanh)"
+  - "check_g6b => `G6B: 5 dieu kien dat tren 144 task`"
+  - "kiem hai chieu 2 ca: moi ca do dung so phep kiem, hoan nguyen xanh lai"
+  - "21/26 cong xanh; 5 do da quy chu (duoi)"
+
+quy_chu_nam_cong_do_va_mot_test_web:
+  KHONG_phai_cua_toi:
+    core_assets_schema: >
+      `core/assets/frontmatter.schema.json` sua 08-28 12:18, frozen va CHUA ky
+      lai => keo do 3 cong: check_frozen · check_danh_muc (hai ban schema lech)
+      · check_skill (bundle da cai lac hau so voi 4 nguon: schema, khung-than-bai,
+      khung.py, validate.py). File nay nam trong danh sach CAM CHAM cua toi.
+    check_running: "do VI no chay check_danh_muc + check_frozen — do keo theo"
+    shell_html: "so ky tu lech; file sua 08-29 14:28, tuc 2 phut SAU lan ghi cuoi cua toi"
+    anh_nen_708KB: "npm test do o `he-kinh`: alexander-slattery-...jpg 708KB > tran 500KB. Anh nay khong do toi them."
+  CUA_toi_va_da_sua: "so dong prototype.css trong web/styles/WORKLOG.md (2827 -> 2846)"
+  cach_quy_chu: "`ls --time-style` doi chieu voi moc ghi cuoi cua toi (14:25/14:26) + git status truoc khi phan"
+
+KHONG_ky_lai_FROZEN_lock: >
+  `core/assets/frontmatter.schema.json` dang lech baseline. Ky lai la ky ho mot
+  thay doi chua xong cua nguoi khac => DUNG va bao nguoi dung, dung nguyen tac
+  da nhan.
+
+khong_dung_vao:
+  - "plugins/multiwindow/**: markup `.hv` GIU nguyen — sua duoc bang CSS thuan thi khong dong vao TS"
+  - "core/** · web/api/** · web/render/** · project_map.yaml · FROZEN.lock — 0 dong"
+
+no_con_lai:
+  - "NGUOI CHOT: mo mot ban PDF va mot ban video, phong to cua so — khung phai lap day be ngang"
+  - >
+    Tai lieu dung `.hv` TRAN (khong class rieng) nen selector la phu dinh
+    `.hv:not(.vid)`. Them mot loai hien vat thu tu ma quen `:not()` thi no an
+    nham luat cua tai lieu. Duong chac hon: cho markup mot class `.hv.tl` — can
+    sua multiwindow.inline.ts, ngoai pham vi T03-76.
+  - "`height:min(78vh,1000px)` doc VIEWPORT chu khong doc cua so. Cua so nho trong man hinh lon van cho khung PDF cao 78vh. Dung hon la `cqh`, nhung `.bk-b` khai `container-type:inline-size` nen chua co truc doc — doi sang `size` co the pha layout khac, chua danh doi."

@@ -1,0 +1,34 @@
+id: WL-01KB40SPACE4Q
+luc: 2026-09-09 (phien PM)
+ai: claude (PM)
+viec: ap 4 quyet Space cua chu du an — dinh chinh s1 · proposal-4 khung · decisions · T08-35 +space
+object:
+  - 01_research/space-model-danh-gia-va-de-bai.md   # §8 dinh chinh (Space KHONG thay M19)
+  - 02_proposal/proposal-4-space-da-vu-tru.md       # s2 NHAP — cho duyet
+  - memory/decisions.md                             # entry 4 o
+  - 07_plan/M08_api/tasks/T08-35-cua-kho-delta-va-proxy-tim.md   # +cot space
+noi_dung: |
+  T13-0 da danh khoa `space` tu sang (dev/PM-assist, decisions 2026-09-09) —
+  khong sua them. M13 KHONG dung. Spike R1-R6 giu de bai §4 ban s1 nhung R1
+  da co dap an (loi A) ⇒ do he qua. ADR-09 viet SAU spike. Cho chu du an:
+  duyet proposal-4 · chon nguoi cam spike + time-box.
+duyet_va_vai: |
+  2026-09-09 — chu du an: "duyet proposal 4. M13 giao cho PM khac (moi tuyen),
+  cho lam song song. Ban phu trach phan Space nay." ⇒ proposal-4 DA DUYET;
+  PM phien nay nhan Space; rule.md +muc 12 (dai ID T##-90+ / FR-080+ cho
+  PM-Space, hai diem noi pham_vi.space + kho-delta.space KHOA — doi phai FR
+  va bao PM kia). Cho chu du an: ai cam spike + time-box.
+spike_xong: |
+  2026-09-09 — SPIKE R1-R6 CHAY XONG (phuong an 1, PM tu do):
+  R1 loi A xac nhan — PK (source_type,slug) khong co cot space ⇒ slug duy nhat
+    TOAN HE theo cau truc; 5/5 dang dia chi giu; duong ghi da chan 409.
+  R2 giu cay kb/<loai>/ (space o frontmatter) — bao ve diem bat dong bam_cay.
+  R3 ontology per-space bang COT (3 bang, 30 hang); yaml van la export;
+    consumer: categories 27 · concepts 37 · loai-nguon 20 cho.
+  R4 GIAO DEV — de bai cong check_khong_ro_cheo_space (do_khi/xanh_khi + phai
+    do duoc tren fixture bo-loc).
+  R5 KHONG mo space_member dot 1 — FR-045 giu nguyen; lop hoc = dot 2.
+  R6 CHAY THAT tren ban sao 276MB: ALTER x3 + INDEX x3 = 8 ms, 13 ban ghi;
+    view tham_chieu_media/nhan KHONG gay; view ban_ghi THIEU cot space ⇒ FR-080.
+  object: 01_research/space-spike-r1-r6-ket-qua.md · .factory/fr/FR-080 ·
+  04_system/adr.md#ADR-09 (DE XUAT — cho chu du an duyet).

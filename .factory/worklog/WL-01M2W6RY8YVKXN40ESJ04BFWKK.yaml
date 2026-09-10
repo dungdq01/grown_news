@@ -1,0 +1,103 @@
+entry: ban-giao
+ulid: 01M2W6RY8YVKXN40ESJ04BFWKK
+ngay: 2026-09-09
+module: M03_web
+don_vi: T03-130
+wo: WO-073
+fr: FR-076
+tieu_de: >-
+  Nam dieu khien toan app roi day rail len header trang `.ph`
+
+object:
+  - .factory/fr/FR-076-dieu-khien-toan-app-len-header.md
+  - .factory/wo/WO-073-dieu-khien-len-header.md
+  - 07_plan/M03_web/tasks/T03-130-dieu-khien-len-header.md
+  - web/render/shell.html
+  - web/plugins/home-pages/shell.html
+  - web/styles/prototype.css
+  - web/test/rail-trai.test.js
+  - 06_modules/M03_web/backlog.md
+commit:
+  - 23a71bc  tieu chi + FR-076 truoc code
+  - 9928576  cong DO truoc (12 ve do)
+  - 4cb59a6  ma
+
+viec: |
+  Chu du an 2026-09-09: chuyen `#dmode` (REAL/MOCK) · `#lang` · `#tb` · `#bgb`
+  · `#bgp` tu `.rail-d` (day rail doc 78px) len `.ph` (header trang), nhom moi
+  `.ph-d`.
+
+  FR TRUOC MA. Day la DAO mot quyet dinh da chot: `FR-027f` viet thang trong
+  `shell.html:64` rang de chung o `.ph` la "sai vai". Lap luan ay van dung —
+  FR-076 khong gia vo nguoc lai, no khai VAI cua `.ph` doi: tu "header cua
+  TRANG" thanh "thanh tren cung cua APP". `.ph` von da lai vai san vi o tim
+  trong no tim TOAN KHO chu khong tim trong trang.
+
+cong:
+  lenh: node web/test/rail-trai.test.js
+  do_truoc: 12 ve (4 man x ve 6, + 7a-7e)
+  xanh_sau: 0 loi
+  cach_do_do_duoc: |
+    Ve 6 cu chi hoi "`.rail-d` co chua". Doi thanh KEP HAI PHIA — `.ph-d` co VA
+    `.rail-d` khong con. Noi mot phia thi mot ban sao sot lai o rail van xanh,
+    va app hien HAI bo nut. Rui ro that, vi co HAI shell byte-identical
+    (63 078 B moi ban): sua mot cai la de lai mot ban mang markup cu. Ve 7a doc
+    ca hai file nguon.
+
+do_do: |
+  Toan bo 12 ve do la do MA CHUA DOI — dung y do, R5.
+
+quy_chu_cac_do_KHAC: |
+  Chay ROI tung file (129 file) thay 7 file do. Khong cai nao thuoc don vi nay.
+
+  Lan quy chu DAU TIEN cua toi SAI va toi ghi lai day de khong ai lap:
+  toi `git stash push` ba file cua don vi nay roi chay lai, thay
+  `opacity-khong-pha-contrast` chuyen XANH, va suyt ket luan "do la loi cua
+  T03-130". Nhung `git stash` go ve HEAD, ma CSS the cua `T03-126` cung DANG
+  CHUA COMMIT trong chinh `prototype.css` — nen phep "go" ay xoa luon luat
+  `.cd-n[data-i]::before`. Cong xanh vi luat BIEN MAT, khong vi loi duoc sua.
+
+  Do lai dung cach: dung mot ban `prototype.css` chi DAO NGUOC 3 hunk cua
+  T03-130 va giu nguyen moi thu khac. Cong THAY luat `.cd-n` o CA HAI ban
+  => chu la `T03-126`, khong phai don vi nay.
+
+  Bai hoc: `git stash` khong phai phep "go mot don vi viec" khi cay lam viec
+  dang mang sua chua commit cua NHIEU don vi. Phai dao nguoc dung hunk.
+
+phat_hien_lon: |
+  `npm test` CHE 116 cong. `package.json:scripts.test` noi 129 file bang `&&`,
+  va `page-weight.test.js` dung thu 13 — no DANG DO tu 2026-09-05 (`WO-055`,
+  chu la mot phien khac). Moi lan chay `npm test` deu chet o do, nen 116 file
+  sau no CHUA TUNG CHAY trong ca phien nay.
+
+  Sau khi chay roi, 6 cong do khac lo ra, va 4 trong so do la no cua chinh
+  cac don vi truoc trong phien nay:
+    - api-guard          : `ghiKieuMoc` thieu `banXuat()`      <- WO-071
+    - opacity-...        : `.cd-n[data-i]::before` 3.63:1 < 4.5 <- T03-126
+    - man-video          : 2 thuoc tinh `src="https://` (hotlink ytimg) <- T03-126
+    - man-video/tai-lieu : man hien 4 the thay vi 2, 6 thay vi 3  <- chua quy chu
+    - moc-fe-con-that    : `hienVatVideo is not defined`         <- chua quy chu
+    - mot-bien-mau       : cung so page-weight                   <- WO-055
+
+  Toi da bao "suite web co dung MOT FAIL" o cac ban giao truoc. Cau do SAI, va
+  no sai vi toi tin vao `npm test`. So dung la 7. Da mo o backlog M03.
+
+byte: |
+  prototype.css -772 B (xoa khoi de `.dmode` doc: `.dmode` goc da la
+  `inline-flex` ngang, khoi ay chi ton tai vi cot 78px).
+  Trang chu 63 199 -> 63 197 B. Khong cong them vao no cua `WO-055`.
+
+duoc_kem: |
+  Mobile <=720px truoc day co `.top .lg,.top .rail-d{display:none}` — nghia la
+  tren dien thoai KHONG doi duoc ngon ngu, tone, hay nguon du lieu. Khong ai
+  khai do la y do; no la he qua cua rail nam ngang duoi day. O `.ph` thi nam
+  nut song o moi be rong. Ve 7d giu cho no khong quay lai.
+
+khong_phai_sua_JS: |
+  Ba cho bind deu delegated tren `document` (`t.closest("#...")`) va `#dmode`
+  mount theo TEN (`chen(shell,"dmode",...)`), nen doi cho trong DOM khong can
+  mot dong JS. Ve 7f KHANG DINH dieu do thay vi tin no.
+
+keo_theo:
+  - 06_modules/M03_web/backlog.md o "`.ph-d` troi khi cuon" (FR-076 §4)
+  - 06_modules/M03_web/backlog.md o "`npm test` che 116 cong"

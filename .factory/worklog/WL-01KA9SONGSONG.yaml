@@ -1,0 +1,47 @@
+id: WL-01KA9SONGSONG
+khi: 2026-09-09
+loai: ban_giao
+tac_nhan: claude-opus-5
+vai: overview — kiem cheo tai lieu hai nhanh (M13 · Space) va checklist chong dung nhau cho PM/dev
+gate: khong ky gi
+module: M13_truyhoi · Space (xuyen M01 M02 M03 M08) · M04 (cong scope)
+viec: >
+  Chi dao "Kiem tra lai cac tai lieu va len checklist plan de PM va dev 2 module lam tranh conflict".
+  Do trang thai that: proposal-4 DA DUYET · spike R1-R6 xong · ADR-09 DE XUAT · FR-080 CHO DUYET ·
+  plan M13 v2 (8 task, da danh khoa `space` o T13-0/T13-5) · T08-35 danh cot space.
+phat_hien:
+  - "CONG SCOPE VANG: core/tests khong co check_scope*.py; check_g6b chi do ID trung + trong boundary,
+     KHONG do hai task tranh mot file. CLAUDE.md liet <scope-check> la 1/8 lenh du an tu cai — chua cai."
+  - "MOT worktree, mot nhanh (main) — CLAUDE.md: song song => moi don vi mot worktree. Hau qua da thay:
+     trung FR ×2 (054, 070/071), cai-dat.test.js bi xoa, FROZEN.lock sua treo."
+  - "Hai file HAI NHANH cung khai: core/src/source_distiller/validate.py (T01-51 vs ontology per-space)
+     · web/api/dungchung.mjs (T08-35 vs WHERE space). Do tay tu pham_vi_ghi; check_scope phai xac nhan."
+  - "project_map.yaml: ba ben muon bump (T01-50 · Space · M13 G6C) — can mot nguoi giu but."
+  - "FROZEN.lock dang co diff chua commit (M11 spec fe50->3b97, 12:18) — chua quy chu."
+  - "FR-077 duoc tro o 4 cho (T01-51 · FR-078 · 2 worklog) nhung file chua ton tai — T01-51 se tao; luu y
+     FR max = 080, tao moi phai lay 081+."
+  - "M14 spec FROZEN: ca hai nhanh deu muon sua (M13: ten truong FR-072 — da lam o model_flow non-frozen;
+     Space: bot = nut cay). Chot: cam ca hai toi khi ADR-09 ky, sau do MOT FR."
+object:
+  - path: 07_plan/song-song-m13-space-checklist.md
+    ghi_chu: "MOI — §0 ba viec truoc · §1 bang phan dat · §2 bon diem tranh + cach go · §3 thu tu + 3 canh phu thuoc xuyen nhanh · §4 ky luat hang ngay · §5 so moc"
+do_do:
+  - lenh: "git worktree list | wc -l"
+    ket_qua: "1"
+  - lenh: "ls core/tests | grep -ci scope"
+    ket_qua: "0"
+  - lenh: "ls .factory/fr | grep -c FR-077"
+    ket_qua: "0"
+  - lenh: "git diff HEAD -- FROZEN.lock | grep -c '^[+-] '"
+    ket_qua: "2 (mot dong doi)"
+do_do_boi: "chua-quy-duoc-chu (FROZEN.lock M11)"
+khong_lam:
+  - "KHONG cai check_scope — viec dev M04, de bai o checklist §0.1."
+  - "KHONG tao worktree — PM quyet ten nhanh."
+  - "KHONG sua task file cua PM (T13-*, T01-5*, T08-35) — de nghi phu_thuoc xuyen nhanh o §3."
+  - "KHONG cham FROZEN.lock / project_map."
+  - "KHONG commit, KHONG push."
+cho_NGUOI_quyet:
+  - "Ky ADR-09 + duyet FR-080 — Space khong co gi de go truoc hai chu ky nay."
+  - "Ai giu but project_map.yaml (de nghi PM-Space, mot luot v31 gom ca T01-50 + 9 lech WL-01KA7)."
+  - "Diff FROZEN.lock M11 12:18 la cua ai — commit rieng hay bo."

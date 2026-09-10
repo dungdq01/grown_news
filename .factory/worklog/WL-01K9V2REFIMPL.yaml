@@ -1,0 +1,46 @@
+id: WL-01K9V2REFIMPL
+at: 2026-09-01
+by: claude
+buoc: "s1-research dot bon — reference implementation scan M13 + M14"
+loai: artifact khao sat; KHONG dong ma san pham
+gate: >
+  project_map.yaml khai skipped_gates [G1, G2, G3] => ghi chu theo giao thuc,
+  khong phai artifact ky gate
+
+object:
+  - 01_research/ref-impl-m13-m14-scan.md   # MOI — raw dot bon, 33 patterns doc tu ma that
+  - 01_research/research_summary.md         # +§11 con tro
+
+cach_lam: >
+  Workflow 6 agent: 2 track (M13 · M14) × 2 goc DOC MA THAT (fetch file GitHub,
+  khong dung o README) + 1 phan bien/track fetch lai CHINH file kiem ma dung
+  nhu mo ta. 24 pattern duoc kiem: 23 CONFIRMED · 1 REFUTED (github-slugger —
+  thuat toan dung nguyen van nhung repo chet 2023-09 ma pattern khong khai;
+  noi dung van dung duoc KEM co repo-chet).
+
+ket_qua_dang_gia_nhat:
+  - "dau 'đ' (U+0111) KHONG fold duoc bang tokenizer nao (unicode61 lan trigram — bang chung chay that): phai normalize_vi() tang ung dung, MOT ham cho ca index lan query"
+  - "moi repo khao duoc deu DROP-IM-LANG citation hong => 'tu choi co phan loai' cua Grown_news khong co tien le ma — tu thiet ke + tu viet AC; nhanh co-nhung-mau-thuan cung khong tien le"
+  - "tu mo phong format Anthropic citations thi KHONG thua huong bao dam valid-pointers (do la validate server-side cua ho) — cong verify tu cai la bat buoc"
+  - "schema chunk: kieu zk ha xuong muc chunk — metadata o bang thuong, FTS external-content chi title+body; BO 'porter' (stemming Anh pha tieng Viet); 3 trigger _ai/_ad/_au chep nguyen mau sqlite.org"
+  - "refusal 2 tang kieu paper-qa: CODE quyet khong-co-trong-kho khi FTS tra 0 hang (khong dat nguong tuyet doi tren bm25 tho — ragflow tu tat threshold khi diem term-only); MODEL quyet phan con lai qua enum + sentinel"
+  - "tran kich thuoc M14 co tien le: epistemic.technology ~1600 dong / 9 file => M14 khong co ly do vuot 2000 dong"
+  - "multi-turn giai doan dau KHONG condense (nhet history 1 message, 0 call phu); diem re hybrid da co hop dong san (query RRF SQL thuan cua Alex Garcia) — kiem NGAY: sqlite3 trong Python-Windows >= 3.39 (FULL OUTER JOIN)"
+
+bon_cau_cho_NGUOI_chot: >
+  (1) anchor giu unicode (huong-dan co dau, khop GitHub) hay ASCII-fold (khop
+  ten file kho hien co)? — GAP NHAT, mot ham dung ca indexer + renderer, doi
+  sau la link chet hang loat. (2) heading doi ten => anchor chet — can bang
+  anchor_alias khong? (3) citation khong verify duoc: tu choi CA cau tra loi
+  hay gan co TUNG khang dinh? (4) co-nhung-mau-thuan quyet bang model tu khai
+  (choi luat 'khong ai so huu thuoc do minh') hay code so metadata frontmatter?
+
+evidence:
+  - "workflow ww0xuewya: 6/6 agent xong, 0 loi, 181 luot tool, ~409k token"
+  - "wc -c 01_research/ref-impl-m13-m14-scan.md => ~82.8k chars"
+  - "phan bien: 12+12 kiem, 23 CONFIRMED / 1 REFUTED"
+  - "da kiem tai cho: sqlite3 cua Python313 = 3.50.4 >= 3.39 => FULL OUTER JOIN co, diem re hybrid hop le (Node better-sqlite3 kiem rieng khi toi luot)"
+
+no_con_lai:
+  - "4 cau cho NGUOI chot o tren — chan viet ham slugify/anchor cua s6 M13"
+  - "khong repo nao co san tang chunk-theo-heading tren SQLite — tu thiet ke (~100 dong, da biet tu dot ba)"

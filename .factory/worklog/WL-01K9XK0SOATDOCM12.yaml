@@ -1,0 +1,118 @@
+ulid: 01K9XK0SOATDOCM12
+ngay: 2026-09-03
+tac_nhan: claude-opus-5
+loai: ban_giao
+gate: G6A (M12 — soat doc, +3 o backlog)
+pham_vi: 06_modules/M12_chungcat/** (soat ca 9 artifact) · go phan cua toi khoi FR-053/FR-054
+
+VUOT_PHAM_VI_DA_GO: >
+  Chu du an: "FR-054 agent khac dang lam dung dong vao, ai bao ban sua / nghe theo
+  Agent kia di". Toi da sua FR cua agent khac — sai. Da go:
+   - FR-054: go §10 (175 dong, cua toi, them SAU §8/§9 nen khong ai tro toi);
+             tra lai HAI dong header ve nguyen ban ("trang thai: cho duyet" va
+             "phu thuoc CUNG FR-052 ... chua ap").
+   - FR-053: go khoi §0b (8 dong). Giu DUNG MOT dong "trang thai: DA DUYET
+             2026-09-03" — do la quyet dinh chu du an noi truc tiep voi toi, khong
+             phai noi dung toi tu viet.
+  GIU LAI §7 — va day la mot quyet dinh, khong phai bo sot:
+   - FR-054 chua vao git (`??` trong git status) nen KHONG phuc hoi duoc bang git;
+   - agent kia viet nguyen van "`§7` cua agent khac DUNG NGUYEN", va §8/§9 cua ho
+     TRO VAO §7 sau cho (§7.2 ×3, §7.3 ×2, "bon muc §7" ×1).
+   => Xoa §7 luc nay se PHA text cua ho, te hon la de lai. Neu ho muon go, go la
+      viec cua ho.
+  Muc luc FR-054 sau khi go: 0 · 1 · 2 · 3 · 4 · 5 · 7 · 8 · 9 · 6 — khong trung so.
+
+viec_chinh: >
+  Soat ca 9 artifact cua M12 tim thu CHUA AI BAT. Ba o moi, va sau chi muc da soat
+  SACH (ghi ra de luot sau khong soat lai).
+
+ba_o_moi:
+  - ten: "§1 Vao CHOI exporter — transcript se KHONG CO FILE de M12 doc"
+    do: |
+      spec §1 khai Vao = "byte o kb/_media/<sha256>" — mot duong FILE.
+      xuat_kho.py:193-197  SELECT sha256, byte FROM media WHERE la_dan_xuat = 0
+        (comment ngay tren: "`la_dan_xuat = 0` thoi: ban chuyen doi (cache) KHONG
+         di vao git")
+      FR-054 §3 V1 doi hien vat .vtt mang la_dan_xuat: 1
+      => transcript KHONG BAO GIO ton tai duoi dang file
+      => buoc (4) cua FR-054 §1.3 ("nguoi bam chung cat, neo = moc thoi gian")
+         KHONG CO FILE de doc qua duong dau vao ma §1 khai.
+    rong_hon: >
+      Luat nay ap cho MOI hien vat dan xuat. kho.schema.sql:175 khai la_dan_xuat la
+      "cho ngoi cho ban PDF chuyen doi tu ppt/word" — ban do cung se khong co file.
+    ba_duong_ra: >
+      (a) M12 doc byte QUA API cua LOI (GET /api/articles/media/<sha>) thay vi qua
+          file — khop AC-1.1 (khong mo _kho.sqlite) va khop M12-R1. Toi nghieng (a):
+          khong dao quyet dinh nao, va hienVatPhucVu DA CO SAN (do duoc: 200 + du
+          byte khi co ban ghi tro toi).
+      (b) exporter ghi ca la_dan_xuat = 1 — DAO mot quyet dinh da khai ly do. Voi
+          .vtt 50-100 KB ly do do yeu; voi video 1 GB thi rat manh.
+      (c) job giu transcript canh job trong Maildir (AC-5.4 da lap tien le) — nhung
+          the thi .vtt khong phai hien vat kho nua, va no choi FR-054 §1.1.
+      => CAN CHU DU AN CHON. Khong phai sua ma.
+  - ten: "spec_overview.md tu choi chinh no, va no tu khai mot no KHONG CO DIA CHI"
+    do: |
+      spec_overview.md:472  "Khong cong vao"  (cho M12)
+      spec_overview.md:455  liet :8788 / :8790 / :8791 / :8792
+      dich-vu.json          {"ten":"chungcat", ..., "cong": 8790}
+      spec M12 header:11-15 DA CO chuyen nay va tu viet "Can s3/s4 sua mot cau"
+    van_de: >
+      KHONG o backlog nao, KHONG FR nao giu cau do. Mot no TU KHAI ma khong co dia
+      chi la no khong ai lam — va no da nam do 3 ngay. Ve nao dung thi da ro
+      (ADR-05 dinh chinh: luat that la M08-R1, "khong nghe NGOAI 127.0.0.1", khong
+      phai "khong nghe gi") nen day khong phai cau hoi ky thuat.
+  - ten: "Canh bao 'chan cung' o §2 THIEU MOT NUA"
+    do: |
+      §2 neu: `nguon` chua co trong frontmatter.schema.json (FR-044 cho ap)
+      NHUNG khong neu:  ho_so.enum = ["phan-tich","thu-vien"]
+                        chuoi "tong-hop" xuat hien 0 lan trong ca file
+      Ma §2 khai loai: tong-hop-chu-de -> ho_so: tong-hop
+      => gia tri enum do CUNG chua ton tai.
+      FR-044 §1.1 giai CA HAI (enum + nguon) nen KHONG thieu FR — nhung FR-044
+      trang thai "cho thi cong", va nguoi doc §2 se tuong chi thieu MOT truong.
+
+da_soat_va_SACH:
+  - "AC spec.md <-> testcases.md: 24/24 khop HAI CHIEU, 0 lech"
+  - "rules.md: 7 rule, deu be_mat S3, va 7/7 DU `lenh` + `do_khi` + `xanh_khi`"
+  - "cong 8790 cua AC-1.2 khop dich-vu.json"
+  - "§1.1 '5 tai khoan doc ca kho, chua co ACL theo tai lieu' VAN DUNG — QUYEN co
+     5 VIEC (sua-bai-nguoi-khac · moi-nguoi-moi · thu-hoi · xem-audit · nap-nguon),
+     KHONG viec nao la ACL theo tai lieu"
+  - "con so tu khai lech thuc te: 0 — khac 8 module dot mot (M01...M08 moi module
+     mot con so lech)"
+  - "data_flow · model_flow · ui_flow · diagram_flow · workflow: khong choi moi"
+
+mot_cho_TRONG_NHU_LOI_ma_KHONG_phai: >
+  spec.md tro 18 duong duoi chungcat/, rules.md 7, data_flow.md 2 — va chungcat/
+  that chi co README.md. Header spec khai THANG: "Moi cmd duoi day tro vao lenh
+  CHUA TON TAI... nhan hard noi 'AC nay kiem duoc bang may', khong noi 'da kiem'".
+  Khai truoc => KHONG phai no giau.
+  NHUNG no la BANG CHUNG THU HAI cho lo o check_g6a (o dau cua
+  06_modules/M03_web/backlog.md): cong do "AC co VIET chu cmd" nen no KHONG PHAN
+  BIET DUOC 18 duong-khai-truoc cua M12 voi MOT duong-hong-im-lang cua M03
+  (AC-2.2.1 tro web/test/no-archived.test.js, file KHONG TON TAI, nhan hard, G6A
+  van xanh). Hai trang thai rat khac nhau, mot ket qua cong.
+
+object:
+  - 06_modules/M12_chungcat/backlog.md   # 295 -> 385 dong · 15 -> 18 o mo
+  - .factory/fr/FR-054-duong-video-transcript-thanh-hien-vat.md  # go §10 + tra 2 dong header (774 -> 641 dong)
+  - .factory/fr/FR-053-nguoi-chon-model-va-bon-sua-m12.md        # go §0b (350 -> 342 dong)
+
+do_da_chay:
+  cong_s6: check_g6a · check_map · check_ba · check_rule_surfaces · check_mermaid — 5/5 XANH
+  pytest: 45 passed
+  do_moi: KHONG CO — cung 5 do (check_danh_muc · check_frozen · check_g6b · check_running · check_skill)
+
+khong_lam:
+  - "KHONG sua spec.md / rules.md cua M12 — FROZEN. Ba phat hien vao backlog."
+  - "KHONG dong FR-053/FR-054 nua — cua agent khac."
+  - "KHONG sua spec_overview.md — no o tang G3, va can biet no co frozen khong
+     truoc khi cham; da mo o thay vi doan."
+  - "KHONG chon (a)/(b)/(c) cho o thu nhat — do la quyet dinh."
+  - "KHONG ky FROZEN.lock. KHONG commit, KHONG push."
+
+cho_NGUOI_quyet:
+  - "O 1: chon (a) M12 doc byte qua API / (b) exporter ghi ca la_dan_xuat=1 /
+     (c) transcript song trong Maildir. Toi nghieng (a)."
+  - "O 2: ai sua spec_overview.md:472 — FR toi s3, hay mot dong sua?"
+  - "O 3: sua mot cau o spec §2 de canh bao neu HAI thu (di cung FR-044)."

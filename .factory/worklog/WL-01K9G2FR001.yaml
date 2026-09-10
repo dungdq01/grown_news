@@ -1,0 +1,24 @@
+at: 2026-08-18T12:05Z
+agent: human+claude
+step: FR-001 / mở FR sửa hợp đồng schema
+did: >
+  FR-001 RAISE — thêm 3 trường vào core/assets/frontmatter.schema.json.
+
+  Vì sao cần FR: file này nằm trong deny S1 (.claude/settings.json) nên không
+  được sửa tại chỗ. Đây là hợp đồng máy đọc, sửa phải qua FR.
+
+  Vấn đề: M1 là metric CHẶN của dự án (proposal §5) — không đạt thì dừng, sửa
+  giao thức, không làm web. Nhưng schema không có trường nào ghi được 3 chỉ số
+  của M1, nên hiện M1 không đo được bằng máy. Proposal khai cách đo là "chủ dự
+  án đánh dấu insight_new: true khi duyệt" — trường đó chưa tồn tại.
+
+  Thêm:
+    insight_new     boolean  M1.1 — bản này cho insight chưa biết và sẽ hành động theo
+    skill_installed boolean  M1.2 — đã sinh skill thật và cài vào agent
+    review_minutes  integer  M1.3 — số phút thực duyệt, để tính trung bình
+
+  Người quyết: chủ dự án chọn lối A trong 3 lối (A schema / B worklog / C file
+  riêng). Lý do: metric chặn nên được cưỡng chế bằng máy như mọi luật khác, và
+  ba trường này là thuộc tính của BẢN PHÂN TÍCH chứ không phải của phiên làm
+  việc — cùng loại với review_status.
+object: FR-001 · core/assets/frontmatter.schema.json

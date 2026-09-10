@@ -1,0 +1,71 @@
+ulid: 01K9SE4T0827DDL
+khi: 2026-09-04T02:45+07:00
+tac_nhan: agent-thi-cong (Claude, phiên 6c7880c5)
+loai: ban-giao
+module: M08_api
+don_vi: T08-27 — DDL `nhap_chung_cat` khớp `FR-046 §1` (WO-043, lối A)
+
+viec: |
+  Chủ dự án duyệt lối A: *"sửa luôn DDL và cứ note vào worklog, backlog là
+  được"*. `FR-046` ĐÃ DUYỆT nên KHÔNG cần FR mới — đây là làm cho mã khớp hợp
+  đồng đã chốt, không phải đổi hợp đồng.
+
+  Tên file task ghi NGAY lúc tạo theo `rule.md` mục 9; ID cấp bằng
+  `ls 07_plan/M08_api/tasks/` → max 26 ⇒ **27**.
+
+  BA SỬA:
+  1 · enum `trang_thai`: `nhap|da_gui|bo` → `nhap|da_sua|da_duyet|tra_lai`.
+      `da_gui` và `bo` KHÔNG CÓ NGUỒN — grep toàn repo chỉ ra chính DDL đó và
+      một dòng test của nó. Không spec, không FR, không `decisions.md`.
+  2 · +`khang_dinh_bi_tia TEXT` (JSON, cho NULL — `{}` và NULL đọc ra hai câu
+      khác nhau, và "chưa đo" khác "đo ra không").
+  3 · +`ly_do TEXT` (không NOT NULL — ba trạng thái kia không có lý do, và một
+      cột bắt buộc sẽ bị điền chuỗi rỗng cho đủ; chuỗi rỗng là một lý do KHÔNG
+      đọc được. Ràng "tra_lai ⇒ phải có ly_do" cưỡng chế ở CỬA, kèm phép kiểm).
+
+  KHÔNG đổi: `review_status` `CHECK` hằng · trigger `ban_goc_ai` · `lan_gui_duyet`
+  · `cap_nhat_luc` (giữ tên thay vì `sua_luc` của FR: hai tên một nghĩa, đổi tên
+  một cột ba chỗ đọc là rủi ro không mua được gì — ghi ra để không ai tưởng đây
+  là chỗ lệch thứ tư).
+
+object:
+  - .factory/wo/WO-043-ddl-nhap-lech-fr046.md
+  - 07_plan/M08_api/tasks/T08-27-ddl-nhap-khop-fr046.md
+  - web/api/loi.schema.sql                # enum 4 giá trị + 2 cột
+  - web/api/dungchung.mjs                 # XUAT_LOI +khang_dinh_bi_tia,+ly_do
+  - web/test/loi-cua.test.js              # 12 ca mới + sửa 1 ca xanh-sai-lý-do
+  - 06_modules/M08_api/backlog.md         # tick WO-043 + 1 ô lớp lỗi
+
+bang_chung:
+  - "ĐỎ-TRƯỚC (rule.md mục 8), mốc 2026-09-04T02:3x, `node web/test/loi-cua.test.js`:
+     7 SAI — `da_sua`/`da_duyet`/`tra_lai` BỊ CHẶN · `da_gui`/`bo` ĐƯỢC NHẬN ·
+     `cột khang_dinh_bi_tia tồn tại` SAI · `cột ly_do tồn tại` SAI ·
+     `Error: no such column: khang_dinh_bi_tia`"
+  - "SAU KHI SỬA, cùng lệnh: 12 ok — bốn giá trị FR nhận, ba giá trị ngoài FR
+     chặn, hai cột đọc lại ra đúng giá trị, `review_status` vẫn `draft`"
+  - "node web/test/loi-cua-http.test.js → pass (bảy cửa trên SERVER THẬT)"
+  - "cd web && npm test → exit 0 · 2746 ok · 0 FAIL"
+
+do_do: khong-co-do-moi
+
+hoc_duoc: |
+  SIẾT một enum có thể làm một phép kiểm KHÁC thành vô nghĩa mà nó vẫn XANH.
+  Ca *"payload đòi `trang_thai` phải bị lột"* dùng `da_gui`; sau khi enum khớp
+  FR-046, `da_gui` bị `CHECK` chặn ⇒ cổng xanh vì DDL từ chối giá trị, không vì
+  `loiTaoNhap` lột nó. Đã đổi sang `da_duyet` — giá trị DDL SẼ NHẬN.
+  ⇒ Mỗi lần đổi một `CHECK`, phải soi lại mọi phép kiểm dùng giá trị vừa bị
+    loại. Không cổng nào tự báo điều đó.
+
+  Và: `FR-046 §1` khai bảng từ 2026-09-02, DDL viết 2026-09-03 lệch ba chỗ, và
+  `check_g6a`/`check_g6b`/`check_frozen` đều XANH suốt. Không cổng nào so DDL
+  với hình dạng bảng mà FR khai — nó chỉ lộ khi `T08-22` đi cài bốn hành động.
+
+keo_theo:
+  - "T08-22 nay cài được: enum có `tra_lai`/`da_sua`, có `ly_do` +
+     `khang_dinh_bi_tia`. Nhắc lại cảnh báo đã ghi trong task đó: bốn cửa cho
+     TRÌNH DUYỆT đặt ở `tho-cua.mjs`, KHÔNG `loi-cua.mjs` (`quaCong` đòi khoá)."
+  - "Ô nợ M08: mỗi lần đổi CHECK phải rà lại phép kiểm dùng giá trị bị loại"
+
+chua_xong: |
+  Ràng "tra_lai ⇒ phải có ly_do" CHƯA cưỡng chế — nó thuộc cửa của `T08-22`.
+  Gate G6C do NGƯỜI ký. Chưa commit.

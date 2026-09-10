@@ -1,0 +1,95 @@
+entry: ban-giao
+ulid: 01M2JTDFPVXZ57B7F22VJQDBXV
+ngay: 2026-09-09
+module: [M03_web, M12_chungcat]
+don_vi: [T03-132, T03-133, T12-32]
+wo: WO-075
+tieu_de: >-
+  Khung poster mot-khung-hai-ket-cuc, nhan giua, nut ep sinh lai anh bia
+
+object:
+  - .factory/wo/WO-074-tiktok-douyin-day-du.md   # phan WO-075 noi tiep o cuoi
+  - chungcat/src/tai_nguon.py
+  - chungcat/src/worker.py
+  - chungcat/tests/check_sinh_thumbnail.py
+  - web/plugins/multiwindow/src/scripts/multiwindow.inline.ts
+  - web/styles/prototype.css
+  - web/test/xem-tiktok-douyin.test.js
+commit: [2a160cd, HEAD]
+
+ba_viec: |
+  T03-132 GIANH BYTE (dieu kien, khong phai viec phu). `mock/index.html` o
+    272 384/272 384 — 0 byte trong. Gop 11 ban sao cua
+    `{ "content-type": "application/json" }` thanh `const HJ`. gn.js
+    103 495 -> 103 159 (**-336**).
+  T03-133 MOT KHUNG, HAI KET CUC. Poster dung lai `.cd-n` cua the (0 luat nen
+    moi): anh that neu kho co, icon+mau neu khong. Bam -> nhung tai cho (host
+    khai `nhung`) hoac mo tab nguon (`nhung: null`).
+  T12-32  TIKTOK TRA ANH TRONG + ban ghi KET voi no.
+
+tiktok_anh_trong: |
+  Lo ra khi nhin poster: mot o den. `yt-dlp --list-thumbnails` cho thay TikTok
+  cong bo BA ban — dynamicCover · cover · originCover — va `--write-thumbnail`
+  lay ban CUOI (`originCover`), von la gradient TRONG 4 761 byte. Ban `cover`
+  la anh that 28 980 byte.
+
+  Sua: `--write-all-thumbnails` roi chon tep LON NHAT. Khong go ten ban nao —
+  moi nen tang dat ten khac nhau, con "anh trong nen xuong gan bang khong" thi
+  dung o moi nen tang.
+
+  LO THU HAI ngay do: chay lai bi chinh luat "da co anh ⇒ thoi" chan, kem cau
+  loi nghe nhu dang lam dung. Ban ghi KET VINH VIEN voi anh hong. Them co `ep`
+  — dung cai "sinh lai la viec NGUOI bam" ma chu thich cu da hua nhung chua ai
+  cai. Ve 11f kep: `ep` CHI mo dung luat ay, khong pha loai tru douyin hay
+  allowlist.
+
+  Nghiem thu that: bam nut ↻ tren cua so -> job `ep=True` -> xong -> 28 980 B.
+
+nam_lan_cong_xanh_ma_man_hong: |
+  Ca nam chi lo khi MO TRINH DUYET THAT. Day la lan thu hai lien tiep nhu vay.
+
+  1 Regex gop header an luon CHINH dong khai: `const HJ = HJ;` =>
+    `ReferenceError: Cannot access 'HJ' before initialization` => toan bo FE
+    chet. Khong cong nao bat.
+  2 Icon DE len anh — the ngoai danh sach chi dat `data-i` khi KHONG co anh;
+    toi dat ca hai.
+  3 Anh doc 540x960 tran cao 1207px trong khung 382px. `height:100%` vo dung:
+    `.cd-n` cao theo NOI DUNG, ma noi dung la chinh tam anh — phan tram gap
+    vong tron nay thi roi ve `auto`. Phai neo TUYET DOI.
+  4 Nhan bi day len dinh: `translate(-50%,-50%)` tinh theo kich thuoc CHINH NO,
+    ma `.hv-play` von da to bang ca khung.
+  5 Nut ↻ mang `duong` RONG khi mo tu danh sach: HAI duong mo cua so mang hai
+    hinh dang — tu danh sach thi `ban.slug` da la `<loai>/<slug>`; tu URL thi
+    phong bi dat `slug` = `url_normalized` va duong that o `duong`. Doc mot
+    trong hai thi mot nua so cua so co mot cai nut chet cam.
+
+nhan_giua: |
+  Chu du an: nut phai o GIUA khung. Ban truoc toi day no xuong day de NE va
+  cham voi icon — ne, khong phai giai. Nay nhan boc `<b>` co vien thuoc DAC nen
+  doc duoc tren ca icon phang lan anh that, va nam dung giua (do: tam khung
+  1007/448, tam nhan 1007/448).
+
+cong:
+  do_duoc_chung_minh:
+    - ve 8  — gieo `place-items:end` => DO
+    - ve 8d — doi `duong ?? slug` thanh `duong` => DO
+    - ve 8c — go co `ep` => DO (SAU khi neo lai, xem duoi)
+    - ve 11d-f — goi `chien_luoc_anh_bia` that voi/khong `ep`
+  mot_ve_trang_tri_da_va: |
+    Ve 8c ban dau quet CA FILE tim `ep: true`. Phep thu gieo-loi cho thay no
+    KHONG DO khi co bi go — mot ve trang tri. Neo lai vao than
+    `layLaiAnhBia`, gieo lai: DO dung. Bai hoc cu, lop loi cu: quet ca file la
+    do sai vung.
+
+byte: |
+  gn.js 104 195 / 104 448 (con 253). gn.css 104 167 / 106 496.
+  Chuoi: -336 (gop HJ) roi +~700 (poster + nut ↻ + CSS). Neu con them tinh
+  nang cham `gn.js`, phai gianh byte truoc — o backlog M03 da mo.
+
+do_do: |
+  7 cong web con do — DUNG BANG truoc WO-074/075, ca hai WO them 0.
+  M12 51/51. core pytest 49 passed.
+
+con_treo:
+  - douyin van khong co anh bia (Argus doi UIFID) — icon+mau, da ghi bang khai
+  - nut ↻ chi hien khi DA co anh; ban ghi chua co anh thi LOI tu xep viec

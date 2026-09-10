@@ -1,0 +1,64 @@
+entry: ban-giao
+ulid: 01KB44FR077
+ngay: 2026-09-09
+module: M01_core (chu bang khai) · M13_truyhoi (doc) · M12_chungcat (doc)
+don_vi: [T01-51]
+fr: FR-077
+tieu_de: >-
+  Mo FR-077 — dai ky tu Han thanh bang khai core/assets/dai-han.json, chu la M01.
+  Tra mot no GIAY dang bi 10 cho tro ma file khong ton tai.
+
+object:
+  - .factory/fr/FR-077-dai-han-bang-khai.md                    # MOI — CHO DUYET
+  - 07_plan/M01_core/tasks/T01-51-bang-khai-cho-m13.md         # muc 1: "mo FR-077" -> "AP FR-077 da mo"
+  - .factory/worklog/WL-01KB44FR077.yaml
+
+vi_sao_bay_gio: |
+  Do sau khi ky T13-0 (WL-01KB43T130KYGATE): `grep -rl FR-077` ra **10 file** tro toi
+  ma `ls .factory/fr/FR-077*` KHONG CO. Nang hon: mot trong 10 cho la
+  `06_modules/M13_truyhoi/spec.md` AC-3.4 — file FROZEN VUA KY xong, tro vao mot FR
+  chua ton tai. Do la `#cong-xanh-vi-neo-sai` o dang GIAY: moi ben deu "chay dung"
+  theo mot tai lieu khong co.
+  10 cho tro: FR-078 · 3 worklog (KA9SONGSONG · KB40S7M13V2 · KB41KEOTHEO) ·
+  M13 backlog · M13 model_flow · M13 spec · T01-51 · song-song-checklist · decisions.md.
+
+chot_trong_FR: |
+  §1.1 hinh dang file — 4 dai CJK dang SO (khong phai chuoi regex: hai ben doc la
+    Python va JS, mot regex viet cho engine nay khong chac dung o engine kia, nhat la
+    dai ngoai BMP can surrogate pair) + `$vi_sao` tung dai + hai `$comment` am
+    (KHONG gom Hiragana/Katakana/Hangul · KHONG chua nguong ti le).
+  §1.2 CHU LA M01, khong phai M13 — dao cau cu cua `M13/data_flow` ("M13 so huu").
+    Ba loi da can, ghi ra de khong ban lai: dat M13 / giu o chungcat / moi ben mot ban.
+    Ly le: mot HANG SO khong co "muc dich rieng", no chi co gia tri dung hoac sai —
+    khac han mot HAM (chuan_hoa_tim vs chuan_hoa duoc phep hai ban vi hai muc dich).
+  §2 nam cong H1-H5, chia dung chu: H1·H2·H4 do BANG KHAI ⇒ vao
+    check_khai_mot_noi.py §4 (cong do da la nha cua "hai tap khai mot noi", day la
+    tap thu ba); H3·H5 do MA CUA BEN DOC ⇒ thuoc FR-078 (M12) va T13-3 (M13).
+  §3 bon rang buoc: khong doi gia tri 4 dai · khong them nguong · khong cho ben doc
+    co dai mac dinh (thieu bang khai thi DO, khong doan) · giu dang so.
+
+do_do:
+  - lenh: "python -c json.loads(<khoi json trong FR-077>) + tu nghiem H1/H2/H4"
+    ket_qua: |
+      parse OK · dai: 4
+        0x3400-0x4dbf CJK Ext A · 0x4e00-0x9fff CJK Unified ·
+        0xf900-0xfaff CJK Compatibility · 0x20000-0x2a6df CJK Ext B
+      H1 (du tu/den/ten/$vi_sao moi dai): True
+      H2 (khong chong nhau, sap tang):    True
+      H4 (khong Hiragana/Hangul):         True
+  - lenh: "sed -n 27,33p chungcat/src/dinh_tuyen.py"
+    ket_qua: "BON DAI KHOP TUNG SO voi _DAI_HAN cua M12 ⇒ FR nay DOI CHO, khong doi hanh vi dinh tuyen"
+  - lenh: "grep -c goi_duoc core/assets/dich-vu.json · grep -c file-anchor core/assets/dia-chi.json · ls core/assets/dai-han.json"
+    ket_qua: "0 · 0 · khong co — ca ba viec cua T01-51 con nguyen, dung nhu task khai"
+đỏ_do: "khong chay cong nao co the do trong luot nay (FR la giay); khong gay do moi"
+
+cho_NGUOI_quyet:
+  - "Duyet FR-077 (chu du an) — T01-51 chan o day: khong duyet thi dev ap mot FR chua duyet."
+  - "Ai thi cong T01-52 -> T01-51 (ma that trong core/**): dev, hay PM M13 lam tiep?"
+
+khong_lam:
+  - "KHONG tao core/assets/dai-han.json — do la T01-51 (dat M01), va FR chua duyet."
+  - "KHONG sua chungcat/src/dinh_tuyen.py — FR-078, team M12."
+  - "KHONG sua core/tests/check_khai_mot_noi.py — §4 moi thuoc T01-51/T01-52."
+  - "KHONG sua M13 spec (vua ky) — AC-3.4 da tro dung FR-077, nay file co that."
+  - "KHONG bump project_map — PM-Space giu but (rule.md muc 13)."

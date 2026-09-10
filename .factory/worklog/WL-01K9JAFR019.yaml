@@ -1,0 +1,173 @@
+id: WL-01K9JAFR019
+at: 2026-08-19
+by: claude
+buoc: s8 (M08_api + M03_web) + s6 (M02_kb/rules.md — FROZEN) + s4 (security_baseline)
+loai: amend-frozen — mở đường ghi danh mục, đổi bề mặt một rule bất biến
+fr: FR-019-them-nhan-tu-web.md (DUYỆT 2026-08-19)
+
+viec: >
+  Người dùng: "Làm xong đi rồi chúng ta sửa sau, UI còn phải sửa nhiều đấy" —
+  duyệt FR-019 CẢ HAI đường (concepts + categories), không chỉ concepts như tôi
+  đề xuất cân nhắc. Thi hành đủ.
+
+pham_vi_ghi:
+  - web/api/danhmuc.mjs                 # MỚI — 2 handler POST
+  - web/api/dungchung.mjs               # themVaoDanhMuc · traLaiDanhMuc · ghiHopDong
+                                        # · ghiNhatKyDanhMuc · kyLaiBaseline · chayCong
+  - web/api/router.mjs                  # POST cho 2 đường; PUT/PATCH/DELETE → 404
+  - web/plugins/home-pages/shell.html   # form thêm chủ đề (.api-only)
+  - web/plugins/home-pages/index.ts     # nút Kết nạp ở mục đạt ngưỡng
+  - web/plugins/multiwindow/.../multiwindow.inline.ts  # 2 handler FE + nối sự kiện
+  - web/test/danh-muc-them.test.js      # MỚI — 22 phép kiểm
+  - web/test/no-write-path.test.js      # whitelist 3 → 5 đường, kèm lý do
+  - web/package.json · .github/workflows/ci.yml
+  - 06_modules/M02_kb/rules.md          # FROZEN — M02-R3 đổi bề mặt S1 → S3+S2
+  - 04_system/security_baseline.md      # §6.1 MỚI — giới hạn rủi ro RIÊNG
+  - project_map.yaml · kb/_nhat-ky-danh-muc.md
+  - FROZEN.lock                         # ký lại SAU khi FR duyệt (27 file)
+
+diem_mau_chot_deny_S1_KHONG_phai_rao:
+  do_duoc: >
+    security_baseline §5.1 ghi như một SỰ VIỆC ĐÃ XẢY RA: "21/21 file trong deny
+    list đã bị ghi qua Bash heredoc mà không bị chặn lần nào — kể cả
+    kb/concepts.yaml". Deny chỉ canh tool Write của agent; tiến trình Node không
+    đi qua lớp quyền đó.
+  hau_qua: >
+    M02-R3 khai `bề_mặt: S1` là khai một bề mặt KHÔNG CÓ RĂNG. Nên FR-019 không
+    "mở" gì về kỹ thuật — nó làm cho lời khai khớp thực tế, và thay bằng răng thật.
+  giu_nguyen_deny: >
+    CỐ Ý không xoá dòng deny. Nó không cưỡng chế được nhưng vẫn là lời khai ý
+    định, và vẫn bắt lỗi vô ý khi agent gõ Write. Ghi rõ trong FR để lần sau
+    không ai tưởng là sót.
+
+M02_R3_doc_ky_thi_khong_cam_viec_nay:
+  nguyen_van: '"concepts.yaml bị sửa BỞI MÁY, không qua người"'
+  ly_do_no_neu: "máy tự SINH tên ⇒ rag / RAG / retrieval-augmented — bốn tên một thứ"
+  lap_luan: >
+    Endpoint KHÔNG sinh tên: nó ghi cái người gõ, và đòi bằng chứng nhãn đó đã
+    xuất hiện ở ≥N bài. Cùng khuôn security_baseline §1 dùng cho nút Duyệt —
+    thứ nhạy cảm hơn nhiều: "thêm bề mặt, không thêm chủ thể".
+  van_can_FR: >
+    Vì nó đổi Ý NGHĨA của một file frozen. Không lách: mở FR, người duyệt, rồi
+    mới sửa rules.md và ký lại baseline.
+
+khong_duoc_dung_lai_gioi_han_rui_ro_cu:
+  what: >
+    security_baseline:114 "mức tác động tối đa là một bài rác trong draft" CHỈ phủ
+    nội dung bài. Nhãn rác không phải bài rác — nó là lỗi tách bộ lọc, ảnh hưởng
+    mọi bài đã và sẽ có.
+  lam_gi: >
+    Thêm §6.1 với giới hạn RIÊNG: "một nhãn thừa mà người đó tự gõ, tự khai nhãn,
+    và đã xuất hiện trong ≥2 bài của chính họ. Không sửa được mục cũ, không xoá
+    được mục nào." Và ghi thẳng FR-019 GIẢM một lớp.
+
+nam_rang_deu_kiem_duoc_bang_may:
+  1_chi_them: "PUT/PATCH/DELETE → 404 (router không có nhánh). Kiểm 5 request."
+  2_khong_default: "thiếu label_vi → 422 trả đúng trường thiếu (M08-R3)"
+  3_doi_bang_chung: >
+    id phải ở concepts_proposed của ≥ concept_merge_min bài. Ngưỡng đọc từ
+    07_curate/thresholds.yaml (M07-R2). Test kiểm CẢ ca 1/2 — ca dễ lọt nhất nếu
+    ai đổi `<` thành `<=`.
+  4_khong_trung: >
+    trùng id → 409; trùng ALIAS của mục cũ → 409 và CHỈ RA id chính. Vế alias
+    đúng là thứ M02-R3 nói tới.
+  5_nguyen_ven_phan_cu: >
+    Không round-trip toàn file qua parser — giữ NGUYÊN VĂN mọi thứ trước mục đầu,
+    chỉ YAML.stringify cho mục MỚI rồi nối. 22 mục + 9 dòng comment + mọi aliases
+    nguyên từng byte. Test assert `sau.startsWith(truoc)`.
+
+hai_quyet_dinh_thiet_ke_de_khong_lam_test_do:
+  khong_rename_thu_4: >
+    api-guard.test.js:52-55 đòi renameSync ĐÚNG 3 chỗ, "mọc chỗ thứ tư nghĩa là có
+    đường ghi/di chuyển mới chưa qua thiết kế". Đúng cảnh báo. Ghi danh mục là
+    ĐỌC-SỬA-GHI một file nhỏ dưới mutex tuanTu() + giữ bản cũ trong bộ nhớ để
+    rollback ⇒ không cần nguyên tử-bằng-rename. Tiền lệ: POST /api/inbox cũng
+    writeFileSync thẳng (server.mjs:136).
+  moi_ghi_o_dungchung: >
+    api-guard cấm handler cầm lời gọi fs ghi — cấm đúng: mọi đường ghi ở một file
+    để đọc hết trong một lần. Nên themVaoDanhMuc/ghiHopDong/ghiNhatKyDanhMuc đều
+    ở dungchung.mjs. ghiHopDong dùng WHITELIST khoá (`schema`|`schema_skill`),
+    không nhận đường tuỳ ý — một hàm ghi-file-bất-kỳ trong web/api là đúng thứ
+    path traversal cần.
+
+toi_viet_sai_va_tu_sua:
+  lan_1_lach_test_bang_gian: >
+    Bản đầu tôi viết `ghiTho()` trong danhmuc.mjs với `globalThis.__gnFs ??
+    require_fs()` để regex của api-guard không khớp. Đó là lách cổng, không phải
+    thiết kế. Và `require_fs` trả Promise nên còn KHÔNG CHẠY. Xoá, đưa việc ghi
+    về dungchung.mjs — nơi luật cho phép.
+  lan_2_ten_ham_khong_ton_tai: >
+    Gọi `docKho()` — không có hàm đó. Tên thật là `quetKho()` và nó trả
+    {type,slug,duong} không có `fm`, nên phải qua docBai(). Nếu không kiểm thì
+    demDeXuat luôn trả 0 và răng bằng chứng chặn MỌI thứ — trông như hoạt động.
+
+bug_TU_BAT_luc_kiem_tay:
+  hien_tuong: >
+    POST /api/categories trên kho tạm trả 500 "check_danh_muc.py đỏ — đã hoàn
+    nguyên cả 3 file". Rollback đúng, nhưng lý do sai.
+  goc: >
+    categories.yaml đi theo KB_DIR (env override để test không đụng kho thật),
+    còn enum schema nằm ở REPO. KB_DIR trỏ kho tạm ⇒ hai bên ở hai nơi ⇒
+    check_danh_muc (đọc kb/ thật) KHÔNG BAO GIỜ khớp.
+  sua: >
+    Chặn thẳng: KB !== join(GOC,"kb") ⇒ 409 với câu giải thích, thay vì để nó 500
+    mờ mịt sau khi đã ghi rồi lùi. Test kiểm ĐÚNG cái chặn này thay vì kiểm đường
+    ghi thật — sửa file frozen trong test là tự tạo ra thứ check_frozen phải bắt.
+
+ca_khong_phai_bug_da_kiem_chung:
+  what: "curl trên Windows console gửi `Cache theo ng? nghia` — mất dấu tiếng Việt"
+  do_lai: >
+    Gửi lại bằng `node -e` với fetch: ra `label_vi: Kiểm thử dấu tiếng Việt`
+    NGUYÊN VẸN. Lỗi ở client console (code page), không ở server. docBody trả
+    Buffer, decode utf8 đúng. Trình duyệt luôn gửi UTF-8.
+  khong_sua: "sửa ở server là sửa sai chỗ. Test assert dấu tiếng Việt còn nguyên."
+
+mo_whitelist_CO_HO_SO:
+  what: >
+    no-write-path.test.js tự ghi: "Them duong thu TU la test do — sua test la mot
+    quyet dinh co ho so, khong lot im". Nó ĐỎ đúng như thiết kế khi tôi nối FE.
+  lam_gi: >
+    Mở whitelist 3 → 5 đường, và viết vào docstring của chính test: vì sao FR-019
+    được thêm hai đường, M02-R3 nói gì, và CHỈ-THÊM nghĩa là gì. Người đọc test
+    sau này không phải đi tìm FR.
+
+verify:
+  loai: hard
+  ket_qua:
+    npm_run_check: sạch
+    web_test: 23/23 file, exit 0 (thêm danh-muc-them.test.js — 22 phép kiểm)
+    cong_may: 12/12
+    pytest: 30/30
+    build: exit 0
+  kiem_tay_tren_server_that:
+    - "PUT/PATCH/DELETE /api/concepts + PUT/DELETE /api/categories → 404 (5/5)"
+    - "thiếu label_vi → 422 · id không kebab-case → 422"
+    - "0/2 và 1/2 bài đề xuất → 422, file KHÔNG đổi một byte"
+    - "2/2 bài → 200, 23 mục, ky_lai:true, 22 mục cũ + comment nguyên văn"
+    - "trùng id → 409 · trùng alias `rolling-origin` → 409 chỉ ra `walk-forward-validation`"
+    - "thiếu xac_nhan → 422 · KB_DIR lệch repo → 409"
+    - "category thật (chủ đề thứ 7 `security`): 200, 3 file đồng bộ, 2 cổng xanh,
+       nhật ký có dòng — rồi HOÀN NGUYÊN, kho về đúng 6 mảng / 22 khái niệm"
+    - "rollback: cố tình để cổng đỏ → cả 3 file nguyên trạng (cmp byte)"
+  frozen: >
+    M02_kb/rules.md đổi ⇒ check_frozen ĐỎ đúng như phải. Ký lại bằng --ky SAU khi
+    FR-019 duyệt. 27 file trong FROZEN.lock.
+
+no:
+  - "UI CHƯA chỉnh — người dùng nói rõ 'UI còn phải sửa nhiều đấy'. Nút Kết nạp
+     dùng prompt() để lấy label_vi; form thêm chủ đề là 4 ô thô. Đủ để dùng,
+     chưa đẹp."
+  - "Sau khi kết nạp một khái niệm, các bài đang để nó ở `concepts_proposed` KHÔNG
+     tự chuyển sang `concepts` — response có ghi_chu nhắc, nhưng phải sửa từng
+     bài. Tự động chuyển là ghi vào N bài từ một request, mức khác hẳn."
+  - "Thêm nhãn KHÔNG tự dựng lại site. Trang tĩnh vẫn hiện danh mục cũ tới khi
+     `npm run build`. Cùng hở đã biết với nút Duyệt."
+  - "POST /api/categories chỉ chạy khi KB_DIR = kb/ thật (409 nếu không). Nghĩa là
+     đường đó KHÔNG có test đường-thành-công tự động — chỉ kiểm tay. Đánh đổi có ý
+     thức: test mà sửa enum schema frozen là tự tạo ra thứ check_frozen phải bắt."
+  - "category vẫn KHÔNG có `category_proposed` ⇒ không đòi được bằng chứng như
+     concepts. Răng thay thế là xác nhận 2 bước + đòi `gom`. Đây là chỗ yếu nhất
+     của FR-019, đã khai trong FR."
+  - "Server bind 127.0.0.1 (M08-R1) KHÔNG đổi. FR-019 không giải chuyện 'không có
+     PC' — muốn xem từ điện thoại là FR-020 riêng, đụng B-D3. (Lưu ý: số FR-020 đã
+     bị session song song dùng cho việc khác — chọn số kế tiếp còn trống.)"

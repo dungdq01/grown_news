@@ -1,0 +1,28 @@
+id: WL-01K9Z1PMQUYET4
+luc: 2026-09-04T01:30+07:00
+ai: claude (PM, phiên giám sát)
+viec: thi hành 4 quyết định chủ dự án gật ("ok làm đi") — từ báo cáo 4-việc của dev
+object:
+  - .claude/rule.md                                    # mục 8 (cách đo R5) + mục 9 (cấp ID)
+  - 07_plan/M08_api/tasks/T08-23-cong-db-dung-cho.md   # cũ T08-10 (bản mới hơn dời)
+  - 07_plan/M08_api/tasks/T08-24-ddl-db-loi.md         # cũ T08-11
+  - 07_plan/M08_api/tasks/T08-25-nam-cua-tai-khoan.md  # cũ T08-12
+  - 07_plan/M08_api/tasks/T08-26-bang-cai-dat.md       # cũ T08-17
+  - 07_plan/M08_api/tasks/T08-26b-test-cai-dat.md      # cũ T08-17b
+  - 06_modules/M08_api/backlog.md                      # 2 ô tick: ID-trùng [x] + luật-chỏi CHỐT
+  - 07_plan/M03_web/tasks/T03-95-khoi-viec-dashboard.md # quyết (a): chunk T03-102, JS vào plugins/chungcat
+noi_dung: |
+  1 · BYTE (quyết PM, lối a): T03-95 dựng bằng chunk theo màn (khuôn T03-102) —
+      JS vào web/plugins/chungcat/, KHÔNG vào bundle chung. Tiền đề dev đã cũ:
+      gn.css đo lại 91380/102400 (dư 11KB sau T03-99), chỉ HTML trang chủ kẹt (~9B).
+  2 · R5 vs nut-song §5 (chủ dự án gật): KHÔNG luật nào nhường — đổi CHỖ ĐO R5.
+      Đỏ-trước chứng minh bằng bằng chứng worklog (output đỏ tại mốc trước-code +
+      xanh sau, cùng entry), suite chung chỉ cần xanh lúc bàn giao. Cổng viết-trước
+      sống ở thư mục task, dời vào web/test/ CÙNG LƯỢT với mã. Khuôn T03-92 thành
+      chính thức. DEV LÀM: gỡ bản sửa "có CHỦ không" của nut-song §5 về nghĩa gốc.
+  3 · 4 cặp ID trùng M08 (chủ dự án gật): bản CŨ đã commit giữ số, bản MỚI dời
+      T08-23/24/25/26 + 26b. Header sửa; tham chiếu SỐNG sửa (xanh_khi T08-26b);
+      worklog cũ KHÔNG sửa (sổ lịch sử). Máy: nut-song exit 0 · check_g6b 202 task
+      parse, hết cảnh báo trùng (exit 1 còn lại = vế-4 M13/M14 chưa plan, có sẵn).
+  4 · CHỐNG TÁI DIỄN va ID (quyết PM): rule.md mục 9 — ls lấy max+1 trước khi tạo,
+      ghi worklog ngay lúc tạo; hai agent cùng plan một module thì chia dải trước.

@@ -1,0 +1,180 @@
+entry: ban-giao
+ulid: 01M2WKQ3B7ZDYRF6MTAX52NPGH
+ngay: 2026-09-09
+module: M03_web
+don_vi: T03-136
+wo: WO-082
+fr: FR-061a
+tieu_de: >-
+  Tran hien thi cho moi luoi; va gn.js het tran — bon duong lay lai byte deu bang 0
+
+object:
+  - web/plugins/multiwindow/src/scripts/multiwindow.inline.ts
+  - web/plugins/chungcat/src/chungcat.inline.ts
+  - web/styles/prototype.css
+  - web/test/tran-hien-thi-luoi.test.js
+  - web/test/mot-phieu-chung-cat.test.js
+  - web/test/cua-so-transcript.test.js
+  - web/test/_tran.mjs
+  - core/tests/check_host_video.py
+  - web/WORKLOG.md
+  - web/test/WORKLOG.md
+  - web/styles/WORKLOG.md
+  - web/plugins/WORKLOG.md
+  - 07_plan/M03_web/tasks/T03-135-panel-transcript-xong.md
+  - 07_plan/M03_web/tasks/T03-136-tran-hien-thi-danh-sach.md
+  - 07_plan/M03_web/tasks/T03-137-cat-thut-dau-dong.md
+  - 06_modules/M03_web/backlog.md
+  - .factory/fr/FR-061a-noi-tran-gn-js-cho-tran-hien-thi.md
+  - .factory/wo/WO-082-tran-hien-thi-danh-sach.md
+  - .factory/wo/WO-083-lay-lai-byte-gn-js.md
+
+trieu_chung: |
+  Chu du an: *"ko co co che phan trang va limit size, nen khi du lieu nhieu la
+  bi tran man - phai scroll xuong lien tuc"*. Do duoc: `/chung-cat/` ve ca 23
+  viec mot luot; `/video/` tra `#grid2` voi 30 the `.cd`.
+
+vi_sao_khong_cat_o_SSR: |
+  Ba man loai (`/video/`, `/tai-lieu/`, `/kho/`) DUNG CHUNG `grid2` va loc o FE
+  bang class `.off` (`apLoc`). Cat 12 the dau o server nghia la mot video xep
+  thu 25 theo thu tu chung KHONG TON TAI tren man `/video/` — du man ay chi co
+  4 video. Do la mat du lieu tren man, khong phai phan trang.
+
+  ⇒ Tran dat len cai NHIN THAY sau khi loc, va tinh lai moi lan loc.
+
+sua: |
+  `capNhin(luoi, datLai)` o chunk multiwindow, xuat qua cau `_cau()` de chunk
+  chungcat (IIFE rieng) goi duoc. Goi o cuoi `apLoc` cho MOI `.grid`, va trong
+  `ccNap` cho `#g-cc`. CSS `.cd.qua{display:none}` — class RIENG voi `.off`, vi
+  `apLoc` dem `:not(.off)` cho nhan; dung chung mot class thi nhan tut xuong 12
+  tren mot kho 30 ban.
+
+cong:
+  them: web/test/tran-hien-thi-luoi.test.js — 18 ve
+  cach_do: |
+    Trich `capNhin` khoi CHUNK DA BUILD roi CHAY tren mot DOM toi gian. Khong
+    doc `.ts` (chu thich con nguyen => mot cau van xuoi lam ve xanh) va khong
+    doc `site/gn.js` (do `assets.mjs` ghep luc server KHOI DONG => cong do ban
+    cua lan chay truoc — dung cai bay `memory/` da ghi hai lan).
+  do_duoc: chay truoc khi sua => 7 ve DO, trong do ve 1 (ham chua ton tai)
+  ve_am: |
+    Ve 5 nang ngang ve 2: loc con 5 the => phai hien du 5. Mot cai dat dem tren
+    tap GOC se "dung" o man Tong hop va an nham o `/video/` — khong ve duong
+    nao bat duoc.
+
+chan: |
+  `capNhin` ton 853 byte da nen => `gn.js` 104961/104448, VUOT 513 byte, 9 cong
+  cung do. Quy chu ro: red nay cua WO-082, khong phai no WO-055.
+
+WO_083_ket_qua_am: |
+  Chu du an chon huong "gianh lai byte". Uoc tinh ban dau cua toi (1.5-2 KB tu
+  ba bang nhung) SAI. Do that, bon duong deu bang 0:
+
+    bang nhung (MEDIA 2452 · KHUNG 1868 · XUAT 1389) — da chieu sach tu FR-036/038
+    ham chet                                        — khong co
+    chu thich                                       — catBinhLuanJs cat tu T03-101
+    thut dau dong                                   — minifyWhitespace bo tu WO-057
+    TX_CSS 4KB -> prototype.css                     — gn.css cung vo tran
+
+  Da cai `catThutDauDong` kem TRONG TAI `esbuild.minify`
+  (`minify(goc) === minify(da cat)` <=> khong byte nao cua chuoi bi cham).
+  Trong tai bat duoc HAI bug that cua may quet: template long trong `${}`, va
+  regex `/`([^`]+)`/g` mang ba dau backtick. Cat duoc 9846 byte o tang nguon,
+  0 byte o `gn.js`. Doi lai lam do `id-video-hoa-thuong` + `nap-video` (hai
+  cong cat mot ham khoi chunk THEO DONG roi chay). => hoan tac sach.
+
+  Cong cua chinh WO-083 tung khoe "lay lai 9846 byte" — con so do NOI DOI ve
+  thu duoc ship. Da sua truoc khi hoan tac, ghi lai o day vi do la lop loi
+  "xanh oan" dang nho.
+
+FR_061a: |
+  Lan noi tran THU TU (FR-061 -> FR-068 -> FR-074 -> nay). Chu du an ky:
+  *"ok, duyet va ky giup toi"*. `TRAN_KB.js` 102 -> 103, MOT dong, mot nguon.
+
+  No THUA: khong tra no nao, mua 512 byte. Ly do van duyet: bon duong toi uu
+  da do het va bang 0, con duong DUNG (doi vao chunk) bi khoa o CHO KHAC —
+  doi `home-motion` (6469 byte, chi Trang chu dung) thi `gn.js` con 98492,
+  nhung HTML Trang chu du 9 BYTE, khong du cho mot the `<script>` thu hai (+48)
+  (`trang.mjs:1792`). No that khong phai "gn.js qua to" ma la "HTML Trang chu
+  het cho". O backlog M03 mo voi dung cau do.
+
+  Khong lay `FR-081` vi dai `FR-080+` da cap cho PM-Space.
+
+cong_dich_theo_ma: |
+  `mot-phieu-chung-cat` ve 3b do sau WO-081: no cat 1400 ky tu sau
+  `LOAI_KHONG_NHAP.has(loai)` roi tim `data-act="cc-tu-tr"` NGAY trong cua so
+  ay — tuc do *"nut nam canh nhanh"*. WO-081 tach nut ra
+  `veNutChungCatTuTranscript`, hanh vi DUNG HON ma phep do do.
+
+  Da DOI PHEP DO theo ma, khong noi no: neo vao HAI mat xich that (nhanh goi
+  ham; ham phat ra nut), dung loi §3d ben duoi da dung cho bo nghe. Chung minh
+  do duoc: bo loi goi => 3b do; doi ten act => 3b3 do; va cua so 4000 KHONG
+  chua than ham nen 3b3 khong xanh oan.
+
+ba_cong_dich_theo_ma: |
+  Ngoai `mot-phieu-chung-cat` o tren, hai cong nua do vi MA DA DOI, khong vi he
+  sai. Ca hai duoc DOI PHEP DO, khong noi:
+
+  1 `check_host_video` — ve doi MOI host co mot `nhung` https. `WO-074` dat
+    `douyin.nhung = null` vi do duoc Douyin KHONG nhung duoc (ca ba duong;
+    `open.douyin.com/player` khung duoc nhung `aweme/detail` tra 403
+    ArgusSecurityPlugin — chung thuc THIET BI). Bang khai noi DUNG SU THAT nen
+    cong do oan. Ve moi doi CA HAI CHIEU: co `nhung` => https + dung host +
+    la tien to (y nhu cu); `nhung` null => phai khai `$vi_sao_nhung_null`.
+    Mot host mat `nhung` vi xoa nham VAN do, o ve thu hai.
+    Do duoc: xoa `$vi_sao_nhung_null` => ve do (da mo phong, khong sua bang that).
+
+  2 `cua-so-transcript` — THEM ve 6/6a/6b/6c. `check_g6b` bat `T03-135` khai
+    4 AC ma chi 3 `cmd`: AC2 (`.vc-ok` mot dong xanh) KHONG cong nao do. Do la
+    mot loi hua, va `R3` ha ca task xuong `soft`. Da viet ve con thieu roi noi
+    `cmd` vao AC2. "Mot dong" do duoc: ca the `<p class="vc-ok">…</p>` < 160
+    ky tu. Lan dau toi neo nham bien (`cc` = chunk chungcat) va cong do — dung
+    lop loi "cong xanh/do vi neo sai", da sua sang `tab` (chunk cctab).
+
+so_sach_WORKLOG: |
+  `check_worklog` do 17 test khong duoc nhac trong `web/test/WORKLOG.md` va ba
+  so lieu lech. Da them 17 dong (mo ta lay tu tieu de CUA CHINH moi file test,
+  khong bia) va cap nhat ba so: test 115->132 · prototype.css 3084->3282 ·
+  shell.html 58443->58633.
+
+do_do: |
+  Web  : 17 do -> 7 do. Dung bang baseline dau phien, KHONG mot do moi:
+         api-guard · man-tai-lieu · man-video · moc-fe-con-that · mot-bien-mau ·
+         opacity-khong-pha-contrast · page-weight
+         `page-weight` con HAI ve: "trang chu" va "tai dau nang nhat".
+         Ve `gn.js` da XANH (104971/105472).
+
+         SUA MOT LOI BAO CAO CUA CHINH TOI: co luc toi doc duoc "page-weight
+         chi con mot ve" — phep do ay lay LUC WO-083 con dang ap (chunk nho
+         hon ~2 KB). Sau khi hoan tac, hai ve. Con so dung la hai.
+
+         Va do them duoc mot dieu dang ke: trang chu 65669 byte voi **0 byte**
+         CSS/JS nhung lai — no nang thuan tuy vi dang phat **34 the `.cd`**.
+         Tuc `WO-082` chua duoc cai NGUOI THAY (tran man) nhung KHONG chua
+         byte: SSR van phat moi the, va HTML lon tuyen tinh theo kho. Da mo o
+         backlog M03 rieng cho viec do — no la thu dang khoa duong dua
+         `home-motion` vao chunk.
+  M12  : 56/56 xanh.
+  core : 7 do — `check_g6b` (xung dot he thong, xem duoi) + 6 cai commit lan
+         cuoi 2026-08-29/09-07, truoc phien nay: check_danh_muc ·
+         check_db_dung_cho · check_loai_nguon_db · check_media_ddl ·
+         check_skill · check_running (cai nay chi tong hop cac cai kia).
+         => `chua quy duoc chu` cho 6 cai do; khong phai cua WO-082/083.
+
+  Luu y moi truong: cong Python phai chay bang `./.venv/Scripts/python.exe` +
+  `PYTHONIOENCODING=utf-8`. `python` tran thieu `rapidfuzz` va cp1252 lam moi
+  cong "do" — mot lan hoang bao 58/58 do.
+
+check_g6b_xung_dot: |
+  Cong phan *"cham file test ma khong phai don vi test (R1)"* cho MOI task co
+  file test trong `pham_vi_ghi` ma ten khong mang `-test-`. Nhung PATCH buoc 5
+  bat CHINH task sua bug viet cong tai hien DO TRUOC — nen luong dung luon
+  luon vi pham cong. 21 task da vuong (T03-129/130/131 · T03-136 · T08-38 ·
+  T12-31 · T12-33..37 ...). Khong lach: da mo o backlog M03 voi hai loi de
+  nguoi chon (tach doi moi task, hay sua cong cho phep task ghi cong CUA CHINH
+  no).
+
+con_mo: |
+  WO-084 — chung cat loi tren `Mo mang tam mat...`:
+  `bee/gemini-3.5-flash-lite` tra `{"text": "## 1. Overview..."}` roi
+  `json.loads` nem. Chua chan doan: bi cat cut (het token) hay boc sai vo.

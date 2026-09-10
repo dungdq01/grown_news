@@ -1,0 +1,120 @@
+id: WL-01K9NXWO019
+at: 2026-08-29
+by: claude
+buoc: WO-019 — loại nguồn vào BẢNG DB · API · màn Danh mục đọc từ DB
+loai: bàn giao WO-019 (phần DB + API + render)
+wo: WO-019-loai-nguon-vao-db-va-thiet-ke-lai.md
+
+object:
+  wo:
+    - .factory/wo/WO-019-loai-nguon-vao-db-va-thiet-ke-lai.md
+  task:
+    - 07_plan/M01_core/tasks/T01-32-test-bang-loai-nguon.md   # test
+    - 07_plan/M01_core/tasks/T01-33-bang-loai-nguon.md        # code
+  code:
+    - core/assets/kho.schema.sql      # CREATE TABLE loai_nguon
+    - core/tools/dung_lai_db.py       # nhập yaml + gieo khi CHƯA CÓ FILE
+    - core/tools/xuat_kho.py          # xuất loai-nguon.yaml
+    - web/api/dungchung.mjs           # docLoaiNguon · suaLoaiNguon
+    - web/api/danhmuc.mjs             # suaLoaiNguonHttp
+    - web/api/router.mjs              # GET + PATCH /api/loai-nguon
+    - web/render/data.mjs             # duLieuReal/Mock mang `loai_nguon`
+    - web/render/trang.mjs            # panel ĐỌC bảng, file khai chỉ là đường lùi
+  test:
+    - core/tests/check_loai_nguon_db.py   # MỚI — 5 mục
+    - web/test/loai-nguon-api.test.js     # MỚI — 3 mục
+
+may_xanh:
+  - "PYTHONIOENCODING=utf-8 python core/tests/check_loai_nguon_db.py  ->  pass"
+  - "cd web && node test/loai-nguon-api.test.js  ->  pass"
+  - "19/24 cổng Python · pytest 42 · quét web 69/70 (chỉ `he-kinh`)"
+  - "gn.css 98421 / 102400 — dư 3979 · gn.js 100658 / 102400 — dư 1742"
+  - >
+    ĐƯỜNG THẬT qua HTTP: `GET /api/loai-nguon` trả 14 mục từ DB ·
+    `PATCH /api/loai-nguon/pdf {label_vi:"PDF (ban sua tay)"}` ⇒ 200, và
+    `/khai-niem/` HIỆN nhãn mới ⇒ panel đọc DB, không suy lại từ file khai
+  - "vòng file→DB→file đạt điểm bất động; `check_media_dan_xuat` xanh trở lại"
+
+hinh_dang:
+  - >
+    `loai_nguon (id, module, nhan, thu_tu)`. `module` là thứ trả lời câu người
+    dùng hỏi: *loại nguồn nào ứng với phân loại nào*
+  - >
+    `loai-nguon.json` KHÔNG bị thay. File đó giữ enum `source_type` và sinh các
+    ràng buộc `CHECK`; nó phải đọc được KHI DB CHƯA TỒN TẠI (`coFileBai()` và
+    phép kiểm `type` của route chạy trước khi có DB). Bảng giữ thứ NGƯỜI DÙNG
+    thấy — định dạng · nơi phát · loại bài. Hai vai, không phải hai bản
+  - >
+    KHÔNG có POST/DELETE: danh sách đến từ schema và whitelist. Thêm một loại mà
+    DDL không biết là hứa thứ `CHECK` sẽ từ chối; xoá một loại còn bản ghi dùng
+    là làm facet mất một nhóm. Đổi CHỮ HIỆN THỊ thì được — đó là thứ của người
+    dùng
+  - >
+    PATCH từ chối `module`: loại nguồn thuộc phân loại nào là do PHÉP SUY
+    (`nguonCua`) quyết. Gán `pdf` sang `video` thì màn Video liệt kê một định
+    dạng không video nào có
+
+luat_gieo_sai_lan_dau:
+  - >
+    Tôi viết "gieo khi BẢNG RỖNG". `check_media_dan_xuat` đỏ ngay: nó dựng DB1
+    bằng SQL trực tiếp (không qua `dung_lai_db`), nên `loai-nguon.yaml` xuất ra
+    RỖNG — rồi vòng sau thấy bảng rỗng và gieo 14 dòng ⇒ hai cây export khác nhau
+  - >
+    "Bảng rỗng" và "chưa có file" là HAI trạng thái. Một kho đã có
+    `loai-nguon.yaml` rỗng là một kho đã NÓI: không loại nguồn nào. Gieo ở đó là
+    ghi đè một câu trả lời đã có. Luật đúng: gieo khi CHƯA CÓ FILE
+
+tu_bat_duoc:
+  - >
+    Điểm bất động hỏng lần đầu vì export ghi khoá `label_vi` (quy ước của
+    `yaml_danh_muc`) còn import đọc khoá `nhan` ⇒ tên rơi về id sau một vòng.
+    Cổng bắt bằng cách so từng hàng, không so số hàng — so số thì 14 == 14 và nó
+    xanh
+  - >
+    Cổng CHẾT thay vì BÁO hai lần: `dem()` ném khi bảng chưa có, và `items[0]`
+    là `undefined` ở lần chạy đầu. R5 đòi ĐỎ TRƯỚC, nên "chưa có" là trạng thái
+    HỢP LỆ của lần chạy đầu — phép kiểm phải báo, không chết
+  - >
+    Đặt task vào M02_kb trong khi `core/**` thuộc boundary M01_core; `check_g6b`
+    bắt. M02_kb là `kb/**` — DỮ LIỆU, không phải công cụ sinh ra nó
+  - >
+    Truy vấn "tìm mục lạ" của tôi dùng `id LIKE '%__%'` và khớp TẤT CẢ — trong
+    SQL `LIKE`, `_` là ký tự đại diện một ký tự. Lỗi phép đo, không phải dữ liệu
+
+kho_that:
+  - >
+    Kho THẬT nay có bảng `loai_nguon` 14 hàng (5 bài viết · 6 tài liệu · 3 video)
+    và `kb/loai-nguon.yaml`. Quy chủ: server của NGƯỜI DÙNG đang chạy trên 8787
+    với kho thật (có `-wal`/`-shm` ⇒ kết nối mở); họ khởi động lại nó sau khi tôi
+    đổi mã, nên bản mới áp DDL và `banXuat()` xuất file
+  - >
+    Không có gì lạ lọt vào: đúng 14 mục đã gieo, và số bản ghi không đổi
+    (`bai_viet 1 · tai_lieu 0 · video 0`)
+
+phan_FE_da_noi:
+  - >
+    Nút SỬA trên từng hàng loại nguồn; `guiPopupSua` chọn đường bằng BẢNG TRA
+    `DUONG_NHAN` thay cho ternary hai nhánh
+  - >
+    MỘT khuôn hàng (`hangLn`), không hai: nhánh "nhóm chưa dùng loại nào" từng
+    dựng hàng bằng khuôn thứ hai nên nút sửa không có ở đó
+  - >
+    Sửa xong màn ĐỔI NGAY. Đo trên trình duyệt: hàng `pdf` "PDF" -> "TÊN MỚI TỪ
+    MÀN", và `data-nhan` của nút theo cùng — quên nó thì lần mở sau hiện giá trị
+    lúc trang được dựng
+  - >
+    KHÔNG thêm/xoá: cổng `bon-chieu-facet` §8 đảo từ "cấm cả ba" sang "cho SỬA,
+    cấm THÊM/XOÁ"
+
+con_lai_cua_WO019: ĐÃ ĐÓNG — xem WL-01K9NZWO019B
+  - >
+    Host `fb` + `douyin` đã vào whitelist, kèm cổng `check_host_video.py` chứng
+    minh M09-R3 bằng CẤU TRÚC (sinh chuỗi tấn công, không đọc regex bằng mắt)
+
+do_do:
+  - cong: he-kinh.test.js
+    do_do_boi: ảnh 724 KB người dùng thêm — `python core/tools/toi_uu_anh_nen.py`
+  - cong: check_frozen.py
+    do_do_boi: chờ NGƯỜI ký sau khi FR-039 duyệt
+  - cong: check_danh_muc.py · check_skill.py · check_running.py
+    do_do_boi: agent khác · và hệ quả của hai cổng trên

@@ -1,0 +1,78 @@
+id: WL-01K9NYWO022
+at: 2026-08-29
+by: claude
+buoc: WO-022 — `idVideo()` hạ cả URL về chữ thường ⇒ id YouTube sai
+loai: bàn giao WO-022
+wo: WO-022-id-video-bi-ha-chu-thuong.md
+
+object:
+  wo:
+    - .factory/wo/WO-022-id-video-bi-ha-chu-thuong.md
+  task:
+    - 07_plan/M03_web/tasks/T03-53-test-id-video-hoa-thuong.md   # test
+    - 07_plan/M03_web/tasks/T03-54-id-video-hoa-thuong.md        # code
+  code:
+    - web/plugins/multiwindow/src/scripts/multiwindow.inline.ts  # idVideo
+  test:
+    - web/test/id-video-hoa-thuong.test.js   # MỚI — 5 mục
+    - web/package.json                       # đăng ký vào `npm test`
+
+may_xanh:
+  - >
+    ĐỎ TRƯỚC (R5), đúng ba chỗ và đúng lời:
+    `id giữ nguyên chữ hoa — kỳ vọng "dQw4w9WgXcQ"  nhận được "dqw4w9wgxcq"`
+  - "sau khi vá: `node test/id-video-hoa-thuong.test.js` -> pass (12 mục)"
+  - "quét từng file: 70/71 xanh — chỉ `he-kinh` (ảnh của người dùng)"
+  - "pytest 42 · 21/26 cổng Python"
+  - "page-weight: gn.js 99 KB · gn.css 96 KB · trang lớn nhất 66/74 KB"
+
+bug:
+  - >
+    `const s = String(un ?? "").toLowerCase()` rồi bóc id TỪ `s`. Chữ thường cần
+    cho MỘT việc — so tên miền — nhưng nó được áp cho cả phần id, và id YouTube
+    là base64url PHÂN BIỆT hoa–thường
+  - >
+    Đo trên byte đã build: `youtube.com/watch?v=dQw4w9WgXcQ` ⇒ id `dqw4w9wgxcq`,
+    `src` iframe trỏ vào MỘT VIDEO KHÁC. Xác suất id 11 ký tự không có chữ hoa
+    nào là `(38/64)^11 ≈ 0,0028` ⇒ **~99,7% video YouTube nhúng sai**
+  - >
+    `normalize_url()` phía Python làm ĐÚNG:
+    `chu = duong.lower().split("/", 1)[0]` — hạ RIÊNG phần host. FE lệch với nó
+
+vi_sao_70_cong_khong_keu:
+  - >
+    `dqw4w9wgxcq` VẪN khớp `^[A-Za-z0-9_-]{11}$`. `id_mau` hỏi *"id có đúng HÌNH
+    DẠNG không"* và câu trả lời là CÓ — id sai vẫn đúng hình dạng. Đo HÌNH THỨC
+    thay vì đo SỰ THẬT, đúng lớp lỗi đã gặp nhiều lần ở dự án này
+  - >
+    Ba file test nhắc `video_host` đều dùng id toàn chữ thường hoặc toàn chữ số.
+    `tiktok` là số nên `.toLowerCase()` VÔ HẠI ở đó — bug ẩn sau đúng cái host
+    duy nhất miễn nhiễm với nó. Cổng mới giữ một ca tiktok ở §5 để phép sửa
+    không làm hỏng cái đang đúng
+
+phep_do:
+  - >
+    Cổng chạy BYTE ĐÃ BUILD: cắt thân `idVideo` khỏi `gn.js` rồi `new Function`.
+    Chép tay bản thứ hai là kiểm bản chép — nó luôn đúng vì tôi vừa viết nó
+  - >
+    So TỪNG KÝ TỰ với id kỳ vọng, không so `id_mau`: `id_mau` không phân biệt
+    được đúng với sai, và đó chính là chỗ bug sống sót
+  - >
+    §3 kẹp phép sửa từ phía kia — `YouTube.COM/…` vẫn phải nhận ra host. Bỏ luôn
+    `.toLowerCase()` thì §2 xanh mà §3 đỏ
+
+hep_dung_pham_vi:
+  - >
+    Bản vá lỡ đổi chữ ký thành `idVideo(un: string)`. Đã trả lại `idVideo(un)`:
+    khối này là mã .ts phục hồi, không có chú kiểu ở hàm nào quanh nó, và sửa
+    chữ ký không nằm trong phạm vi bug
+
+đỏ_do: chưa quy được chủ  # bug có từ trước WO-019, không truy được lượt ghi nào
+
+do_do:
+  - cong: he-kinh.test.js
+    do_do_boi: ảnh 708 KB người dùng thêm — `python core/tools/toi_uu_anh_nen.py`
+  - cong: check_frozen.py
+    do_do_boi: chờ NGƯỜI ký sau khi FR-039 duyệt
+  - cong: check_danh_muc.py · check_skill.py · check_running.py
+    do_do_boi: agent khác · và hệ quả của hai cổng trên

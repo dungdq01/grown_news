@@ -1,0 +1,62 @@
+ulid: 01K9SK1T0395KHOI
+khi: 2026-09-04T05:55+07:00
+tac_nhan: agent-thi-cong (Claude, phiên 6c7880c5)
+loai: ban-giao
+module: M03_web
+don_vi: T03-95 — khối việc trên Dashboard + badge rail
+
+viec: |
+  Ba số (đang chạy · cần xử lý · xong) + MỘT link, cắm vào mốc `#kpi` ĐÃ CÓ.
+  Badge trên mục nav **Chưng cất** qua `data-mount` + luật `[data-mount]:empty`
+  sẵn có — 0 nhánh `if`.
+
+  BA ràng buộc byte quyết hình dạng, không phải sở thích:
+    trang chủ HTML  61430/61440 ⇒ dư   11 byte ⇒ 0 byte HTML mới trong shell
+    gn.css         102038/102400 ⇒ dư  362 byte ⇒ 0 luật CSS mới
+    gn.js           98277/102400 ⇒ dư 4123 byte ⇒ khối ~1512 LỌT
+
+  ⚠️ Ở BUNDLE CHUNG, ngược `phạm_vi_ghi` của PM (`plugins/chungcat`). Lý do đo
+  được: thẻ `<script>` của chunk tốn **+48 byte** HTML trang chủ mà nó dư 11.
+  `T03-104` dọn 3466 byte trong `gn.js` chính là thứ làm lối này khả thi — quyết
+  (a) của PM đã đúng về HƯỚNG (dọn chỗ), chỉ sai về CHỖ ĐẶT cuối cùng.
+
+object:
+  - web/plugins/multiwindow/src/scripts/multiwindow.inline.ts
+  - web/test/chung-cat-quan-ly.test.js   # dời từ thư mục task, đăng ký npm test
+  - web/test/man-video.test.js           # nới phép so sau T03-104
+  - web/package.json
+  - 06_modules/M03_web/backlog.md        # tick T03-95 + 1 ô lớp lỗi
+
+bang_chung:
+  - "ĐỎ-TRƯỚC: 7 lỗi tại mốc trước-code, ghi ở `WL-01K9SD4T0399T0395`
+     (`đọc được thân hàm dựng khối` · `ba con số` · `có MỘT link` · `có hàm
+     ccBadge` · `badge mang data-mount` · `badge trỏ mục nav Chưng cất`)"
+  - "SAU: `node web/test/chung-cat-quan-ly.test.js` → pass"
+  - "TRÌNH DUYỆT THẬT: `#kpi` mọc 4 ô (`chưng cất` · đang chạy 2 · cần xử lý 0 ·
+     xong 0) + nút `mở màn Chưng cất`; badge rỗng ⇒ `display:none`, đặt '3' ⇒
+     `display:block` — luật `:empty`, không nhánh `if`"
+  - "gn.js 99865/102400 · trang chủ 61430/61440 · cd web && npm test → exit 0 ·
+     2815 ok · 0 FAIL"
+
+do_do: khong-co-do-moi
+
+hoc_duoc: |
+  1 · MỘT LỖI CHỈ ẢNH CHỤP MỚI THẤY. Ba ô số cắm vào `#kpi` — mốc duy nhất tốn
+      0 byte HTML — nhưng `#kpi` nằm trong panel tiêu đề **KHO**. Mọi con số
+      đúng, mọi cổng xanh, và người đọc hiểu "đang chạy 2" là 2 bản ghi kho.
+      Thêm một ô nhãn `chưng cất` trước ba ô. Không phép kiểm mã nào bắt được
+      "khối nói sai vì CHỖ ĐẶT".
+
+  2 · Tôi tự thêm một phép phủ định SAI trong lúc sửa cổng: *"không tên miền
+      nào gõ tay trong `hostVideoHopLe`"*. Hàm đó CÓ một tên gõ tay có chủ đích
+      (`PHU = { "youtube.com": ["youtu.be"] }` — `youtu.be` là tên rút gọn cùng
+      nhà mà FE tự sinh, đã ghi lý do trong mã). Thêm rồi gỡ ngay cùng lượt.
+      ⇒ Một phép phủ định quét cả thân hàm sẽ phạt mọi ngoại lệ ĐÃ ghi lý do.
+
+keo_theo:
+  - "M03 backlog: SÁU cổng đã phải nới sau T03-104/105 — rà xem còn cái nào neo
+     vào tên file/cách viết thay vì vào tính chất"
+
+chua_xong: |
+  T03-94 · Xoá nháp · audit_loi vào backup — đã duyệt, chưa làm.
+  Gate G6C do NGƯỜI ký. Chưa commit.

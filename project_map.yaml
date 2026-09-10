@@ -1,0 +1,1168 @@
+# Grown_news — bản đồ cấu trúc
+# Chỉ mục + quan hệ. Không chép nội dung: mọi ô có con trỏ về nơi sự thật sống.
+# Bản đồ lệch spec ⇒ spec thắng, bản đồ sửa.
+
+version: 31
+# v29 — media-mime.json vào chủ M03 (ghi chú có ở M03 từ trước,
+#       `version:` bị bỏ quên; bump này trả nợ luôn cả nó).
+# v31 — PM rà tiến độ 2026-09-08 (2 lượt — lượt 2 theo audit 9-chỗ của dev
+#       mới: status M08/M10/M11 hết 'planned' · S3_toolchain số thật · flows
+#       thêm đợt-hai F4/F5/F6 · gaps đóng 3 cái lỗi thời có object · entities
+#       thêm Media/Transcript/BanGhi/LoaiNguon · updated hết lệch): M13 `depends_on` đổi [M02_kb] → [M08_api]
+#       (plan T13-0/T08-35 chốt: đọc kho QUA API kho-delta, không đọc kb/ file
+#       — đúng lớp lỗi v30 vừa sửa cho M12); M03 status/screens hết đông cứng
+#       ở "4 plugin, 7 test"; M12 thêm dòng tiến độ C4a+C4b.
+# v30 — hai chỗ bản đồ NÓI SAI mà không cổng nào bắt: `depends_on`
+#       của M12 và M03 đều thiếu `M08_api`. `check_map` chỉ đối
+#       chiếu module ↔ thư mục, KHÔNG đối chiếu quan hệ — nên một
+#       cạnh phụ thuộc sai thì im lặng mãi. Đo bằng lời gọi thật.
+updated: {at: 2026-09-08, by: claude-pm, worklog: WL-01KB31MAPRA}
+
+# ═══ v15 · MỖI MODULE SỞ HỮU SPEC CỦA CHÍNH NÓ ═════════════════════════════
+#
+# Trước v15, `06_modules/**` không thuộc boundary của module nào. Nên
+# `check_g6b` §2 không đo được ai sửa spec nào — và A6 đã sửa `M01_core/spec.md`
+# + `M03_web/spec.md`, B0 đã TẠO `M09_thuvien/spec.md` và ký vào `FROZEN.lock`,
+# tất cả mà không khai `phạm_vi_ghi`. Đây là lần thứ BA của cùng lớp lỗi trong
+# một plan (`Makefile` ở v14-1, `kb-mock/**` ở v14).
+#
+# Khai chủ theo lẽ hiển nhiên: module sở hữu spec/rules của chính nó. `FROZEN.lock`
+# về M01_core vì `core/tests/check_frozen.py --ky` là thứ ký nó.
+#
+# CÒN THIẾU CHỦ (ghi ra để lần sau không phải đo lại): `RUNNING.md` ·
+# `memory/decisions.md` · `03_docs/**`. (`05_uiux/**` đã về M03 — v17/FR-042.)
+# Chưa khai vì chưa có đơn vị việc nào cần — khai một chủ không ai dùng là một
+# dòng bản đồ không ai kiểm.
+
+# Vào khung từ giữa: dự án đã có code trước khi áp Factory.
+# Bỏ G1-G3. G4 ký trên map + security_baseline thay vì trên scaffold.
+adopted:
+  entry: mid-framework          # ADOPT.md §5
+  reason: core/ + kb/ đã chạy và có test trước khi áp khung
+  skipped_gates: [G1, G2, G3]
+
+# ═══ v18 · NĂM MODULE DỰ KIẾN — đợt hai (s4, 2026-08-31) ══════════════════
+#
+# VÌ SAO KHÔNG NẰM TRONG `modules:`
+# `check_map` §1 đòi mỗi module có `06_modules/<tên>/`, §4 đòi `spec.md`. Spec
+# là artifact của s6, chưa viết. Khai vào `modules:` bây giờ ⇒ cổng đỏ, và
+# cách chữa duy nhất là đẻ năm spec rỗng — tức năm hợp đồng không nói gì.
+#
+# Nên chúng ở mục riêng: `check_map` không đọc mục này, nhưng NGƯỜI đọc được,
+# và s6/s7 tiêu thụ được `be` để khai `phạm_vi_ghi`. Không phải chỗ giấu —
+# đây là chỗ ghi rõ 'đã quyết biên, chưa viết hợp đồng'.
+#
+# TỐT NGHIỆP sang `modules:` khi module-pack của nó tồn tại (s6).
+#
+# Thư mục mã đã dựng ở s4 (khung rỗng, mỗi cái một README):
+#   chungcat/ · truyhoi/ · chatbot/ · artifact/ · kenh/
+# Bảng khai cổng + vùng: core/assets/dich-vu.json
+#
+# `be` CHỈ liệt thư mục mã đã có thật. Một boundary trỏ vào hư không thì task
+# khai `phạm_vi_ghi` trong đó vẫn đi qua check_g6b mà không ai báo — đúng lý do
+# check_map §2 tồn tại.
+#
+# ══ 2026-09-01 · MỤC `modules_du_kien` ĐÃ HẾT, và đó là lý do nó bị XOÁ ══
+#
+# Cả SÁU module đợt hai (M12→M17) đã tốt nghiệp sang `modules:` — mỗi cái một
+# pack 6 artifact dựng ở s6. Nên `06_modules/<ten>/**` nay ĐÃ khai cho cả sáu,
+# và `check_g6a` đối chiếu 17 module ↔ 17 thư mục.
+#
+# KHÔNG để lại một khoá `modules_du_kien:` RỖNG: một khoá rỗng đọc như 'còn
+# module đang chờ' trong khi không còn cái nào, và nó là thứ PHẢI NHỚ mới dọn.
+# Cần lại mục này (đợt ba) thì thêm lại — kèm đúng đoạn giải thích ở trên.
+# Worklog: WL-01K9W3S6M12 … WL-01K9W8S6M17.
+modules:
+  M17_cong:
+    purpose: cổng xác thực — nhận HTTPS từ Internet, xác thực, chuyển tiếp vào
+             127.0.0.1. Dịch vụ DUY NHẤT được nghe ngoài loopback.
+    vung: BIEN
+    be: [cong/**, 06_modules/M17_cong/**]   # pack dung 2026-09-01 (s6)
+    fe: null
+    cong: 443
+    nghe_ngoai: true
+    depends_on: [M08_api]
+    luat_rieng: >
+      FR-045. KHONG ghi kb/, KHONG doc kb/, KHONG co key model, KHONG co giao
+      dien. Ton tai de M08-R1 va api-guard.test.js giu NGUYEN VAN khi he co 5
+      tai khoan: be mat Internet nam o BIEN, khong nam o LOI.
+      Cho loi bao mat song: buoc chat_id <-> account (U3, U4).
+# Entity mới đợt hai — khai thô, chốt hình dạng ở s6:
+#   `viec`   hàng đợi việc cho THỢ. Ba câu chưa trả lời (build_order §Ba câu):
+#            idempotency · treo bao lâu · giới hạn thử lại. Câu ba KHÔNG thuần
+#            kỹ thuật: mỗi lần thử là một lần dữ liệu rời khỏi máy.
+#   `nguon`  trường mới của ho_so tong-hop (FR-044) — danh sách slug, >=2.
+#
+# Entity FR-045 (2026-09-01) — bốn bảng, LÕI sở hữu, chỉ lộ qua API:
+#   `nguoi_dung`      (id, ten, vai, trang_thai, tao_luc) — `vai` CHƯA ai đọc
+#   `ma_moi`          (ma, nguoi_dung_id, het_han, dung_luc) — MỘT LẦN, hết hạn
+#   `dinh_danh_kenh`  (kenh, chat_id, nguoi_dung_id, buoc_luc) — THAY allowlist
+#                     phẳng của B-B4; `kenh/` hỏi web thay vì tự quyết
+#   `phien`           (id, nguoi_dung_id, kenh, ngu_canh, cap_nhat_luc)
+#                     — chatbot KHÔNG được đọc/ghi bảng này (U6): session là
+#                     dữ liệu, dữ liệu ở LÕI
+
+  M16_artifact:
+    purpose: bài đã duyệt → slide · giọng đọc · video.
+    vung: THO
+    be: [artifact/**, 06_modules/M16_artifact/**]   # pack dung 2026-09-01 (s6)
+    fe: null
+    cong: 8792
+    depends_on: [M02_kb, M09_thuvien]
+    luat_rieng: >
+      Chạy PHÚT không phải giây ⇒ API bất đồng bộ, không nằm trong một HTTP
+      request. Xếp CUỐI vì phụ thuộc nhiều nhất và 'gửi RA' gắt nhất.
+
+  M15_kenh:
+    purpose: adapter kênh chat. Ba việc và chỉ ba — allowlist người gửi ·
+             dịch lệnh → gọi web:8787 · dịch phản hồi → tin nhắn.
+    vung: BIEN
+    be: [kenh/**, 06_modules/M15_kenh/**]   # pack dung 2026-09-01 (s6)
+    fe: null
+    cong: null                     # KHÔNG nghe — kéo bằng long polling
+    depends_on: [M08_api, M14_chatbot]
+    luat_rieng: >
+      KHÔNG chạm kb/ một lần nào (Z4). KHÔNG logic nghiệp vụ.
+      Allowlist chat-id BẮT BUỘC (B-B4): nó là thứ DUY NHẤT đứng giữa người lạ
+      và cửa ghi — mọi service khác ở 127.0.0.1 không auth.
+      Chỉ cắm kênh có BỀ MẶT CHÍNH THỨC (B-E4). Thứ tự: Telegram → Discord →
+      Zalo (đang nghiên cứu) → FB.
+
+  M14_chatbot:
+    purpose: hỏi → đáp KÈM ĐỊA CHỈ. Không có trong kho thì từ chối, có phân loại
+             lý do. Trả JSON, không trả trình bày.
+    vung: THO
+    be: [chatbot/**, 06_modules/M14_chatbot/**]   # pack dung 2026-09-01 (s6)
+    fe: null                       # web là client #1, KHÔNG phải chủ sở hữu
+    cong: 8788
+    depends_on: [M13_truyhoi]
+    luat_rieng: >
+      Là SERVICE có API, không nằm trong web/. Metric bắt được nếu làm sai:
+      M7.4 (curl vào API trả JSON) và M8.2 (kênh thứ hai ≤20% công kênh đầu).
+      Vùng THỢ vì nó gọi model — không phải LÕI, dù nó phục vụ web.
+
+  M13_truyhoi:
+    purpose: chỉ mục + truy hồi. Phạm vi lấy từ bộ lọc facet — control HIỂN THỊ,
+             không phải top-k ẩn.
+    vung: THO
+    be: [truyhoi/**, 06_modules/M13_truyhoi/**]   # pack dung 2026-09-01 (s6)
+    fe: null
+    cong: 8791
+    # v31 · [M02_kb] → [M08_api]: plan chốt indexer đọc kho QUA API LÕI
+    # (GET /api/kho-delta + thân qua cửa bản ghi — T08-35), KHÔNG đọc kb/**
+    # file (kb là bản export, chân lý ở DB — FR-034). Dữ liệu vẫn LÀ của
+    # M02, nhưng cạnh trong map đo bằng LỜI GỌI, không bằng gốc dữ liệu.
+    depends_on: [M08_api]
+    luat_rieng: >
+      Chỉ mục là DỮ LIỆU DẪN XUẤT — dựng lại được từ kho, không phải chân lý
+      (cùng nguyên tắc B-C1). Mất chỉ mục không mất gì.
+
+  M12_chungcat:
+    purpose: nguyên liệu → bản nháp. BỐN loại việc — `chung-cat-mot-nguon`
+             (ho_so phan-tich) · `tong-hop` N nguồn (ho_so tong-hop, FR-044) ·
+             `sinh-transcript` (FR-054) · `tai-video` (FR-069). Engine cắm rút
+             được. Nguyên liệu của một bản ghi VIDEO là TRANSCRIPT, không phải
+             `than` (FR-070).
+    vung: THO
+    be: [chungcat/**, 06_modules/M12_chungcat/**]   # pack dung 2026-09-01 (s6)
+    fe: null                       # THỢ không có giao diện (Z7)
+    cong: 8790
+    status: as-built               # v31 · C4a+C4b CHẠY THẬT (worker song song,
+                                   # gọi gateway thật, transcript .vtt vào kho,
+                                   # commit b7ab3f8) — chờ: CI (T04-8) · đo
+                                   # nguong_fuzzy chính thức · NGƯỜI ký G6C
+    # v30 · thêm M08_api — ĐO bằng lời gọi thật, không suy từ sơ đồ:
+    #   grep chungcat/src/*.py ⇒ /api/articles · /api/loi · /api/nhap-chung-cat
+    # Cả ba là cửa của LÕI. `luat_rieng` bên dưới đã NÓI ra phụ thuộc này ba
+    # dòng liền ("Ghi kho CHỈ qua POST /api/nhap của LÕI") mà cạnh vẫn thiếu —
+    # một sự thật khai bằng văn xuôi thì không máy nào đọc được.
+    depends_on: [M01_core, M02_kb, M05_intake, M08_api]
+    luat_rieng: >
+      Gọi model ⇒ egress (B-E1 bậc 4) ⇒ MỌI lời gọi ghi log sha256 payload.
+      Ghi kho CHỈ qua POST /api/nhap của LÕI, dừng ở draft (M05-R1).
+      (v30 — bỏ câu "Không thi công được trước C1": M12 ĐÃ thi công, 43 cổng
+      xanh. Để một câu lỗi thời trong bản đồ là dựng một cái bẫy cho người đọc
+      sau.)
+
+  M01_core:
+    purpose: sinh và kiểm file .md trong kb/, không biết gì về web
+    be: [core/**, kb-mock/**, 06_modules/M01_core/**, FROZEN.lock]
+                                   # `kb-mock/**` thêm ở v14 (FR-036/B8a): nó do
+                                   # `core/tools/sinh_kb_mock.py` SINH RA, và
+                                   # trước đó không module nào khai nó — nên
+                                   # check_g6b không đo được ai sinh lại kho mock,
+                                   # và A3 đã sinh lại nó mà không khai phạm_vi.
+                                   # M03 chỉ ĐỌC nó (boundaries.web_reads).
+    fe: null
+    depends_on: []
+    screens: []
+    spec: 06_modules/M01_core/spec.md
+    status: as-built               # có code + 14 test, chưa có spec chuẩn s6
+
+  M02_kb:
+    purpose: kho tri thức — hợp đồng giữa core và web, nguồn chân lý
+    be: kb/**
+    fe: null
+    depends_on: []                 # KHÔNG phụ thuộc core: core ghi vào nó, không ngược lại
+    screens: []
+    spec: 06_modules/M02_kb/spec.md
+    status: as-built
+
+  M03_web:
+    purpose: render kb/ thành tờ báo tri thức, chỉ đọc
+    be: 06_modules/M03_web/**    # spec/rules của chính nó — xem ghi chú v15
+    # v17 · FR-042 — 05_uiux/** VÀO chủ M03: ghi chú "còn thiếu chủ" ở đầu file
+    # nói khai khi CÓ đơn vị việc cần, và T03-88 (nền sáng be) là đơn vị đầu
+    # tiên ghi vào tokens.css. M03 là bên duy nhất TIÊU THỤ nó (map: contracts
+    # trỏ tokens là hợp đồng UI của chính M03).
+    # v28 · FR-056 — core/assets/man-hinh.json VÀO chủ M03: mọi bên đọc lẫn ghi
+    # đều là M03 (server/trang.mjs/build-fe/cổng web; ghi = đơn vị thêm màn);
+    # nằm ở core/assets chỉ vì quy ước bảng-khai-một-chỗ.
+    # v29 · media-mime.json VÀO chủ M03, cùng lý lẽ v28 ở trên. Bảng khai loại
+    # media: bên ĐỌC là cổng nạp của web, bên GHI là đơn vị thêm một loại file
+    # cho màn nạp (`T03-111` thêm `.md`/`.txt`, `FR-064` thêm cột `chip_loc`).
+    # M01 không đọc nó, không ghi nó — nó nằm ở core/assets chỉ vì quy ước
+    # bảng-khai-một-chỗ, y như man-hinh.json.
+    fe: [web/**, 05_uiux/**, core/assets/man-hinh.json, core/assets/media-mime.json]   # _quartz/ là thượng nguồn, ngoài git
+    # v30 · thêm M08_api. Câu cũ ("đọc kb/, KHÔNG phụ thuộc core") đúng về
+    # M01 và SAI về LÕI: FE gọi 14 cửa `/api/*` — articles · categories ·
+    # concepts · health · inbox · index · job · loai-nguon · model ·
+    # nhap-chung-cat · recycle · tai-lieu · video · viec (đo bằng grep trên
+    # `web/plugins/**/*.ts`). Không phụ thuộc `core` vẫn đúng và được giữ.
+    depends_on: [M02_kb, M08_api]
+    screens: [SCR-00, SCR-01, SCR-02, SCR-03]   # SCR-00 = app shell + multi-window
+    # v31 · wireframe đợt hai: SCR-12..17 (mock s5) · SCR-18..23 (chỉ-dẫn ·
+    # tải-xuống · nút-trạng-thái · menu-tải-2 · tìm-toàn-văn · thẻ-2-tầng)
+    # — file ở 05_uiux/wireframes/, KHÔNG lặp nội dung vào đây.
+    spec: 06_modules/M03_web/spec.md
+    status: as-built               # v31 · s8 đợt-hai: 7 plugin (multiwindow ·
+                                   # backdrop · home-motion · home-pages ·
+                                   # chungcat · cctab · napvideo), ~100 cổng
+                                   # trong npm test; màn mới /chung-cat/ +
+                                   # /chung-cat/nhap/ (man-hinh.json là nguồn,
+                                   # map không lặp danh sách màn — FR-056)
+    stack: quartz-v5               # ADR-01 + FR-007 — v4 không có trên npm, v5 là bản hiện hành
+    custom_parts:                  # ba luật tòa soạn Quartz không cho sẵn
+      - {name: approvedOnly, kind: filter, rule: chỉ render review_status approved}
+      - {name: sortByPriority, kind: config, rule: sắp theo priority không theo ngày}
+      - {name: mergeBySource, kind: emitter, rule: gộp theo url_normalized}
+
+    # ═══ s5 FROZEN v1 — hợp đồng UI cho s6 ═══
+    # Đổi bất kỳ giá trị nào ⇒ FR + bump version + worklog. Drift owner: PM.
+    ui_frozen:
+      version: v1.18                          # FR-041 — màn Kho: mỗi câu hỏi một hình dạng
+      frozen_at: 2026-08-18
+      amended_at: 2026-08-29                  # FR-041: kpi2→donut · bars2→lưới ô ·
+                                              #   bars3→bậc thang · bars4→vòng đời ·
+                                              #   kf-thang→đường vùng; mốc id GIỮ;
+                                              #   chuyển động một-nhịp (kho-hinh-dang canh)                  # FR-008: panel rỗng · cột thẳng đáy · nhãn cùng cao
+                                              # FR-013: --e-1..4 + --e-top, đảo luật
+                                              #   "không shadow" của DESIGN.md §3
+                                              #   (nhãn cũ ghi FR-011 — số đó là
+                                              #   bàn biên tập local, đã dùng)
+                                              # FR-014: viền màu · tách cột · scroll
+                                              #   ngang · bar chạy từ 0
+                                              # FR-016: chữ phụ --ink-3→--ink-2 (cả
+                                              #   hai đã có trong contrast-audit;
+                                              #   KHÔNG đổi giá trị token nào) ·
+                                              #   .two có nhịp tách khối · số KPI
+                                              #   mang màu trạng thái · màn Nạp
+                                              #   nguồn 3 cột → 3 tab
+                                              # FR-017: header mang màu theo màn
+                                              #   (CHỈ 3 màu đã audit làm màu
+                                              #   chữ: brand/success/warning) ·
+                                              #   thanh điều hướng lên --ink ·
+                                              #   sắp xếp client-side theo ngày
+                                              #   (M03-R5 giữ nguyên: build vẫn
+                                              #   sắp theo priority)
+                                              # FR-018: MỘT họ chữ (Inter) mọi
+                                              #   màn; mono chỉ còn ở mã thật
+                                              # FR-020: form viết bài dựng lại —
+                                              #   4 nhóm câu hỏi, hàng xếp dọc,
+                                              #   cột theo dõi cổng validate,
+                                              #   thanh hành động dính đáy. Màn
+                                              #   Nạp nguồn CHỈ đi theo trang
+                                              #   /nap/ (trang chủ 47→35 KB)
+                                              # FR-021: màn Khái niệm → "Danh mục"
+                                              #   (CHỈ đổi chữ, slug khai-niem và
+                                              #   view id v-concepts GIỮ — đổi tốn
+                                              #   4 test và phá URL đã có). Bố cục
+                                              #   theo khuôn màn Kho: panel mở đầu
+                                              #   + .two ĐÚNG 2 panel + full-width
+                                              #   + khu .api-only; thêm .rise (màn
+                                              #   duy nhất thiếu). Nhãn từ chip →
+                                              #   hàng .rc-r để có chỗ đặt nút;
+                                              #   nút xoá dùng .bt.dstr (biến thể
+                                              #   đã có CSS, trước đây chưa dùng).
+                                              #   Sửa bug: nhãn dài phình cột lọc
+                                              #   190px → lưới bài từ 4 cột còn 2
+                                              #   (thiếu min-width:0, xem
+                                              #   nhan-dai-khong-tran.test.js)
+                                              # FR-022: bỏ confirm()/prompt() của
+                                              #   trình duyệt — một hộp thoại
+                                              #   <dialog> dùng chung, trả Promise.
+                                              #   Không tự dựng overlay: z-index
+                                              #   cửa sổ đọc tăng không trần, chỉ
+                                              #   top layer mới luôn nổi trên.
+                                              #   Toast GIỮ — hỏi và báo là hai vai
+                                              # FR-026: `st-edited` có luật CSS
+                                              #   (trước đó KHÔNG có luật nào nên
+                                              #   trông y hệt approved, dù bài đã
+                                              #   rời khỏi site). Viền trái --warn,
+                                              #   KHÔNG opacity: draft/rejected mờ
+                                              #   vì "chưa tới"/"đã bỏ", còn edited
+                                              #   CẦN HÀNH ĐỘNG — mờ là ngược nghĩa.
+                                              #   Không sinh màu chữ mới nào nên
+                                              #   contrast-audit KHÔNG đổi.
+                                              #   Nút `Sửa` thêm `title` + `…`: nó
+                                              #   là nút hệ quả nặng nhất (bài
+                                              #   approved tụt edited ⇒ rời site)
+                                              #   mà là nút DUY NHẤT im lặng.
+                                              # FR-027: HỆ KÍNH — thêm --gloss
+                                              #   (vệt sáng chéo 157°), thứ THỨ TƯ
+                                              #   của "kính iPhone"; ba thứ kia
+                                              #   (--edge/--e-top/--blur-lift) đã
+                                              #   có từ FR-013/014 nên dễ tưởng đủ.
+                                              #   Panel tối alpha .88→.62 (đo trên
+                                              #   ảnh thật, ink-3 = 5.16 dư 0.66);
+                                              #   bản SÁNG giữ .9 — ảnh sáng làm
+                                              #   nền nhạt nên chữ tối cần panel
+                                              #   đặc. Hai chế độ hai alpha là hệ
+                                              #   quả vật lý, không phải lệch chuẩn.
+                                              #   Trả 2 nợ CŨ: .dlg::backdrop gõ
+                                              #   blur(2px) trái DESIGN.md §9, và
+                                              #   muted-foreground sáng #6B6B74
+                                              #   TRƯỢT AA (4.34) trên ảnh thật —
+                                              #   audit 2.0.0 viết TAY đo trên nền
+                                              #   giả định #F0F5F7 nên không thấy.
+                                              #   contrast-audit lên 3.0.0, giờ
+                                              #   SINH bằng script từ tokens.css:
+                                              #   62 cặp · 0 trượt trên ảnh đang dùng.
+                                              # FR-027e: TRANG CHỦ theo hợp đồng UI
+                                              #   mới (`trang-chu.html`, người dùng
+                                              #   chỉ định). Đổi CẤU TRÚC vùng, không
+                                              #   sơn lại: khung nội dung tách HAI
+                                              #   lớp (.wrap chỉ bù rail 78px · .mid
+                                              #   max-width 1440 ⇒ nội dung 1344px) ·
+                                              #   vùng Nổi bật bỏ panel bọc, 2 cột +
+                                              #   perspective, 3 thẻ CHỒNG grid-area ·
+                                              #   KPI 3 ô dọc → 4 ô 2×2 · biểu đồ 1 →
+                                              #   3 pane chồng + khối 3D.
+                                              #   Token mới: 9 × --b{1,2,3}{t,f,s} +
+                                              #   --gridline + --planeb, khai riêng
+                                              #   CẢ HAI chế độ — ba mặt ba màu là
+                                              #   thứ làm khối đọc ra thể tích.
+                                              #   NỚI DESIGN.md §9 (cấm carousel) cho
+                                              #   ĐÚNG HAI vòng tự chuyển ở Trang chủ,
+                                              #   giới hạn đóng ghi ở FR-027e "Nợ luật":
+                                              #   dừng khi hover (HAI cờ riêng) · dừng
+                                              #   khi document.hidden · reduced-motion
+                                              #   TẮT HẲN · có nút bấm tay · addCleanup.
+                                              #   Trần trang 48→60 KB (nội dung người
+                                              #   dùng yêu cầu, không phải phình) và
+                                              #   thêm HAI trần chưa từng có:
+                                              #   gn.css ≤160 · gn.js ≤100 — trước đó
+                                              #   bundle không có trần nào và đã âm
+                                              #   thầm lên 112 KB.
+                                              # FR-027f: NĂM MÀN CÒN LẠI. Thêm BẬC
+                                              #   vào thang, KHÔNG đổi giá trị nào
+                                              #   đang có: --fs-nano 10.5 · --fs-card
+                                              #   15.5 · --fs-stat 27 · --fs-logo 17 ·
+                                              #   --fs-feat clamp(30–44). Ba bậc đầu là
+                                              #   ui_guide §3 ĐÒI mà thang 10 bậc KHÔNG
+                                              #   có — và thiếu bậc chính là lý do 9 luật
+                                              #   font-size gõ px thẳng vào CSS.
+                                              #   HẰNG SỐ BỐ CỤC §9 thành token:
+                                              #   --rail-w 78 · --mid-w 1440 · --mid-pad
+                                              #   48 · --mid-bot 120 · --pn-py/px 26/28 ·
+                                              #   --pn-gap 18 · --r-pill 999.
+                                              #   Giữ RIÊNG khỏi thang --s-* (4/8/12/16/
+                                              #   24/32/48/64): nhịp bản tham khảo là
+                                              #   18/26/28, một thang KHÁC. Trộn hai
+                                              #   thang vào một tên là cách chắc nhất để
+                                              #   sau này ai đó chọn sai bậc.
+                                              #   --rail-w quan trọng nhất: rail và phần
+                                              #   bù của khung nội dung đọc CÙNG token
+                                              #   nên khớp do CẤU TẠO — trước đây
+                                              #   rail-trai.test.js phải SO hai số 78.
+                                              #   KHÔNG đổi màu nào ⇒ contrast-audit
+                                              #   KHÔNG đổi (62 cặp · 0 trượt).
+                                              # FR-027g: GỘP màn Chờ duyệt vào Kho.
+                                              #   Hai màn cũ cùng MỘT VAI: nơi
+                                              #   người dùng THAO TÁC trên kho.
+                                              #   Kho đã chứa thùng rác — tức đã
+                                              #   có một danh sách thao tác — nên
+                                              #   danh sách chờ duyệt về cạnh nó,
+                                              #   và ô KPI "chờ duyệt" nằm CÙNG
+                                              #   MÀN với danh sách nó đếm.
+                                              #   Thứ tự: KPI -> CHỜ DUYỆT -> biểu
+                                              #   đồ -> thùng rác. Việc-phải-làm
+                                              #   đứng TRƯỚC bối cảnh.
+                                              #   Rail 5 -> 4 tab; tab Kho mang
+                                              #   BADGE đọc cùng biến choDuyet với
+                                              #   ô KPI. Badge rỗng khi 0 nhờ luật
+                                              #   [data-mount]:empty — không có
+                                              #   trạng thái "badge 0" để diễn giải.
+                                              #   Cặp màu badge là cặp MỚI, tính tay
+                                              #   theo WCAG: sáng 6.85:1 · tối
+                                              #   11.47:1 (cả --warning lẫn
+                                              #   --primary-foreground đều ĐẢO theo
+                                              #   chế độ nên một cặp đủ cho cả hai).
+                                              #   KHÔNG thêm/đổi token màu nào ⇒
+                                              #   contrast-audit KHÔNG đổi.
+                                              #   840px của ui_guide §9 chuyển từ
+                                              #   PANEL sang DANH SÁCH (.qw .nw):
+                                              #   lý do của nó là độ dài dòng mắt
+                                              #   phải quét, tức về danh sách.
+                                              #   /cho-duyet/ giữ làm TRANG CHUYỂN
+                                              #   HƯỚNG 469 byte — bookmark cũ không
+                                              #   gãy; 404 trên tool local đọc ra
+                                              #   như "dữ liệu mất", không phải
+                                              #   "trang đã dời".
+                                              # FR-027h: HAI LỖI BỐ CỤC có từ
+                                              #   TRƯỚC (cân bằng thẻ ở HEAD lệch
+                                              #   −1) mà không cổng nào bắt:
+                                              #   (1) một </div> LẠC + một bản SAO Y
+                                              #   dòng .foot đóng .mid ngay trước
+                                              #   v-nap ⇒ riêng màn Nạp nguồn nằm
+                                              #   NGOÀI khung giữa, trải gần hết bề
+                                              #   ngang. Đo: 4 màn ở độ sâu 2,
+                                              #   v-nap ở độ sâu 1.
+                                              #   (2) catNap cắt tới </main> ⇒ cắt
+                                              #   luôn </div> của .mid ⇒ 4 trang kia
+                                              #   có .mid KHÔNG BAO GIỜ đóng. Lỗi 1
+                                              #   CHE lỗi 2. Trình duyệt tự vá ở
+                                              #   </main> nên mắt không thấy.
+                                              #   Badge tab Kho: đo hình học ra nó
+                                              #   CHỒNG góc icon (x 33–36.5) ⇒ dồn
+                                              #   sát góc + vòng 2px bằng --glass.
+                                              #   CỬA SỔ ĐỌC: đo trước thì lưới bất
+                                              #   đối xứng · mục lục dính · 4 thứ
+                                              #   của kính · chặn độ dài dòng ĐỀU ĐÃ
+                                              #   CÓ. Chỉ thêm 3 thứ §3.2 còn nợ:
+                                              #   thanh tiến độ · metadata cột neo ·
+                                              #   mục 6 Tinh túy khác biệt (số bằng
+                                              #   CSS counter).
+                                              #   reduced-motion KHÔNG tắt thanh
+                                              #   tiến độ — nó là THÔNG TIN, không
+                                              #   phải hiệu ứng. Ngoại lệ DUY NHẤT
+                                              #   trong dự án, khai ở FR-027h.
+                                              #   KHÔNG đổi token màu nào.
+                                              # FR-027i: MÀN KHO — 5 ô số khô khan
+                                              #   thành MỘT thanh chia đoạn. Bốn số
+                                              #   đầu không phải 4 đại lượng độc lập
+                                              #   mà là BA PHẦN của MỘT tổng; ô rời
+                                              #   rạc che đúng thứ quan trọng nhất
+                                              #   là TỈ LỆ. (Và lưới 1fr 1fr với 5
+                                              #   ô ra 2+2+1 — đúng lỗi đã tự ghi ở
+                                              #   FR-027e rồi vẫn để nó xảy ra.)
+                                              #   BA quyết định về TÍNH TRUNG THỰC
+                                              #   của biểu đồ:
+                                              #   - thùng rác KHÔNG là một đoạn:
+                                              #     bài xoá đã RỜI kb/, gộp vào là
+                                              #     sai chính MẪU SỐ
+                                              #   - mẫu số là tatCa chứ không phải
+                                              #     tổng ba đoạn; nếu không thì
+                                              #     thanh LUÔN đầy 100%
+                                              #   - cắt bớt phải NÓI RA: nhãn
+                                              #     +N loại nữa
+                                              #   SỬA LỖI THẬT: khối 3D gõ cứng
+                                              #   paper/video/repo ⇒ bản real vẽ BA
+                                              #   CỘT 0 (kb/ chỉ có docs+article).
+                                              #   Lớp lỗi lặp lại của dự án nhưng
+                                              #   NGƯỢC: mẫu phủ rồi, THẬT không phủ.
+                                              #   Khối 3D đổi sang đếm tatCa cho
+                                              #   cùng gốc với câu của dải bao nó.
+                                              #   bars2/bars3 GIỮ cơ sở appr nhưng
+                                              #   KHAI ở nhãn — đổi cơ sở là đổi Ý
+                                              #   NGHĨA panel, cần người chốt.
+                                              #   Chuyển động: chạy MỘT LẦN khi vào
+                                              #   tầm nhìn, KHÔNG vòng lặp. Dashboard
+                                              #   là ẢNH CHỤP lúc build; nhấp nháy
+                                              #   kiểu đang-xử-lý là nói sai về hệ
+                                              #   thống — cùng loại sai với một biểu
+                                              #   đồ sai mẫu số.
+                                              #   KHÔNG thêm/đổi token màu nào.
+      tokens: 05_uiux/tokens.css              # 90 token — NGUỒN DUY NHẤT, import thẳng
+                                              # (ghi 113 từ s5, đếm thật 90 — FR-027 sửa)
+      design: 05_uiux/DESIGN.md               # vì sao token là vậy
+      typography: 05_uiux/TYPOGRAPHY.md       # cỡ chữ nào dùng ở đâu
+      wireframe: 05_uiux/wireframes/SCR-00-app-shell.md
+      prototype: 05_uiux/prototype/app-v20.html
+      readme: 05_uiux/README.md               # đọc file này trước
+      contracts:
+        - 05_uiux/contracts/analyses.sample.v5.json   # shape dữ liệu + test (FR-006)
+        - 05_uiux/contracts/chart-palette.json        # màu biểu đồ, đã validate
+        - 05_uiux/contracts/contrast-audit.json       # bằng chứng WCAG
+      verified:
+        contrast: >
+          62 cặp · 0 trượt trên ẢNH ĐANG DÙNG (audit 3.0.0, FR-027).
+          24 đặc + 24 trên nền giả định (tham chiếu) + 12 trên ảnh thật + 2 hue.
+          SINH bằng core/tools/sinh_contrast_audit.py, KHÔNG viết tay — bản
+          2.0.0 viết tay đã lệch: khai glass_alpha.dark 0.88 trong khi token
+          đổi sang .62, và đo chữ mờ trên nền giả định nên không thấy nó trượt
+          trên ảnh thật.
+          2 cặp trượt còn lại nằm trên nền GIẢ ĐỊNH (sáng 243 / tối 18) —
+          ngoài khoảng ảnh thật 77–152, nên ghi để theo dõi chứ không tính lỗi.
+        chart_palette: pass dataviz/validate_palette.js cả light và dark
+        typography: >
+          0 cỡ chữ gõ tay · MỘT họ chữ (Inter) cho mọi màn · weight chỉ từ token.
+          FR-018: mono chỉ còn ở mã thật (code/pre/kbd + output gate/validate);
+          nhãn tách khỏi nội dung bằng HOA + tracking + tabular-nums, không bằng
+          đổi họ chữ. markup-matches-css.test.js canh cả hai vế.
+        guidelines: 12 lỗi Vercel guidelines tìm ra, 12 đã sửa
+
+  M04_ci:
+    purpose: chạy validate + test trên mỗi PR, làm S3 có răng; sở hữu cả hook S4
+    be: [.github/**, .githooks/**, Makefile, .gitattributes]
+                                     # .gitattributes thêm v29 (PM 2026-09-05, cùng
+                                     # lý lẽ Makefile v13: bề mặt cơ chế git/CI —
+                                     # lfs filter là thứ ci.yml phải biết; trước
+                                     # đó vô chủ nên T04-8 dính lỗi boundary).
+                                     # FR-003 duyệt 2026-08-19: hook là bề mặt S4,
+                                     # cùng loại cơ chế với CI. M01 sở hữu LUẬT,
+                                     # M04 sở hữu BỀ MẶT chạy luật đó.
+                                     # `Makefile` thêm ở v13 (FR-036/B4): nó là
+                                     # bản NGƯỜI-CHẠY-TAY của cùng danh sách cổng
+                                     # trong ci.yml. Trước đó nó không thuộc
+                                     # module nào, nên check_g6b không đo được —
+                                     # và T01-9 đã sửa nó mà không khai. Cùng
+                                     # module với ci.yml thì hai danh sách lệch
+                                     # nhau là việc của MỘT chủ.
+    fe: null
+    depends_on: [M01_core, M02_kb] # kiểm chúng, KHÔNG sở hữu file nào của chúng
+    screens: []
+    spec: 06_modules/M04_ci/spec.md
+    status: as-built
+
+  M05_intake:
+    purpose: gác cửa cho bản .md do agent khác sinh — kiểm rồi cho vào kb/ ở draft
+    be: 05_intake/**
+    fe: null
+    depends_on: [M02_kb]           # ghi vào kb/; DÙNG LẠI validate.py của M01, không copy
+    screens: []
+    spec: 06_modules/M05_intake/spec.md
+    status: as-built
+    luat_rieng: >
+      Bản origin=external KHÔNG BAO GIỜ vào thẳng approved. Schema đã cưỡng chế
+      (external ⇒ review_status const draft ⇒ citations_sampled >= 2).
+      Đây là lý do tách khỏi M01: nhét chung thì validate.py mang hai chế độ.
+    inbox: _inbox/                 # nơi người dùng thả file
+
+  M06_skillgen:
+    purpose: đọc skill_candidates trong bản approved, sinh SKILL.md dạng NHÁP
+    be: 06_skillgen/**
+    fe: null
+    depends_on: [M02_kb]           # chỉ đọc kb/, không ghi
+    screens: []
+    spec: 06_modules/M06_skillgen/spec.md
+    status: as-built
+    ghi_ra_ngoai_repo: "~/.claude/skills/<name>/SKILL.md"
+    manifest: skill-manifest.json  # năng lực hiện có — nguồn để chấm verdict
+    luat_rieng: >
+      Sinh NHÁP, không sinh đủ. Trigger máy làm tốt (draft_trigger có sẵn);
+      nội dung máy làm dở (một nguồn thì chỉ chép lại nguồn đó). Sinh đủ tạo ra
+      thứ trông như skill mà cài vào làm agent tệ hơn.
+      Ngưỡng: priority >= 25 VÀ verdict thuộc {NEW, DEEPEN}.
+      Thứ tự chấm theo skill-manifest.json $matching.order — cổng cứng TRƯỚC domain.
+    do_M1_nao: M1.2 — không có module này thì M1.2 chắc chắn bằng 0
+
+  M07_curate:
+    purpose: quét kho theo nhịp, báo ba thứ hỏng dần — bài chết, draft đọng, concepts phình
+    be: 07_curate/**
+    fe: null
+    depends_on: [M02_kb]           # CHỈ ĐỌC — không tự sửa kb/ kể cả concepts.yaml
+    screens: []
+    spec: 06_modules/M07_curate/spec.md
+    status: as-built
+    thresholds: 07_curate/thresholds.yaml
+    luat_rieng: >
+      Đề xuất, không tự sửa. kb/ là nguồn chân lý và là thứ M1 đo — module tự gộp
+      concept hoặc tự đổi trạng thái thì người duyệt mất quyền kiểm soát thứ đang
+      dùng để chấm dự án.
+      Ngưỡng ngày là THAM SỐ ở thresholds.yaml, không phải hằng số rải trong code:
+      kho đang 0 bài nên mọi ngưỡng hiện tại là phỏng đoán và sẽ sai.
+
+  M08_api:
+    purpose: bàn biên tập local — CRUD bài viết qua HTTP cho NGƯỜI, mọi ghi qua validate.py, chỉ 127.0.0.1
+    # v30 · T08-33 — hai đường thêm, cùng lý lẽ v28/v29 đã dùng cho M03:
+    #
+    # `core/assets/xuat-dang.json` — bảng khai LOẠI BẢN GHI → DẠNG XUẤT. Bên
+    # cưỡng chế nó là CỬA (`xuat-cua.mjs` trả 422 theo bảng); FE chỉ đọc để vẽ
+    # menu. Nằm ở `core/assets` vì quy ước bảng-khai-một-chỗ, y như
+    # `nguong-loi.json` ngay cạnh đây. M01 không đọc, không ghi nó.
+    #
+    # `web/package.json` — cửa xuất cần thư viện `docx` (MIT). Phụ thuộc của
+    # một tính năng M08 phải khai ở chỗ npm đọc, và chỗ đó chỉ có một. Đây là
+    # đường HẸP có chủ đích: M08 thêm phụ thuộc cho cửa của mình, không sửa
+    # `scripts` hay cấu hình build của M03.
+    be: [web/api/**, _recycle/**, 06_modules/M08_api/**, core/assets/nguong-loi.json,
+         core/assets/xuat-dang.json, web/package.json]
+                                   # FR-058 lớp A — bảng khai NGƯỠNG: người đọc
+                                   # duy nhất là web/api/dungchung.mjs (nguongLoi)
+                                   # + cổng của nó. Nằm ở core/assets chỉ vì quy
+                                   # ước bảng-khai-một-chỗ, không vì quan hệ sở
+                                   # hữu. Đo trước khi khai (2026-09-04):
+                                   # grep -rl nguong-loi core web chungcat
+                                   #   → web/api/dungchung.mjs · web/test/rate-limit.test.js
+    fe: null                       # FE thuộc M03; M08 chỉ là handler sau server.mjs
+    depends_on: [M02_kb, M01_core] # đọc/ghi kb theo hợp đồng; DÙNG LẠI validate.py qua spawn, không copy
+    screens: [SCR-04]              # bàn biên tập: nút duyệt/sửa/xoá + form tạo bài (control ẩn khi không có API)
+    spec: 06_modules/M08_api/spec.md
+    status: as-built               # v31 · web/api là server ĐANG CHẠY live
+                                   # (cửa LÕI + nháp + xuất + proxy THỢ, ~30
+                                   # cổng node). spec §5 vẫn ghi 'planned' —
+                                   # đó là nợ FR riêng, ô backlog M08 giữ.
+    luat_rieng: >
+      Ghi kb/ CHỈ qua luồng validate-trước-ghi (M08-R2). Không default trường
+      quyết định — 3 trường M1, reject_reason là LỜI KHAI của người (M08-R3,
+      B-B1 nguyên vẹn). DELETE = move _recycle/, không unlink (M08-R4).
+      Chuyển trạng thái chỉ qua PATCH /status, bảng chuyển cứng M02 §2.2 (M08-R5).
+
+  M09_thuvien:
+    purpose: ban ghi THU VIEN — tai lieu tai len (pdf/ppt/word) va video theo URL, co nhan nhu bai phan tich
+    be: 06_modules/M09_thuvien/**                       # khong so huu file BE nao — xem luat_rieng
+    fe: null                       # khong so huu file FE nao — xem luat_rieng
+    depends_on: [M02_kb, M01_core, M08_api, M03_web]
+    screens: [SCR-05]              # tab thu tu cua man Nap nguon + man xem truoc trong cua so doc
+    spec: 06_modules/M09_thuvien/spec.md
+    status: as-built               # FR-037 xong 2026-08-28; 7 cổng S3 xanh
+    luat_rieng: >
+      Module NGANG — no khong so huu file nao, no khai HOP DONG roi bon module chu
+      thi hanh: DDL + export/import o M02_kb, cua ghi o M08_api, render o M03_web,
+      nhanh ho so validate o M01_core. Nen moi don vi viec cua no phai khai
+      pham_vi_ghi theo boundary cua MODULE CHU, va check_g6b kiem dieu do.
+      Nam rule rieng (M09-R1..R5): luat mo coi hop UNION BA BANG (bo sot recycle
+      thi DELETE pha byte vinh vien ma phucHoi van bao thanh cong) · sha256 do MAY
+      tinh + magic-byte khop mime · src iframe tu whitelist host, khong tu
+      frontmatter · ban ghi thu vien khong dem vao thuoc do CHAT LUONG · tran body
+      JSON 1 MB KHONG duoc noi, media co tran rieng.
+
+  M10_tailieu:
+    purpose: module TÀI LIỆU — pdf/ppt/word tải lên; màn riêng, nạp riêng, CRUD tại chỗ
+    be: [06_modules/M10_tailieu/**]  # bảng `tai_lieu` do M02_kb khai trong DDL
+    fe: null                       # màn thuộc M03_web thi hành — xem luat_rieng
+    depends_on: [M02_kb, M01_core, M08_api, M03_web, M09_thuvien]
+    screens: [SCR-06, SCR-07]      # SCR-06 màn Tài liệu · SCR-07 nạp tài liệu
+    spec: 06_modules/M10_tailieu/spec.md
+    status: as-built               # v31 · bảy màn + ba đường nạp đã dựng
+                                   # (C5/C6); spec §5 'planned' = nợ FR (ô chung
+                                   # 'năm module một bệnh' — backlog M08).
+    luat_rieng: >
+      Module NGANG như M09: khai hợp đồng, module chủ thi hành. DDL bảng
+      `tai_lieu` ở M02_kb, cửa ghi ở M08_api, màn ở M03_web, hồ sơ validate ở
+      M01_core, kho hiện vật (byte + magic-byte + sáu đầu đề) ở M09_thuvien.
+      Ba rule riêng: màn chỉ đọc bảng của nó (đo bằng SỐ ĐẾM, không bằng lời
+      khai) · form sửa PHẢI có ô `media`, không dựa vào `FM_GOC` giữ hộ · form
+      nạp phải có ô chọn `category`/`concepts` từ danh mục, không đẩy người dùng
+      vào `concepts_proposed` mà họ không biết.
+
+  M11_video:
+    purpose: module VIDEO — đăng ký URL YouTube/TikTok; không byte vào kho
+    be: [06_modules/M11_video/**]  # bảng `video` do M02_kb khai trong DDL
+    fe: null                       # màn thuộc M03_web thi hành — xem luat_rieng
+    depends_on: [M02_kb, M01_core, M08_api, M03_web, M09_thuvien]
+    screens: [SCR-08, SCR-09]      # SCR-08 màn Video · SCR-09 nạp video
+    spec: 06_modules/M11_video/spec.md
+    status: as-built               # v31 · bảy màn + ba đường nạp đã dựng
+                                   # (C5/C6); spec §5 'planned' = nợ FR (ô chung
+                                   # 'năm module một bệnh' — backlog M08).
+    luat_rieng: >
+      Module NGANG. Đây là module LÀM MỚI, không phải tách ra: đo được không có
+      đường tạo video nào tồn tại trước FR-038 — đăng ký URL đi qua form viết bài
+      8 ô với cổng `phan-tich` đầy đủ.
+      Ba rule riêng: màn chỉ đọc bảng của nó · mở màn KHÔNG gọi ra mạng ngoài
+      (click-to-load; hàm dựng thẻ không được nhắc `.nhung` — kiểm hai chiều ở
+      B8b chứng minh phép kiểm 'không chứa hằng host' xanh oan khi host qua một
+      biến) · `url_normalized` do MÁY tính và host lạ báo TẠI CHỖ DÁN, không đợi
+      422 sau khi người dùng điền xong.
+
+  M18_nguoidung:
+    purpose: module TÀI KHOẢN + CÀI ĐẶT — ai có account, mời thế nào, buộc kênh nào,
+      phiên của ai, và ô quyền nào bật/tắt được từ web (proposal-3, ADR-07)
+    be: [06_modules/M18_nguoidung/**]   # bốn bảng do M08_api khai DDL trong DB của LÕI (ADR-06)
+    fe: null                       # màn admin thuộc M03_web thi hành — xem luat_rieng
+    depends_on: [M08_api, M03_web]
+    screens: []                    # CHƯA CÓ wireframe màn admin — s5 chưa chạy cho màn này (FR-048 §6b)
+    spec: 06_modules/M18_nguoidung/spec.md
+    status: planned                # FR-048
+    luat_rieng: >
+      Module NGANG như M09/M10/M11: khong so huu file ma nao, khai HOP DONG roi
+      module chu thi hanh. DDL + bay cua o M08_api (FR-047), xac thuc bien o
+      M17_cong, man admin o M03_web. Moi don vi viec khai pham_vi_ghi theo
+      boundary cua MODULE CHU — check_g6b kiem dieu do.
+      FR-045 viet "LOI so huu bon bang". LOI la mot VUNG TIN CAY, khong phai mot
+      module: entities.*.owner can mot module vi owner la thu pham_vi_ghi neo vao.
+      M18 la cai ten do. Truoc FR-048 bon bang chi ton tai duoi dang COMMENT o
+      project_map:83-90, va check_map khong doc khoa `entities` mot lan nao nen
+      khong cong nao bao duoc.
+      Bon rule rieng (M18-R1..R4): ma_moi MOT LAN + het han, danh dau bang
+      UPDATE...WHERE dung_luc IS NULL + changes() chu khong phai SELECT-roi-UPDATE ·
+      moi lan thu (ke ca that bai) ghi audit_log, va dong log KHONG chua ma da thu ·
+      cot `vai` chua ai doc nen KHONG duoc dung lam cong chan cho toi khi co
+      quyet dinh "vai nao lam duoc gi" · ba bang phai-xuat co duong export, hai
+      bang con lai (ma_moi, phien) KHONG xuat trang thai (ADR-06 c).
+
+# Ranh giới ghi — cũng chính là biên R1 đo ở mức nhánh.
+# core ghi vào kb/, web CHỈ ĐỌC kb/. Hai bên không gọi thẳng nhau.
+# Backup theo TỪNG MODULE — quyết F4. Không có cơ chế tập trung.
+# Ràng buộc bất biến: xoá sạch mọi thứ trừ kb/ rồi dựng lại phải ra trạng thái cũ.
+backup:
+  M01_core:  {what: code + test, how: git remote, why: dựng lại từ git được}
+  M02_kb:    {what: NGUỒN CHÂN LÝ, how: "git remote + ổ ngoài (chưa chốt lối)",
+              why: mất là mất tất cả, không dựng lại được từ đâu}
+  M03_web:   {what: output dẫn xuất, how: KHÔNG cần, why: build lại từ kb/}
+  M04_ci:    {what: workflow yaml, how: git remote, why: file nhỏ trong repo}
+  M05_intake: {what: báo cáo hợp lệ, how: git remote, why: file .md vào kb/}
+  M06_skillgen: {what: "skills/<name>/SKILL.md", how: git remote riêng của agent,
+                 why: nằm ngoài repo này (~/.claude/skills/)}
+  M07_curate: {what: không sở hữu dữ liệu, how: —, why: chỉ đọc và sửa kb/}
+  M09_thuvien: {what: KHONG co du lieu rieng, how: theo M02_kb, why: byte song trong kb/_kho.sqlite + export kb/_media/}
+  M08_api:   {what: handler code + _recycle/, how: git remote,
+              why: "code dựng lại từ git; _recycle/ là bài đã xoá — track trong git như kb/"}
+
+# ═══ FR-058 lớp B — ARTIFACT HỆ THỐNG: KHÔNG nhận chủ module ═══════════════
+#
+# `04_system/**` là artifact **s4**, ở TẦNG TRÊN mọi module; `.gitignore` là của
+# cả repo. Gán chúng cho một module là nói dối về quan hệ — và luật gốc cấm đúng
+# điều đó: *"không ai được sở hữu thứ dùng để đánh giá mình"*.
+#
+# Trước FR-058, mỗi lần một task chạm chúng là một dòng FAIL boundary bị BỎ QUA
+# BẰNG TAY (T08-24 `.gitignore` · T08-28 `04_system/adr.md`) — và một cổng mà
+# mọi người quen bỏ qua là một cổng đã chết. Thà khai luật ra rồi đo nó.
+he_thong:
+  duong: ["04_system/**", ".gitignore"]
+  luat: >
+    Task của MỌI module được khai các đường này trong `phạm_vi_ghi`, với ba điều
+    kiện: (1) khai TƯỜNG MINH từng file, không wildcard, kèm một dòng lý do ngay
+    cạnh; (2) worklog entry của lượt đó phải có file trong `object`; (3) file
+    FROZEN thì vẫn qua FR như thường — mục này KHÔNG mở khoá gì.
+    `check_g6b` đọc mục này và KHÔNG báo boundary cho chúng.
+
+boundaries:
+  # ═══ FR-034 — DB là nguồn chân lý, file kb/** là export dẫn xuất ═══════════
+  db_writers:  [M05_intake, M08_api]   # writer CÓ ĐIỀU KIỆN: mọi COMMIT qua
+                                   # validate.py --strict trên tmp compose
+                                   # (M08-R2), không default trường người
+                                   # (M08-R3). M01 nộp bài QUA M08 (cửa 1)
+                                   # hoặc M05 (_inbox) — không cầm SQL.
+                                   # Danh mục (FR-019/034): bảng concepts/
+                                   # categories, người khai nhãn (M02-R3),
+                                   # vết ghi ở bảng audit_log (trigger cấm
+                                   # sửa/xoá), export ra kb/_nhat-ky-danh-muc.md.
+  db_readers:  [M03_web, M04_ci, M06_skillgen, M07_curate]  # qua khoDoc()/SELECT
+  exporter:    core/tools/xuat_kho.py   # đường ghi file kb/** DUY NHẤT (chỉ SELECT
+                                   # từ DB). Đường file→DB duy nhất là
+                                   # core/tools/dung_lai_db.py — người/CI/test
+                                   # chạy, server KHÔNG BAO GIỜ gọi.
+                                   # Răng: core/tests/check_export_dan_xuat.py
+  kb_writers:  []                  # (lịch sử — trước FR-034: [M01, M05, M08].
+                                   # File kb/** giờ là export, không ai "ghi kho"
+                                   # bằng cách ghi file nữa.)
+  web_reads:   [kb-mock/**]        # bản /mock/ vẫn đọc file demo
+  web_writes:  ["_inbox/**"]        # FR-010 — FE/render (M03) vẫn RỖNG với kho.
+                                   # _inbox/ là thư mục trung chuyển của M05,
+                                   # không phải nguồn chân lý: xoá sạch không mất gì.
+                                   # gate.py hardcode review_status draft khi nạp
+                                   # (test -k draft_external) ⇒ upload không tới
+                                   # được approved. Cổng người nguyên. (FR-012 bỏ
+                                   # khoá const trong schema — răng giờ ở gate.)
+  api_writes:  [kb/_kho.sqlite]     # FR-011/FR-034 — M08, tiến trình LOCAL riêng
+                                   # người tự chạy (npm run api). Mỗi ghi = 1 HTTP
+                                   # request người bấm, validate trước COMMIT.
+                                   # DELETE = INSERT recycle + DELETE articles
+                                   # cùng transaction (M08-R4).
+  curate_writes: []                # M07 chỉ báo, không sửa — kể cả danh mục
+  skillgen_writes: ["~/.claude/skills/**"]   # NGOÀI repo này, không đụng kb/
+  contract:    format file .md      # hợp đồng là format, không phải code
+
+entities:
+  Analysis:
+    owner: M02_kb
+    description: một bản phân tích một nguồn = một file .md
+    storage: kb/<source_type>/<slug>.md
+    schema: core/assets/frontmatter.schema.json    # nơi ràng buộc SỐNG
+    fields:
+      review_status:
+        formula: "draft | edited | approved | rejected"
+        spec: kb/README.md#trạng-thái-duyệt
+        note: cổng người DUY NHẤT trong toàn hệ thống; chỉ approved lên web
+      credibility_max:
+        formula: "verified | plausible | claimed | conflicted"
+        spec: core/skill-src/web-spec.md
+        note: chỉ để lọc và hiển thị — KHÔNG phải cổng chặn
+      category:
+        formula: "agent-llm | backend | data-ml | ai-services | observability | delivery"
+        spec: kb/README.md#ba-chiều-phân-loại--đừng-nhầm-chúng-với-nhau
+        note: >
+          FR-009 — CHỦ ĐỀ của bài, thay trường `tags` tự do. Enum ĐÓNG trong
+          schema (khác concepts để ở file rời): 6 giá trị, hiếm đổi, nên thêm
+          mục mới phải qua FR chứ không duyệt lô hàng tuần.
+          KHÔNG bắt buộc — bài announcement có thể không thuộc mảng nào.
+          Đừng nhầm với concepts: category là chủ đề (thô, chia kho thành mảng),
+          concepts là khái niệm kỹ thuật (mịn).
+          `kb/categories.yaml` là bản ĐỌC-ĐƯỢC-CHO-WEB của enum này, không phải
+          chân lý thứ hai: form cần label_vi để render, và trước đây 6 giá trị
+          bị gõ tay trong shell.html. `check_danh_muc.py` canh ba nơi khớp nhau
+          (yaml ⇔ enum ⇔ shell không gõ tay).
+          SỬA LỖI TÀI LIỆU: dòng này từng ghi concepts "dùng tính
+          corroboration_factor". Không đúng — grep corroboration trong core/src,
+          05_intake, 06_skillgen, 07_curate ra 0 kết quả. Không mã nào tính nó;
+          nó là số LLM tự khai, suy từ `independent_sources` (đếm theo
+          url_normalized). Concepts chỉ là ĐƠN VỊ để nhận ra hai nguồn đang nói
+          cùng một điều, không phải đầu vào của phép tính nào.
+      url_normalized:
+        formula: "url bỏ tracking, bỏ www, quy youtu.be và arxiv/pdf về dạng chuẩn"
+        spec: kb/README.md
+        note: đơn vị đếm nguồn độc lập; 3 bản cùng url = 1 nguồn
+      word_count:
+        formula: "đếm từ thân bài, bỏ code block, tiêu đề, locator"
+        spec: core/src/source_distiller/validate.py
+        note: dữ liệu dẫn xuất — sinh bằng --fix, không khai tay
+      skill_candidates:
+        formula: "priority = (relevance × frequency × durability × corroboration) / cost"
+        spec: core/assets/frontmatter.schema.json
+        note: credibility claimed/conflicted + 1 nguồn ⇒ cấm NEW/DEEPEN
+    used_by: [M01_core, M02_kb, M03_web, M04_ci, M05_intake, M06_skillgen, M07_curate]
+
+  Concept:
+    owner: M02_kb
+    description: khái niệm trong danh mục kiểm soát
+    storage: kb/concepts.yaml
+    fields:
+      id:    {spec: kb/README.md#conceptsyaml, note: "concepts[] chỉ được lấy từ đây"}
+      aliases:
+        spec: kb/README.md#conceptsyaml
+        note: >
+          CODE CHẾT — validate.py:279 chỉ lấy {c["id"]}; grep toàn repo không ra
+          đường đọc nào (aliases của M06 là skill-manifest.json, file khác).
+          22 mục × ~3 ≈ 60 giá trị không ai đọc. Hai lối: xoá (sửa file frozen
+          ⇒ FR) hoặc dùng (validate nhận alias, chỉ về id chính). Chưa quyết.
+    used_by: [M01_core, M02_kb, M03_web, M05_intake, M07_curate]
+
+  Category:
+    owner: M02_kb
+    description: chủ đề bài — enum ĐÓNG, khác Concept ở chỗ chân lý nằm trong schema
+    storage: >
+      core/assets/frontmatter.schema.json (enum — CHÂN LÝ, frozen)
+      + kb/categories.yaml (bản đọc-được-cho-web, DẪN XUẤT)
+    fields:
+      id:       {note: "phải khớp enum; thêm mục = sửa file frozen ⇒ FR"}
+      label_vi: {note: "nhãn hiển thị — lý do file yaml tồn tại: form cần nhãn"}
+      gom:      {note: "ranh giới giữa 6 mảng, theo FR-009"}
+    canh_boi: core/tests/check_danh_muc.py
+    used_by: [M01_core, M02_kb, M03_web, M05_intake, M08_api]
+
+  SkillDraft:
+    owner: M06_skillgen
+    description: nháp SKILL.md sinh từ skill_candidates — NGOÀI repo này
+    storage: "~/.claude/skills/<name>/SKILL.md"
+    schema: null                   # không qua validate.py; file cho agent đọc
+    fields:
+      name:        {spec: 06_modules/M06_skillgen/spec.md#22, note: từ capability}
+      description: {spec: 06_modules/M06_skillgen/spec.md#22, note: từ draft_trigger}
+      than:        {spec: 06_modules/M06_skillgen/spec.md#22,
+                    note: PHẢI RỖNG + dòng TODO — M06-R2 chống chính module phình vai}
+    used_by: [M06_skillgen]
+
+  # ═══ FR-048 (2026-09-02) — bốn bảng tài khoản, CHỦ = M18_nguoidung ═══
+  # Trước FR này chúng chỉ tồn tại dưới dạng COMMENT ở đầu file (khối M17_cong).
+  # FR-045 viết "LÕI sở hữu" — LÕI là một VÙNG, không phải một module, nên
+  # `entities.*.owner` không nhận được nó. Đây là chỗ vá.
+  # Cả bốn nằm trong DB RIÊNG của LÕI ở `web/` — KHÔNG ở kb/_kho.sqlite (ADR-06).
+
+  NguoiDung:
+    owner: M18_nguoidung
+    description: một tài khoản = một dòng; MỘT chủ dự án + 5 đồng nghiệp (prd.md:8)
+    storage: "web/<db của LÕI>   # ADR-06 — KHÔNG kb/_kho.sqlite"
+    schema: null                   # không qua validate.py; DDL ở M08_api
+    fields:
+      id:          {spec: 06_modules/M18_nguoidung/spec.md, note: khoá chính}
+      ten:         {spec: 06_modules/M18_nguoidung/spec.md, note: "DỮ LIỆU CÁ NHÂN — B-E5"}
+      vai:
+        spec: 06_modules/M18_nguoidung/spec.md
+        note: >
+          CHƯA AI ĐỌC. Cột trống từ FR-045. KHÔNG được dùng làm cổng chặn cho
+          tới khi có quyết định "vai nào làm được gì" (M18-R3). Hôm nay M17-R6
+          (lột review_status khỏi payload) là lớp DUY NHẤT giữa một account
+          thường và quyền duyệt.
+      trang_thai:  {spec: 06_modules/M18_nguoidung/spec.md, note: còn hiệu lực hay đã thu hồi}
+      tao_luc:     {spec: 06_modules/M18_nguoidung/spec.md, note: máy đặt}
+    used_by: [M08_api, M17_cong, M15_kenh, M12_chungcat, M14_chatbot, M03_web]
+
+  MaMoi:
+    owner: M18_nguoidung
+    description: mã mời MỘT LẦN + hết hạn — đường duy nhất tạo ràng buộc chat_id
+    storage: "web/<db của LÕI>"
+    schema: null
+    fields:
+      ma:
+        spec: 06_modules/M18_nguoidung/spec.md
+        note: >
+          BÍ MẬT. KHÔNG xuất ra file và KHÔNG ghi vào log (ADR-06 c) — log không
+          hết hạn, còn mã thì có; chép mã vào log là biến một bí mật ngắn hạn
+          thành một bí mật vĩnh viễn.
+      nguoi_dung_id:  {spec: 06_modules/M18_nguoidung/spec.md, note: mã cấp cho ai}
+      het_han:        {spec: 06_modules/M18_nguoidung/spec.md, note: "bắt buộc — sinh mã không hết hạn là ĐỎ Ở CỔNG SINH"}
+      dung_luc:
+        spec: 06_modules/M18_nguoidung/spec.md
+        note: >
+          NULL = chưa dùng. Đánh dấu bằng UPDATE...WHERE dung_luc IS NULL +
+          changes(), KHÔNG phải SELECT-rồi-UPDATE (M18-R1) — hai request dùng
+          cùng một mã đồng thời phải có đúng MỘT thành công.
+    used_by: [M08_api, M17_cong, M15_kenh]
+
+  DinhDanhKenh:
+    owner: M18_nguoidung
+    description: buộc một chat_id của một kênh vào một tài khoản — THAY allowlist phẳng B-B4
+    storage: "web/<db của LÕI>"
+    schema: null
+    fields:
+      kenh:           {spec: 06_modules/M18_nguoidung/spec.md, note: "telegram | ..."}
+      chat_id:        {spec: 06_modules/M18_nguoidung/spec.md, note: "DỮ LIỆU CÁ NHÂN — B-E5"}
+      nguoi_dung_id:  {spec: 06_modules/M18_nguoidung/spec.md, note: buộc vào ai}
+      buoc_luc:       {spec: 06_modules/M18_nguoidung/spec.md, note: máy đặt}
+    used_by: [M08_api, M17_cong, M15_kenh]
+
+  Phien:
+    owner: M18_nguoidung
+    description: phiên hội thoại — ngữ cảnh sống ở LÕI, không ở THỢ
+    storage: "web/<db của LÕI>"
+    schema: null
+    fields:
+      id:             {spec: 06_modules/M18_nguoidung/spec.md, note: khoá chính}
+      nguoi_dung_id:  {spec: 06_modules/M18_nguoidung/spec.md, note: phiên của ai}
+      kenh:           {spec: 06_modules/M18_nguoidung/spec.md, note: "web | telegram | ..."}
+      ngu_canh:
+        spec: 06_modules/M18_nguoidung/spec.md
+        note: >
+          M14_chatbot KHÔNG được đọc/ghi bảng này (FR-045 U6) — session là DỮ
+          LIỆU, và dữ liệu ở LÕI. THỢ giữ khoá model, nên một prompt injection
+          trên M14 không được chạm session.
+      cap_nhat_luc:   {spec: 06_modules/M18_nguoidung/spec.md, note: máy đặt}
+    used_by: [M08_api, M17_cong, M14_chatbot]
+
+  # FR-046 (2026-09-02) — bản nháp chưng cất. CÙNG LỖ với bốn bảng trên:
+  # FR-046 không gán chủ cho nó, và `check_map` không đọc `entities` nên không ai báo.
+  # Chủ là M12 vì M12 SINH và SỬA nó (AC-5.4/5.5: checkpoint + lan_gui);
+  # M08 chỉ là nơi THI HÀNH cửa ghi, giống quan hệ M08 ↔ M18.
+
+  NhapChungCat:
+    owner: M12_chungcat
+    description: bản nháp AI sinh, người sửa — sống trong DB, không phải file (FR-046)
+    storage: "web/<db của LÕI>"
+    schema: null
+    fields:
+      job_ulid:      {spec: 06_modules/M12_chungcat/spec.md, note: khóa chính}
+      ban_goc_ai:    {spec: 06_modules/M12_chungcat/spec.md, note: bản MÁY sinh, KHÔNG được ghi đè}
+      ban_hien_tai:  {spec: 06_modules/M12_chungcat/spec.md, note: bản người đang sửa}
+    used_by: [M12_chungcat, M08_api, M03_web]
+    note: >
+      Tốn TOKEN MODEL để tạo ra — thứ đắt nhất trong năm bảng của DB LÕI, nên
+      ADR-06 (c) xếp nó vào nhóm PHẢI XUẤT ra file để backup.
+
+  # ═══ proposal-3 + ADR-07 (2026-09-03) — ô setting sửa được từ web ═══
+  #
+  # BA TẦNG, và ranh giới giữa chúng LÀ quyết định (ADR-07):
+  #   bất biến   → mã + DDL CHECK      → KHÔNG AI đổi, kể cả `chu`
+  #   schema ô   → `O_SUA_DUOC` trong mã → không ai đổi QUA WEB (sửa = PR)
+  #   giá trị ô  → bảng `cai_dat` ở DB   → `chu`, qua web
+  #
+  # Tầng giữa phân biệt quyết định này với "một form sửa DB": DB chỉ giữ GIÁ TRỊ
+  # của ô ĐÃ ĐƯỢC KHAI TỒN TẠI TRONG MÃ. Không đường nào để một form TẠO RA một
+  # ô mới — allowlist, không denylist (CVE-2018-8007 đi vòng một blacklist).
+
+  CaiDat:
+    owner: M18_nguoidung
+    description: >
+      giá trị boolean của các ô quyền ĐÃ KHAI trong mã. KHÔNG phải "mọi cài đặt
+      hệ thống" — bảng model/trần/quota vẫn read-only trỏ file (SCR-16 nguyên).
+    storage: "web/<db của LÕI>   # ADR-06 — cùng chỗ với bốn bảng tài khoản"
+    schema: null                   # không qua validate.py; DDL ở M08_api
+    fields:
+      khoa:
+        spec: 06_modules/M18_nguoidung/spec.md
+        note: >
+          PHẢI có trong `O_SUA_DUOC` (allowlist trong mã). Khoá lạ ⇒ TỪ CHỐI,
+          không tạo hàng. Đây là vế `M3.2` của proposal-3.
+      gia_tri:
+        spec: 06_modules/M18_nguoidung/spec.md
+        note: >
+          Boolean. KHÔNG chuỗi tự do, KHÔNG JSON — vế nền của security_baseline
+          §9.2: không ô nào được diễn giải thành đường dẫn/lệnh/URL/mã.
+          CVE-2024-3028/3025: một trường setting ⇒ XOÁ ĐƯỢC FILE SQLITE.
+      doi_luc:  {spec: 06_modules/M18_nguoidung/spec.md, note: máy đặt}
+      boi:
+        spec: 06_modules/M18_nguoidung/spec.md
+        note: >
+          AI ĐÃ đổi. SEC 17a-4(f)(2)(i) gọi tên trường này (*identity of the
+          actor*), và CVE-2026-48086 ghi đúng chỗ né được nếu thiếu nó.
+    used_by: [M08_api, M03_web]
+    note: >
+      BỐN vế KHÔNG THƯƠNG LƯỢNG (security_baseline §9.1), mỗi vế một CVE:
+        1. `duyet-bai` không bao giờ là một ô  (CVE-2024-3283)
+        2. `vai` không là một ô; enum khoá DDL  (CVE-2026-9796)
+        3. cửa ghi không nhận object            (CVE-2026-31942)
+        4. `viec` sửa-setting không sửa DANH SÁCH ô  (CVE-2026-17601)
+
+  # ═══ FR-048 — GIỮ CHỖ cho M19_baihoc (Edu), CHƯA THI CÔNG ═══
+  # KHÔNG có 06_modules/M19_baihoc/ và KHÔNG có mục trong `modules:`.
+  # check_map kiểm HAI CHIỀU: thêm module vào map mà không dựng thư mục ⇒ ĐỎ,
+  # và đó là ĐÚNG — nó bắt đúng lúc ai đó định thi công M19 mà chưa qua s2/s3.
+  #
+  # Vì sao giữ chỗ ngay bây giờ mà không đợi upgrade 2:
+  #   M14_chatbot AC-8.4 (đã viết, G6A xanh) hứa "đúng MỘT hàm giải bot → tập
+  #   doc_id". Hôm nay KHÔNG CÓ BẢNG NÀO đứng sau lời hứa đó. `bai_hoc` chính
+  #   là nó. Không khai hình dạng ở đây thì ba module (M13, M14, M03) mỗi bên
+  #   tự nghĩ ra một hình dạng, và hợp nhất về sau đắt hơn nhiều.
+  #
+  # Vì sao CHƯA thi công được (FR-048 §4):
+  #   s1 ĐÃ phủ  — research_summary §3.1 nguyên lý ①: "phạm vi truy hồi là
+  #                control HIỂN THỊ". NotebookLM là 1 trong 4 bản khảo.
+  #   s2 CHƯA    — proposal đợt hai không có scope-in nào tên "gom nhóm".
+  #                Luật riêng s2: "Proposal duyệt xong = phạm vi thô CHỐT.
+  #                Đổi ⇒ FR, không âm thầm phình ở s3."
+  #   s3 CHƯA    — prd.md không có "bài học".
+  #   ⇒ Đường đúng khi upgrade 2 khởi động: FR mở rộng phạm vi → PRD + proposal
+  #     → s6. KHÔNG quay về s1.
+
+  # ═══ v31 · BỐN ENTITY ĐANG CHẠY mà map chưa biết (audit dev mới #8) ═══
+  Media:
+    owner: M09_thuvien             # hàng byte hiện vật; schema sống ở kho.schema.sql (M01)
+    fields: [sha256, byte, la_dan_xuat, kieu_moc, so_byte(GENERATED)]
+    used_by: [M08_api, M10_tailieu, M11_video, M12_chungcat]
+  Transcript:
+    owner: M12_chungcat            # hiện vật DẪN XUẤT .vtt — media[] + kieu_moc=la_asr
+    fields: [sha256->Media, mime text/vtt]
+    used_by: [M03_web, M08_api]    # tab Transcript · cửa xuất srt/txt
+  BanGhi:
+    owner: M01_core                # VIEW hợp nhất ba bảng (bai_viet+tai_lieu+video)
+    fields: [xem kho.schema.sql — view, không bảng]
+    used_by: [M08_api, M13_truyhoi]
+  LoaiNguon:
+    owner: M01_core                # bảng khai core/assets/loai-nguon.json (FR-038)
+    fields: [7 giá trị — bảng là nguồn, không gõ tay]
+    used_by: [M03_web, M08_api, M05_intake]
+  BaiHoc:
+    owner: M19_baihoc              # module CHƯA TỒN TẠI — cố ý; xem khối trên
+    description: >
+      một tập nguồn CÓ TÊN và CÓ THỨ TỰ, gom bài viết + tài liệu + video thành
+      một đơn vị học. Chiều phân loại THỨ TƯ.
+    storage: null                  # chưa quyết — thi công ở upgrade 2
+    schema: null
+    status: planned                # cùng giá trị M10/M11 mang
+    fields:
+      ten:      {spec: null, note: chưa thi công}
+      thu_tu:
+        spec: null
+        note: >
+          ĐIỂM PHÂN BIỆT với concepts/category, và là lý do nó không suy ra
+          được: concepts là một TẬP, bài học là một DANH SÁCH. Không phép tính
+          nào lấy concepts ra thứ tự bài 1 → bài 2 → bài 3.
+    used_by: [M14_chatbot, M13_truyhoi, M03_web]   # khi thi công
+    note: >
+      KHÔNG nhét vào M12_chungcat: M12 chưng MỘT nguồn thành MỘT nháp (1→1);
+      bài học là nhiều-nhiều CÓ THỨ TỰ giữa ba bảng đã có. Hai hình dạng khác nhau.
+      Lộ trình đã chốt: bài học → khóa học → lớp học ⇒ Edu, ở đợt upgrade 2.
+
+flows:
+  F0_toan_canh:
+    p0: true
+    purpose: bốn module, một chiều dữ liệu
+    modules: [M01_core, M02_kb, M03_web, M04_ci]
+    diagram: 04_system/diagrams/flow-tong.md
+
+  F1_ingest:
+    p0: true
+    purpose: link → bản phân tích draft trong kb/
+    modules: [M01_core, M02_kb]
+    steps: skill 6 pass → kb/<type>/<slug>.md → pre-commit validate → draft
+    diagram: 04_system/diagrams/flow-tong.md
+
+  F2_review:
+    p0: true
+    purpose: draft → approved. Cổng người duy nhất.
+    modules: [M02_kb]
+    steps: người đọc → sửa → đổi review_status → commit
+    diagram: 04_system/diagrams/flow-tong.md
+
+  F3_publish:
+    p0: true
+    purpose: approved → trang báo
+    modules: [M02_kb, M03_web, M04_ci]
+    steps: git push → CI xanh → build đọc kb/ → chỉ approved → gộp url_normalized
+    diagram: 04_system/diagrams/flow-tong.md
+
+# Cưỡng chế bằng máy — nơi rule có răng (S1-S4).
+enforcement:
+  S1_deny:
+    file: .claude/settings.json
+    paths: 6                       # 3 mặc định ADOPT + 3 hợp đồng dự án
+    note: schema, concepts.yaml, .githooks — sửa phải qua FR
+  S3_toolchain:
+    cmds:
+      - {cmd: "python core/src/source_distiller/validate.py kb/", gate: 8 cổng format}
+      - {cmd: "pytest core/tests -q", gate: 49 test, note: kiểm luật có hiệu lực}
+      - {cmd: "for f in core/tests/check_*.py", gate: 31 cổng check, note: v31 đếm bằng ls}
+    ci: .github/workflows/ci.yml   # v31 · CÓ RỒI (M04 as-built). Nợ còn:
+                                   # chungcat/** + truyhoi/** CHƯA vào CI — T04-8.
+  S4_git:
+    hook: .githooks/pre-commit
+    note: chặn commit .md sai format trong kb/; đã kiểm chứng chặn thật
+
+# Khoảng trống đã biết — không giấu, để gate sau soi
+  # ═══ v31 · FLOWS ĐỢT HAI — mã đã chạy thật, map phải biết ═══
+  F4_chung_cat:
+    p0: true
+    purpose: bản ghi kho → job M12 → model thật → verify quote → NHÁP → người duyệt → kho
+    modules: [M03_web, M08_api, M12_chungcat]
+    steps: nút Chưng cất → POST /api/job → worker → egress một cửa → C2 nháp → /chung-cat/nhap/
+  F5_transcript:
+    p0: true
+    purpose: video (URL/mp4) → tải audio → ASR local → .vtt hiện vật → (chưng cất từ transcript)
+    modules: [M03_web, M08_api, M12_chungcat]
+    steps: Sinh transcript → tai_nguon (allowlist+ingress) → faster-whisper → gan-hien-vat → tab Transcript
+  F6_truy_hoi:
+    p0: false                      # plan 9 đơn vị đã duyệt, 0 mã (2026-09-08)
+    purpose: kho → chỉ mục dẫn xuất → tìm đoạn kèm địa chỉ bấm được
+    modules: [M03_web, M08_api, M13_truyhoi]
+
+gaps:
+  - id: gap-ci
+    trang_thai: ĐÃ ĐÓNG — v31; object .github/workflows/ci.yml (M04 as-built).
+                Nợ kế thừa 'chungcat/truyhoi vào CI' sống ở T04-8, không ở gap này.
+    what: S3 chưa có CI; hook local bỏ qua được bằng --no-verify
+    vá_ở: build_order B1
+  - id: gap-m1
+    what: kho rỗng nên M1 (metric chặn) chưa đo được — 0/10 nguồn
+    vá_ở: build_order B2
+    note: đây là chỗ dự án có thể chết; M1 fail ⇒ quay lại sửa giao thức
+    fr: FR-001 đã thêm 3 trường đo (insight_new, skill_installed, review_minutes)
+        + ràng buộc approved bắt buộc khai. Giờ đo được bằng máy, còn thiếu dữ liệu.
+  - id: gap-web
+    trang_thai: ĐÃ ĐÓNG — v31; object commit b7ab3f8 (web SSR + 7 plugin +
+                ~100 cổng đang chạy live).
+    what: M03_web chưa có code production — mới có prototype vanilla HTML
+    vá_ở: build_order B3a, B3b
+  - id: gap-quartz
+    trang_thai: ĐÃ ĐÓNG — s8 T03-3, 2026-08-19
+    what: prototype dựng vanilla, chưa port sang Quartz component
+    vá_ở: s6 spec M03_web → s8 implement
+    quyet: >
+      F1 (2026-08-18) — GIỮ Quartz, port 363 dòng JS sang component.
+      Kiểm doc chính thức, không đoán. emit() nhận toàn bộ content array nên
+      gộp url_normalized được. SPA routing giữ DOM state nên multi-window sống
+      được. Chênh ~700 dòng phải tự viết nếu chọn vanilla.
+  - id: gap-content
+    trang_thai: ĐÃ ĐÓNG — v31; object kb/ thật (9+ bản ghi, 3 loại) + 15 nháp
+                chưng cất; web đọc DB chân lý từ FR-034.
+    what: prototype dùng chung một thân bài mẫu cho mọi bài
+    vá_ở: s6 — nối kb/ thật
+  - id: gap-spec
+    what: M01_core và M02_kb là as-built, spec mới ở mức README chứ chưa qua s6
+    vá_ở: s6 nếu cần sửa; hiện chấp nhận vì đã có 14 test làm bằng chứng
+  - id: gap-python
+    # v31 · CÒN SỐNG và vừa cắn dev mới (2026-09-08: PATH 3.11 vs pin 3.13,
+    # cp1252 giết print) — giữ mở, vá_ở RUNNING.md + T04-8.
+    what: môi trường Python phân mảnh — bản có jsonschema thiếu pip
+    vá_ở: build_order B1 (ADR-02 pin 3.13 — FR-005 đính chính)

@@ -1,0 +1,715 @@
+{
+  "$comment": "Bằng chứng WCAG AA. Sinh lại mỗi khi token màu đổi — KHÔNG chỉnh tay. Lệnh: python core/tools/sinh_contrast_audit.py",
+  "generated": "2026-08-30",
+  "version": "3.0.0",
+  "supersedes": "2.0.0 — v2 viết tay và đã lệch: khai glass_alpha.dark 0.88 trong khi tokens.css đổi sang .62 (FR-027)",
+  "source": "05_uiux/tokens.css (đọc bằng script, không gõ lại)",
+  "standard": "WCAG 2.1 AA — chữ 4.5:1 · UI 3:1 · viền 1.35:1 · hue_gap ≥25°",
+  "note": "Nhóm glass-* đo chữ trên panel kính (alpha lấy TỪ --background) phủ lên 4 loại ảnh nền. Hai chế độ hai alpha: ảnh sáng làm nền nhạt nên chữ tối cần panel đặc hơn.",
+  "tokens": {
+    "light": {
+      "bg": "#FCF9F2",
+      "fg": "#17171A",
+      "card": "#FAF6ED",
+      "primary": "#C81E1E",
+      "primary_fg": "#FFFFFF",
+      "secondary_fg": "#3A3A42",
+      "muted_fg": "#5F5F66",
+      "accent": "#F4EDE1",
+      "accent_fg": "#8F1515",
+      "destructive": "#B3261E",
+      "destructive_fg": "#FFFFFF",
+      "success": "#15803D",
+      "warning": "#854D0E",
+      "warning_bg": "#FFFBEB",
+      "border": "#DBD3C0",
+      "ring": "#C81E1E"
+    },
+    "dark": {
+      "bg": "#0E0F11",
+      "fg": "#F2F2F0",
+      "card": "#151719",
+      "primary": "#F87171",
+      "primary_fg": "#1A0B0B",
+      "secondary_fg": "#D6D6DA",
+      "muted_fg": "#9A9AA4",
+      "accent": "#251A1B",
+      "accent_fg": "#FCA5A5",
+      "destructive": "#F87171",
+      "destructive_fg": "#1A0B0B",
+      "success": "#4ADE80",
+      "warning": "#FBBF24",
+      "warning_bg": "#1C1917",
+      "border": "#2A2D33",
+      "ring": "#F87171"
+    }
+  },
+  "glass_alpha": {
+    "light": 0.8,
+    "dark": 0.62
+  },
+  "backgrounds_tested": {
+    "ảnh sáng": "#F0F5F7",
+    "ảnh tối": "#0E1216",
+    "ảnh xanh": "#4A7FA8",
+    "ảnh cỏ": "#7FA060"
+  },
+  "backgrounds_real": {
+    "light": {
+      "thật nhạt nhất": "#6D6D6D",
+      "thật đậm nhất": "#898989"
+    },
+    "dark": {
+      "thật nhạt nhất": "#0F0F0F",
+      "thật đậm nhất": "#989898"
+    }
+  },
+  "results": [
+    {
+      "mode": "light",
+      "scope": "solid",
+      "pair": "chữ / nền",
+      "fg": "#17171A",
+      "bg": "#FCF9F2",
+      "ratio": 17.01,
+      "min": 4.5,
+      "pass": true
+    },
+    {
+      "mode": "light",
+      "scope": "solid",
+      "pair": "chữ / thẻ",
+      "fg": "#17171A",
+      "bg": "#FAF6ED",
+      "ratio": 16.59,
+      "min": 4.5,
+      "pass": true
+    },
+    {
+      "mode": "light",
+      "scope": "solid",
+      "pair": "chữ phụ / nền",
+      "fg": "#3A3A42",
+      "bg": "#FCF9F2",
+      "ratio": 10.72,
+      "min": 4.5,
+      "pass": true
+    },
+    {
+      "mode": "light",
+      "scope": "solid",
+      "pair": "chữ mờ / nền",
+      "fg": "#5F5F66",
+      "bg": "#FCF9F2",
+      "ratio": 6.02,
+      "min": 4.5,
+      "pass": true
+    },
+    {
+      "mode": "light",
+      "scope": "solid",
+      "pair": "chữ mờ / thẻ",
+      "fg": "#5F5F66",
+      "bg": "#FAF6ED",
+      "ratio": 5.87,
+      "min": 4.5,
+      "pass": true
+    },
+    {
+      "mode": "light",
+      "scope": "solid",
+      "pair": "nhấn / nền",
+      "fg": "#C81E1E",
+      "bg": "#FCF9F2",
+      "ratio": 5.46,
+      "min": 4.5,
+      "pass": true
+    },
+    {
+      "mode": "light",
+      "scope": "solid",
+      "pair": "chữ trên nhấn",
+      "fg": "#FFFFFF",
+      "bg": "#C81E1E",
+      "ratio": 5.74,
+      "min": 4.5,
+      "pass": true
+    },
+    {
+      "mode": "light",
+      "scope": "solid",
+      "pair": "loại bỏ / nền",
+      "fg": "#B3261E",
+      "bg": "#FCF9F2",
+      "ratio": 6.22,
+      "min": 4.5,
+      "pass": true
+    },
+    {
+      "mode": "light",
+      "scope": "solid",
+      "pair": "đạt / nền",
+      "fg": "#15803D",
+      "bg": "#FCF9F2",
+      "ratio": 4.77,
+      "min": 4.5,
+      "pass": true
+    },
+    {
+      "mode": "light",
+      "scope": "solid",
+      "pair": "cảnh báo / nền cảnh báo",
+      "fg": "#854D0E",
+      "bg": "#FFFBEB",
+      "ratio": 6.61,
+      "min": 4.5,
+      "pass": true
+    },
+    {
+      "mode": "light",
+      "scope": "solid",
+      "pair": "viền / nền",
+      "fg": "#DBD3C0",
+      "bg": "#FCF9F2",
+      "ratio": 1.42,
+      "min": 1.35,
+      "pass": true
+    },
+    {
+      "mode": "light",
+      "scope": "solid",
+      "pair": "vòng focus / nền",
+      "fg": "#C81E1E",
+      "bg": "#FCF9F2",
+      "ratio": 5.46,
+      "min": 3.0,
+      "pass": true
+    },
+    {
+      "mode": "light",
+      "scope": "glass-on-ảnh sáng",
+      "pair": "chữ",
+      "fg": "#17171A",
+      "bg": "#FAF8F2",
+      "ratio": 16.84,
+      "min": 4.5,
+      "pass": true,
+      "tham_chieu": true
+    },
+    {
+      "mode": "light",
+      "scope": "glass-on-ảnh sáng",
+      "pair": "chữ mờ",
+      "fg": "#5F5F66",
+      "bg": "#FAF8F2",
+      "ratio": 5.96,
+      "min": 4.5,
+      "pass": true,
+      "tham_chieu": true
+    },
+    {
+      "mode": "light",
+      "scope": "glass-on-ảnh sáng",
+      "pair": "tab active",
+      "fg": "#C81E1E",
+      "bg": "#FAF8F2",
+      "ratio": 5.4,
+      "min": 4.5,
+      "pass": true,
+      "tham_chieu": true
+    },
+    {
+      "mode": "light",
+      "scope": "glass-on-ảnh tối",
+      "pair": "chữ",
+      "fg": "#17171A",
+      "bg": "#DDDBD5",
+      "ratio": 12.92,
+      "min": 4.5,
+      "pass": true,
+      "tham_chieu": true
+    },
+    {
+      "mode": "light",
+      "scope": "glass-on-ảnh tối",
+      "pair": "chữ mờ",
+      "fg": "#5F5F66",
+      "bg": "#DDDBD5",
+      "ratio": 4.58,
+      "min": 4.5,
+      "pass": true,
+      "tham_chieu": true
+    },
+    {
+      "mode": "light",
+      "scope": "glass-on-ảnh tối",
+      "pair": "tab active",
+      "fg": "#C81E1E",
+      "bg": "#DDDBD5",
+      "ratio": 4.14,
+      "min": 4.5,
+      "pass": false,
+      "tham_chieu": true
+    },
+    {
+      "mode": "light",
+      "scope": "glass-on-ảnh xanh",
+      "pair": "chữ",
+      "fg": "#17171A",
+      "bg": "#E5E9E8",
+      "ratio": 14.61,
+      "min": 4.5,
+      "pass": true,
+      "tham_chieu": true
+    },
+    {
+      "mode": "light",
+      "scope": "glass-on-ảnh xanh",
+      "pair": "chữ mờ",
+      "fg": "#5F5F66",
+      "bg": "#E5E9E8",
+      "ratio": 5.17,
+      "min": 4.5,
+      "pass": true,
+      "tham_chieu": true
+    },
+    {
+      "mode": "light",
+      "scope": "glass-on-ảnh xanh",
+      "pair": "tab active",
+      "fg": "#C81E1E",
+      "bg": "#E5E9E8",
+      "ratio": 4.69,
+      "min": 4.5,
+      "pass": true,
+      "tham_chieu": true
+    },
+    {
+      "mode": "light",
+      "scope": "glass-on-ảnh cỏ",
+      "pair": "chữ",
+      "fg": "#17171A",
+      "bg": "#EBEDDE",
+      "ratio": 15.08,
+      "min": 4.5,
+      "pass": true,
+      "tham_chieu": true
+    },
+    {
+      "mode": "light",
+      "scope": "glass-on-ảnh cỏ",
+      "pair": "chữ mờ",
+      "fg": "#5F5F66",
+      "bg": "#EBEDDE",
+      "ratio": 5.34,
+      "min": 4.5,
+      "pass": true,
+      "tham_chieu": true
+    },
+    {
+      "mode": "light",
+      "scope": "glass-on-ảnh cỏ",
+      "pair": "tab active",
+      "fg": "#C81E1E",
+      "bg": "#EBEDDE",
+      "ratio": 4.84,
+      "min": 4.5,
+      "pass": true,
+      "tham_chieu": true
+    },
+    {
+      "mode": "light",
+      "scope": "glass-on-thật nhạt nhất",
+      "pair": "chữ",
+      "fg": "#17171A",
+      "bg": "#E9E6E0",
+      "ratio": 14.36,
+      "min": 4.5,
+      "pass": true
+    },
+    {
+      "mode": "light",
+      "scope": "glass-on-thật nhạt nhất",
+      "pair": "chữ mờ",
+      "fg": "#5F5F66",
+      "bg": "#E9E6E0",
+      "ratio": 5.09,
+      "min": 4.5,
+      "pass": true
+    },
+    {
+      "mode": "light",
+      "scope": "glass-on-thật nhạt nhất",
+      "pair": "tab active",
+      "fg": "#C81E1E",
+      "bg": "#E9E6E0",
+      "ratio": 4.61,
+      "min": 4.5,
+      "pass": true
+    },
+    {
+      "mode": "light",
+      "scope": "glass-on-thật đậm nhất",
+      "pair": "chữ",
+      "fg": "#17171A",
+      "bg": "#EDEAE4",
+      "ratio": 14.9,
+      "min": 4.5,
+      "pass": true
+    },
+    {
+      "mode": "light",
+      "scope": "glass-on-thật đậm nhất",
+      "pair": "chữ mờ",
+      "fg": "#5F5F66",
+      "bg": "#EDEAE4",
+      "ratio": 5.28,
+      "min": 4.5,
+      "pass": true
+    },
+    {
+      "mode": "light",
+      "scope": "glass-on-thật đậm nhất",
+      "pair": "tab active",
+      "fg": "#C81E1E",
+      "bg": "#EDEAE4",
+      "ratio": 4.78,
+      "min": 4.5,
+      "pass": true
+    },
+    {
+      "mode": "light",
+      "scope": "hue",
+      "pair": "cảnh báo vs nhấn",
+      "fg": "#854D0E",
+      "bg": "#C81E1E",
+      "ratio": 31.8,
+      "min": 25,
+      "pass": true
+    },
+    {
+      "mode": "dark",
+      "scope": "solid",
+      "pair": "chữ / nền",
+      "fg": "#F2F2F0",
+      "bg": "#0E0F11",
+      "ratio": 17.11,
+      "min": 4.5,
+      "pass": true
+    },
+    {
+      "mode": "dark",
+      "scope": "solid",
+      "pair": "chữ / thẻ",
+      "fg": "#F2F2F0",
+      "bg": "#151719",
+      "ratio": 16.03,
+      "min": 4.5,
+      "pass": true
+    },
+    {
+      "mode": "dark",
+      "scope": "solid",
+      "pair": "chữ phụ / nền",
+      "fg": "#D6D6DA",
+      "bg": "#0E0F11",
+      "ratio": 13.23,
+      "min": 4.5,
+      "pass": true
+    },
+    {
+      "mode": "dark",
+      "scope": "solid",
+      "pair": "chữ mờ / nền",
+      "fg": "#9A9AA4",
+      "bg": "#0E0F11",
+      "ratio": 6.88,
+      "min": 4.5,
+      "pass": true
+    },
+    {
+      "mode": "dark",
+      "scope": "solid",
+      "pair": "chữ mờ / thẻ",
+      "fg": "#9A9AA4",
+      "bg": "#151719",
+      "ratio": 6.45,
+      "min": 4.5,
+      "pass": true
+    },
+    {
+      "mode": "dark",
+      "scope": "solid",
+      "pair": "nhấn / nền",
+      "fg": "#F87171",
+      "bg": "#0E0F11",
+      "ratio": 6.93,
+      "min": 4.5,
+      "pass": true
+    },
+    {
+      "mode": "dark",
+      "scope": "solid",
+      "pair": "chữ trên nhấn",
+      "fg": "#1A0B0B",
+      "bg": "#F87171",
+      "ratio": 6.92,
+      "min": 4.5,
+      "pass": true
+    },
+    {
+      "mode": "dark",
+      "scope": "solid",
+      "pair": "loại bỏ / nền",
+      "fg": "#F87171",
+      "bg": "#0E0F11",
+      "ratio": 6.93,
+      "min": 4.5,
+      "pass": true
+    },
+    {
+      "mode": "dark",
+      "scope": "solid",
+      "pair": "đạt / nền",
+      "fg": "#4ADE80",
+      "bg": "#0E0F11",
+      "ratio": 11.0,
+      "min": 4.5,
+      "pass": true
+    },
+    {
+      "mode": "dark",
+      "scope": "solid",
+      "pair": "cảnh báo / nền cảnh báo",
+      "fg": "#FBBF24",
+      "bg": "#1C1917",
+      "ratio": 10.48,
+      "min": 4.5,
+      "pass": true
+    },
+    {
+      "mode": "dark",
+      "scope": "solid",
+      "pair": "viền / nền",
+      "fg": "#2A2D33",
+      "bg": "#0E0F11",
+      "ratio": 1.39,
+      "min": 1.35,
+      "pass": true
+    },
+    {
+      "mode": "dark",
+      "scope": "solid",
+      "pair": "vòng focus / nền",
+      "fg": "#F87171",
+      "bg": "#0E0F11",
+      "ratio": 6.93,
+      "min": 3.0,
+      "pass": true
+    },
+    {
+      "mode": "dark",
+      "scope": "glass-on-ảnh sáng",
+      "pair": "chữ",
+      "fg": "#F2F2F0",
+      "bg": "#373B3D",
+      "ratio": 10.1,
+      "min": 4.5,
+      "pass": true,
+      "tham_chieu": true
+    },
+    {
+      "mode": "dark",
+      "scope": "glass-on-ảnh sáng",
+      "pair": "chữ mờ",
+      "fg": "#9A9AA4",
+      "bg": "#373B3D",
+      "ratio": 4.06,
+      "min": 4.5,
+      "pass": false,
+      "tham_chieu": true
+    },
+    {
+      "mode": "dark",
+      "scope": "glass-on-ảnh sáng",
+      "pair": "tab active",
+      "fg": "#F87171",
+      "bg": "#373B3D",
+      "ratio": 4.09,
+      "min": 4.5,
+      "pass": false,
+      "tham_chieu": true
+    },
+    {
+      "mode": "dark",
+      "scope": "glass-on-ảnh tối",
+      "pair": "chữ",
+      "fg": "#F2F2F0",
+      "bg": "#0C0F13",
+      "ratio": 17.13,
+      "min": 4.5,
+      "pass": true,
+      "tham_chieu": true
+    },
+    {
+      "mode": "dark",
+      "scope": "glass-on-ảnh tối",
+      "pair": "chữ mờ",
+      "fg": "#9A9AA4",
+      "bg": "#0C0F13",
+      "ratio": 6.89,
+      "min": 4.5,
+      "pass": true,
+      "tham_chieu": true
+    },
+    {
+      "mode": "dark",
+      "scope": "glass-on-ảnh tối",
+      "pair": "tab active",
+      "fg": "#F87171",
+      "bg": "#0C0F13",
+      "ratio": 6.94,
+      "min": 4.5,
+      "pass": true,
+      "tham_chieu": true
+    },
+    {
+      "mode": "dark",
+      "scope": "glass-on-ảnh xanh",
+      "pair": "chữ",
+      "fg": "#F2F2F0",
+      "bg": "#18242E",
+      "ratio": 14.08,
+      "min": 4.5,
+      "pass": true,
+      "tham_chieu": true
+    },
+    {
+      "mode": "dark",
+      "scope": "glass-on-ảnh xanh",
+      "pair": "chữ mờ",
+      "fg": "#9A9AA4",
+      "bg": "#18242E",
+      "ratio": 5.66,
+      "min": 4.5,
+      "pass": true,
+      "tham_chieu": true
+    },
+    {
+      "mode": "dark",
+      "scope": "glass-on-ảnh xanh",
+      "pair": "tab active",
+      "fg": "#F87171",
+      "bg": "#18242E",
+      "ratio": 5.71,
+      "min": 4.5,
+      "pass": true,
+      "tham_chieu": true
+    },
+    {
+      "mode": "dark",
+      "scope": "glass-on-ảnh cỏ",
+      "pair": "chữ",
+      "fg": "#F2F2F0",
+      "bg": "#222A21",
+      "ratio": 13.18,
+      "min": 4.5,
+      "pass": true,
+      "tham_chieu": true
+    },
+    {
+      "mode": "dark",
+      "scope": "glass-on-ảnh cỏ",
+      "pair": "chữ mờ",
+      "fg": "#9A9AA4",
+      "bg": "#222A21",
+      "ratio": 5.3,
+      "min": 4.5,
+      "pass": true,
+      "tham_chieu": true
+    },
+    {
+      "mode": "dark",
+      "scope": "glass-on-ảnh cỏ",
+      "pair": "tab active",
+      "fg": "#F87171",
+      "bg": "#222A21",
+      "ratio": 5.34,
+      "min": 4.5,
+      "pass": true,
+      "tham_chieu": true
+    },
+    {
+      "mode": "dark",
+      "scope": "glass-on-thật nhạt nhất",
+      "pair": "chữ",
+      "fg": "#F2F2F0",
+      "bg": "#0C0F11",
+      "ratio": 17.16,
+      "min": 4.5,
+      "pass": true
+    },
+    {
+      "mode": "dark",
+      "scope": "glass-on-thật nhạt nhất",
+      "pair": "chữ mờ",
+      "fg": "#9A9AA4",
+      "bg": "#0C0F11",
+      "ratio": 6.9,
+      "min": 4.5,
+      "pass": true
+    },
+    {
+      "mode": "dark",
+      "scope": "glass-on-thật nhạt nhất",
+      "pair": "tab active",
+      "fg": "#F87171",
+      "bg": "#0C0F11",
+      "ratio": 6.95,
+      "min": 4.5,
+      "pass": true
+    },
+    {
+      "mode": "dark",
+      "scope": "glass-on-thật đậm nhất",
+      "pair": "chữ",
+      "fg": "#F2F2F0",
+      "bg": "#27292B",
+      "ratio": 13.03,
+      "min": 4.5,
+      "pass": true
+    },
+    {
+      "mode": "dark",
+      "scope": "glass-on-thật đậm nhất",
+      "pair": "chữ mờ",
+      "fg": "#9A9AA4",
+      "bg": "#27292B",
+      "ratio": 5.24,
+      "min": 4.5,
+      "pass": true
+    },
+    {
+      "mode": "dark",
+      "scope": "glass-on-thật đậm nhất",
+      "pair": "tab active",
+      "fg": "#F87171",
+      "bg": "#27292B",
+      "ratio": 5.28,
+      "min": 4.5,
+      "pass": true
+    },
+    {
+      "mode": "dark",
+      "scope": "hue",
+      "pair": "cảnh báo vs nhấn",
+      "fg": "#FBBF24",
+      "bg": "#F87171",
+      "ratio": 43.3,
+      "min": 25,
+      "pass": true
+    }
+  ],
+  "total": 62,
+  "failures": 0
+}

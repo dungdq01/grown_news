@@ -1,0 +1,82 @@
+id: WL-01K9JHTIEUDEDOI
+at: 2026-08-20
+by: claude
+buoc: s8 (M03_web)
+loai: fix — bug lộ ra ở bài kb/ thật đầu tiên
+fr: không cần — sửa lỗi render, không đổi hợp đồng nào
+
+viec: >
+  Người dùng mở cửa sổ đọc bài thật đầu tiên và hỏi "duyệt lỗi à". Ảnh chụp cho
+  thấy hai vấn đề, và cả hai là lỗi thật — không phải cảnh báo validate.
+
+hai_trieu_chung_MOT_goc:
+  1_hai_tieu_de: >
+    Cửa sổ đọc hiện "Đưa AI agent từ prototype lên production — stack không phải
+    bài toán chính" (từ frontmatter `title`) RỒI hiện lại "Đưa AI agent từ
+    prototype lên production" (từ `# H1` của thân bài).
+  2_muc_luc_sai: >
+    Mục lục chỉ có MỘT mục "01 Đưa AI agent từ prototype lên production" — tức
+    tên bài, không phải mục 1-9. Chín mục thật KHÔNG xuất hiện.
+  goc_chung: >
+    `multiwindow.inline.ts:230` chèn `<h1>title</h1>` vô điều kiện rồi mới
+    `md(than)`. Và `md()` dòng 111 HẠ CẤP mọi heading một bậc
+    (`Math.min(h[1].length + 1, 4)`), nên:
+      · `# H1` của thân bài → h2 ⇒ lọt mục lục (mục lục đọc `.doc h2`)
+      · `## 1. Bối cảnh` → h3 ⇒ KHÔNG lọt mục lục
+    Một phép +1 gây cả hai triệu chứng.
+
+vi_sao_lo_LAU_moi_thay:
+  do_duoc: "0/14 bản ghi trong kb-mock/ có `# H1`"
+  ly_do: >
+    kb-mock/ do sinh_kb_mock.py dựng từ contract, thân bài là template mở đầu
+    bằng `## 1. Bối cảnh` — không có H1. Mọi test đọc mock nên phép hạ cấp trông
+    đúng: `##` → h2, mục lục chạy.
+  mau_chuan_thi_CO_H1: "core/skill-src/mau-dat-chuan.md:38 mở đầu bằng `# Ví dụ đạt chuẩn`"
+  ket_luan: >
+    Bài THẬT đầu tiên là bài đầu tiên đi theo mẫu chuẩn, và nó phơi lỗi ra ngay
+    lần mở cửa sổ đầu. Cùng lớp lỗi với parser YAML flow-vs-block (FR-010) và
+    word_count (FR-015): DỮ LIỆU MẪU KHÔNG PHỦ HÌNH DẠNG DỮ LIỆU THẬT.
+
+sua:
+  1: >
+    `coH1 = /^#\s+\S/m.test(ban.than)` — chỉ chèn `<h1>title</h1>` khi thân bài
+    CHƯA có H1. Bản không có thân bài giữ nguyên đường cũ.
+  2: >
+    `md()`: `Math.min(h[1].length, 4)` thay cho `+ 1`. Giữ ĐÚNG cấp: `#`→h1,
+    `##`→h2. Kiểm bài mock: chúng dùng `##` nên vẫn ra h2, mục lục không vỡ.
+
+cong_may_moi:
+  ten: web/test/tieu-de-khong-nhan-doi.test.js
+  bon_khoi:
+    - "có phép kiểm thân bài đã có H1 chưa; không chèn <h1> vô điều kiện"
+    - "md() KHÔNG hạ cấp (+1) — regex bắt đúng biểu thức tính cấp"
+    - "mục lục đọc `.doc h2` nên `## N. Tên` phải ra h2"
+    - "ĐO và ghi ra: 0/14 bản mock có H1 — nói thẳng vì sao lỗi ngủ lâu"
+  kiem_hai_chieu: "trả `+ 1` vào md() → exit 1; phục hồi → exit 0"
+  vi_sao_khong_assert_mock_phai_co_H1: >
+    Sửa sinh_kb_mock.py để thân bài mẫu có H1 là việc khác (đổi contract render).
+    Test này chỉ canh CODE RENDER đúng, và ghi lại con số 0/14 để lần sau ai đọc
+    biết mock không phủ ca này.
+
+verify:
+  loai: hard
+  ket_qua:
+    npm_run_check: sạch
+    web_test: "27/27 file, exit 0 (thêm tieu-de-khong-nhan-doi)"
+    check_ci_teeth: 0
+    check_rule_surfaces: 0
+    build: exit 0
+  kiem_bundle_da_build:
+    - "gn.js có `coH1`"
+    - "gn.js có `Math.min(h[1].length, 4)` (không còn +1)"
+
+no:
+  - "Chưa xem lại trên màn thật sau khi build — người dùng mở /cho-duyet/ rồi
+     bấm một bài là thấy."
+  - "kb-mock/ vẫn không có bản nào mang `# H1`. Nghĩa là ca này chỉ được canh
+     bằng test tĩnh, không có bản ghi mẫu nào đi qua đường render thật. Sửa
+     sinh_kb_mock.py cho thân bài mẫu có H1 sẽ phủ kín hơn — chưa làm."
+  - "Cảnh báo `2 khái niệm chờ duyệt danh mục` trong ảnh KHÔNG phải lỗi: bài
+     dùng concepts_proposed đúng như kb/concepts.yaml:3 chỉ định. Nhưng
+     `--strict` coi cảnh báo là lỗi nên check_running vẫn đỏ — xung đột luật
+     đã ghi ở WL-01K9JGBAITHAT01, chờ người dùng quyết."

@@ -1,0 +1,93 @@
+id: WL-01K9NMC6B
+at: 2026-08-28
+by: claude
+buoc: s8 — FR-038/C6b `/video/nap/`, đường TẠO video (trước đó không tồn tại)
+loai: bàn giao C6b
+fr: FR-038-tach-ba-module-noi-dung.md · FR-040-tach-route-theo-module.md
+
+object:
+  task:
+    - 07_plan/M01_core/tasks/T01-29-fix-dien-url-normalized.md   # code
+    - 07_plan/M01_core/tasks/T01-30-test-fix-url.md              # test
+    - 07_plan/M01_core/tasks/T01-31-khai-man-nap-video.md        # code
+    - 07_plan/M03_web/tasks/T03-34-man-nap-video.md              # code
+    - 07_plan/M03_web/tasks/T03-35-test-nap-video.md             # test
+  code:
+    - core/src/source_distiller/validate.py   # --fix điền url_normalized
+    - core/assets/man-hinh.json               # +nap-video (đủ ba màn nạp)
+    - web/render/shell.html · web/plugins/home-pages/shell.html   # v-napvideo
+    - web/plugins/multiwindow/src/scripts/multiwindow.inline.ts   # ganNapVideo · ghiVideo
+  test:
+    - core/tests/check_fix_url.py     # MỚI — 4 mục
+    - core/tests/test_gates.py        # tập DẪN XUẤT thành hai khoá
+    - web/test/nap-video.test.js      # MỚI — 4 mục
+    - web/test/no-write-path.test.js  # whitelist đường ghi DẪN XUẤT
+    - web/test/thu-vien-nap.test.js   # tập pane-không-tab dẫn xuất
+    - web/test/WORKLOG.md · web/package.json
+  no:
+    - 06_modules/M03_web/backlog.md   # 3 ô mới
+
+may_xanh:
+  - "python core/tests/check_fix_url.py  ->  pass (4 mục)"
+  - "cd web && node test/nap-video.test.js  ->  pass (4 mục)"
+  - "cd web && npm test  ->  exit 0 (59 file)"
+  - "PYTHONIOENCODING=utf-8 pytest core/tests -q  ->  42 passed"
+  - "18/23 cổng check_*.py"
+  - "ngân sách: gn.css 92/100 · gn.js **102395/102400 byte — dư 5** · trang lớn nhất 60/74"
+
+do_tren_trinh_duyet:
+  - "`/video/nap/` chỉ hiện `v-napvideo`; KHÔNG có form viết bài, KHÔNG có ô chọn file"
+  - >
+    host lạ ⇒ chặn TẠI CHỖ DÁN kèm lời "không nằm trong danh sách nhận:
+    youtube.com · tiktok.com"; host tốt ⇒ mở phần điền
+  - >
+    vòng ĐẦY ĐỦ: dán `https://youtu.be/abc123xyz01` → gõ tóm tắt tiếng Việt →
+    slug tự sinh `hoi-thao-ve-ngu-canh-agent-dang-ky-thu` (bỏ dấu đúng) → bấm
+    ghi → bản ghi vào kho với `source_type: video`
+
+quyet_dinh_thiet_ke:
+  - >
+    `url_normalized` do `validate.py --fix` điền, KHÔNG do FE tính. Viết lại phép
+    chuẩn hoá bằng JS là bản THỨ HAI của `normalize_url()` — đúng lớp lỗi
+    `dongBoThe` (hai bên dựng cùng một khoá bằng hai đường). MỘT công thức, chạy
+    MỘT nơi. Điều này cũng đóng ô backlog M01 mở ở FR-040
+  - >
+    `--fix` CHỈ điền khi VẮNG. Ghi đè một lời khai có sẵn là xoá bằng chứng của
+    cổng 9 — cổng duy nhất bắt lời khai lệch hàm tính — và sau đó nó không bao
+    giờ đỏ được nữa. Có phép kiểm riêng cho ca đó
+  - >
+    FE gọi `/api/video`, KHÔNG `/api/articles`. Đường cũ vẫn tạo được bản video
+    (bí danh còn sống), nên gọi nó thì tính năng TRÔNG đúng mà cổng riêng của
+    module video không chạy
+  - >
+    Whitelist đường ghi của `no-write-path` DẪN XUẤT từ `loai-nguon.json`. Gõ ba
+    tên vào regex là bản gõ tay thứ hai, và nó lệch đúng vào hôm thêm module thứ tư
+
+kiem_hai_chieu:
+  - "R5 ĐỎ TRƯỚC có thật: check_fix_url 1 lỗi · nap-video 6 lỗi"
+  - "fetch ghi tới `/api/duong-la` ⇒ no-write-path đỏ; hoàn tác khớp sha"
+  - "đổi `ten` của module video trong bảng khai ⇒ whitelist hẹp lại và cổng đỏ"
+
+tu_bat_duoc:
+  - >
+    `gn.js` vượt trần 266 byte sau khi thêm FE, và `page-weight` VẪN XANH vì nó
+    làm tròn KB. Đã SIẾT bốn chỗ (gộp `kqVD` vào `kqTV` · rút câu whitelist thành
+    một hằng · bỏ listener `paste` dư vì `input` đã bắn · gộp nhánh `youtu.be`
+    vào vòng lặp) — còn dư 5 byte. Lỗ làm tròn đã ghi backlog
+  - >
+    MỘT BẢN GHI THỬ ĐI VÀO KHO THẬT trong lượt kiểm bằng trình duyệt. Đã xoá qua
+    API nên byte còn trong `_recycle` (M08-R4) và `bam_cay` đổi
+    `ef94495f161ef0e5` → `74a0412e3ab1b051`; `kb/` về đúng 1 bản ghi. Kiểm bằng
+    trình duyệt phải trỏ `KB_DIR` vào kho tạm — mọi test đều làm thế, tôi thì không
+  - "Sự cố escaping 21→23: chuyển hẳn sang viết script ra FILE, và regex dùng mã hex cho ba dấu nháy"
+
+do_do:
+  - cong: check_skill.py
+    do_do_boi: agent khác
+  - cong: check_danh_muc · check_frozen · check_running
+    do_do_boi: chính tôi, từ FR-039 — hai ô backlog M01 chờ người dùng định tuyến
+
+con_lai:
+  - "C7 · CRUD tại chỗ từng loại; form Tài liệu phải có ô `media` (sự thật 7 của plan)"
+  - "C8 · BUG-1 `[hidden]` thua `.api-only` · BUG-2 `#acount` đếm cả trang"
+  - "C9 · spec ba module · wireframe · ký lại FROZEN.lock sau khi FR duyệt"

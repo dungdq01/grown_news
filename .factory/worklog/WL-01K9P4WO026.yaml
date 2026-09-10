@@ -1,0 +1,68 @@
+id: WL-01K9P4WO026
+at: 2026-08-29
+by: claude
+buoc: WO-026 — hai phép kiểm trong `filter-counts` báo "ok" mà không đo gì
+loai: bàn giao WO-026
+wo: WO-026-hai-phep-kiem-chet-trong-filter-counts.md
+
+object:
+  wo:
+    - .factory/wo/WO-026-hai-phep-kiem-chet-trong-filter-counts.md
+  task:
+    - 07_plan/M03_web/tasks/T03-60-test-filter-counts-song-lai.md
+  test:
+    - web/test/filter-counts.test.js
+
+may_xanh:
+  - >
+    KIỂM HAI CHIỀU: phá `.sort` ở `trang.mjs:590` (đổi chiều so sánh) ⇒ ĐỎ với
+    `hàng sắp giảm dần: 1 2 3`; phục hồi ⇒ sha256 `5d0d03b9be187164` y hệt và
+    xanh lại. **Trước bản vá, cùng phép phá đó không sinh lỗi nào**
+  - "cổng nay in số liệu THẬT: `3 hàng` · `3/3 đang dùng` · `3 2 1`"
+  - "quét web 72/73 (chỉ `he-kinh`) · 21/25 cổng Python · pytest 42"
+
+bug:
+  - >
+    Kho mock KHÔNG có nhãn nào đang dùng — trạng thái HỢP LỆ, emitter khai rõ
+    `ccount` rỗng khi danh mục rỗng. Hệ quả: `mCc` là `null` nên
+    `if (mCc) ok(...)` **không chạy và không in dòng nào**; `soTrongHang` rỗng
+    nên `[].every(...)` đúng vô điều kiện
+  - >
+    Phép thứ nhất BIẾN MẤT KHÔNG DẤU VẾT. Phép thứ hai IN RA CHỮ "ok" trong khi
+    tập nó xét là rỗng — `hàng sắp giảm dần: ` với không gì sau dấu hai chấm.
+    Chính output của cổng đã nói điều đó suốt, không ai đọc
+
+ban_va:
+  - >
+    MỘT bản render riêng có nhãn thật cho đúng hai phép này. KHÔNG đụng `kn`:
+    cả chục phép khác trong file dựa vào nó, và kho mock rỗng nhãn là trạng thái
+    hợp lệ không nên bị ép đổi
+  - >
+    Gieo 3 khái niệm với 3 · 2 · 1 lượt dùng ⇒ thứ tự đúng là `3 2 1`, phân biệt
+    được với mọi thứ tự khác
+  - >
+    HAI phép tự kiểm vật liệu: `> 0` hàng nhãn, và `>= 2` hàng mang số. Dưới 2
+    thì `.every` lại đúng vô điều kiện — chết ở chỗ mới
+  - >
+    `if (mCc)` đổi thành `ok(mCc !== null, ...)` RỒI MỚI `if`. Im lặng bỏ qua là
+    thứ phải bị chặn, không phải thứ được phép
+
+da_kiem_khong_sua:
+  - >
+    `hai-chieu-facet.test.js:76` có hình dạng giống (`.every` trên
+    `tapCua[...] ?? []`) nhưng AN TOÀN: vòng ngay trên đã đòi `ng.length > 0`
+    cho từng module. Đó là cách viết đúng của cùng một khuôn
+  - >
+    Quét 19 chỗ `.every(` trong bộ cổng: `api-crud` có `total === 3` chặn trước ·
+    `script-runs` có `khoi.length - 1 >= 2` · `bon-chieu-facet` xét mảng literal.
+    Chỉ `filter-counts` không có ai canh vật liệu
+
+đỏ_do: chưa quy được chủ  # hai phép có từ trước, chết từ lúc kho mock hết nhãn dùng
+
+do_do:
+  - cong: he-kinh.test.js
+    do_do_boi: ảnh 724662 byte người dùng thêm — `python core/tools/toi_uu_anh_nen.py`
+  - cong: check_frozen.py
+    do_do_boi: chờ NGƯỜI ký sau khi FR-039 duyệt
+  - cong: check_danh_muc.py · check_skill.py · check_running.py
+    do_do_boi: agent khác · và hệ quả của hai cổng trên

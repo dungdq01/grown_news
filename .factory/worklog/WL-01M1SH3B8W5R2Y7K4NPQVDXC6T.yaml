@@ -1,0 +1,42 @@
+ulid: 01M1SH3B8W5R2Y7K4NPQVDXC6T
+thoi_diem: 2026-09-06T06:45+07:00
+tac_nhan: chủ dự án (ghi hộ bởi claude-opus-5)
+loai: ky_gate
+module: M03_web
+don_vi: T03-116 · AC0 — DUYỆT WIREFRAME SCR-18
+
+moc_duyet: >
+  Chủ dự án duyệt `05_uiux/wireframes/SCR-18-popup-chung-cat-chi-dan.md`,
+  nguyên văn một chữ: "duyệt". Đây là mốc `AC0` (soft, NGƯỜI chấm) — bước 2
+  được phép bắt đầu từ đây, và KHÔNG sớm hơn.
+
+ba_cau_hoi_khong_duoc_tra_loi: >
+  Tôi hỏi ba câu kèm wireframe; chữ "duyệt" không trả lời câu nào. Không hỏi
+  lại để chặn tiến độ — chọn mặc định AN TOÀN HƠN cho từng câu, ghi ra đây để
+  chủ dự án đảo lại bằng một câu, và mỗi lựa chọn đều rẻ khi đổi.
+
+mac_dinh_da_chon:
+  - cau: nhớ chỉ dẫn gần nhất theo tab
+    chon: CHIP "dùng lại chỉ dẫn trước", KHÔNG điền sẵn
+    vi_sao: >
+      Điền sẵn tiện hơn đúng một cú bấm, nhưng nó LẶNG LẼ đổi kết quả của lần
+      chưng cất sau: người mở popup cho một tài liệu khác, không đọc lại ô, và
+      nhận về một bản viết theo yêu cầu của tài liệu trước. Chip thì phải bấm —
+      một cú bấm đổi lấy việc người BIẾT mình đang dùng lại cái gì.
+      Đảo lại rẻ: một dòng đổi `value` thay vì render chip.
+  - cau: preset thứ tư "giữ nguyên giọng tài liệu gốc"
+    chon: CHƯA thêm
+    vi_sao: >
+      Ba preset đủ DẠY cái ô này nhận loại yêu cầu nào — đó là việc chính của
+      preset. Cái thứ tư thêm lúc nào cũng được: một dòng `chi-dan-mau.json`,
+      0 dòng mã (AC4 đã khoá đúng tính chất đó).
+  - cau: dòng meta ở cửa sổ kết quả
+    chon: CẮT ~60 ký tự + `title=` xem đủ
+    vi_sao: >
+      Chỉ dẫn dài 500 ký tự đổ nguyên vào thanh meta thì nó đè phần còn lại của
+      cửa sổ kết quả — mà thứ người mở cửa sổ đó muốn đọc là BẢN CHƯNG, không
+      phải yêu cầu họ vừa gõ. Cắt + rê chuột giữ được cả hai.
+
+object:
+  - 05_uiux/wireframes/SCR-18-popup-chung-cat-chi-dan.md
+  - 07_plan/M03_web/tasks/T03-116-o-chi-dan-trong-popup-chung-cat.md

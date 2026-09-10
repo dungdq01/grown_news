@@ -1,0 +1,13 @@
+{
+  "name": "approved-only",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "index.ts",
+  "quartz": {
+    "name": "approved-only",
+    "displayName": "Chỉ approved lên site",
+    "description": "M03-R1 — chặn draft/rejected/bản lưu trữ khỏi output build",
+    "category": "filter",
+    "defaultEnabled": true
+  }
+}

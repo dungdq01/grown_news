@@ -1,0 +1,81 @@
+id: WL-01K9NLWO012UI
+at: 2026-08-28
+by: claude
+buoc: WO-012 — ba màn loại đầy đủ · panel kéo đáy · bốn chỗ nói sai
+loai: bàn giao WO-012
+wo: WO-012-ui-ba-man-loai-va-nen.md
+
+object:
+  wo:
+    - .factory/wo/WO-012-ui-ba-man-loai-va-nen.md
+  task:
+    - 07_plan/M03_web/tasks/T03-32-ui-ba-man-day-du.md    # code
+    - 07_plan/M03_web/tasks/T03-33-test-ui-ba-man.md      # test
+  code:
+    - web/render/shell.html · web/plugins/home-pages/shell.html   # byte-identical
+    - web/render/trang.mjs        # nutNap() · soDem() · sidebar+dải cho 3 màn
+    - web/styles/prototype.css    # chuỗi ba khâu min-height (gộp vào MỘT luật .mid)
+    - web/plugins/WORKLOG.md · web/styles/WORKLOG.md · web/WORKLOG.md
+  test:
+    - web/test/ui-ba-man.test.js   # MỚI — 7 mục, §7 khai giới hạn
+    - web/test/cac-man-con-lai.test.js · web/test/real-vs-mock.test.js
+    - web/test/WORKLOG.md · web/package.json
+
+may_xanh:
+  - "cd web && node test/ui-ba-man.test.js  ->  pass (7 mục)"
+  - "cd web && npm test  ->  exit 0 (58 file)"
+  - "PYTHONIOENCODING=utf-8 pytest core/tests -q  ->  42 passed"
+  - "18/22 cổng check_*.py — bốn đỏ y hệt trước, không thêm đỏ mới"
+  - "ngân sách: gn.css 92/100 (KHÔNG đổi — dùng lại class) · gn.js 95/100 · trang chủ 51/60 · trang lớn nhất 60/74"
+
+do_tren_trinh_duyet:
+  cong_cu: Playwright, khung 1600×1026, `/tai-lieu/` (kho 0 tài liệu)
+  truoc_sau:
+    - "panel kính: 278px = 27% khung nhìn  ->  722px = 70%"
+    - "ảnh nền dưới panel: 65%  ->  20%"
+    - "#tcount: '1 bài · 1 bản ghi' (số CẢ KHO)  ->  '0 bài · 0 bản ghi'"
+    - "nút header: '+ VIẾT BÀI'  ->  '+ nạp tài liệu'"
+    - "sidebar lọc · ba nút sắp · dải: KHÔNG CÓ  ->  có đủ trên cả ba màn loại"
+
+quyet_dinh_thiet_ke:
+  - >
+    DÙNG LẠI `.fw`/`.fl`/`.sortb`/`.mb` của màn Tổng hợp thay vì đặt class mới —
+    `gn.css` giữ nguyên **92/100 KB** sau khi ba màn loại đầy đủ. Đặt class mới
+    cho việc đã có class là cách hết 8 KB còn lại trong một lượt
+  - >
+    Màn có `module` mà module đó CHƯA có đường nạp ⇒ KHÔNG hiện nút nào. `/video/`
+    chưa có `/video/nap/` (C6b), và một nút "+ viết bài" ở đó là mời người dùng
+    làm việc của module khác. Vắng một nút nói đúng sự thật
+  - >
+    Màn không có `module` (Trang chủ · Tổng hợp · Kho · Danh mục) vẫn nói số CẢ
+    KHO — chúng là màn trộn, và đó là đúng
+
+tu_bat_duoc:
+  - >
+    CỔNG CỦA TÔI ĐO HÌNH THỨC, hai lần. §4 hỏi "`.mid` có luật `min-height`
+    không" và trả lời "có" — trong khi `.mid` cao 906/1026px mà `.pn` (khối kính
+    NHÌN THẤY ĐƯỢC) vẫn 278px. `.mid` trong suốt. Sửa thành chuỗi BA khâu, và §7
+    khai thẳng rằng đây là phép kiểm chuỗi luật kèm số đo thật
+  - >
+    §5 CẮT SAI VÙNG: tôi cắt tới `</header>`, và `<header class="top">` là RAIL
+    TRÁI — chữ "viết bài" chưa bao giờ ở đó. CẢ HAI chiều vô căn cứ. Vùng đúng
+    là `.ph`
+  - >
+    Dải "LỚP CỔNG 6" trên màn nạp tài liệu — chính tôi thêm ở C6a, và nó nói
+    KIẾN TRÚC. `chu-giao-dien` tồn tại đúng để chặn điều đó, và tôi vi phạm cổng
+    của chính mình
+  - >
+    Tôi thêm luật `.mid` THỨ HAI; cổng chặn: "một selector, một sự thật" — hai
+    luật thì phép kiểm dễ khớp vào luật đã bị đè
+
+do_do:
+  - cong: check_skill.py
+    do_do_boi: agent khác
+  - cong: check_danh_muc · check_frozen · check_running
+    do_do_boi: chính tôi, từ FR-039 — hai ô backlog M01 chờ người dùng định tuyến
+
+con_lai:
+  - "C6b · `/video/nap/` — đường tạo video CHƯA CÓ; nút header của `/video/` cố ý vắng tới đó"
+  - "C7 · CRUD tại chỗ; form Tài liệu phải có ô `media`"
+  - "C8 · BUG-1 `[hidden]` thua `.api-only` · BUG-2 `#acount` đếm cả trang"
+  - "Người chốt: mở bảy màn xem bằng mắt — cổng chỉ canh được chuỗi luật, không canh được 'đẹp'"

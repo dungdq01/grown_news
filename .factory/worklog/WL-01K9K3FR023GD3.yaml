@@ -1,0 +1,160 @@
+id: WL-01K9K3FR023GD3
+at: 2026-08-24
+by: claude
+buoc: s8 (M02_kb + M08_api)
+loai: amend-frozen + hoan thien tang DB cho duong doc
+fr: FR-023-index-sqlite.md
+
+viec: >
+  Nguoi dung: "hoan thien DB cho tat ca cac muc can no, vi du nhu cac trang thai
+  duyet bai... liet ke tat ca va hoan thanh". Nen viec chia hai: (1) DO xem
+  nhung muc nao THUC SU can DB, (2) lam.
+
+# ── Phan (1): DO, khong phong doan ────────────────────────────────────────
+do_truoc_khi_liet_ke:
+  cach_do: "grep moi loi goi doc dia trong web/api + khao sat 1 agent doc lai doc lap"
+  so_lieu:
+    - "9 loi goi docBai() — 7 nam tren duong GHI, chi 2 la doc thuan"
+    - "5 cho goi quetKho() — 4 goi ngay docBai() cho tung bai => mo + parse N file/request"
+    - "quetKho+docBai 7.546 ms/luot · khoDoc (index) 1.079 ms/luot · sinh_index ~430ms/luot"
+    - "giu handle 0.206ms vs mo-doc-dong 0.594ms (duong dia 7.546ms)"
+
+ket_luan_kien_truc: >
+  DB cho DOC; file cho GHI va cho etag. Khong phai thu tuc — do la cho DUY NHAT
+  bat duoc xung dot giua web va editor ngoai. `etag = sha256(FILE)`; lay tu index
+  thi mot lan sua bang editor KHONG lam etag lech => If-Match mat rang =>
+  lost-update im lang.
+
+# ── Phan (2): lam ────────────────────────────────────────────────────────
+da_chuyen_sang_DB:
+  - "GET /api/articles (danhSach + theBai) — bo readFileSync + parse YAML moi bai"
+  - "GET /api/index (chiMucMo) — bo doc THAN bai tu dia"
+  - "demDeXuat() — dem bai de xuat mot khai niem"
+  - "demDangDung() — dem bai dang dung mot nhan (con so QUYET DINH xoa duoc hay khong)"
+  - "khoDoc() la CUA DUY NHAT: index neu co, dia neu khong — hai duong khong the lech nghiep vu"
+
+co_y_GIU_doc_dia:
+  etag_moi_vanTay: >
+    api-crud.test.js:25 doi moi the co etag. etag cua index khong phan anh byte
+    tren dia nen no se la mot con so trong-nhu-etag ma khong bat duoc gi.
+  POST_409_va_phucHoi_409: >
+    Phai hoi DIA "file co that chua". Index dung lai async nen tre mot nhip =>
+    hoi index roi POST la duong ghi de mot bai vua tao.
+  guard_kho_rong_khi_xoa_nhan: >
+    Index rong trong khi kho khong rong thi guard mo ra va mot nhan dang duoc
+    dung bi xoa. Khong danh doi 7ms lay cua so do.
+  _recycle_va_concepts_yaml: "ngoai kb/ — index khong phu; va yaml danh muc LA nguon, khong phai dan xuat"
+
+# ── Ba bug that trong index, lo ra khi co nguoi doc ──────────────────────
+bug_1_mat_ban_ghi_im_lang:
+  hien_tuong: "gieo 5 file, index ghi 3 — repo/nop-qua-web.md BIEN MAT"
+  nguyen_nhan: "`slug` la PRIMARY KEY mot minh; slug = f.stem (ten file tran)"
+  muc_do: "PHA RANG 1 (dung lai duoc) — AC hard cua B-C1, khong phai bug cham"
+  sua: "PRIMARY KEY (source_type, slug); bang nhan cung the"
+bug_2_ban_luu_tru_lot_danh_sach:
+  nguyen_nhan: >
+    quetKho() loc `*.v<n>.md` bang regex, validate.py va sinh_index thi KHONG —
+    ba noi ba luat. Comment cua la_ban_phan_tich() con ghi "mot noi khai, khong
+    hai" trong khi thuc te la ba.
+  sua: "cot `luu_tru`; index GIU ban luu tru (anh chieu cua kho), consumer loc luu_tru = 0"
+bug_3_OR_IGNORE_nuot_xung_dot:
+  nguyen_nhan: "`INSERT OR IGNORE INTO nhan` — chinh thu CHE bug 1"
+  sua: "INSERT thuong; trung trong CUNG mot file thi dict.fromkeys lo"
+vi_sao_ca_ba_ngu: >
+  kb/ that co 3 bai, 3 slug khac nhau, 0 ban luu tru. Dung lop loi quen cua du
+  an: "du lieu mau khong phu hinh dang du lieu that". Nen check_index_dan_xuat.py
+  gio co khoi 6 TU GIEO ba hinh dang do vao kho tam.
+
+# ── Bon bug do chinh toi gay ra o GD 3, va cach bat ──────────────────────
+bug_toi_gay_500_ENOENT:
+  hien_tuong: "DELETE roi GET /api/articles => 500 ENOENT"
+  nguyen_nhan: "index con ban ghi cua file da sang _recycle/; theBai goi vanTay tren file khong con"
+  sua: "khoDoc() loc existsSync — DIA THANG khi index va dia khong dong y"
+bug_toi_gay_danh_sach_3_tren_4:
+  hien_tuong: "restore roi GET => 3/4 bai"
+  nguyen_nhan: >
+    Hai lan capNhatIndex chong nhau va lan CHAM HON thang, nen index chot o
+    trang thai truoc restore. `void capNhatIndex()` khong ai cho.
+  sua: >
+    Hang doi rieng cho index (khong dung tuanTu — do la mutex duong GHI, dung
+    chung se giu mutex them ~430ms moi request) + co `_ban`: index KHONG dang tin
+    tu luc kho doi toi luc dung lai xong; trong cua so do moi duong doc roi ve dia.
+bug_toi_gay_EBUSY:
+  hien_tuong: "EBUSY: unlink _index.sqlite — CA file test chet, khong chi do mot phep kiem"
+  nguyen_nhan: "giu handle SQLite; sinh_index.py xoa roi tao lai file do"
+  sua: "mo-doc-dong moi lan (0.594ms, van nhanh 12.7x so dia) + don kho tam co maxRetries"
+  ghi_chu: "Tai hien duoc bang cach chay 3 test API SONG SONG — chay rieng thi xanh"
+bug_toi_gay_cong_do_vi_ly_do_sai:
+  hien_tuong: "check_index_dan_xuat do: WinError 32 khi unlink kb/_index.sqlite"
+  nguyen_nhan: "3 `node server.mjs` dev dang chay giu file — khong phai index sai"
+  sua: "cong chay tren kho TAM, khong tren kb/ that (KB_DIR)"
+
+# ── Rang moi ─────────────────────────────────────────────────────────────
+rang_moi:
+  - >
+    web/test/hai-duong-doc-khop.test.js (9 phep kiem) — HAI DUONG DOC PHAI TRA
+    DU LIEU Y HET. Khong co no thi "index la dan xuat" chi la loi khai: tat index
+    ma man hinh doi noi dung nghia la index da mang thong tin rieng.
+    Kiem hai chieu: bo `WHERE luu_tru = 0` => do 3 phep kiem, goi ten dung nguyen nhan.
+  - >
+    check_index_dan_xuat.py khoi 6 (7 phep kiem) — tu gieo bai trung slug, ban
+    luu tru, nhan trung. Kiem hai chieu: lui khoa ve `slug` => do 4 phep kiem.
+  - >
+    check_index_dan_xuat.py — "moi renameSync deu co banIndex() di kem".
+    Ban DAU toi viet `count("banIndex()") >= 3` va no KHONG bat duoc khi toi bo
+    mot loi goi: con 1 dinh nghia + 2 loi goi = 3, vua du nguong. Dem mot ten
+    xuat hien bao nhieu lan la phep kiem yeu; hoi "moi renameSync co ban di kem
+    khong" moi la phep kiem that.
+  - >
+    check_index_dan_xuat.py — BO COMMENT truoc khi so thu tu renameSync/capNhatIndex.
+    Ban truoc do vi comment CUA TOI o dau file khop truoc lan goi that. Cung lop
+    loi voi phep kiem quet hex bat gia tri trong comment.
+
+# ── Loi trong kho phat hien khi doi chieu hai duong ──────────────────────
+truong_dan_xuat_khong_ai_dien:
+  hien_tuong: >
+    kb/docs/ai-agent-prototype-len-production.md co `url` ma KHONG co
+    `url_normalized`. Index tinh lai bang normalize_url() nen ra gia tri; duong
+    dia doc loi khai nen ra rong => hai duong hai khoa gop khac nhau.
+  vi_sao_khong_ai_bat: >
+    validate.py:233 (cong 9) chi kiem khi CA HAI truong co. Thieu han thi cong
+    ngu. Va `--fix` chi sua word_count, khong dien url_normalized.
+  sua_hom_nay: "dien truong cho bai do bang chinh normalize_url() cua M01"
+  chua_sua: >
+    Cong 9 van ngu khi truong vang. Sua validate.py la doi hop dong CI => can FR
+    rieng. Ghi vao no.
+  chiMucMo_gop_theo_gi: >
+    CO Y giu `fm.url_normalized` (loi khai), KHONG dung cot tinh lai cua index du
+    cot do "dung hon" — hai duong doc phai tra CUNG ket qua.
+
+evidence:
+  - "cd web && npm test => exit 0, 30/30 file, 0 FAIL, 0 EBUSY (chay lai 3 luot deu sach)"
+  - "npm run check => sach"
+  - "3 test API chay SONG SONG => ca 3 pass, 0 EBUSY (truoc khi sua: api-crud chet cung)"
+  - "pytest core/tests -q => 30 passed"
+  - "12/12 cong check_* exit 0"
+  - "check_frozen: dung 2 file doi (M02_kb/spec.md, M08_api/spec.md) roi ky lai 27 file"
+  - "hai-duong-doc-khop: 9/9 ok, gom 'bai trung slug khac loai: con 2/2 ban'"
+
+moi_truong: >
+  Ghi lai vi da mat thoi gian chan doan: `make` khong co tren may. `python` mac
+  dinh la venv hermes — co jsonschema, THIEU pytest; ban dung theo ADR-02 la
+  C:/Users/Admin/AppData/Local/Programs/Python/Python313/python.exe (3.13.7,
+  pytest 9.1.1). stdout cp1252 lam 9/12 cong nem UnicodeEncodeError khi chuyen
+  huong ra file — can PYTHONIOENCODING=utf-8.
+
+no_con_lai:
+  - >
+    check_running DO, dung mot muc: `validate.py kb/ --strict` exit 1 vi 1 CANH
+    BAO (2 khai niem cho duyet danh muc), 0 loi. Ba duong ra, cho nguoi chon:
+    (a) noi --strict, (b) doi lenh trong RUNNING.md, (c) duyet danh muc cho 2
+    khai niem kia. Toi nghieng ve (c) — xu ly nguyen nhan, khong xu ly bao dong.
+  - >
+    Cong 9 cua validate.py khong bat khi `url_normalized` VANG han (chi bat khi
+    khai sai). Mot truong dan xuat ma khong ai dien, khong ai bat. Can FR rieng
+    vi sua validate.py la doi hop dong CI.
+  - "3 `node server.mjs` dev dang chay — chung giu ban code TRUOC khi sua handle. Khoi dong lai de an ban moi."
+  - "node:sqlite con experimental o Node 22.20 — in canh bao moi lan nap module."
+  - "GET /api/articles/:type/:slug (chi tiet) VAN doc file: doc dung 1 file nen loi khong dang ke, ma rui ro hien ban cu thi that. Cho nguoi chot neu muon doi."
+  - "Man Cho duyet chua duoc dongBoThe() (no chi dong bo #grid2)."
+  - "Chua co cache-busting cho gn.js/gn.css."

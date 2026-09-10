@@ -1,0 +1,83 @@
+id: WL-01K9NZWO019B
+at: 2026-08-29
+by: claude
+buoc: WO-019 phần cuối — hai nơi phát `fb` + `douyin` vào whitelist
+loai: bàn giao WO-019 (đóng phần còn lại)
+wo: WO-019-loai-nguon-vao-db-va-thiet-ke-lai.md
+
+object:
+  wo:
+    - .factory/wo/WO-019-loai-nguon-vao-db-va-thiet-ke-lai.md
+  task:
+    - 07_plan/M01_core/tasks/T01-34-test-whitelist-host-video.md   # test
+    - 07_plan/M01_core/tasks/T01-35-them-host-fb-douyin.md         # code
+  code:
+    - core/assets/media-mime.json    # video_host: 2 -> 4
+  test:
+    - core/tests/check_host_video.py # MỚI — 5 mục
+  backlog:
+    - 06_modules/M01_core/backlog.md # 3 ô mở
+
+may_xanh:
+  - >
+    ĐỎ TRƯỚC (R5): `whitelist có 'fb'` · `whitelist có 'douyin'`, hai mục, đúng
+    lời — hai mươi mục còn lại XANH ngay từ lượt đỏ, nên cổng đo đúng chỗ
+  - "sau khi thêm: `check_host_video.py` -> pass (4 host, 34 mục)"
+  - "quét web 70/71 (chỉ `he-kinh`) · pytest 42 · 20/25 cổng Python"
+  - "page-weight: gn.js 99 KB · gn.css 96 KB · trang chủ 58/60 · lớn nhất 66/74"
+
+khong_file_ma_nao_phai_doi:
+  - >
+    Thêm hai host mà `cong-module.mjs` · `idVideo()` · `nhungVideo()` ·
+    `nguonCua()` · panel Danh mục đều KHÔNG đổi một dòng — cả năm ĐỌC bảng khai.
+    Đó là phép thử cho thiết kế bảng-khai-một-nơi: phải sửa thêm chỗ nào thì chỗ
+    đó đang gõ tay
+
+m09_r3_chung_minh_bang_cau_truc:
+  - >
+    `src` = `nhung` (hằng trong bảng khai) + `id` (từ URL người dùng dán). Câu
+    "src chỉ dựng từ whitelist + regex id" chỉ là LỜI HỨA cho tới khi có ai chứng
+    minh không id hợp lệ nào thoát ra khỏi vị trí của nó
+  - >
+    Cổng SINH CHUỖI TẤN CÔNG rồi thử, không đọc regex bằng mắt: chèn từng ký tự
+    trong `/ ? # & % : @ \ . " ' < >` và khoảng trắng vào giữa một id thật, rồi
+    đòi `id_mau` từ chối. Một regex đọc-bằng-mắt là một lời khai
+  - >
+    Và đòi `id_mau` NEO HAI ĐẦU. Thiếu `^…$` thì `[0-9]{6,24}` khớp phần GIỮA
+    của `9999999/../evil` và id mang theo dấu gạch chéo
+  - >
+    `nhung` của `fb` dài vì trình nhúng Facebook nhận một URL ĐÃ MÃ HOÁ PHẦN TRĂM
+    làm tham số `href`. `show_text` phải đứng TRƯỚC `href`: id luôn nối vào cuối,
+    nên tham số nào đặt sau sẽ rơi vào trong giá trị `href`. `id_mau` chỉ chữ SỐ —
+    đó là thứ chặn mọi lối thoát, vì không ký tự nào trong `[0-9]` mở được một
+    lớp giải mã phần trăm hay thêm được một tham số
+
+khong_do_duoc:
+  - >
+    Trình nhúng của Facebook và Douyin có THẬT SỰ phát ở URL đó không — tôi không
+    gọi ra ngoài mạng để thử. An toàn KHÔNG phụ thuộc vào việc đó (M09-R3 giữ
+    nguyên dù `nhung` sai), nhưng NGƯỜI PHẢI CHỐT: dán một URL fb và một URL
+    douyin rồi mở cửa sổ đọc. Khung trống ⇒ chỉ sửa `nhung`, không đụng mã.
+    Đã mở ô backlog
+
+lo_lon_hon_tim_ra:
+  - >
+    **TÁM cổng Python không có trong `ci.yml`** — CI đăng ký bằng từng bước
+    `- name:` gõ tay, nên viết một cổng mới không làm nó chạy ở đâu cả. Sáu trong
+    tám cái có từ trước phiên này. Theo CLAUDE.md: *"chưa cài ⇒ vế gate đó không
+    tồn tại và không ai báo"*
+  - >
+    KHÔNG tự nối: thêm tám bước làm CI chặt hơn cho mọi PR sau, và tôi không chạy
+    được GitHub Actions ở đây để chứng minh nó còn xanh trên runner. Nối mà không
+    đo là tự nhận xong (R2). Ô backlog đã mở, kèm gợi ý một cổng
+    `check_ci_dang_ky` so hai chiều — vì đăng ký gõ tay CHÍNH LÀ cơ chế sinh ra lỗ
+
+đỏ_do: chưa quy được chủ  # tám cổng vắng CI tích tụ qua nhiều đơn vị việc
+
+do_do:
+  - cong: he-kinh.test.js
+    do_do_boi: ảnh 708 KB người dùng thêm — `python core/tools/toi_uu_anh_nen.py`
+  - cong: check_frozen.py
+    do_do_boi: chờ NGƯỜI ký sau khi FR-039 duyệt
+  - cong: check_danh_muc.py · check_skill.py · check_running.py
+    do_do_boi: agent khác · và hệ quả của hai cổng trên

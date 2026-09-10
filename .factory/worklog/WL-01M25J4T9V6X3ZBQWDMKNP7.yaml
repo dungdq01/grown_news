@@ -1,0 +1,101 @@
+ulid: 01M25J4T9V6X3ZBQWDMKNP7
+thoi_diem: 2026-09-09
+tac_nhan: claude-opus-5 (dev)
+loai: ban_giao
+module: M12_chungcat · M08_api · M01_core
+don_vi: WO-071 / T12-30 + T08-38 — thumbnail cho video URL (task B của PLAN)
+
+viec: >
+  Chủ dự án: *"reel (url fb) chưa có nền giống youtube hay tiktok"*.
+  `nenThe` lớp 2 chỉ dựng được ảnh cho YouTube vì `i.ytimg.com/vi/<id>/…` là
+  URL ĐOÁN ĐƯỢC từ id; ba host còn lại phải HỎI nền tảng.
+
+doi_thiet_ke_so_voi_T12-29_ban_soan: >
+  Bỏ oEmbed, dùng `yt-dlp --write-thumbnail --skip-download`. Lý do đo được:
+  oEmbed của Facebook ĐÒI app token từ 10/2020 (fb là host chủ dự án hỏi), và
+  `douyin.com` còn chưa có trong allowlist. `yt-dlp` có extractor cho CẢ BỐN
+  host — 0 token, 0 nhánh per-platform — và nó đã cài, đã qua cửa egress, đã
+  có allowlist. Ghi ở `WO-071` + `PLAN-2026-09-09`.
+
+object:
+  - .factory/wo/WO-071-thumbnail-cho-video-url.md
+  - 07_plan/M12_chungcat/tasks/T12-30-job-sinh-thumbnail-url.md
+  - 07_plan/M08_api/tasks/T08-38-cua-gan-thay-theo-kieu-moc.md
+  - chungcat/src/tai_nguon.py           # lenh_tai_thumbnail
+  - chungcat/src/worker.py              # chay_sinh_thumbnail + BANG_LOAI
+  - chungcat/assets/nguon-transcript.json  # +douyin.com
+  - web/api/articles.mjs                # thay_kieu_moc · KIEU_MOC · inline cho `anh`
+  - web/api/dungchung.mjs               # ghiKieuMoc · shaTheoKieuMoc
+  - core/assets/media-mime.json         # image/jpeg · image/png · xem_truoc `anh`
+  - core/assets/kho.schema.sql          # CHECK +la_thumbnail
+  - core/tests/check_dinh_dang_mo.py    # enum +anh
+  - chungcat/tests/check_sinh_thumbnail.py     # cổng MỚI, 13 vế
+  - web/test/thumbnail-video-url.test.js       # cổng MỚI, 20 vế
+
+r5_do_truoc:
+  - "check_sinh_thumbnail: ĐỎ 8/13 → xanh 13/13"
+  - "thumbnail-video-url: ĐỎ 15/20 → xanh 20/20"
+
+do_duoc: "6/6 fixture hỏng đỏ, mỗi cái đỏ đúng vế của nó"
+
+ba_thu_KHONG_AI_THAY_neu_chi_lam_phan_de:
+  - >
+    `image/*` CHƯA CÓ trong bảng mime. Hai thứ hỏng cùng lúc mà không ai báo:
+    `luuHienVat` chỉ soi magic `if (loai)` ⇒ mime lạ LỌT QUA lớp thứ sáu của
+    intake — đúng lúc byte đến từ một CDN ngoài; và `hienVatPhucVu` trả
+    `octet-stream` + `attachment` ⇒ thẻ 2 tầng KHÔNG hiện nổi ảnh. Thêm
+    `image/jpeg`(ffd8ff) + `image/png`(89504e47) + `xem_truoc: "anh"` (inline).
+  - >
+    Cửa gắn hiện vật THÊM chứ không THAY (`media: [...media, entry]`) — đúng ô
+    backlog append của transcript (2026-09-08) còn treo ở TẦNG CỬA. Thêm
+    `thay_kieu_moc`; mặc định `false` nên 0 ca gọi hiện tại đổi.
+  - >
+    `kieu_moc` được cửa KIỂM mà **CHƯA BAO GIỜ ĐƯỢC GHI** — không một
+    `UPDATE media SET kieu_moc` nào trong repo. Cột có trong schema từ T01-45,
+    trường có trong payload từ T08-30, và nó đi vào hư không. Nên phép THAY
+    không có gì để khoá vào, VÀ `AC-V1` (*hiện vật .vtt mang `kieu_moc:
+    la_asr`*) chưa bao giờ đúng trong DB — trong khi cổng của AC ấy vẫn xanh.
+    Đã thêm `ghiKieuMoc`. Mở rộng phạm vi T08-38 trong CÙNG module, khai ra ở
+    task file chứ không nới lặng lẽ.
+
+fe_0_dong: "`nenThe` lớp 1 đã đọc `media[].mime` bắt đầu `image/` từ WO-064"
+
+do_sau:
+  - lenh: "for f in chungcat/tests/check_*.py"
+    ket_qua: 51/51 XANH
+  - lenh: python -m pytest core/tests -q
+    ket_qua: 49 passed
+  - lenh: cd web && npm test
+    ket_qua: "exit 1 · ĐÚNG MỘT FAIL: page-weight trang chủ (WO-055 có chủ)"
+
+đỏ_do: "page-weight trang chủ — WO-055 đã có chủ từ 2026-09-05; đơn vị này 0 byte HTML thêm"
+
+loi_a_va_hai_thu_chi_lo_khi_chay_that: >
+  Chủ dự án chọn lối (a): LÕI TỰ xếp việc sau khi ghi bản ghi video, fire-and-
+  forget, bỏ qua YouTube (đã có ảnh từ id) và `kho://`. Chạy thật lộ HAI lỗi mà
+  mọi cổng đều bỏ qua:
+  (1) `egress.gui(_chay=)` sai tên tham số (đúng: `chuyen=`) ⇒ tên lạ rơi vào
+      `**kw` rồi vào dòng log JSON ⇒ TypeError. Năm vế đầu đọc NGUỒN nên không
+      thấy; thêm vế `6` CHẠY THẬT với LÕI giả + yt-dlp giả.
+  (2) DDL sửa mà DB ĐANG CHẠY vẫn CHECK cũ — job đi trọn đường rồi chết ở
+      `dang-verify`. Cổng dùng DB TẠM dựng từ DDL MỚI nên mù hoàn toàn ca này.
+      Viết `core/tools/di_tru_kieu_moc.py` (12 bước SQLite, có bản lùi, đếm
+      hàng trước/sau). KHÔNG dùng `dung_lai_db.py`: nó dựng lại từ export, mà
+      exporter chỉ ghi `la_dan_xuat = 0`.
+
+nghiem_thu_may_that: >
+  Reel Facebook `mo-mang-tam-mat-…`: job xong · ảnh 45 591 byte vào kho ·
+  `media[]` có `image/jpeg` · màn `/video/` hiện nền = ẢNH TRONG KHO 960×559.
+
+con_lai:
+  - "`la_dan_xuat` CŨNG chưa bao giờ được ghi (`luuHienVat` chỉ INSERT sha256+byte). Cùng `kieu_moc`, đó là hai cột không ai điền — và `AC-V1` đòi cả ba thứ mà cổng của nó vẫn xanh. Ô backlog riêng."
+  - >
+      RÚT: tôi từng ghi "5 bản ghi video cũ chưa có ảnh — cần chạy bù". SAI, và
+      chủ dự án bắt đúng. Đo lại: 5 bản ghi YouTube CÓ nền qua ytimg (lối 2,
+      đoán từ id — không cần ảnh trong kho), reel fb có ảnh trong kho. KHÔNG
+      bản ghi video nào thiếu nền, không cần chạy bù.
+      Lỗi của tôi: lấy con số "chưa có ảnh TRONG KHO" rồi gọi nó là "chưa có
+      NỀN" — nền có HAI lối, và tôi đo một thứ cạnh cái mình định nói.
+
+  - "task C (mp4 frame + PDF trang 1) của PLAN-2026-09-09"
+  - "ô backlog: `AC-V1` xanh trong khi `kieu_moc` chưa từng được ghi — cổng đo thiếu vế DB"

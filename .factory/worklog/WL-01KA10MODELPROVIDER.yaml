@@ -1,0 +1,96 @@
+id: WL-01KA10MODELPROVIDER
+khi: 2026-09-04T13:35:00+07:00
+loai: ban_giao
+tac_nhan: claude-code
+viec: T12-11 (bảng model 3→8 dòng) + T03-107 (bố cục phiếu chưng cất, bộ chọn nhà × model)
+module: M12_chungcat · M03_web
+
+nguoi_quyet: |
+  Chủ dự án 2026-09-04, kèm ảnh chụp lỗi 502: "xử lý luôn vụ model và provider"
+  + "design lại prototype bố cục cho tab chưng cất sau khi click button Chưng cất".
+
+object:
+  - path: chungcat/assets/model.json                 # 3 → 8 dòng
+  - path: chungcat/src/bang_khai.py                  # goi_y ưu tiên la_mac_dinh
+  - path: web/plugins/multiwindow/src/scripts/multiwindow.inline.ts
+  - path: web/styles/prototype.css
+  - path: 07_plan/M03_web/tasks/T03-107-test-bo-cuc-phieu-chung-cat.md
+  - path: 07_plan/M12_chungcat/tasks/T12-11-mo-rong-bang-model.md   # + AC4, + phạm vi
+  - base_sha: 8535a26                                # chưa commit
+
+chan_doan_502: |
+  KHÔNG phải lỗi mã. `:8790` (THỢ) không chạy ⇒ `GET /api/model` của LÕI trả 502
+  kèm câu ĐÚNG: "dịch vụ chưng cất không trả lời — kiểm xem nó có đang chạy
+  không". FE NUỐT câu đó, thay bằng "không đọc được danh mục model (502)".
+  Bật THỢ là hết 502. Hai thứ SỬA THẬT ở đây:
+    · FE đưa câu của server ra thay vì tự nghĩ một câu (`j.loi ?? mã`);
+    · phát hiện kèm: `npm run api` KHÔNG mang `CHUNGCAT_KHOA_LOI` thì
+      `GET /api/job` trả 403 — hai dịch vụ cần CÙNG một khoá và không có lệnh
+      dev nào khai điều đó. Đã mở ô backlog M03.
+
+do_do:
+  - lenh: 21 cổng chungcat/tests/*.py
+    ket_qua: 21/21 exit 0 (bảng 8 dòng không làm đỏ cổng nào)
+  - lenh: cd web && npm test
+    ket_qua: 2877 ok · exit 0
+  - lenh: node web/test/page-weight.test.js
+    ket_qua: |
+      tải đầu nặng nhất `/chung-cat/nhap/` 280517/280576 — còn 59 byte.
+      gn.css 102364/102400 (còn 36) · gn.js 100882/102400 (còn 1518).
+  - lenh: chạy thật — kill 8787/8790, build, bật CẢ HAI, Playwright
+    ket_qua: |
+      GET /api/model → 8 dòng, đủ ba nhà.
+      Bấm "Chưng cất" trên bản ghi `xgboost-stap-by-step` ⇒ phiếu mở đúng ba
+      tầng; đổi Nhà cung cấp sang `anthropic` ⇒ ô Model đổi thành 4 model
+      Claude; ô Khu vực hiện `khong-xac-dinh` NGUYÊN VĂN.
+      Ảnh: `phieu-cc.png` (trước sửa chú thích) · `phieu-cc2.png` (sau).
+
+do_do_boi: chua-quy-duoc-chu
+
+quyet_dinh:
+  - |
+      KHÔNG thêm nhà openai/GPT dù `T12-11` nêu. `$vi_sao_ten_gia_dinh` của bảng
+      khai mô tả gateway là chỗ cấp hạn mức cho claude opus + gemini + deepseek.
+      Bày một model của nhà mà gateway chưa chắc có là bày một lựa chọn SẼ CHẾT
+      lúc gọi — và người dùng chỉ biết sau khi đã bấm. Cần chủ dự án xác nhận
+      gateway có, rồi mới 1 dòng bảng + 1 `adapter/openai.py`.
+  - |
+      Mọi dòng mới giữ `khu_vuc: khong-xac-dinh` và mang `$chua_goi_thu`. Đúng
+      luật T12-11: "KHÔNG điền đại một khu vực cho đẹp".
+  - |
+      `du_phong` của dòng mới trỏ TRONG CÙNG NHÀ. Cùng nhà thì `kieu_structured`
+      giống nhau ⇒ payload không phải dựng lại theo hợp đồng khác giữa lúc rơi;
+      và rơi sang nhà khác là một lần đổi NƠI DỮ LIỆU TỚI mà người dùng không
+      bấm — đúng thứ FR-053 §1.4 bắt phải hiện.
+  - |
+      `goi_y` ưu tiên `la_mac_dinh` thay vì dòng đầu khớp. Với bảng ba dòng,
+      "dòng đầu khớp" TÌNH CỜ đúng; với tám dòng nó thành chọn-theo-vị-trí-trong
+      -file, và một cú sắp xếp lại đổi mặc định mà không ai khai.
+  - |
+      `khu_vuc` ra khỏi chuỗi `<option>`, thành Ô RIÊNG luôn hiện. FR-053 §1.4
+      đòi "hiện khu_vuc cạnh mỗi model — không phải chú thích cuối trang". Một
+      đuôi "— khu vực: …" bên trong `<option>` đang đóng thì người dùng chỉ thấy
+      lúc bung danh sách ra, tức đúng lúc họ đã quyết xong.
+  - |
+      Cảnh báo một-gateway hạ xuống `<em>` (micro, mờ, nghiêng) — KHÔNG cắt chữ
+      nào. Đo trên ảnh chụp: ở cỡ chữ thường nó là khối TO NHẤT trong phiếu, át
+      cả câu cảnh báo dữ liệu-rời-máy. Cắt một câu pháp lý cho gọn mắt là đúng
+      thứ `$canh_bao_mot_gateway` viết ra để chống; đổi CỠ thì không.
+  - |
+      Ba phép gộp CSS là gộp THẬT (hai rule cùng selector `.bk-phieu label`; ba
+      rule khai y hệt nhau cho ô nhập), làm vì `gn.css` không còn chỗ — không
+      phải dọn tiện tay. `.cc-kv` bỏ `--f-mn`: `markup-matches-css` bắt đúng,
+      `FR-018` giữ mono CHỈ cho mã thật, và `khong-xac-dinh` là giá trị bảng
+      khai chứ không phải mã ai chép đi.
+
+keo_theo:
+  - |
+      NGÂN SÁCH BYTE ĐÃ CẠN: gn.css còn 36 byte, tải đầu `/chung-cat/nhap/` còn
+      59 byte. Việc FE tiếp theo chạm `gn.css` sẽ đỏ `page-weight`. Cần một đợt
+      giảm béo (khuôn T03-99) hoặc một FR nới trần — chủ dự án quyết.
+  - |
+      `npm run api` không mang `CHUNGCAT_KHOA_LOI` ⇒ `/api/job` 403. Hai dịch vụ
+      cần cùng một khoá, và không có lệnh dev nào khai điều đó.
+  - |
+      Nút "Sinh transcript" của video VẪN disabled — `FR-054` chưa thi công.
+      Chưa nhận: cần chủ dự án chọn lối (xem báo cáo).

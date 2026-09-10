@@ -1,0 +1,88 @@
+id: WL-01K9PEWO033
+at: 2026-08-29
+by: claude
+buoc: WO-033 — `localhost` mất ~205 ms mỗi request vì server chỉ nghe IPv4
+loai: bàn giao WO-033
+wo: WO-033-localhost-ipv6-tra-205ms-moi-request.md
+
+object:
+  wo:
+    - .factory/wo/WO-033-localhost-ipv6-tra-205ms-moi-request.md
+  task:
+    - 07_plan/M03_web/tasks/T03-74-test-nghe-hai-loopback.md   # test
+    - 07_plan/M03_web/tasks/T03-75-nghe-hai-loopback.md        # code
+  code:
+    - web/server.mjs
+  test:
+    - web/test/nghe-hai-loopback.test.js   # MỚI
+    - web/package.json
+
+may_xanh:
+  - "ĐỎ TRƯỚC (R5): `[::1]` không nối được; ca âm an ninh XANH sẵn từ đầu"
+  - >
+    ĐO TRƯỚC/SAU trên hai server thật, cùng máy, cùng lệnh curl:
+    `localhost` connect **207 → 1 ms**, ttfb **215 → 2 ms**
+  - >
+    Trang đầy đủ: `/` **229 → 39 ms** · `/kho/` **226 → 12 ms** ·
+    `/khai-niem/` **240 → 13 ms** — nhanh ~18 lần
+  - "quét web 76/77 (chỉ `he-kinh`) · 22/26 cổng Python · pytest 42"
+
+chan_doan:
+  - >
+    Mười màn đều ~230 ms phía server, ĐỒNG ĐỀU, với kho chỉ 1 bản ghi ⇒ chi phí
+    CỐ ĐỊNH mỗi request, không phụ thuộc dữ liệu
+  - >
+    Và nó trúng cả `/static/bg/index.json`, một file **0 KB** — vậy không phải
+    chi phí dựng trang. Đó là phép đo khoanh vùng nhanh nhất: một tài sản tĩnh
+    rỗng mà cũng chậm thì không thể đổ cho renderer
+  - >
+    Tách nhỏ đồng hồ curl mới thấy ~205 ms nằm trong bước CONNECT. `localhost`
+    trên Windows phân giải `::1` TRƯỚC; server chỉ nghe IPv4 nên kết nối đó bị
+    từ chối, client chờ rồi mới thử lại
+  - >
+    Ứng dụng thật ra NHANH: ttfb 8 ms, FCP 112 ms, và **0 tác vụ dài** trong 9
+    giây đo trên `/tat-ca/`
+
+hai_gia_thuyet_bi_phep_do_bac_bo:
+  - >
+    **"Ảnh nền quá nặng"** — trang chủ tải 1199 KB ảnh, 87% trọng lượng, nên đây
+    là nghi phạm đầu tiên. Nhưng `toi_uu_anh_nen.py --xem` chỉ giảm **10%**
+    (3615 → 3286 KB): gần như mọi ảnh đã dưới ngưỡng 400 KB
+  - >
+    **"Thu nhỏ ảnh sẽ giải mã nhanh hơn"** — đo thẳng: 2.1 MP mất 49 ms, 4.4 MP
+    mất 53 ms, tức gần như PHẲNG theo số điểm ảnh; và thu nhỏ về 1440px lúc giải
+    mã còn CHẬM HƠN (71–138 ms). Tôi suýt ship bản vá này dựa trên trực giác
+  - >
+    Ghi lại vì đây là giá trị của việc đo trước: hai bản vá hợp lý, cả hai sai,
+    và cái đúng nằm ở chỗ không ai nhìn — bước connect của TCP
+
+an_ninh_khong_doi:
+  - >
+    `::1` cũng là loopback, nên ràng buộc *"không mở ra mạng"* (BRD B-D3 ·
+    security_baseline §4) GIỮ NGUYÊN. Đây KHÔNG phải nới sang `0.0.0.0`
+  - >
+    Cổng có CA ÂM đo thật: liệt kê địa chỉ ngoài loopback của máy rồi thử nối —
+    `192.168.1.35` và `172.29.176.1` đều KHÔNG nối được. Vế này quan trọng vì
+    một bản vá "cho nhanh" bằng `0.0.0.0` cũng làm vế tốc độ xanh
+  - >
+    Listener thứ hai nuốt lỗi: máy không có IPv6 thì vẫn chạy bằng IPv4, chỉ mất
+    phần nhanh thêm
+
+con_lai_da_do_chua_sua:
+  - >
+    Vòng đổi ảnh nền KHÔNG kiểm `prefers-reduced-motion` — `hen_gio()` chỉ gác
+    `treoChuot || document.hidden || bo.length < 2`. Người đã tắt hiệu ứng ở hệ
+    điều hành vẫn nhận crossfade + giải mã ~50 ms mỗi 5–7 giây. Ô backlog
+  - >
+    19 phần tử `backdrop-filter` trong DOM. CHƯA có bằng chứng nó là vấn đề:
+    cuộn 12 khung hết 105 ms (~8,7 ms/khung, dưới ngưỡng 16,7 ms)
+
+đỏ_do: chưa quy được chủ  # `listen(127.0.0.1)` có từ lúc dựng server
+
+do_do:
+  - cong: he-kinh.test.js
+    do_do_boi: ảnh 707 KB người dùng thêm — `python core/tools/toi_uu_anh_nen.py`
+  - cong: check_frozen.py
+    do_do_boi: chờ NGƯỜI ký sau khi FR-039 duyệt
+  - cong: check_danh_muc.py · check_skill.py · check_running.py
+    do_do_boi: agent khác · và hệ quả của hai cổng trên

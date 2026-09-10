@@ -1,0 +1,47 @@
+id: WL-01K9M6FR034C
+at: 2026-08-26
+by: claude
+buoc: s8 — FR-034 giai doan C (FE thoat Quartz) + C7 don — HOAN TAT FR-034
+fr: FR-034-db-nguon-chan-ly.md
+plan: .claude/plans/ph-ng-n-b-l-n-sorted-swan.md
+
+da_xong:
+  C1_C2_C3:
+    - "web/render/{data,trang,assets}.mjs (265+868+133 dong) — port co hoc tu home-pages emitter; duLieuReal goi HAM khoDoc/docDanhMucDb (khong self-HTTP), duLieuMock doc kb-mock/"
+    - "server.mjs mount SSR (import dong co cache, GN_SSR=0 khong nap module render): 7 trang real + /mock/* + gn.css/js + open-index dong + /static/bg tu public/ GOC repo + /mau-nap-nguon.md + /:type/:slug tra shell + data-mo-bai"
+    - "dungLaiTrang XOA han — POST roi GET / thay bai sau 679ms khong build"
+  C4_FE:
+    - "multiwindow.inline.ts: nap() ban that CHI /api/index (loi = bao() nhin thay, khong roi ve open-index); doTimApi banner khi API chet o ban that; NHAC_BUILD xoa han (3 doi lich su ghi trong comment); khoiDong doc data-mo-bai mo cua so doc (xoa marker sau lan dau — khoiDong chay moi nav)"
+    - "test sua: man-danh-muc (dao chieu: khong NHAC_BUILD nao con), api-index-khong-can-build muc 5 (ban that mot nguon), buttons (dev/serve nho, build=build-fe)"
+  C5_di_tru_test:
+    - "web/test/_render.mjs harness goi thang renderTrang; ssr-routes.test.js (AC2 T03-8); ~20 test doi nguon HTML tu web/site sang render; only-approved RETIRE stub (M03-R1 -> S2); expected-render VIET LAI tu contract qua tinhChiMuc; no-write-path quet them web/render/**; va no-op phan trang (thayGrid2 dem do sau div)"
+    - "VERIFY CHINH: doi ten web/site -> npm test van exit 0 — bo test het phu thuoc ban build"
+  C6_cat_day_quartz:
+    - "web devDep that: yaml@2.9.0 + esbuild@0.27.7 (pin exact, dung ban tung muon _quartz); dungchung.mjs canRequire -> web/package.json"
+    - "web/build-fe.mjs (tach tu link-plugins:115-153, esbuild devDep); shell.html copy ve web/render/ va trang.mjs doc tu do"
+    - "package.json: scripts con test/build(=build-fe)/seed/nap(=gate.py tran)/api; engines.node >=22.5; go dev/serve/check/link/dev:kb"
+    - "RUNNING.md viet lai ban do nhanh + cai dat + van hanh (khong Quartz); kb/README.md dao nguon chan ly; web/api/WORKLOG.md viet lai; 3 WORKLOG web sua mention script cu; test/WORKLOG them ssr-routes + danh dau retired"
+  C7_don:
+    - "check_running gia co os.walk onerror (rglob chet vi rung symlink _quartz)"
+    - "sinh_index.py + check_index_dan_xuat.py + hai-duong-doc-khop + only-approved = STUB RETIRED (sandbox chan rm — xoa vat ly cho nguoi)"
+
+trang_thai_cuoi:
+  - "npm test exit 0 (44 pass + 2 retired stub, khong can build)"
+  - "14 cong python: 13 xanh; check_running con 2 muc env SAN CO (python PATH la venv hermes khong pip/pytest — CI Ubuntu xanh, khong lien quan FR-034)"
+  - "pytest 32 · 6 test module · check_export_dan_xuat 4 rang: XANH"
+  - "SMOKE KHO THAT (cong 8899, chi GET): / 200 + hien hermes-agent · /repo/hermes-agent 200 + data-mo-bai · /api/index total=2 · /mock/ 200"
+
+viec_cho_NGUOI:
+  - "RESTART server: tien trinh `npm run api` (8787) dang chay CODE CU truoc FR-034 — tat roi chay lai"
+  - "COMMIT tat ca (goi y tag `truoc-nho-quartz` TRUOC buoc xoa duoi day, de quay lui re)"
+  - "XOA VAT LY (sandbox chan rm, lenh mot dong):
+     rm -rf web/_quartz web/site web/dev-server.mjs web/link-plugins.mjs web/quartz.config.yaml \
+       web/plugins/home-pages web/plugins/approved-only web/plugins/merge-by-source web/plugins/backdrop-assets \
+       web/test/hai-duong-doc-khop.test.js web/test/only-approved.test.js \
+       core/tools/sinh_index.py core/tests/check_index_dan_xuat.py kb/_index.sqlite
+     LUU Y: xoa 2 file test thi go 2 dong tuong ung khoi scripts.test cua web/package.json;
+     kiem lai `grep -rn 'home-pages' web/` truoc khi xoa plugins/home-pages (test C5 da tro het sang render/ nhung cu kiem);
+     go not 2 dong kb/_index.sqlite* trong .gitignore"
+  - "Deny S1 Write(./kb/concepts.yaml) trong .claude/settings.json: het doi tuong bao ve (file la export) — GIU lam loi khai y dinh (cung lap luan FR-019), khong can sua"
+
+danh_doi_da_khai: "export await ~300ms/luot ghi · version/etag reset khi dung lai DB tu export · crash giua COMMIT va export thi kb/ cu mot nhip (tu lanh o lan ghi sau)"

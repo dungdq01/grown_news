@@ -1,0 +1,90 @@
+{
+  "$comment": "BẢNG KHAI DỊCH VỤ — nguồn duy nhất cho tên thư mục, vùng, và số cổng. ADR-05 (Z1/Z3/Z6) dẫn xuất TỪ file này, không gõ danh sách lần thứ hai. Trước file này, số cổng gõ cứng ở web/server.mjs:46 (`API_PORT ?? 8787`); với N dịch vụ nó thành N chỗ gõ tay và sẽ lệch. Cùng khuôn với khung-than-bai.json / man-hinh.json / loai-nguon.json.",
+  "$comment_vung": "Ba vung khac nhau ve QUYEN, khong ve viec — xem 03_docs/spec_overview.md va 04_system/security_baseline.md §4b.1. LOI: nghe loopback, KHONG BAO GIO goi ra ngoai loopback, giu mot cua ghi. THO: nghe loopback, noi DUY NHAT goi ra Internet, ghi kho chi qua cua ghi cua LOI. BIEN: doi mat Internet — hoac keo (kenh/, long polling, khong nghe) hoac nghe that (cong/, nghe_ngoai: true); ca hai KHONG cham kb/.",
+  "$comment_cong": "`cong: null` nghia la dich vu KHONG nghe — khong phai chua gan so. SUA 2026-09-01 (FR-045): cau cu noi 'BIEN luon null' va cau do het dung — cong/ thuoc BIEN va nghe 443. Dieu dung con lai: chi dich vu khai `nghe_ngoai: true` moi duoc nghe NGOAI loopback, va hien co dung mot.",
+  "$comment_key_model": "`can_key_model` quyết định biến môi trường nào được truyền cho tiến trình. Chỉ THỢ nhận key. Đây là cưỡng chế bằng CẤU TRÚC cho B-E2: LÕI không có gì để xác thực nên không gọi model được kể cả khi ai đó viết nhầm một dòng fetch.",
+  "$comment_hai_truc": "HAI BO TU VUNG, MOT BANG KHAI (chi dao 2026-09-01, adr.md#ADR-05 'HAI bo tu vung'). Truc SAN PHAM (noi gia tri, noi voi nguoi): bon dich vu `vung: THO` — chungcat/truyhoi/chatbot/artifact — la CORE cua san pham, tuc cac services AI/LLM; `web` va `cong` va `kenh` la HE THONG. Truc TIN CAY (viet luat va cong Z1-Z8): `web` la LOI, services la THO, kenh/cong la BIEN. KHONG them cot thu ba cho truc san pham: no dung bang `vung`, va hai cot noi cung mot dieu se lech nhau. Doc mot chu `core` ma khong biet dang o truc nao thi tra ve adr.md#ADR-05.",
+  "phien_ban": 2,
+  "dich_vu": [
+    {
+      "ten": "web",
+      "thu_muc": "web",
+      "module": "M03_web + M08_api",
+      "vung": "LOI",
+      "ngon_ngu": "node",
+      "cong": 8787,
+      "can_key_model": false,
+      "vai": "SSR + MỘT CỬA GHI + gateway chuẩn hoá output. Client DUY NHẤT của mọi dịch vụ THỢ.",
+      "nghe_ngoai": false
+    },
+    {
+      "ten": "chungcat",
+      "thu_muc": "chungcat",
+      "module": "M12_chungcat",
+      "vung": "THO",
+      "ngon_ngu": "python",
+      "cong": 8790,
+      "can_key_model": true,
+      "vai": "nguyên liệu → bản nháp. Hai kiểu: chưng cất một nguồn (ho_so phan-tich) và tổng hợp N nguồn (ho_so tong-hop, FR-044). Engine cắm rút được.",
+      "nghe_ngoai": false
+    },
+    {
+      "ten": "truyhoi",
+      "thu_muc": "truyhoi",
+      "module": "M13_truyhoi",
+      "vung": "THO",
+      "ngon_ngu": "python",
+      "cong": 8791,
+      "can_key_model": true,
+      "vai": "chỉ mục + truy hồi. Phạm vi truy hồi lấy từ bộ lọc facet — control HIỂN THỊ, không phải top-k ẩn.",
+      "nghe_ngoai": false
+    },
+    {
+      "ten": "chatbot",
+      "thu_muc": "chatbot",
+      "module": "M14_chatbot",
+      "vung": "THO",
+      "ngon_ngu": "node",
+      "cong": 8788,
+      "can_key_model": true,
+      "vai": "hỏi → đáp KÈM ĐỊA CHỈ. Không có trong kho thì từ chối, có phân loại lý do. Trả JSON, không trả trình bày.",
+      "nghe_ngoai": false
+    },
+    {
+      "ten": "artifact",
+      "thu_muc": "artifact",
+      "module": "M16_artifact",
+      "vung": "THO",
+      "ngon_ngu": "python",
+      "cong": 8792,
+      "can_key_model": true,
+      "vai": "bài đã duyệt → slide · giọng đọc · video. Chạy PHÚT, nên API bất đồng bộ.",
+      "nghe_ngoai": false
+    },
+    {
+      "ten": "kenh",
+      "thu_muc": "kenh",
+      "module": "M15_kenh",
+      "vung": "BIEN",
+      "ngon_ngu": "node",
+      "cong": null,
+      "can_key_model": false,
+      "vai": "adapter kênh chat. Ba việc và chỉ ba: allowlist người gửi · dịch lệnh → gọi web:8787 · dịch phản hồi → tin nhắn. Không logic nghiệp vụ, không đọc kb/.",
+      "nghe_ngoai": false
+    },
+    {
+      "ten": "cong",
+      "thu_muc": "cong",
+      "module": "M17_cong",
+      "vung": "BIEN",
+      "ngon_ngu": "chua chon",
+      "cong": 443,
+      "nghe_ngoai": true,
+      "can_key_model": false,
+      "vai": "FR-045 · cong xac thuc. Nhan HTTPS tu Internet, xac thuc bang ma_moi/phien, chuyen tiep vao 127.0.0.1. KHONG ghi kho, KHONG doc kb/. La dich vu DUY NHAT duoc nghe ngoai loopback — nho the ma M08-R1 giu nguyen van va api-guard khong phai sua mot dong."
+    }
+  ],
+  "$comment_thu_tu": "Thứ tự dựng ở 04_system/build_order.md. Tóm: M01(S8,S9) → FR-043 → M03(S10) → M12 → M13 → M14 → CORE XONG → M15 → M16.",
+  "$comment_chua_co": "BAY dich vu tren, `web` da chay; SAU cai con lai CHUA DUNG. File nay khai HOP DONG truoc, ma sau — nen dung doc no nhu ban mo ta hien trang.",
+  "$comment_nghe_ngoai": "FR-045 · Z3 co DUNG MOT ngoai le, va no khai o day chu khong o dau nguoi. Ngoai le trong bang khai thi cong con dem duoc; ngoai le trong dau nguoi thi lan thu hai khong ai biet la lan thu hai."
+}

@@ -1,0 +1,108 @@
+entry: ban-giao
+ulid: 01M2XB6PDR4KJWY7Q0NFA3ZTVE
+ngay: 2026-09-10
+module: M03_web
+don_vi: T03-138
+wo: WO-085
+tieu_de: >-
+  /chung-cat/ gop viec theo BAI GOC (tieu de that) + truc thoi gian
+
+object:
+  - web/plugins/chungcat/src/chungcat.inline.ts
+  - web/plugins/multiwindow/src/scripts/multiwindow.inline.ts
+  - web/styles/prototype.css
+  - web/test/chung-cat-nhom-theo-bai.test.js
+  - web/package.json
+  - web/WORKLOG.md
+  - web/test/WORKLOG.md
+  - web/styles/WORKLOG.md
+  - 07_plan/M03_web/tasks/T03-138-chung-cat-nhom-theo-bai.md
+  - .factory/wo/WO-085-chung-cat-nhom-theo-bai-va-thoi-gian.md
+
+trieu_chung: |
+  Chu du an 2026-09-10: *"co 1 van de ve logic: /chung-cat/ dang khong phan
+  loai theo bai. Y toi la toi can biet bai chung cat, transcript do thuoc bai
+  goc nao? va co filter theo thoi gian nua (nhu cac man bai viet)"*.
+
+  Anh chup 25 viec: NAM the dau deu la
+  `video/mo-mang-tam-mat-sau-khi-xem-chi-lauren-xai-ai` (1 thumbnail + 4
+  transcript) nhung nam rai. Slug tren the bi CAT CUT
+  (`…dang-va…`) va no la khoa KY THUAT — tieu de that khong xuat hien o dau.
+  Khong mot dieu khien thoi gian nao.
+
+do_truoc_khi_lam: |
+  Ca ba du lieu DA toi FE roi, khong phai doi cua:
+
+    bai goc   payload.slug        co
+    tieu de   open-index -> title co (multiwindow da cache vao `BAI`)
+    thoi diem tao_luc             co (them o WO-081)
+
+  => 0 thay doi API, 0 thay doi tang THO.
+
+hoi_truoc_khi_lam: |
+  "Filter theo thoi gian" co HAI cach doc khac han nhau ve UI: man bai viet
+  thuc ra chi co SAP (moi/cu), khong co bo loc khoang. Da hoi thay vi doan.
+  Chu du an chon: **ca hai** (sap moi/cu + chip loc khoang), va **tieu de lam
+  dau nhom**.
+
+vi_sao_MOT_WO_khong_phai_hai: |
+  Hai yeu cau nhung cung MOT man, MOT luot ve, MOT ham (`ccNap` -> `ccThe`).
+  Tach doi thi WO thu hai viet lai dung doan WO thu nhat vua viet. Luat tach
+  cua `go` nham viec KHONG lien quan; day la mot cau hoi duy nhat: danh sach
+  nay to chuc the nao. AC van tach bach hai nhom de quy trach nhiem.
+
+sua: |
+  1 `multiwindow.tenBai(slug)` — tra tieu de tu chi muc DA CACHE (`BAI`), xuat
+    qua `_cau()`. DONG BO, khong `await`: nguoi ve danh sach viec khong doi
+    duoc mot vong mang. Chua nap => tra "" va ben goi lui ve slug.
+  2 `ccNhom(ds, tenBai)` — thuan, nen cong chay duoc ma khong can cau lan DOM.
+    Gop theo `payload.slug`, xep nhom theo viec MOI NHAT trong nhom.
+  3 `ccTrongKhoang(v, khoang, bayGio)` — doc `tao_luc`.
+  4 Hai nhom nut moi (`data-ccsap`, `data-cckhoang`) dung lai `.sortb`,
+    0 byte CSS moi cho nut. Dat HANG RIENG duoi hang loc trang thai: chung la
+    HAI chieu, nhoi chung mot hang thi nguoi bam tuong chung loai tru nhau —
+    dung loi WO-014 da sua cho `pl`/`nguon`.
+  5 CSS `.cc-nhom` — `grid-column:1/-1` + `grid-template-columns:inherit`.
+    `.grid` la luoi cot, nen mot khoi khong chiem tron hang se bi luoi be bon
+    viec cua mot bai ra bon cot, va cai gop lai thanh vo nghia.
+
+quyet_dinh_dang_ke: |
+  Tra TRUOT tieu de => LUI VE SLUG, khoi VAN HIEN. Ban ghi bi xoa / doi slug /
+  chi muc chua nap xong deu la ca THUONG. Nuot khoi o do la cat duong toi mot
+  viec dang chay — te hon han cai bug dang sua. Ve 3/3a canh dung dieu do.
+
+cong:
+  them: web/test/chung-cat-nhom-theo-bai.test.js — 17 ve
+  cach_do: trich `ccNhom` khoi CHUNK DA BUILD roi chay tren du lieu dung hinh
+    dang `/api/job`. Khong doc `.ts` (chu thich con nguyen => van xuoi lam ve
+    xanh).
+  do_duoc: chay truoc khi sua => 13 ve DO
+  xanh_oan_da_bat_duoc: |
+    Ve 3a ban dau viet `nhom3.every(...)` — `[].every()` la `true`, nen no
+    XANH tren mang RONG, tuc xanh dung luc phep gop hong nhat. Da siet:
+    doi `nhom3.length > 0` truoc.
+  ve_khac: |
+    Ve 4 chan chunk `chungcat` tu `fetch` `open-index.json` ban thu hai.
+    Ve 5b2 chan doc `nhan_luc` thay `tao_luc` — `nhan_luc` la luc worker NHAT
+    viec, nen mot viec cho ba ngay roi moi chay se roi nham khoang.
+    Ve 7 khoa lai WO-015/BUG-2: tong ket van noi ve CA hang doi.
+
+do_do_cua_toi_da_sua: |
+  `token-only` DO sau khi toi them CSS: `font-size:.95rem` la mot so go tay.
+  Doi sang `var(--fs-card)`. Do la do MOI va la CUA TOI — sua ngay, khong ghi
+  vao no cu.
+
+do_do: |
+  Web: 7 do, dung bang baseline, KHONG mot do moi:
+    api-guard · man-tai-lieu · man-video · moc-fe-con-that · mot-bien-mau ·
+    opacity-khong-pha-contrast · page-weight
+  `chua quy duoc chu` cho ca 7 — chung do truoc phien nay.
+  `check_worklog` xanh (test 133, prototype.css 3289).
+  Da rebuild + restart; `/gn-chungcat.js` co `ccNhom`+`ccTrongKhoang`,
+  `/gn.js` co `tenBai`.
+
+chua_nghiem_thu_duoc: |
+  Khong tu bam thu tren trinh duyet. Cong chay `ccNhom` that tren du lieu dung
+  hinh dang, va do markup + CSS + noi day; nhung "khoi trong dep hay khong" va
+  "chip bam co doi mau khong" thi phai mat nguoi nhin. Chu du an mo
+  `/chung-cat/` la thay ngay.

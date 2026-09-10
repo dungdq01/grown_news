@@ -1,0 +1,93 @@
+ulid: 01M1WWN5SD76Q0DYH4EHGJPGN1
+khi: 2026-09-07
+tac_nhan: claude-opus-5 (agent)
+loai: ban_giao
+don_vi: FR-071 + T12-28 + W5 của check_g6b
+tom_tat: >
+  Chủ dự án duyệt 1·2·3 và yêu cầu *"giải pháp an toàn và lâu dài"* cho câu 4
+  (M18 chặn G6B). Thi công FR-071, dựng đơn vị test T12-28, và vá ĐIỂM MÙ của
+  W5 thay vì vá báo cáo. G6B ĐÓNG lần đầu — 259 task, 5/5 điều kiện.
+object:
+  - .factory/fr/FR-071-nap-lai-mot-viec-tra-200-khong-201.md   # duyệt + thi công
+  - 06_modules/M12_chungcat/spec.md            # §5.0a + AC-5.5
+  - FROZEN.lock                                # ký lại sau FR-071
+  - chungcat/src/vong.py                       # nap() → (ulid, da_co)
+  - chungcat/src/api.py                        # 200 if da_co else 201
+  - chungcat/tests/check_nap_lai_tra_200.py    # cổng MỚI, 7 vế
+  - chungcat/tests/check_tran_thu_lai.py       # + 5 file khác gọi nap()
+  - 07_plan/M12_chungcat/tasks/T12-28-don-vi-test-cong-m12-sau-t12-8.md  # MỚI
+  - 07_plan/M12_chungcat/tasks/T12-8-test-cong-m12.md   # khai đổi chủ 5 file
+  - core/tests/check_g6b.py                    # W5 + --tu-kiem 7 ca
+  - 06_modules/M12_chungcat/backlog.md         # 18 → 13 ô mở
+r5_do_truoc: >
+  check_nap_lai_tra_200.py viết TRƯỚC mã, ĐỎ ngay vế đầu (*"nap() trả str"*) và
+  dừng vì chưa có hình dạng để kiểm tiếp. Xanh 7/7 sau khi cắm mã.
+  check_g6b --tu-kiem: 7 ca viết trước nhánh W5.
+đỏ_do: >
+  Một đỏ, và nó của CHÍNH tôi: tôi vá NĂM file gọi `nap()` rồi tuyên xanh, còn
+  file thứ SÁU (`check_tran_thu_lai.py`) bỏ sót. Nó lộ ra vì suite chạy đỏ,
+  không vì tôi kiểm lại. Bài học: `grep` trên toàn thư mục TRƯỚC khi sửa, không
+  liệt kê bằng trí nhớ. Đã ghi vào FR-071 §6.
+cau_4_giai_phap: >
+  M18 có spec FROZEN với 5 AC hard mà không lệnh nào chạy được, và nó chặn G6B.
+  Ba lối, chọn lối thứ ba:
+
+  (a) xếp lượt build M18 ngay ⇒ dựng phần tài khoản/phiên/thu-hồi cho vừa một
+      cổng xanh. M18 là phần BẢO MẬT; làm nó vì gate là đúng cách làm sai nó.
+  (b) gỡ T18-1 ⇒ làm cổng xanh bằng cách XOÁ THỨ BÁO. Bên bị đánh giá cầm bút
+      ghi vào thứ đánh giá mình — luật gốc cấm đúng chuyện này. Và mất luôn chủ
+      quyền giấy tờ mà T18-1 vừa lập.
+  (c) VÁ ĐIỂM MÙ CỦA CỔNG. `co_plan` cũ hỏi *"module có task nào chưa"*, và câu
+      đó TRỘN hai trạng thái: module đang DỰNG (AC phải có cổng) với module vừa
+      có một task GIẤY (áp một FR, sửa một câu spec). T18-1 khai `phạm_vi_ghi`
+      đúng hai file — spec.md + rules.md. Không core/, không web/. Vì nó là
+      "một task", W5 lật M18 từ MIỄN TOÀN BỘ sang 5 lỗi hard trong một nhịp,
+      và cả 5 đòi cổng cho mã KHÔNG AI ĐANG VIẾT.
+
+  Vì sao (c) an toàn LÂU DÀI, không phải một lối lách:
+  · Nó KHÔNG thêm cờ miễn cho ai bấm. Nó đọc BẰNG CHỨNG đã khai (`phạm_vi_ghi`).
+  · Muốn "được hoãn" phải khai phạm vi TOÀN GIẤY — khai vậy rồi viết mã là vi
+    phạm `R1`, đã có cổng riêng bắt (`check_g6b §5`).
+  · Nợ KHÔNG BIẾN MẤT: khối `HOÃN` in ra từng cmd, có tổng, và trỏ về ô backlog.
+  · Task ĐẦU TIÊN của module chạm MÃ ⇒ cả 5 AC thành ĐỎ ngay.
+  · Nhãn dòng in cũng vá luôn: trước đó nó in `FAIL` cho MỌI module còn thiếu —
+    kể cả module chưa có plan, thứ mà `if` bên dưới KHÔNG tính là lỗi. Một dòng
+    `FAIL` không vào danh sách lỗi dạy người đọc rằng `FAIL` ở đây vô nghĩa, và
+    đó là cách mất một cổng.
+quyet_dinh:
+  - >
+    FR-071 dùng `200 + da_co`, KHÔNG `409`: nạp lại không phải xung đột, nó là
+    một phép idempotent THÀNH CÔNG; `409` đẩy client vào nhánh lỗi cho một
+    chuyện không sai.
+  - >
+    FE KHÔNG sửa dù FR §2.3 đề xuất. Đo lúc thi công: không client nào gửi
+    `ulid` (cửa làm `b.get("ulid") or uuid4()`), nên `da_co` không thể true từ
+    FE và nhánh ấy sẽ là mã chết. Đã đính chính §2.3 thay vì viết mã không
+    đường nào tới.
+  - >
+    T12-28 là đơn vị test MỚI, `T12-8` KHÔNG mở lại. Một đơn vị đã đóng mà nuốt
+    thêm file thì `phạm_vi_ghi` của nó thành cái giỏ, và `R1` mất địa chỉ. Khuôn
+    `T03-110b` của M03 đã có tiền lệ — không đẻ hình dạng thứ hai.
+  - >
+    Ô 884 (`FR-054` lối `dich_vu`) đóng theo *"OK"* của chủ dự án, và đo được là
+    nó ĐÃ ở hình dạng an toàn: `cua-asr` là một DÒNG NGUỒN riêng
+    (`loai: dich_vu`, `uu_tien: 1`), không phải bản vá `asr.py`, nên vế "KHÔNG
+    import egress" của `ytdlp-asr-local` còn nguyên. Nó khai `tieu_egress: true`
+    ngay trong bảng — egress không im lặng. Và `can_key: true` + chưa có
+    BEEKNOEE_API_KEY ⇒ CHƯA MỘT BYTE AUDIO NÀO RỜI MÁY.
+chay_that: >
+  Trên thợ đang sống, job `thu-hong` (không tiêu token):
+  lan 1 → 201 · lan 2 → 200 · thân: {"viec_id": "01K9ZLIVE…", "da_co": true}.
+may_xanh: >
+  web 115/115 · chungcat 45/45 · pytest core 49 passed ·
+  check_frozen · check_map · check_rule_surfaces · check_worklog · check_g6a ·
+  **check_g6b XANH lần đầu** (G6B: 5 điều kiện đạt trên 259 task).
+con_no: >
+  M12 còn 13 ô mở (18 → 13 trong lượt này). 1 ô chỉ cần công sức (khoá
+  service-to-service); 1 ô là vế còn lại của T12-12 (nhỏ hơn nhiều, đã có tiền
+  lệ T12-28); 11 ô chặn ở thứ không có trong máy: BEEKNOEE_API_KEY (3) · M13
+  chưa dựng · gói [asr] chưa cài · route gateway chưa xác minh · FR-044 chuỗi
+  654→442. Khối kiểm kê ở đầu backlog.md nói rõ từng ô.
+  <docs-sync> · <backlog-check> · <scope-check> vẫn CHƯA CÀI — ba vế gate đó
+  không tồn tại và không ai báo. T12-28 phải tự viết dòng cảnh báo chống hai
+  đơn vị cùng khai một file, vì <scope-check> không có để làm việc đó.

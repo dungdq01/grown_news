@@ -1,0 +1,376 @@
+# CI — bề mặt S3. Bật ở T04-2 sau khi 4 lệnh hard xanh trên máy (M04-R3).
+#
+# Không bước nào được continue-on-error (M04-R1) — check_rule_surfaces.py quét.
+# Không bước nào sửa file trong core/ hay kb/ (M04-R2) — kể cả --fix.
+
+name: CI
+
+on:
+  pull_request:
+    paths: ['core/**', 'kb/**', 'web/**', '.github/workflows/**']
+  push:
+    branches: [main]
+    paths: ['core/**', 'kb/**', 'web/**']
+
+jobs:
+  core:
+    name: test + validate
+    runs-on: ubuntu-latest
+
+    # Mọi script kiểm in tiếng Việt. Không khai hai biến này thì runner nào có
+    # locale không phải UTF-8 sẽ crash ở UnicodeEncodeError — và log đọc ra như
+    # "test hỏng" chứ không phải "môi trường sai", đúng thứ ADR-02 muốn tránh.
+    # Lộ ra khi chạy bộ mô phỏng CI ở T04-2: subprocess đọc stdout bằng cp1252.
+    env:
+      PYTHONIOENCODING: utf-8
+      PYTHONUTF8: '1'
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'      # pin cứng — ADR-02 + FR-005
+
+      - name: cài phụ thuộc
+        run: python -m pip install -e "./core[dev]"
+
+      # `chungcat` cài RIÊNG, KHÔNG kèm extra `[asr]`.
+      #
+      # Cổng M12 chạy 0 mạng · 0 model — đo được 2026-09-07: cả 39 cổng xanh
+      # với env RỖNG (không `CHUNGCAT_KHOA_LOI`, không khoá gateway). Kéo
+      # `faster-whisper` + torch vào CI là kéo hơn 2 GB bánh xe cho một bộ
+      # cổng không dùng tới chúng.
+      - name: cài chungcat (M12) — không extra `asr`
+        run: python -m pip install -e "./chungcat"
+
+      # ── luật của M01 ──
+      - name: pytest — kiểm luật có hiệu lực
+        run: python -m pytest core/tests -q
+
+      - name: validate kb/ — 8 cổng format
+        run: python core/src/source_distiller/validate.py kb/ --strict
+
+      # FR-015 — kb-mock/ cũng phải sạch. Nó nằm TRONG git và là thứ bản /mock/
+      # render, nên một bản ghi sai ở đây là một trang sai trên site.
+      #
+      # Vì sao thêm muộn: không lệnh nào từng validate nó, và `kb/` thì rỗng (0
+      # bài) nên mọi cổng đều xanh. Contract thiếu 3 trường M1 từ FR-001 mà sống
+      # được tới FR-015 chính vì lỗ này.
+      #
+      # Kho này có ĐÚNG MỘT lỗi cố ý: `blog-prompt-caching` khai
+      # citations_verified(1) < sampled(2) — ca âm của cổng spot-check, contract
+      # khai rõ ở khoá `$case`: "DẢI CẢNH BÁO: external + trích dẫn không kiểm
+      # được". Sửa nó là bỏ mất một phép kiểm.
+      #
+      # Lọc theo NỘI DUNG lỗi, không theo SỐ LƯỢNG. Lượt đầu tôi viết
+      # `test n -le 1` và tự kiểm bằng một file cố tình làm hỏng: nó cho qua —
+      # ngưỡng đếm cho qua một lỗi BẤT KỲ, không riêng ca âm đã biết.
+      #
+      # Và KHÔNG `|| true`: `check_rule_surfaces.py` bắt đúng cụm đó là "nuốt
+      # lỗi" (M04-R1). Dùng script riêng để exit code là của chính phép kiểm.
+      - name: validate kb-mock/ — kho mẫu cũng phải sạch
+        run: python core/tests/check_kb_mock.py
+
+      # Cùng lớp lỗi với word_count ở trên: hai nơi khai một sự thật thì sẽ
+      # lệch. 6 giá trị `category` từng có 5 bản copy, bản ở shell.html là thứ
+      # người dùng thực sự bấm mà không cổng nào canh. Lượt đầu chạy, phép kiểm
+      # thứ hai ĐỎ THẬT — core/skill-src còn khoá `const draft` mà FR-012 đã bỏ.
+      - name: danh mục category khai một nơi (categories.yaml ⇔ schema ⇔ shell)
+        run: python core/tests/check_danh_muc.py
+
+      # FR-034 · B-C1 DAO — DB la nguon chan ly, file la export dan xuat.
+      # Bon rang: round-trip 2 chieu · xuat_kho chi SELECT + server khong
+      # dinh dung_lai_db · API khong ghi file kho · .gitignore dung chieu.
+      - name: export dan xuat — dung lai duoc, mot chieu (FR-034, B-C1 dao)
+        run: python core/tests/check_export_dan_xuat.py
+
+      # Khung thân bài khai ở MỘT nơi (core/assets/khung-than-bai.json). Ba
+      # người dùng dẫn xuất được; người thứ tư là VĂN XUÔI (2 file .md mẫu + 2
+      # shell.html) và văn xuôi không dẫn xuất được — nên nó trôi. Khung 9 mục
+      # cũ đã trôi thành HAI bộ tên khác nhau mà không cổng nào bắt, vì
+      # validate.py chỉ ép SỐ mục, không bao giờ đọc tên. Cổng này đọc tên.
+      - name: khung than bai khai mot noi (khai bao ⇔ 2 file mau ⇔ 2 shell)
+        run: python core/tests/check_khung.py
+
+      # Mot CHECK viet trong DDL la mot LOI KHAI. No chi thanh co che khi co ai
+      # thu vi pham va bi chan. Repo nay da trung lop loi do: `PRAGMA
+      # foreign_keys = ON` khai trong header DDL suot may thang ma KHONG code nao
+      # bat — vo hai chi vi DDL khong co FK nao.
+      - name: DDL kho hien vat — moi rang buoc ban that (M09-R1, T01-9)
+        run: python core/tests/check_media_ddl.py
+
+      # Rang cua rule NGUY HIEM NHAT trong M09: bo sot `recycle` khoi tap tham
+      # chieu cua luat mo coi thi MOI DELETE pha byte vinh vien, va `phucHoi()`
+      # sau do VAN BAO THANH CONG — no chay lai validate, ma validate khong bao
+      # gio thay blob. Mat du lieu im lang voi bo test xanh. Cong nay do vong
+      # DB→file→DB bang DIEM BAT DONG, va co mot ca fixture cho TUNG bang mot.
+      - name: byte di tron vong, mo coi tinh tu BA bang (M09-R1, T01-12/13)
+        run: python core/tests/check_media_dan_xuat.py
+
+      # Skill `source-distiller` la thu THAT SU viet bai cho kho nay, va no
+      # nam NGOAI cay git (~/.claude/skills/) nen khong diff nao thay no troi.
+      # No tung giu mot validate.py lac hau tu truoc FR-034: bai viet ra bi
+      # cong tra ve, va loi hien O CHO NGUOI DUNG chu khong o day.
+      # Tren runner CI chua cai skill => cong bao THIEU va do; do la dung:
+      # `--kiem-nguon` chi hoi "moi nguon khai co that trong repo khong",
+      # phan so voi ban cai la viec cua may co cai skill.
+      - name: skill source-distiller sinh ra tu repo (T01-9)
+        run: python core/tests/check_skill.py --kiem-nguon
+
+      # ── S3 có răng: bốn script kiểm chính cơ chế ──
+      - name: CI có đỏ được không (M04-R1, AC-2.1.1)
+        run: python core/tests/check_ci_teeth.py
+
+      - name: pin phiên bản khớp (M04-R4, AC-2.3.1)
+        run: python core/tests/check_version_pin.py
+
+      - name: rule S3 có cơ chế thật (M01-R3, M04-R1)
+        run: python core/tests/check_rule_surfaces.py
+
+      - name: file frozen không đổi ngoài FR (security_baseline §5.1)
+        run: python core/tests/check_frozen.py
+
+
+      # ── MUOI HAI cong TUNG khong o CI (FR-052, 2026-09-02) ──
+      #
+      # Do duoc luc dong FR-052: 29 cong co that, CI chay 17. Muoi hai cai con
+      # lai CHI DO KHI AI DO GO TAY — tuc chung khong phai rang cua duong ong,
+      # chung la ky luat.
+      #
+      # Va do dung thu M04-R1 ton tai de chan: mot cong khong nam trong CI thi
+      # `git push` khong bao gio bi no chan, nen no chi bao cho nguoi da chu
+      # dong di tim. Nguoi khong di tim la nguoi can nghe nhat.
+      - name: bảng khai không lệch thư mục thật
+        run: python core/tests/check_ba_bang.py
+      - name: dữ liệu GỐC không ở kb/_kho.sqlite (ADR-06, M08-R6, M18-R2)
+        run: python core/tests/check_db_dung_cho.py
+      - name: cú pháp địa chỉ + phép phân giải (FR-043 S8/S9)
+        run: python core/tests/check_dia_chi.py
+      - name: mime mở hình dạng nhưng không thả tự do (FR-039)
+        run: python core/tests/check_dinh_dang_mo.py
+      - name: --fix không đổi trường QUYẾT ĐỊNH (M01-R2)
+        run: python core/tests/check_fix_url.py
+      - name: whitelist host video ở SERVER, không chỉ FE (FR-040 S23)
+        run: python core/tests/check_host_video.py
+      - name: chỉ mục là dẫn xuất, dựng lại được (FR-023)
+        run: python core/tests/check_index_dan_xuat.py
+      - name: loại/màn khai MỘT nơi, không gõ tay tầng hai (FR-038 C1)
+        run: python core/tests/check_khai_mot_noi.py
+      - name: loai-nguon.json ↔ DDL ba bảng khớp (FR-038)
+        run: python core/tests/check_loai_nguon_db.py
+      - name: project_map ↔ 06_modules/ khớp HAI CHIỀU
+        run: python core/tests/check_map.py
+      - name: media là MẢNG và luật mồ côi thấy MỌI sha256 (FR-052 Z3)
+        run: python core/tests/check_media_mang.py
+      - name: reject_reason là lời khai của NGƯỜI (M08-R3, B-B1)
+        run: python core/tests/check_reject_reason.py
+
+      # ── gate của khung ──
+      - name: G6A — 7 module pack đủ điều kiện
+        run: python core/tests/check_g6a.py
+
+      - name: G6B — 15 task khai đủ, trong boundary
+        run: python core/tests/check_g6b.py
+
+      - name: m-ba — không điểm treo nào
+        run: python core/tests/check_ba.py
+
+      - name: mermaid parse được
+        run: python core/tests/check_mermaid.py
+
+      - name: sample phủ đủ 4 verdict (M06 AC-2.5.1)
+        run: python 06_skillgen/test_sample_coverage.py
+
+      # ── M06: chấm verdict ──
+      - name: 5 cổng đúng thứ tự (M06-R1, AC-2.1.1/2.1.2)
+        run: python 06_skillgen/test_verdict.py
+
+      - name: manifest có $why + aliases (M06 AC-2.4.1)
+        run: python 06_skillgen/test_manifest.py
+
+      - name: nháp đủ 4 phần, thân RỖNG (M06-R2, AC-2.2.1/2.2.2)
+        run: python 06_skillgen/test_draft_shape.py
+
+      - name: RUNNING.md — mọi lệnh chạy thật (tài liệu lạc hậu là hỏng im lặng)
+        run: python core/tests/check_running.py
+
+      - name: WORKLOG.md — đường dẫn, lệnh, số liệu khớp thực tế
+        run: python core/tests/check_worklog.py
+
+      # ── M05_intake · M07_curate ──
+      - name: cổng gác cửa _inbox (M05-R1/R2/R3)
+        run: python 05_intake/test_gate.py
+
+      - name: quét kho, chỉ báo không sửa (M07-R1/R2/R3)
+        run: python 07_curate/test_curate.py
+
+      # ── M03_web ──
+      - uses: actions/setup-node@v4
+        with: { node-version: '22' }
+
+      - name: dựng Quartz upstream
+        run: |
+          cd web
+          git clone --depth 1 https://github.com/jackyzha0/quartz.git _quartz
+          cd _quartz && npm ci --no-audit --no-fund
+          cd .. && cp quartz.config.yaml _quartz/ && node link-plugins.mjs
+
+      - name: type-check plugin
+        run: cd web/_quartz && npx tsc --noEmit -p ../tsconfig.json
+
+      - name: chỉ approved lên site (M03-R1)
+        run: cd web && node test/only-approved.test.js
+
+      - name: gộp url_normalized + sắp priority (M03-R5)
+        run: cd web && node test/expected-render.test.js
+
+      - name: 4 màn + a11y (T03-4)
+        run: cd web && node test/four-screens.test.js
+
+      - name: CSS + script đến được trang (hỏng im lặng)
+        run: cd web && node test/css-applied.test.js
+
+      - name: script CHẠY được, không chỉ có mặt
+        run: cd web && node test/script-runs.test.js
+
+      - name: mọi nút có mã xử lý + hai chế độ dữ liệu
+        run: cd web && node test/buttons.test.js
+
+      - name: markup khớp CSS + điểm neo duy nhất
+        run: cd web && node test/markup-matches-css.test.js
+
+      - name: REAL và MOCK đọc nguồn khác nhau
+        run: cd web && node test/real-vs-mock.test.js
+
+      - name: trang nhẹ + màn Tất cả có phân trang
+        run: cd web && node test/page-weight.test.js
+
+      - name: kb/ và kb-mock/ tách riêng
+        run: cd web && node test/kho-tach-rieng.test.js
+
+      - name: URL hiện ra + không điều khiển nào là trang trí
+        run: cd web && node test/url-va-tuong-tac.test.js
+
+      - name: không rò listener qua SPA nav (AC-2.4.2)
+        run: cd web && node test/no-leak.test.js
+
+      - name: không đường ghi vào kb/ (M03-R2)
+        run: cd web && node test/no-write-path.test.js
+
+      - name: không gõ tay token (M03-R4)
+        run: cd web && node test/token-only.test.js
+
+      - name: sanitize + không analytics (M03-R3)
+        run: cd web && node test/no-dangerous-html.test.js
+
+      - name: số đếm filter khớp số thẻ
+        run: cd web && node test/filter-counts.test.js
+
+      - name: bấm thẻ mở được bài ở cả hai bản
+        run: cd web && node test/open-card.test.js
+
+      - name: hiệu ứng FR-013/FR-014 đến trang
+        run: cd web && node test/motion-polish.test.js
+
+      # ── M08_api — bàn biên tập local (FR-011). Server thật + kho tạm. ──
+      - name: vòng CRUD đủ + ca âm (M08 AC-2.1.1)
+        run: cd web && node test/api-crud.test.js
+
+      - name: cổng chuyển trạng thái — 3 trường M1 do người khai (M08-R3)
+        run: cd web && node test/api-status.test.js
+
+      - name: xoá là recycle, byte nguyên vẹn (M08-R4)
+        run: cd web && node test/api-recycle.test.js
+
+      - name: guard tĩnh web/api — ghi chỉ sau validate (M08-R1/R2)
+        run: cd web && node test/api-guard.test.js
+
+      # `--strict` exit 1 ca khi CHI co canh bao (validate.py:339). Dung cho CI
+      # cham ca kho, sai cho API chan mot lan ghi: bai dung `concepts_proposed`
+      # — dung nhu kb/concepts.yaml chi dinh — bi 422 voi noi dung "0 loi · 1
+      # canh bao". Nguoi dung gap ngay o bai that dau tien: bam Duyet, khong co
+      # gi xay ra. Test canh HAI chieu vi noi cong de noi qua tay.
+      - name: canh bao khong chan ghi, loi thi chan (M08-R2)
+        run: cd web && node test/canh-bao-khong-chan-ghi.test.js
+
+      # FR-024 · the bai va open-index.json deu sinh luc BUILD, nen sua kho roi
+      # F5 van thay tap cu. GET /api/index tra cung hinh dang nhung doc luc
+      # request. Test canh ca viec HAI BAN markup the (emitter the() va FE
+      # theFE()) khong lech — ban song sinh nao cung phai co cong.
+      - name: sua kho roi F5 la thay, khong can build (FR-024)
+        run: cd web && node test/api-index-khong-can-build.test.js
+
+      # FR-019 đổi bề mặt M02-R3 từ S1 sang S3+S2, và S3 chính là test này.
+      # Server tự chạy `check_frozen --ky` nên hash luôn khớp ⇒ check_frozen thôi
+      # là rào cho concepts.yaml. Răng rụng ở đây thì endpoint trở về đúng thứ
+      # M02-R3 chống: máy thêm nhãn.
+      - name: thêm/sửa/xoá nhãn có điều kiện (FR-019 + FR-021, M02-R3)
+        run: cd web && node test/danh-muc-them.test.js
+
+      # Nhãn dài phình cột lọc 190px và bóp lưới bài từ 4 cột còn 2. Lỗi này KHÔNG
+      # làm test nào đỏ, không type-check đỏ, không build đỏ — chỉ hiện khi có
+      # người nhìn màn hình. Nên nó cần một cổng riêng.
+      - name: nhãn dài cắt được, không phình cột (FR-021)
+        run: cd web && node test/nhan-dai-khong-tran.test.js
+
+      # Ba tab · phân trang client-side · popup <dialog>. Đều là JS trên trình
+      # duyệt: type-check xanh, build xanh, mà trang vẫn hỏng nếu mốc đổi tên
+      # hoặc handler không nối. Quét tĩnh markup + bundle + CSS.
+      - name: màn Danh mục — tab, phân trang, popup (FR-021)
+        run: cd web && node test/man-danh-muc.test.js
+
+      # contrast-audit.json do 50 cap mau DAC. `opacity` tron mau voi nen TRUOC
+      # khi mat thay ⇒ pass tren giay ma chu doc khong noi. Cong nay tinh lai ti
+      # le SAU khi tron. Bat duoc mot loi that: `.rc-r .bt{opacity:.55}` keo chu
+      # do xuong 2.67:1.
+      - name: opacity khong pha hop dong contrast (FR-021)
+        run: cd web && node test/opacity-khong-pha-contrast.test.js
+
+      # Bug lo ra o bai kb/ THAT dau tien: cua so doc chen <h1>title</h1> roi
+      # render md(than) — ma than bai theo mau chuan da mo dau bang `# H1`.
+      # Hai tieu de, va H1 do lot vao muc luc thanh "muc 01". Khong test nao
+      # bat duoc vi 0/14 ban ghi kb-mock/ co H1 — du lieu mau khong phu hinh
+      # dang du lieu that.
+      - name: cua so doc mot tieu de, muc luc dung cap
+        run: cd web && node test/tieu-de-khong-nhan-doi.test.js
+
+      # ══ luật của M12 — 39 cổng ════════════════════════════════════════
+      #
+      # VÌ SAO THÊM (2026-09-07): trước hôm nay CI **không chạy một cổng M12
+      # nào**. Nghĩa là mọi câu "39/39 xanh" trong worklog là xanh TRÊN MÁY
+      # NGƯỜI VIẾT, và `R2` nói thẳng thứ đó không tính — bên làm không được
+      # cầm thước chấm mình, kể cả khi thước đúng.
+      #
+      # Chạy CẢ THƯ MỤC bằng một vòng lặp, không liệt kê từng file: liệt kê
+      # tay thì cổng thứ 40 ra đời sẽ im lặng không được canh, và không ai
+      # biết cho tới lúc nó cần.
+      - name: cổng M12 — chưng cất (39 cổng, 0 mạng · 0 model)
+        run: |
+          set -e
+          n=0
+          for f in chungcat/tests/check_*.py; do
+            echo "── $f"
+            python "$f"
+            n=$((n+1))
+          done
+          echo "M12: $n cổng XANH"
+
+      # E2E ở chế độ `--mock`: chứng minh CHUỖI LẮP ĐÚNG, 0 token, 0 egress.
+      # Chế độ `--that` KHÔNG chạy ở CI — nó tiêu tiền và cần khoá thật; đó
+      # là một lần chạy tay, ghi worklog.
+      - name: E2E chưng cất — mock
+        run: python chungcat/tests/check_e2e_chung_cat.py --mock
+
+      # ── S4: hook local. CI kiểm cả bề mặt kia, vì hook bỏ qua được ──
+      - name: hook chặn file sai format (M04 AC-2.5.1)
+        run: bash .githooks/test-hook.sh
+
+      - name: --no-verify bỏ qua được hook (M04 AC-2.5.2)
+        run: bash .githooks/test-hook.sh --no-verify-case
+
+  # web:
+  #   Bật ở B3a, sau khi Quartz được dựng.
+  #   - uses: actions/setup-node@v4
+  #     with: { node-version: '22' }
+  #   - run: cd web && npm ci && npx quartz build

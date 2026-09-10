@@ -1,0 +1,115 @@
+ulid: 01M1V2K5N7P3XQ8R4T6YWBZC90
+thoi_diem: 2026-09-07T01:40+07:00
+tac_nhan: claude-opus-5
+loai: ban_giao
+module: M08_api + M03_web
+don_vi: WO · hai bug chủ dự án báo — "sinh transcript không hoạt động" · "tải xuống lỗi hết"
+
+viec: >
+  Chủ dự án báo hai triệu chứng kèm ảnh chụp console. Hoá ra là BA lỗi độc
+  lập, và không lỗi nào là lỗi đã báo trước đó.
+
+do_truoc:
+  - lenh: 'curl -s -o /dev/null -w "%{http_code}" localhost:8787/api/xuat/transcript/<slug>?dang=srt'
+    ket_qua: "404 · thân `{\"loi\":\"không có transcript/<slug>\"}`"
+    đỏ_do: claude-opus-5 (T03-121 dựng đường tới một cửa chưa cài)
+  - lenh: node web/test/xuat-transcript.test.js
+    ket_qua: "ĐỎ 6 vế"
+    đỏ_do: claude-opus-5
+
+do_sau:
+  - lenh: node web/test/xuat-transcript.test.js
+    ket_qua: pass — 12/12 vế
+  - lenh: node web/test/menu-tai-dot-hai.test.js
+    ket_qua: pass — 24/24 vế
+  - lenh: cd web && npm test
+    ket_qua: exit 0 · 3177 vế ok · 0 FAIL
+  - lenh: python -m pytest core/tests -q
+    ket_qua: 49 passed
+  - lenh: 'for f in chungcat/tests/check_*.py; do python "$f"; done'
+    ket_qua: 38/38 XANH
+
+ba_loi:
+  - ten: "403 cho MỌI lời gọi `/api/job` — Node không đọc `.env`"
+    trieu_chung: "nút *Sinh transcript* bấm không ra gì; console đầy 403"
+    goc: >
+      `tho-cua.mjs` gửi `X-Khoa-Loi` lấy từ `process.env.CHUNGCAT_KHOA_LOI`,
+      mà **Node không tự đọc `.env`** — biến là `undefined`, cửa thợ so
+      `bool(mong) && header === mong` và chặn. Phía Python đã nạp `.env` từ
+      lâu (`moi_truong.nap()`), nên hai bên lệch nhau đúng ở chỗ này: một bên
+      đọc file, một bên không.
+    sua: "`process.loadEnvFile(new URL(\"../.env\", import.meta.url))` ở đầu `server.mjs`"
+    chinh_lai_chan_doan: >
+      Tôi báo với chủ dự án là *"`.env` có `CHUNGCAT_KHOA_LOI=` rỗng"* — SAI.
+      Khoá đã có sẵn (25 ký tự, tiền tố `dev-`); tôi không đụng vào. Lỗi duy
+      nhất là phía Node không đọc file.
+    bay_thu_hai: >
+      Bản sửa đầu dùng `process.loadEnvFile()` KHÔNG tham số — nó lấy `./.env`
+      theo CWD, mà server chạy trong `web/` còn `.env` ở gốc repo. Đo được:
+      `ENOENT: open '.env'`, và 403 vẫn nguyên. Đường phải tính theo VỊ TRÍ
+      MODULE.
+
+  - ten: "cửa xuất `transcript` — bảng khai HỨA, mã KHÔNG GIAO"
+    trieu_chung: >
+      Bấm *Phụ đề* ⇒ trình duyệt lưu về `<slug>.json` chứa thân lỗi 404
+      ("File wasn't available on site" trong ảnh chủ dự án).
+    goc: >
+      `xuat-dang.json` khai `theo_loai.transcript = [srt,txt,docx,goc]` từ
+      `T08-33`, nhưng `cuaXuat` chỉ biết `khoDoc([loai])` — mà **transcript
+      không phải một BẢN GHI**, nó là hiện vật `text/vtt` gắn trên bản ghi
+      video. Bảng khai hứa một dạng mã chưa bao giờ cài.
+    vi_sao_toi_nay_moi_lo: "`T03-121` là thứ ĐẦU TIÊN dựng đường dẫn tới nó"
+    sua: >
+      `xuatTranscript()` — tra `khoDoc([\"video\",\"tai-lieu\"])`, lấy hiện vật
+      `text/vtt`, `docHienVat` ra byte, rồi `srt`/`txt`/`docx`/`goc`. Chưa có
+      transcript ⇒ câu CHỈ ĐƯỜNG, không 404 trần (404 trần làm trình duyệt lưu
+      thân lỗi thành file, và người mở ra tưởng transcript của mình hỏng).
+
+  - ten: "`video?dang=goc` trả TRANSCRIPT dán nhãn *bản gốc*"
+    phat_hien_boi: "ma trận đo đủ 11 dạng — không phải chủ dự án báo"
+    goc: >
+      `media[0]` với một video ĐĂNG KÝ BẰNG URL là phần tử duy nhất có mặt, và
+      nó là `.vtt` do ASR sinh. Cửa trả file ấy 20 KB kèm nhãn bản gốc.
+    vi_sao_nghiem_trong: >
+      Đúng thứ `xuat-dang.json` gọi là *"nói dối bằng một cái nút"*. Người bấm
+      "bản gốc" muốn thứ họ ĐÃ NẠP.
+    sua: >
+      Bỏ hiện vật `chi_dan_xuat` (đọc từ `media-mime.json` — MỘT bảng, dùng
+      chung với FE) trước khi chọn. Nay trả 422 nói rõ *video đăng ký bằng URL
+      thì xem/tải ở nguồn*.
+
+bug_cua_chinh_toi:
+  ten: "mục `⌁ chưa sinh` là `<a href=\"#\">` — MỤC CHẾT"
+  do: >
+    Bấm vào chỉ đổi URL thành `/video/#`, không làm gì. Đúng lối mà chính
+    `SCR-21` tôi viết xếp là TỆ NHẤT ("màn hứa một thứ nó không giao") — tôi
+    viết dòng ấy rồi tự vi phạm nó.
+  cong_xanh_oan: "vế `4c` chỉ đòi *có `href`*, mà `#` là một `href`"
+  sua: "`<button data-act=\"chung-cat\">` — cùng đường mà nút ⚗ đã đi, không đẻ đường thứ hai"
+
+chay_that:
+  ma_tran_11_dang: >
+    article md/txt/docx/in/goc · tai-lieu goc · transcript srt/txt/docx/goc ·
+    video goc — **11/11 trả file thật**, 0 vế `content-type: json`.
+    docx: magic `504b` (zip thật), 14 521 B.
+  tren_trinh_duyet_8787:
+    - "menu mở bằng CHUỘT THẬT; ba mục transcript tải về 21 255 B srt · 14 120 B txt · 13 892 B docx, không mục nào trả JSON"
+    - "mục `⌁ chưa sinh` nay là BUTTON: URL KHÔNG đổi · hộp thoại *Sinh transcript* mở · bấm Gửi ⇒ `POST /api/job {loai:\"sinh-transcript\", slug:\"video/thien-duong-…\"}`"
+    - "POST bị CHẶN ở tầng `fetch` — chứng minh đường đi đủ mà KHÔNG tiêu tiền ASR"
+    - "console: 0 lỗi thật (lỗi duy nhất là `viec_id: GIA-LAP` của chính stub thử)"
+
+no_moi:
+  - >
+    `POST /api/job` với thân **rỗng `{}`** trả **201** và TẠO một job không có
+    `loai`/`slug`. Đo được lúc thử cửa; job rác đã xoá tay
+    (`chungcat/hang-doi/cur/c7157baa….json`). Cửa nhận một việc mà nó không
+    biết chạy là cửa để FE đẻ rác — và `T03-121` mục 4 vừa thêm một chỗ POST
+    nữa. Cần validate `loai` ∈ `BANG_LOAI` và `slug` bắt buộc.
+
+object:
+  - web/server.mjs
+  - web/api/xuat-cua.mjs
+  - web/plugins/multiwindow/src/scripts/multiwindow.inline.ts
+  - web/test/xuat-transcript.test.js
+  - web/test/menu-tai-dot-hai.test.js
+  - web/package.json

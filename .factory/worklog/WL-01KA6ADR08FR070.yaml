@@ -1,0 +1,96 @@
+id: WL-01KA6ADR08FR070
+khi: 2026-09-07
+loai: ban_giao
+tac_nhan: claude-opus-5
+vai: ghi quyet dinh chu du an thanh artifact (ADR · decisions · rule) + mo hai FR da duyet
+gate: G4 (ADR-08) · FR-072 · FR-073 MO — chua ap   # doi so 2026-09-07: FR-070/071 trung voi team M12 (ho tao sau 6h, nhung da thi cong + spec frozen dan) — id worklog giu nguyen
+module: M13_truyhoi (chinh) · ADR-05 · M12 · M14 · M01 · M03
+
+bon_quyet_dinh_nguyen_van:
+  1: "Rule của tôi là các module / services có thể gọi lẫn nhau , web chỉ là wraper"
+  2: "ok"   # duyet mo FR M13 + FR M01
+  3: "Anh follow kỹ vì M12 đã có thể sinh transcipt và chuyển sang .md /pdf đều được. đọc .vtt .srt cũng là 1 khả năng."
+  4: "suy nghĩ đi"   # G8 — 0 bai Trung cho golden set
+
+do_truoc_khi_ghi:
+  quyet_dinh_1_dao_gi: >
+    ADR-05 bo sung 2026-08-31 luat 2 ("web la client DUY NHAT... khong ai goi thang :8791")
+    + cong Z8. Va no dao ca M12 AC-1.4 / M12-R7 (FROZEN, cong check_chi_loi_goi_tu_loi
+    XANH): "POST /job chi nhan tu LOI, THO khac => do". Do: gate do 7 phep kiem — 6 la
+    L1/L2/AC-4.6 (GIU), 1 la "THO khac => 403" (DOI thanh "THO khong trong goi_duoc => 403").
+    Moi cho khai "chi LOI goi / client duy nhat": M12 spec:69 · adr.md:302,348-349 ·
+    security_baseline:411 · spec_overview:452-458 · dich-vu.json web.vai.
+  quyet_dinh_3_kiem_lai: >
+    Chu du an noi "M12 da chuyen sang .md/.pdf". DO: chungcat/src phat DUY NHAT text/vtt
+    (_nap_hien_vat, worker.py:559); grep markdown|pdf|srt trong chungcat/src => 0.
+    ".md/.txt/.srt" la CUA XUAT cua WEB — web/api/xuat-cua.mjs (T08-33): xuatTranscript
+    tim media text/vtt cua ban ghi roi vttSangTxt / vttSangSrt; bang khai xuat-dang.json
+    (theo_loai.transcript = srt·txt·docx·goc). ".pdf" = print-view trinh duyet (T03-117,
+    wireframe SCR-19 CHO DUYET). => Menh de dung ve KHA NANG cua he, sai ve CHU (web, khong
+    phai M12). He qua cho M13: doc .txt/.srt qua cung cua xuat = doc CUNG MOT CHU nguoi tai
+    xuong, 0 ban chuyen doi thu hai, 0 dep moi.
+  pdf: >
+    chungcat/src 0 lan goi pdfplumber (pyproject.toml:31 khai). _doc_nguon tra than voi
+    neo :p.1 gia. => text PDF KHONG ton tai o dau trong he. FR-072 §5 khai day la NO CUA
+    M12, khong phai no an cua M13; khi M12 sinh text/plain la_dan_xuat thi M13 thay qua
+    cung cua §1.3, 0 dong ma.
+
+da_ghi:
+  - path: 04_system/adr.md
+    ghi_chu: "+ADR-08 — service goi service, web la wrapper; Z8 -> Z8' (hop Z7) + Z9 MOI
+      (goi_duoc + khoa/aud theo chieu, ben NHAN cuong che); bang artifact phai theo (M12
+      AC-1.4/R7 FROZEN => FR; M13 model_flow §3; spec_overview; baseline; dich-vu.json)"
+  - path: memory/decisions.md
+    ghi_chu: "+entry 2026-09-07, bon o (Chon/Thay vi/Vi/Doi thi) cho ca 4 quyet dinh"
+  - path: .claude/rule.md
+    ghi_chu: "+muc 12"
+  - path: 04_system/security_baseline.md
+    ghi_chu: ":411 checklist Z8 -> gach, thay Z8' + Z9"
+  - path: .factory/fr/FR-072-m13-mot-hop-dong-cho-moi-client-va-doc-hien-vat.md
+    ghi_chu: "MO, DA DUYET MO — mot hop dong API (§1.1: doc_id · dia_chi file:A-B · pham_vi
+      dung khoa TANG · bo chunk_id) · goi_duoc + can_key_model=false (§1.2) · doc hien vat
+      van ban qua cua xuat da co (§1.3: .vtt cue -> slug:t= ; .srt ; .md/.txt) · web goi
+      M13 de TIM = tra no PRD U6 (§1.4) · 8 cong T1-T8 · nguyen ven M13-R3/R4/R5 + M14
+      AC-8.4/8.5 · KHONG trich PDF (no M12)"
+  - path: .factory/fr/FR-073-dang-dia-chi-anchor-vao-dia-chi-json.md
+    ghi_chu: "MO, DA DUYET MO — mot dong dang `file-anchor` vao dia-chi.json (khong frozen,
+      nhung la bang khai B-A5 ba module cung doc); dedup -1/-2 state theo file; cong A1-A4;
+      A3 = cong doi chieu BA ban (validate.py · M13 anchor_py · FE slugGoiY) = o C3
+      M03/backlog.md:7 chua co task"
+
+G8_tra_loi: >
+  0 bai chu Han trong kb/**. Chot (decisions.md muc 4): NAP >= 2 bai phon the THAT truoc
+  s8 cua M13; cho toi do AC-6.1 ve zh khai `soft` KEM LY DO — khong xanh bang fixture bia
+  (gap G-8: "truy hoi tren 3 ban ghi la xay mot phep do khong co gi de do"). Duong lay
+  vat lieu re nhat: M12 sinh-transcript tu video Trung (model.json da co ngon_ngu zh;
+  nguon-transcript.json co ytdlp-asr-local 0 dong) — nhung do van la NGUOI chon video.
+
+do_do:
+  - lenh: "check_g6a · check_map · check_ba · check_mermaid · check_frozen"
+    ket_qua: "5/5 XANH — khong artifact frozen nao bi cham (ADR/decisions/rule/baseline/FR deu khong trong lock)"
+  - lenh: "check_rule_surfaces"
+    ket_qua: "DO — van M18-R5/R6 -> web/test/cai-dat.test.js THIEU (WL-01KA40)"
+  - lenh: "check_worklog"
+    ket_qua: "DO — team M12: test 109 · prototype.css 3084 · 6 test chua ghi WORKLOG.md (WL-01KA40 + luot truoc)"
+  - lenh: "grep -c '^## ADR-08' adr.md · '^12\\. ' rule.md · '^## 2026-09-07 · Service' decisions.md"
+    ket_qua: "1 · 1 · 1 — moi cai dung mot lan"
+do_do_boi: "chua-quy-duoc-chu (giu ket luan WL-01KA40)"
+
+khong_lam:
+  - "KHONG AP FR-072/073 — spec M13 + truyhoi.sample.v2 FROZEN; ap la don vi viec rieng
+     (T13-0 kieu T12-0), NGUOI ky lai lock."
+  - "KHONG sua M12 spec AC-1.4 / rules M12-R7 (FROZEN) — ADR-08 liet no la artifact phai
+     theo; can FR rieng cho M12 hoac gop vao dot ap cua team M12 (FR-069 dang mo)."
+  - "KHONG sua dich-vu.json (goi_duoc · can_key_model) — bang khai ADR-05 dan xuat Z1/Z3/Z6;
+     them truong la task M04/M08 sau ADR, kem cong Z9. Ghi o ADR-08 §Doi thi."
+  - "KHONG mo o trong 06_modules/M12_chungcat/backlog.md cho 'PDF text chua trich' — team
+     dang giu file do (bai hoc FR-054). Khai o FR-072 §5; nho chu du an bao team."
+  - "KHONG tao 07_plan/M13_truyhoi/ — s7 sau khi ap FR-072."
+  - "KHONG commit, KHONG push."
+
+cho_NGUOI_quyet:
+  - "Ai ap FR-072/073 vao spec (don vi GIAY, khuon T12-0), roi ky FROZEN.lock?"
+  - "M12 AC-1.4/R7 theo ADR-08: FR rieng, hay bao team M12 gop vao dot FR-069?"
+  - "goi_duoc cho truyhoi = [web, chatbot] — dung y? (M19/M12/M16 them sau, moi cai mot phan tu)"
+  - "Bao team M12: no 'PDF text chua trich' (pdfplumber khai, 0 dung) — mo o trong backlog M12."
+  - "G8: ai chon 2 video/bai phon the de nap?"

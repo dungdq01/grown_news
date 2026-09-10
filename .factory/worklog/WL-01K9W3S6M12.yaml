@@ -1,0 +1,92 @@
+id: WL-01K9W3S6M12
+at: 2026-09-01
+by: claude
+buoc: "s6-module-spec · M12_chungcat — pack 6 artifact + tot nghiep sang modules:"
+loai: s6; G6A cho MOT module; khong dong ma chuc nang
+gate: G6A (M12 rieng le; nam module con lai chua lam)
+
+object:
+  - 06_modules/M12_chungcat/spec.md          # 15 AC, moi AC co nhan + cmd
+  - 06_modules/M12_chungcat/rules.md         # 6 rule S3, moi rule du 3 ve lenh/do_khi/xanh_khi
+  - 06_modules/M12_chungcat/diagram_flow.md  # duong chinh + chieu CAM
+  - 06_modules/M12_chungcat/data_flow.md     # vao/ra + dan xuat vs quyet dinh
+  - 06_modules/M12_chungcat/model_flow.md    # entity + contract + adapter model
+  - 06_modules/M12_chungcat/ui_flow.md       # KHONG co giao dien (Z7) — va do la luat
+  - project_map.yaml                         # v19 -> v20: M12 tu modules_du_kien sang modules
+
+evidence:
+  - "check_g6a => xanh (12 module, 12 thu muc, khop)"
+  - "check_map => xanh (hai chieu)"
+  - "check_ba => xanh (0 diem treo)"
+  - "check_rule_surfaces => xanh"
+  - "check_mermaid => xanh"
+  - "pytest core/tests -q => 42 passed"
+  - "29 cong Python => 22 xanh; 7 do: 4 do CU + 3 cua agent khac (xem do_do)"
+
+# ══ PHAN DANG GIA NHAT ═════════════════════════════════════════════════
+cong_bat_HAI_lo_that_trong_pack_toi_vua_viet: >
+  check_ba bao 8 diem treo, ca 8 la CUA TOI, va ca hai lop deu that:
+
+  1) Nam rule khai `be_mat: S3` ma khong tro lenh nao. CLAUDE.md cam thang:
+     khai S3 thieu `lenh` + `do_khi` + `xanh_khi`. Toi viet "lenh chua ton tai"
+     trong ghi chu roi tuong the la du — khong du: mot rule S3 khong tro lenh la
+     KY LUAT, khong phai co che, va cong doc dung cho do.
+     Da them du ba ve cho ca sau rule.
+
+  2) Ba "truong" toi khai trong data_flow khong co trong schema:
+     `article_versions`, `categories` la ten BANG (toi viet chung trong backtick o
+     dau dong bang, dung dang ma cong doc thanh truong frontmatter);
+     `model_da_dung` la truong toi TU DAT — schema khong co no.
+     Sua: hai cai dau viet ro la "bang ...", cai thu ba ha xuong NO can FR toi
+     M01 (owner cua schema), khong giu trong bang nhu mot hop dong da co.
+
+  Bai hoc: toi viet mot pack roi tu cho la dat, va cong tim ra hai lop sai trong
+  vong mot phut. Do la ly do G6A ton tai — khong phai de xac nhan cai minh vua
+  viet, ma de bat cai minh khong thay.
+
+khai_S3_khi_lenh_chua_co_—_quyet_dinh_va_ly_do: >
+  R3 co tien le cho ca doi xung: "hard ma khong co lenh chay duoc => no la soft".
+  Ap thang thi sau rule nay dang la S2. Nhung ha xuong S2 roi nang lai sau la HAI
+  lan sua cung mot file, va lan nang lai la thu PHAI NHO moi lam — dung lop loi
+  bang khai sinh ra de dep (S18, bai hoc C5: khong dung co `da_dung: false`).
+  Chon: khai S3 kem du ba ve, va NOI THANG o dau file rang lenh chua chay duoc.
+  check_ba thay lenh duoc tro; nguoi doc thay lenh chua co. Hai vai, hai thu.
+
+mot_mau_thuan_G3_ghi_ra_thay_vi_lang_le_chon: >
+  spec_overview viet M12 "Khong cong vao"; dich-vu.json khai `cong: 8790`.
+  Spec M12 theo BANG KHAI (thu may doc), va ADR-05 da dinh chinh rang luat that
+  la M08-R1 (khong nghe NGOAI 127.0.0.1), khong phai khong nghe gi.
+  Ghi drift vao dau spec.md thay vi im lang chon mot ben — nguoi doc sau phai
+  biet hai file noi nguoc nhau, va s3/s4 phai sua MOT cau.
+
+toi_neo_sai_BA_lan_khi_tot_nghiep_M12_trong_project_map: >
+  Lan 1: neo vao "  M17_cong:" tuong no o `modules:` — no o `modules_du_kien`,
+    nen M12 chi bi doi cho trong cung khoi. yaml khong doi mot chu.
+  Lan 2: chen truoc dong `modules_du_kien:` — nhung khoi do o dong 66 con
+    `modules:` o dong 148, tuc du_kien DUNG TRUOC. M12 roi vao `adopted:`.
+  Lan 3: chen ngay sau dong `modules:` bang chi so dong => dung.
+  Bai hoc: file YAML 780 dong thi "chen truoc/sau mot khoa" la phep doan neu
+  chua BIET thu tu khoa. Doc `grep -n '^[a-z_]*:'` truoc, dung sau — mot lenh,
+  va no thay hai lan sua.
+
+FAIL_in_ra_ma_khong_lam_do_cong: >
+  check_g6b in "FAIL M12_chungcat spec 15 cmd (chua co plan) KHONG ai sinh: 15"
+  nhung KHONG cong loi — ma chi append khi `co_plan or xanh`, va M12 chua co plan.
+  Tuc dong do la trang thai binh thuong giua s6 va s7. Nhung in chu FAIL cho mot
+  ca khong fail thi day nguoi doc tap bo qua dong FAIL — mat guong cua mot cong
+  khong do duoc. Ghi ra, chua sua (check_g6b thuoc M01, va day la mot don vi s6).
+
+do_do:
+  check_danh_muc + check_skill: "nguyen nhan FR-039 cua toi; cho sua o core/skill-src (agent khac so huu)"
+  check_frozen: "cho NGUOI ky"
+  check_running: "he qua hai muc tren"
+  check_g6b: "AGENT KHAC — T03-90-man-dot-hai-mock.md (sua 48 phut truoc), dong pham_vi_ghi co chu thich CUNG DONG nen g6b doc ca chu thich thanh duong dan"
+  check_khai_mot_noi: "AGENT KHAC — 'dung 7 man thuoc thanh menu (duoc 8)'; ho dang dung UI frame dot hai"
+  check_worklog: "AGENT KHAC — so dong prototype.css=3020 va ky tu shell.html=58175 khong khop tai lieu; ca hai file la cua ho"
+
+no_con_lai:
+  - "NAM module con lai (M13 M14 M15 M16 M17) chua co pack — tuan tu tiep theo."
+  - "`nguon` (FR-044) chua vao schema => nua `tong-hop-chu-de` cua M12 KHONG thi cong duoc. Chan cung, ghi trong spec §2 va data_flow §5."
+  - "`model_da_dung` can FR toi M01 truoc khi M12 ghi no vao frontmatter."
+  - "Sau lenh trong chungcat/tests/ chua ton tai => sau rule S3 hien la ky luat. s8 dung chung."
+  - "M12 khong duoc import ma cua core/ (doi xung M01-R4) => phep tach dia chi se co HAI ban. Can cong doi chieu, cung khuon check_danh_muc."

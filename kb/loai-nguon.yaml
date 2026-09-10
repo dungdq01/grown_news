@@ -1,0 +1,56 @@
+- id: repo
+  label_vi: repo
+  module: bai-viet
+  thu_tu: 0
+- id: paper
+  label_vi: paper
+  module: bai-viet
+  thu_tu: 1
+- id: article
+  label_vi: article
+  module: bai-viet
+  thu_tu: 2
+- id: docs
+  label_vi: docs
+  module: bai-viet
+  thu_tu: 3
+- id: announcement
+  label_vi: announcement
+  module: bai-viet
+  thu_tu: 4
+- id: pdf
+  label_vi: PDF
+  module: tai-lieu
+  thu_tu: 5
+- id: pptx
+  label_vi: PowerPoint
+  module: tai-lieu
+  thu_tu: 6
+- id: docx
+  label_vi: Word
+  module: tai-lieu
+  thu_tu: 7
+- id: ppt
+  label_vi: PowerPoint (cũ)
+  module: tai-lieu
+  thu_tu: 8
+- id: doc
+  label_vi: Word (cũ)
+  module: tai-lieu
+  thu_tu: 9
+- id: bin
+  label_vi: Tệp khác
+  module: tai-lieu
+  thu_tu: 10
+- id: youtube
+  label_vi: youtube
+  module: video
+  thu_tu: 11
+- id: tiktok
+  label_vi: tiktok
+  module: video
+  thu_tu: 12
+- id: tai-len
+  label_vi: tai len
+  module: video
+  thu_tu: 13

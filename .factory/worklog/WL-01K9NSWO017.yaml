@@ -1,0 +1,142 @@
+id: WL-01K9NSWO017
+at: 2026-08-28
+by: claude
+buoc: WO-017 (ba khung nạp riêng) + WO-016/2 (loại nguồn nằm TRONG phân loại)
+loai: bàn giao WO-017 + sửa WO-016
+wo: WO-017-ba-khung-nap-rieng.md · WO-016-bon-chieu-nhan-va-gan-tu-db.md
+
+object:
+  wo:
+    - .factory/wo/WO-017-ba-khung-nap-rieng.md
+    - .factory/wo/WO-016-bon-chieu-nhan-va-gan-tu-db.md
+  code:
+    - web/plugins/multiwindow/src/scripts/multiwindow.inline.ts   # moTab · nghe · loiMa/loiMay
+    - web/render/shell.html · web/plugins/home-pages/shell.html   # tab Phân loại · hai dải lối · tiêu đề
+    - web/render/trang.mjs      # nutNap ba lựa chọn · nhóm phân loại có số đếm
+    - web/styles/prototype.css  # dm-tabs auto-flow · .nap-ba · miễn trừ luật tự-ẩn
+  test:
+    - web/test/nap-ba-khung.test.js      # MỚI — 6 mục
+    - web/test/bon-chieu-facet.test.js   # +§8 quan hệ tập-con · +§9 strip không đếm tay
+    - web/test/thu-vien-nap.test.js      # hai phép kiểm đổi sang cắt VÙNG
+    - web/test/man-danh-muc.test.js      # (WO-016) con số cứng → bất biến
+
+may_xanh:
+  - "cd web && node test/nap-ba-khung.test.js  ->  pass (6 mục)"
+  - "cd web && node test/bon-chieu-facet.test.js  ->  pass (9 mục)"
+  - "quét từng file: 66/67 xanh (chỉ `he-kinh` — xem `do_do`)"
+  - "gn.css 95763 / 102400 byte — dư 6637"
+  - "gn.js  102045 / 102400 byte — dư 355"
+  - >
+    trình duyệt, kho TẠM, `/khai-niem/`: 4 tab trên MỘT dòng
+    (`grid-auto-flow: column`), tab tên "Phân loại", panel "3 phân loại · 7 loại
+    nguồn · chỉ đọc", nhóm "Bài viết 3 bản · Tài liệu 1 bản · Video 1 bản",
+    hàng loại nguồn thụt 32px
+  - >
+    trình duyệt, `/bai-viet/nap/`: bấm "Tự viết bài" ⇒ `link=ẩn · file=ẩn ·
+    viet=HIỆN`; bấm "Nộp file .md" ⇒ `file=HIỆN`, `aria-selected` theo đúng
+  - >
+    trình duyệt, `/tai-lieu/nap/` và `/video/nap/`: HIỆN ĐẦY ĐỦ — rail 7 tab,
+    tiêu đề riêng, dải lối riêng, vùng nhập, nút nạp theo ngữ cảnh
+  - >
+    trình duyệt, `/tat-ca/`: menu "+ nạp" mở ra ba lựa chọn (viết bài · nạp tài
+    liệu · đăng ký video), 180×122, không lấn rail
+
+bug_nang_nhat_khong_cong_nao_thay:
+  - >
+    HAI MÀN NẠP VÔ HÌNH TỪ TRƯỚC. Luật
+    `.pn:has(> [data-mount]:empty):not(:has(> [data-mount]:not(:empty)))` tắt CẢ
+    section vì mốc `mbnaptl`/`mbnapvd` rỗng ⇒ mở `/tai-lieu/nap/` là TRANG
+    TRẮNG. Đúng câu người dùng: *"chưa có form và design UI cho tài liệu/video"*
+  - >
+    Chú thích của chính luật khai chủ ý *"ẩn panel khi MỌI mốc rỗng — tức panel
+    chỉ còn cái đầu bảng"*. Tiền đề đó SAI với hai màn nạp: chúng đầy nội dung
+    TĨNH. Thêm vế còn thiếu: `:not(:has(input, select, textarea, button))` —
+    panel có ĐIỀU KHIỂN thì nó không rỗng, điều khiển CHÍNH LÀ nội dung
+  - >
+    KHÔNG chữa bằng cách cho SSR luôn điền `mbnaptl`: một màn hiện được chỉ khi
+    một mốc tình cờ có dữ liệu là một màn có thể vô hình lại bất cứ lúc nào
+  - >
+    HANDLER `data-naptab` KHÔNG TỒN TẠI. Bấm "Tự viết bài" không làm gì; hai
+    trong ba lối nạp bài viết không vào được, tức không viết được bài qua web.
+    Mất khi `git checkout --` phá file; bản khôi phục từ build là bản TRƯỚC khi
+    handler được thêm. 66 file test bỏ lọt vì chúng kiểm MARKUP ("nút có trong
+    DOM") — cả hai đúng, thứ sai là KHÔNG AI NỐI chúng lại
+
+wo016_dinh_chinh:
+  - >
+    Người dùng: *"có vẻ bạn lẫn lộn giữa phân loại và loại nguồn: loại nguồn nằm
+    trong (tập hợp con của) phân loại"*. Đo ra: cấu trúc panel vốn ĐÃ lồng đúng
+    (Bài viết → repo·paper·article·docs·announcement); cái sai là **cái tên** —
+    tab gọi "Loại nguồn" nên đọc như chiều thứ tư ngang cấp với Khái niệm/Chủ đề
+  - >
+    TAB STRIP VỠ THẬT: grid tính ra **3 cột** trong khi có 4 tab. Tôi sửa luật ở
+    `prototype.css:1505` còn luật THẮNG ở `:1748` — đúng cái bẫy mà chính file đó
+    viết chú thích cảnh báo. Bỏ hẳn con số: `grid-auto-flow: column`
+
+sieet_khong_noi_tran:
+  - >
+    Handler `naptab` làm `gn.js` vượt trần 81 byte. Hợp hai mẫu câu lỗi
+    (`Lỗi ${r.status}` ×5 · `Máy chủ trả ${r.status}.` ×3) — còn vượt 29
+  - >
+    Rồi `document.getElementById(id)?.addEventListener(...)` ×13: đoạn
+    `")?.addEventListener("` một mình là **252 byte**. Một hàm `nghe()` thay 13
+    bản ⇒ về 102045, dư **355**
+
+kiem_hai_chieu:
+  - "R5 ĐỎ TRƯỚC có thật: nap-ba-khung 9 lỗi · bon-chieu §8-§9 3 lỗi"
+  - "5 răng bẻ được, cả 5 đỏ đúng lời; phục nguyên sha256 BẰNG hết"
+  - "hai shell còn byte-identical sau mọi lượt bẻ"
+
+tu_bat_duoc:
+  - >
+    CHÈN SAI TẦNG. Tôi đặt dải lối VÀO TRONG panel đã có, và thêm một panel thứ
+    hai + một `</div>` lạc. Trình duyệt nói: tab `w=0 h=0`, HAI panel mở cùng
+    lúc. Không cổng đọc-chuỗi nào thấy — mọi chuỗi đều CÓ MẶT, chỉ sai vị trí
+  - >
+    Và một kết luận SAI của tôi từ cùng phép đo đó: tôi đọc "nút Ghi h=0" thành
+    "nút biến mất", trong khi nó nằm trong `#tv-meta` vốn ẩn tới khi chọn file.
+    Đo đúng nhưng suy sai
+  - >
+    LÁT CẮT CHẠY QUÁ CUỐI VIEW làm tôi tưởng view video lệch thẻ (-1). Cắt bằng
+    "id=v- kế tiếp" thì đoạn cuối gồm cả thẻ đóng của khối bao. Chỉ tài liệu có
+    thẻ lạc thật
+  - >
+    CỔNG XANH KHI TÔI BỎ PHÉP ĐẶT PANEL: phép kiểm nối hai điều kiện trên CẢ
+    BUNDLE, và `.hidden =` còn ở hàm khác. Siết vào đúng thân `moTab`
+  - >
+    CỔNG ĐO HÌNH THỨC: tìm chuỗi `napview` trong bundle, mà bản cài đặt ĐÚNG
+    dựng selector từ biến nên chuỗi đó không tồn tại ⇒ đỏ oan trong khi trình
+    duyệt đã xác nhận chạy
+  - >
+    PHẠM VI CẢ SHELL, hai lần trong `thu-vien-nap`: đếm `data-naptab` trên toàn
+    shell rồi đòi bằng 3 (nay 5 vì hai dải mới), và "KHÔNG còn tab `tep`" cũng
+    quét cả shell. Cả hai đổi sang cắt VÙNG
+  - >
+    Escaping #30-32: backtick trong chuỗi kép bash bị thay-thế-lệnh ⇒ hai khai
+    báo mất thân · `</div>` trong `bash -c` đọc thành chuyển hướng · và `\\b`
+    thành ký tự BACKSPACE 0x08 làm `/function moTab\\x08/` không khớp gì — đúng
+    lớp lỗi tôi đã tự đặt tên. Đường đi được: script viết bằng Write, ký tự dựng
+    bằng `chr()`
+  - >
+    Comparator bỏ dấu của tôi chỉ thay `đ` thường, không thay `Đ` hoa ⇒ hai ca
+    kiểm hai chiều báo DO trong khi răng đúng
+
+do_do:
+  - cong: he-kinh.test.js
+    do_do_boi: >
+      KHÔNG phải tôi. `public/alexander-slattery-…unsplash.jpg` 724662 byte
+      (trần 500 KB), untracked, mtime sau lần ghi cuối của tôi, và tôi không
+      chạm `public/`. Cách chữa cổng tự nêu:
+      `python core/tools/toi_uu_anh_nen.py`
+  - cong: check_frozen.py
+    do_do_boi: chờ NGƯỜI ký sau khi FR-039 duyệt — tôi không tự ký
+  - cong: check_danh_muc.py · check_skill.py
+    do_do_boi: agent khác (bản schema thứ hai ở core/skill-src/)
+  - cong: check_running.py
+    do_do_boi: đỏ VÌ hai cổng trên đỏ — nó kiểm lệnh trong RUNNING.md chạy được
+
+con_lai:
+  - >
+    Server của người dùng ở `localhost:8787` đang chạy BẢN BUILD CŨ — ảnh chụp
+    không có rail nào, còn bản vừa build hiện đủ 7 tab. Khởi động lại nó
+  - "spec ba module · wireframe màn mới · memory/decisions.md · FROZEN.lock chờ ký"

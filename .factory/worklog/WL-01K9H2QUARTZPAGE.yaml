@@ -1,0 +1,56 @@
+id: WL-01K9H2QUARTZPAGE
+at: 2026-08-19
+by: claude
+buoc: s8 (M03_web)
+loai: fix
+
+viec: >
+  Người dùng gõ /paper/ và /video/ rồi hỏi "các endpoint kia là sao". Đó là
+  trang Quartz mặc định, không phải màn của tờ báo — site đang có HAI giao
+  diện chồng nhau.
+
+pham_vi_ghi:
+  - web/quartz.config.yaml
+
+vat_the:
+  chan_doan: >
+    Bốn plugin cộng đồng sinh endpoint ngoài 6 màn của emitter:
+      folder-page   -> /paper/ /video/ /repo/ /article/   (index thư mục)
+      tag-page      -> /tags/**                            (index tag)
+      content-page  -> /paper/<slug>/                      (TRANG BÀI)
+      content-index -> /index.xml /sitemap.xml             (RSS + sitemap)
+    folder-page và tag-page render bằng layout Quartz: sidebar explorer,
+    tone đỏ/đen, KHÔNG dùng prototype.css, không nền ảnh. Chúng trùng vai
+    với màn /tat-ca/ (đều là "danh sách bài theo một chiều").
+
+  quyet:
+    tat: [folder-page, tag-page]
+    giu: [content-page, content-index]
+    vi_sao_giu_content_page: >
+      multiwindow.inline.ts hàm tai() gọi fetch("/" + ban.slug) rồi lấy
+      <article> từ HTML trả về. Tắt content-page ⇒ MỌI cửa sổ đọc rỗng.
+      Đây là phụ thuộc cứng, không phải tuỳ chọn.
+
+  do_duoc:
+    truoc: 87 file
+    sau: 70 file
+    mat: /paper/index.html · /video/index.html · /repo/index.html
+         · /article/index.html · /tags/**
+    con: /paper/<slug>.html vẫn có <article> ⇒ cửa sổ đọc sống
+
+verify:
+  loai: hard
+  lenh:
+    - "cd web && npm test"                  # 11/11
+    - "cd web && npm run check"             # type-check sạch
+  ket_qua: xanh
+  kiem_thu_cong: >
+    6 màn emitter + template .md đều còn sau khi tắt. Trang bài còn <article>.
+
+no:
+  - "Bật lại folder-page/tag-page thì KHÔNG chỉ đổi enabled: phải viết layout
+     riêng cho chúng dùng prototype.css, nếu không hai giao diện lại chồng nhau."
+  - "explorer + search + darkmode của Quartz vẫn bật và vẫn hiện trên trang
+     bài (/paper/<slug>/). Người dùng bình thường không vào đó — cửa sổ đọc
+     fetch nội dung rồi render trong layout tờ báo. Nhưng gõ tay URL thì vẫn
+     thấy layout Quartz. Chưa xử lý vì content-page là phụ thuộc cứng."

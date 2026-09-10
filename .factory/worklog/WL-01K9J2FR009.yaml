@@ -1,0 +1,135 @@
+id: WL-01K9J2FR009
+at: 2026-08-19
+by: claude
+buoc: s8 (M01_core + M03_web)
+loai: amend-frozen + feature
+fr: FR-009-category-thay-tags.md
+
+viec: >
+  Thiết kế lại cấu trúc phân loại trong .md: `tags` (tự do) → `category`
+  (danh mục đóng 6 giá trị, enum trong schema). Người dùng nêu đúng vấn đề:
+  "khái niệm và category đang dễ nhầm — khái niệm là khái niệm trong ngành,
+  category là chủ đề của bài viết".
+
+pham_vi_ghi:
+  - core/assets/frontmatter.schema.json        # FROZEN — đã ký lại sau FR
+  - core/skill-src/frontmatter.schema.json     # đồng bộ + trả nợ lệch 4 trường
+  - core/src/source_distiller/validate.py
+  - core/skill-src/mau-dat-chuan.md
+  - core/tools/sinh_kb_mock.py
+  - 05_uiux/contracts/analyses.sample.v4.json  # MỚI
+  - 06_modules/M03_web/spec.md                 # FROZEN — đã ký lại sau FR
+  - kb/README.md
+  - kb-mock/**                                  # sinh lại từ v4
+  - project_map.yaml
+  - RUNNING.md · 05_uiux/README.md · web/README.md
+  - web/plugins/home-pages/index.ts
+  - web/plugins/multiwindow/src/scripts/multiwindow.inline.ts
+  - web/styles/prototype.css
+  - web/test/filter-counts.test.js · web/test/_seed.mjs · web/test/page-weight.test.js
+
+bang_chung_truoc_khi_sua: >
+  Đo 12 tag trên 13 bản ghi sample:
+    5 tag >=2 lần (llm 4, agent 3, backend/research/observability 2)
+      => hành xử như DANH MỤC CHỦ ĐỀ
+    7 tag 1 lần (time-series, forecasting, queue, production, ssg, web, quan-ly)
+      => từ khoá lẻ
+    `quan-ly` tiếng Việt giữa 11 tag tiếng Anh
+      => TRÔI DẠT đã bắt đầu, đúng thứ M02-R3 dự báo
+  Và: `tags` là trường DUY NHẤT trong 41 property không có `description` —
+  nó chưa bao giờ được quyết định là gì.
+
+  Đối chiếu thêm: KHÔNG tag nào trùng tên concept nào ⇒ hai chiều đã phân vai
+  sạch trên thực tế, chỉ chưa được phân vai trong schema.
+
+vat_the:
+  danh_muc_category:
+    gia_tri: [agent-llm, backend, data-ml, ai-services, observability, delivery]
+    nguon: >
+      KHÔNG phát minh. Hợp nhất hai bộ đã có và gần trùng nhau:
+      skill-manifest.json `domain` (5 giá trị) và nhóm trong kb/concepts.yaml
+      (5 nhóm). Bảng đối chiếu ba bộ nằm trong FR-009.
+    vi_sao_6: >
+      chart-palette.json (frozen) có 4 màu categorical + luật "series thứ 5 gộp
+      vào 'khác', không sinh hue mới". 6 nhóm = 4 màu + khác, còn trong luật.
+      Trên 20 nhóm thì mọi biểu đồ theo category thành vô nghĩa.
+    kiem_chung: >
+      Ánh xạ 12 tag → 6 category phủ 12/13 bài, 0 tag không map được.
+      Bài duy nhất trống là announcement "Ra mắt v3" — vốn không có tags.
+      ⇒ category KHÔNG bắt buộc, và đó là kết luận từ dữ liệu không phải giả định.
+
+  co_che_cuong_che:
+    chon: schema enum, chặn ở validate
+    vi_sao: >
+      Người dùng chọn tầng này. Đúng: nó phủ CẢ BA đường nạp — skill sinh,
+      _inbox/ gate, sửa tay. Dropdown trên form CRUD (bước 5 của plan) là tiện
+      lợi thêm, không phải cơ chế chặn.
+    khac_concepts: >
+      concepts để danh mục ở FILE RỜI (22 mục, người thêm thường xuyên).
+      category chỉ 6 giá trị và hiếm đổi ⇒ enum thẳng trong schema là đủ,
+      không cần file thứ hai và cổng thứ hai.
+      Hệ quả có ý thức: thêm category mới phải qua FR, không duyệt lô hàng tuần.
+    thong_bao_loi: >
+      friendly() thêm case cho enum category — jsonschema in cả enum vào một
+      dòng dài rồi bị cắt ở 160 ký tự, người sửa không thấy được chọn gì.
+      Giờ: "category · 'ai-stuff' không có trong danh mục — chọn từ: agent-llm ·
+      backend · data-ml · ai-services · observability · delivery"
+
+  no_da_tra:
+    what: hai bản schema lệch 4 trường
+    truoc: >
+      core/skill-src/frontmatter.schema.json có 38 property, core/assets/ có 41.
+      Bản skill-src THIẾU cả 3 trường M1 (insight_new, skill_installed,
+      review_minutes) VÀ ràng buộc allOf "approved ⇒ bắt buộc 3 trường" (FR-001).
+      Skill sinh file theo bản đó sẽ không biết về FR-001.
+    sau: 41 = 41 property, 6 = 6 allOf, không lệch trường nào
+
+  sidebar_ba_tang:
+    thu_tu: chủ đề (6) → loại nguồn (6) → khái niệm (22)
+    vi_sao: THÔ → MỊN. Người lọc đi từ thô đến mịn, không ngược lại.
+    logic: AND giữa tầng, OR trong tầng
+    do_duoc: 5 nút chủ đề + 6 loại + 11 khái niệm, mọi số đếm khớp số thẻ
+
+verify:
+  loai: hard
+  lenh:
+    - "cd web && npm run check"                          # type-check sạch
+    - "cd web && npm test"                               # 15/15
+    - "python core/src/source_distiller/validate.py <thư mục thử>"  # cổng chặn thật
+    - "python core/tests/check_frozen.py"                # + 8 cổng, 9/9 OK
+  ket_qua: xanh
+  chan_that: >
+    Thử hai file: category:[data-ml] → OK; category:[ai-stuff] → FAIL kèm danh
+    sách hợp lệ. Cổng chặn thật, không chỉ khai trong schema.
+  frozen: >
+    3 file frozen đổi (schema, M03_web/spec.md, + contract v4 mới).
+    check_frozen ĐỎ đúng như phải, ký lại bằng --ky SAU khi FR-009 đã mở.
+    24 file trong FROZEN.lock.
+
+mat_xich_ngoai_repo:
+  what: >
+    Skill source-distiller ĐÃ CÀI ở ~/.claude/skills/ vẫn dùng `tags` — nếu nạp
+    bài thật ngay thì bản sinh ra sai trường. Đây là mắt xích bắt buộc, ngoài
+    repo nhưng không bỏ được.
+  da_sua:
+    - "references/format.md — `tags` → `category` + mục danh mục 6 giá trị,
+       giải thích khác concepts ở chỗ dùng để làm gì"
+    - "SKILL.md — thêm đoạn về category, nói rõ KHÔNG có đường category_proposed"
+    - "references/web-spec.md — bảng ánh xạ báo điện tử: tách Chủ đề / Thẻ"
+    - "assets/frontmatter.schema.json + examples/mau-dat-chuan.md +
+       assets/concepts.seed.yaml + scripts/validate.py — chép từ repo"
+  dong_goi_lai: >
+    source-distiller.skill trong repo: 40.736 → 47.149 byte, 14 file.
+    Kiểm: format.md có `category:`, không còn `tags:`; validate.py parse được.
+    File này được màn /nap/ phát ra cho agent khác tải (plan bước 3).
+
+no:
+  - "FR-009 đang ở trạng thái MỞ — chờ người duyệt. Tôi đã thi hành trước theo
+     yêu cầu 'hay đấy làm đi nhé'; nếu người duyệt bác thì phải revert cả
+     schema + contract v4 + skill ngoài repo + ký lại baseline."
+  - "Sample v3 GIỮ LẠI (như v1/v2). Test và code trỏ v4; v3 còn để đọc git diff."
+  - "kb-mock/README.md và web/test/*.md còn nhắc v3 trong câu kể lịch sử —
+     đúng ngữ cảnh, không sửa."
+  - "Chưa có cổng máy nào canh việc skill ngoài repo lệch schema trong repo.
+     Lần này tôi phát hiện bằng grep tay. Đó là chỗ nên có test, nhưng file
+     nằm ngoài repo nên CI không với tới — ghi lại làm nợ đã biết."

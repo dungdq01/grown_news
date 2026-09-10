@@ -1,0 +1,19 @@
+{
+  "$comment": "NGƯỠNG CHẶN DÒ của LÕI — FR-049. Sửa MỘT chỗ, không rải trong mã. Cùng khuôn 07_curate/thresholds.yaml. Cổng `rate-limit.test.js` đọc CHÍNH file này rồi đòi điểm chặn DỜI THEO khi số đổi — nên gõ cứng một số trong mã sẽ đỏ, không phải xanh.",
+
+  "$comment_vi_sao_o_LOI": "Đếm ở LÕI chứ không ở `cong/`: M17 §0 khai ngôn ngữ của `cong/` CHƯA CHỌN (Caddy · nginx · tự viết), nên một phép chặn ở đó chỉ đúng với một trong ba đường. Và LÕI là chỗ DUY NHẤT biết một mã có tồn tại hay không.",
+
+  "$comment_hai_chieu": "Chặn theo IP KHÔNG chặn được botnet nhiều IP thử MỘT mã. Chặn theo mã KHÔNG chặn được một IP thử NHIỀU mã. Hai chiều khác nhau; bỏ một chiều là bỏ một lớp, không phải tiết kiệm.",
+
+  "thu_theo_ip": 10,
+  "thu_theo_ma": 5,
+  "cua_so_phut": 15,
+
+  "$vi_sao_thu_theo_ip": "10 — một người gõ sai mã mời 10 lần trong 15 phút là chuyện gần như không xảy ra; 5 đồng nghiệp dùng cùng một NAT thì mỗi người vẫn còn 2 lần. CHƯA KIỂM CHỨNG: chưa ai buộc kênh thật lần nào.",
+
+  "$vi_sao_thu_theo_ma": "5 — mã do MÁY sinh 256 bit, nên người thật không bao giờ 'gần đúng'. Quá 5 lần trên CÙNG một mã là dấu hiệu dò, không phải nhầm. Đặt thấp hơn ngưỡng IP có chủ ý: đoán đúng một mã là THÀNH người khác trong kho, nên chiều này đắt hơn.",
+
+  "$vi_sao_cua_so_phut": "15 — ngắn hơn `het_han` của mã (60 phút) để một lần bị chặn không giết luôn cả mã còn hiệu lực. CHƯA KIỂM CHỨNG.",
+
+  "$comment_chua_kiem_chung": "Cả ba số là PHỎNG ĐOÁN. Ghi ra để lần sau có người dám sửa — tiền lệ 07_curate/thresholds.yaml ghi thẳng 'CHƯA kiểm chứng' cho cả ba số của nó, và đó là lý do các số đó sửa được mà không ai phải đoán ý người viết."
+}

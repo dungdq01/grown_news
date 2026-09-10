@@ -1,0 +1,101 @@
+id: WL-01K9N7FR036B5
+at: 2026-08-27
+by: claude
+buoc: s8 — FR-036/B5 đường nạp hiện vật qua HTTP
+loai: bàn giao B5
+fr: FR-036-khung-than-bai-5-muc.md
+
+object:
+  task:
+    - 07_plan/M08_api/tasks/T08-7-duong-nap-hien-vat.md          # code
+    - 07_plan/M03_web/tasks/T03-11-test-duong-nap-hien-vat.md    # test
+  code:
+    - web/api/router.mjs      # route 3 đoạn /api/articles/media
+    - web/api/articles.mjs    # napHienVat + tenGocAnToan
+    - web/api/dungchung.mjs   # luuHienVat trả `ma`; docBodyMedia thôi destroy ở đường header
+  test:
+    - web/test/thu-vien.test.js   # + §7 server thật (12 phép kiểm)
+  plan:
+    - "C:/Users/Admin/.claude/plans/c-c-users-admin-downloads-grown-news-up-bright-newt.md"
+
+may_xanh:
+  - "cd web && node test/thu-vien.test.js  ->  pass (36 phép kiểm, 7 mục)"
+  - "cd web && npm test  ->  exit 0"
+  - "pytest core/tests -q  ->  42 passed · 18/19 cổng check_*.py xanh"
+  - >
+    6/6 răng mới ĐỎ được khi phá, ba file gốc khôi phục nguyên byte
+    (router b26b1690f2b923c4 · articles 6174827d8122da40 · dungchung 97edd02e23587788)
+
+do_do:
+  - cong: core/tests/check_skill.py
+    do_do_boi: agent khác
+    quy_chu: không nằm trong tập file tôi đổi ở lượt này
+
+# ══ Điều đo được TRƯỚC khi viết code, và nó thu nhỏ đơn vị ══════════════════
+#
+# Bốn phép kiểm cuối của §7 (tạo bản ghi `tai-lieu` qua `POST /api/articles`,
+# sha256 bịa ⇒ 422, sha256 thật ⇒ 201, GET lại thấy `media`) XANH NGAY khi test
+# vừa viết xong — trước một dòng code B5 nào. Vì `LOAI` đã có `tai-lieu` (B1) và
+# kiểm con trỏ nằm trong `ghiSauValidate` (B3).
+#
+# Nên B5 KHÔNG phải "route + create" như plan ghi; nó chỉ là ĐƯỜNG NẠP BYTE.
+# Nói ra vì một đơn vị nhỏ hơn tưởng là một đơn vị đã làm dở.
+
+# ══ 413 — phép kiểm đầu tiên trong repo, và cách đo đầu tiên đã SAI ═════════
+#
+# `grep "413" web/test/` ra ĐÚNG 0 dòng trước lượt này: đường 413 của `docBody`
+# (1 MB, FR-010) chưa bao giờ được bấm qua HTTP.
+#
+# Cách đo sai: `fetch` một Buffer 26 MB. undici gửi, server trả 413 rồi đóng, và
+# client nhận ECONNRESET trên đường GHI trước khi kịp ĐỌC phản hồi ⇒
+# `fetch failed`, không phải `413`. Đã thử cả `res.on("finish")` rồi mới destroy
+# — vẫn thế. Đây là giới hạn của HTTP, không phải bug của server.
+#
+# Cách đo đúng: client THÔ (`http.request`), khai `content-length` vượt trần rồi
+# KHÔNG gửi byte nào, và đợi phản hồi. Nó đo đúng hợp đồng: "từ chối theo header
+# TRƯỚC khi đọc byte". Kèm chiều ngược — khai TRONG trần thì server phải CHỜ
+# body, không từ chối sớm (nếu không thì "chặn ở header" thành "chặn mọi thứ").
+#
+# Và một lần đo sai nữa trên đường đi: `http.request` GIỮ header lại cho tới
+# `write()`/`end()` đầu tiên. Không `flushHeaders()` thì server chưa nhận được
+# gì, test timeout, và tôi đã suýt kết luận "server đo sau khi đọc" — tức đo một
+# cái IM LẶNG CỦA CLIENT rồi phán về SERVER.
+#
+# HỆ QUẢ CHO B7/B8, phải nhớ: FE **phải tự kiểm `file.size`** trước khi POST.
+# Người dùng kéo một file 30 MB vào form sẽ thấy "mạng lỗi" nếu chỉ dựa vào 413.
+
+# ══ Ba quyết định nhỏ, mỗi cái một lý do ═══════════════════════════════════
+#
+# 1 · `req.destroy()` RA KHỎI `docBodyMedia` trên đường header — đảo một quyết
+#     định của B3. Destroy ở đó giết socket trước khi handler nói được `413`.
+#     Chủ của socket là HANDLER. Đường STREAM vẫn cắt ngay: ở đó client đã khai
+#     sai, không nợ nó lời giải thích.
+#
+# 2 · `luuHienVat` trả `ma` theo khuôn `themVaoDanhMuc` đã có. 415 = "định dạng
+#     này không nhận, đừng thử lại"; 422 = "file này sai/hỏng so với thứ nó tự
+#     khai". Gộp một mã là bắt người dùng đoán.
+#
+# 3 · `x-ten-goc` LỌC Ở SERVER rồi trả lại. Lọc ở FE thì client thứ hai (curl,
+#     một script) đi vòng qua được — một luật, một chỗ. Và lọc bằng ESCAPE
+#     (`\\u0000-\\u001f`), không dán ký tự điều khiển thật vào nguồn: bản đầu tôi
+#     dán thật, và `git`/`grep` coi `articles.mjs` là "binary file".
+
+# ══ Bẫy R2 của plan: đã tránh, và tránh bằng CẤU TẠO ═══════════════════════
+#
+# `api-guard` răng 5 đòi literal `review_status: "approved"` CHỈ trong `taoBai`.
+# Bản ghi thư viện đi qua `POST /api/articles` (tức `taoBai`), nên `napHienVat`
+# không có literal trạng thái nào — nó không tạo bản ghi, nó chỉ nhận byte.
+# Một endpoint thứ hai để "tạo bản ghi tài liệu" là đúng thứ răng đó chống.
+#
+# Route 3 đoạn không đâm vào `/:type/:slug` (4 đoạn) và cũng không bị cổng cấu
+# trúc soi (`media` không thuộc `LOAI`, mà cổng đó chỉ chạy từ 4 đoạn trở lên).
+# Dưới tiền tố `/api/articles/` nên whitelist của `no-write-path` không phải sửa.
+
+con_lai:
+  - >
+    B6 — đường phục vụ byte + sáu đầu đề an toàn: content-type từ enum ĐÓNG ·
+    nosniff · inline cho pdf / attachment cho ppt-doc · CSP ở HEADER (không ở
+    attribute — `sandbox` attribute không kèm `allow-scripts` làm hỏng viewer PDF
+    của Chromium) · etag + immutable (hợp pháp vì địa chỉ theo nội dung).
+    KHÔNG `Range` ở v1.
+  - "B7..B10 — FE nạp · FE xem trước · tổng hợp All (M09-R4) · tài liệu"

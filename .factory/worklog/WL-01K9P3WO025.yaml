@@ -1,0 +1,96 @@
+id: WL-01K9P3WO025
+at: 2026-08-29
+by: claude
+buoc: WO-025 — `page-weight` làm tròn KB, im lặng nhường 511 byte quá trần
+loai: bàn giao WO-025
+wo: WO-025-page-weight-lam-tron-nhuong-511-byte.md
+
+object:
+  wo:
+    - .factory/wo/WO-025-page-weight-lam-tron-nhuong-511-byte.md
+  task:
+    - 07_plan/M03_web/tasks/T03-59-test-page-weight-byte.md
+  test:
+    - web/test/page-weight.test.js   # 4 phép so + 1 phép sắp + răng tự chứng minh
+
+may_xanh:
+  - >
+    Cổng TỰ IN ra lỗ: `phép so CŨ nhường 511 byte quá trần; phép so MỚI chặn`.
+    Đây là phép TÍNH trong cổng, không phải lời tôi khai
+  - "gn.css 98523/102400 · gn.js 101426/102400 · trang chủ 59104/61440 · lớn nhất 67587/75776"
+  - "quét web 72/73 (chỉ `he-kinh`) · 21/25 cổng Python · pytest 42"
+
+bug:
+  - >
+    `const kb = (s) => Math.round(byteLength(s)/1024)` rồi `ok(n <= tran)`.
+    `Math.round(102911/1024) === 100` và `100 <= 100` ⇒ CHO QUA. Cổng nhường
+    tới **511 byte** quá trần danh nghĩa
+  - >
+    Dự án nói rõ về đúng con trần này: *"FR-027f · gn.css 160 → 100. SIẾT, không
+    nới."* Một cổng lặng lẽ nhường 511 byte là **một nửa lần nới trần mà không ai
+    quyết** — làm đúng thứ FR-027f cấm, chỉ khác là không ai nhìn thấy
+  - >
+    Đo lúc mở WO: `gn.js` dư **974 byte**. Thêm 1 KB nữa thì cổng vẫn xanh trong
+    khi bundle đã qua trần. Không phải giả định xa
+
+toi_da_bao_bang_con_so_da_lam_tron:
+  - >
+    Suốt phiên này tôi báo *"gn.js 99 KB / ngưỡng 100"*. Con số ấy KHÔNG SAI,
+    nhưng nó không phải thứ đang được SO. Câu báo và phép so là hai thứ, và tôi
+    đã đọc câu báo như thể nó là phép so
+
+hinh_dang_ban_va:
+  - >
+    So theo BYTE, hiện theo KB. `kb()` giữ nguyên — người đọc không nghĩ bằng
+    byte. Câu báo nay mang cả hai: `gn.js 99 KB (101426 / 102400 byte)`
+  - >
+    Phép SẮP XẾP tìm trang nặng nhất cũng sắp theo KB làm tròn: hai trang lệch
+    400 byte đổi chỗ được và câu lỗi nêu SAI TÊN trang. Đổi luôn sang byte
+  - >
+    RĂNG TỰ CHỨNG MINH thay cho đỏ-trước: dựng chuỗi dài đúng 100.499 KB rồi đòi
+    *cũ cho qua* VÀ *mới chặn*. Hai phép cho cùng kết quả ⇒ hoặc lỗ không tồn
+    tại, hoặc tôi đo sai; câu lỗi nói thẳng "đừng sửa mã, sửa phép đo này trước"
+  - >
+    Ca âm bắt buộc: file ĐÚNG BẰNG trần vẫn phải qua. Chặn cả nó là siết quá
+    tay, không phải siết — và một cổng đỏ oan bị người ta tắt, không bị người ta
+    sửa
+
+da_lot_that_mot_lan:
+  - >
+    `sua-dung-man.test.js:98` mang sẵn hồ sơ từ C6b: *"điều đó VỪA LỌT THẬT:
+    `gn.js` **102666 byte** báo '100 KB (ngưỡng 100)' và XANH"*. Lỗ này ĐÃ cho
+    một bundle quá trần đi qua — không phải giả định
+  - >
+    Cách chữa lúc đó là đặt một phép so byte ở cổng KHÁC làm chốt chéo: chữa
+    triệu chứng ở nơi khác, để nguyên cái cân hỏng. WO này vá tận gốc. Chốt chéo
+    GIỮ LẠI — một bất biến quan trọng đo ở hai nơi độc lập thì một nơi hỏng
+    không làm mất cả hai, và nó là HỒ SƠ: xoá đi thì lần sau không ai biết lỗ ấy
+    từng tồn tại
+
+mo_rong_he_kinh:
+  - >
+    `he-kinh` mắc y hệt: `Math.round(size/1024) > 500` cho lọt một ảnh 512511
+    byte. Cùng 511 byte
+  - >
+    Và nó hỏng thêm một phép kiểm thứ hai trong cùng file: *"Trùng ảnh: hai file
+    cùng BYTE"* — chú thích nói byte, phép so dùng KB đã làm tròn, nên hai ảnh
+    cách nhau 400 byte bị báo TRÙNG. Sai theo chiều BÁO ĐỘNG GIẢ, chiều mà người
+    ta học cách bỏ qua
+  - >
+    Một biến tên `kb` giữ giá trị BYTE chính là hình dạng của cả lớp lỗi này.
+    Đổi tên luôn, và ghi lý do ngay đó
+  - >
+    `he-kinh` vẫn ĐỎ và đúng: ảnh 724662 byte người dùng thêm. Câu báo nay nêu
+    cả byte thật — `708KB (724662 byte)`
+
+khong_doi_nguong: "Không một con trần nào bị đổi. Đây là siết PHÉP SO."
+
+đỏ_do: chưa quy được chủ  # `kb()` có từ FR-016, trước mọi đơn vị của phiên này
+
+do_do:
+  - cong: he-kinh.test.js
+    do_do_boi: ảnh 708 KB người dùng thêm — `python core/tools/toi_uu_anh_nen.py`
+  - cong: check_frozen.py
+    do_do_boi: chờ NGƯỜI ký sau khi FR-039 duyệt
+  - cong: check_danh_muc.py · check_skill.py · check_running.py
+    do_do_boi: agent khác · và hệ quả của hai cổng trên

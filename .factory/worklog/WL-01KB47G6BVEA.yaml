@@ -1,0 +1,86 @@
+entry: ban-giao
+ulid: 01KB47G6BVEA
+ngay: 2026-09-09
+module: M01_core (cong) · M03_web (hai task, chu khac)
+don_vi: [T01-53, T01-54]
+wo: WO-084
+tieu_de: >-
+  WO-084 ve A DONG (chu M03 tu sua 16:08/16:09) · ve B CON MO va o backlog M01 giu.
+  T01-54 -> T01-53 DA DUYET. Cong xanh vi HET DU LIEU KICH HOAT, khong vi da chiu duoc.
+
+object:
+  - 06_modules/M01_core/backlog.md                                # cap nhat o cua PM-Space: (a) DONG + (b) con mo, co don vi
+  - .factory/wo/WO-084-check-g6b-crash-thay-vi-do.md              # +§6 cap nhat, +§7 loi moi khong thuoc WO; header: DA DUYET
+  - 07_plan/M01_core/tasks/T01-53-g6b-do-duoc-khong-crash.md      # DA DUYET + canh bao "xanh vi het du lieu"
+  - 07_plan/M01_core/tasks/T01-54-test-g6b-thieu-verifiability.md # DA DUYET + doi cach dung ca A sang fixture
+  - .factory/worklog/WL-01KB47G6BVEA.yaml
+
+quyet_dinh_chu_du_an_nguyen_van: |
+  2026-09-09: "1. Chu kia bao cho ban doi, nhung nho note backlog" va "2. duyet".
+
+do_TRUOC_khi_sua_mot_dong: |
+  Chu du an noi "chu kia bao cho ban doi" — nhung DO LAI truoc khi sua thi hai file
+  DA CO `verifiability:` roi:
+    T03-136  16:08  `verifiability: hard`  ⇒ check_g6b: ok 5 AC/5 cmd
+    T03-137  16:09  `verifiability: soft`  ⇒ check_g6b: ok soft 1 AC/0 cmd
+  Va `check_g6b` HET traceback: "1 · 306 task" chay het, ket luan "21 loi" la KET LUAN
+  chu khong phai exception.
+  ⇒ Toi KHONG sua hai file do. Chu cua chung da sua xong, va sua lai la ghi vao dat
+  nhanh khac (checklist song song §4) cho mot viec da xong.
+
+o_backlog_KHONG_ghi_trung: |
+  PM-Space DA ghi mot o cho DUNG bug nay o `06_modules/M01_core/backlog.md:543`, voi
+  cung phan tich hai ve (a)/(b). Nen toi CAP NHAT o do thay vi mo o thu hai:
+    (a) DONG — chu hai task tu sua 16:08/16:09, kem object va moc gio.
+    (b) CON MO — kem WO-084 + T01-54/T01-53, va mot cau canh bao (duoi).
+  Hai o cho mot no la hai o se lech nhau. O nay chet o gate cua M01, khong phai M13.
+
+phat_hien_dang_ghi_nhat: |
+  CONG NAY XANH VI HET DU LIEU KICH HOAT, KHONG VI NO DA CHIU DUOC GIA TRI VANG.
+  `:81` van in BON o qua f-string (mod · verif · acs · cmds); o nao vang cung chet
+  cung cach. Task tiep theo khai thieu mot truong se LAI khoa cong cho ca hai nhanh —
+  va lan do khong ai con nho day la bug da biet.
+  Day la hinh dang nguy hiem nhat cua mot bug: TRIEU CHUNG BIEN MAT TRUOC KHI NGUYEN
+  NHAN DUOC SUA. Dong WO o day thi lan sau no ve duoi mot cai ten khac.
+  ⇒ Ghi cau nay vao BA cho de khong ai doc mau xanh thanh "xong": WO-084 §6 ·
+  o backlog M01 (b) · dau T01-53.
+
+sua_mot_cau_NOI_DOI_trong_task_cua_chinh_toi: |
+  `T01-54` ban dau viet "Hom nay chay check_g6b.py tren plan that ra TypeError" —
+  cau do HET DUNG tu 16:09. Neu de nguyen thi dev doc no, chay plan that, thay xanh,
+  roi tuong ca A khong dung duoc.
+  Da sua: ca A dung tren FIXTURE thu muc tam, va them mot cau noi ro vi sao do cung
+  la cach dung ngay tu dau — mot cong cham `check_g6b` ma doc plan that thi no doi mau
+  theo viec cua nguoi khac, dung thu vua xay ra.
+
+do_do:
+  - lenh: "python core/tests/check_g6b.py 2>&1 | grep -cE 'TypeError|Traceback'"
+    ket_qua: "0 — het crash"
+  - lenh: "python core/tests/check_g6b.py | grep -E 'T03-136|T03-137|^1 ·|G6B'"
+    ket_qua: "ok T03-136 hard 5 AC/5 cmd · ok T03-137 soft 1 AC/0 cmd · '1 · 306 task' · 'G6B CHUA DONG — 21 loi'"
+  - lenh: "ls -l --time-style=+%H:%M 07_plan/M03_web/tasks/T03-13[67]* · git status --short"
+    ket_qua: "T03-136 16:08 · T03-137 16:09 · ca hai van `??` chua commit ⇒ quy chu duoc, khong phai chua-quy-duoc-chu"
+  - lenh: "grep -n check_g6b 06_modules/M01_core/backlog.md"
+    ket_qua: ":543 o cua PM-Space cho dung bug nay ⇒ CAP NHAT, khong mo o thu hai"
+  - lenh: "python core/tests/check_g6b.py | grep -E 'T01-53|T01-54'"
+    ket_qua: "ok T01-53 hard 4 AC/4 cmd · ok T01-54 hard 3 AC/3 cmd — hai don vi moi khai dung khuon"
+đỏ_do: >
+  Ve A: nhanh M03 (da tu dong luc 16:08/16:09). Ve B: M01 (cong khong chiu duoc gia
+  tri vang) — CON MO. 21 loi con lai cua check_g6b thuoc T01-50 · T03-129/130/131/136 ·
+  T08-36/38 · T12-* — task cua module khac, tang tu 14 vi team them 9 task trong ngay.
+
+loi_moi_khong_thuoc_WO_084: |
+  `check_g6b` nay to `T03-136`: cham `web/test/tran-hien-thi-luoi.test.js` +
+  `web/test/_tran.mjs` ma ten khong phai don vi test (R1, phan 5). Do la FAIL THAT
+  va DUNG — cong dang lam viec cua no. Chu T03-136 xu: tach cong sang mot don vi test
+  rieng, hoac doi ten don vi. Ghi o WO-084 §7. KHONG phai viec cua PM M13.
+
+thu_tu_con_lai: |
+  T01-54 (test, do truoc tren fixture) -> T01-53 (sua cong) -> T01-52 -> T01-51 -> T13-1.
+
+khong_lam:
+  - "KHONG sua T03-136/T03-137 — chu cua chung da sua xong; sua lai la ghi vao dat nhanh khac cho viec da xong."
+  - "KHONG mo o backlog thu hai cho cung bug — cap nhat o cua PM-Space."
+  - "KHONG sua core/tests/check_g6b.py — T01-53, dev M13 thi cong."
+  - "KHONG dong WO-084 — ve B con mo, va trieu chung bien mat khong phai nguyen nhan duoc sua."
+  - "KHONG bump project_map — PM-Space giu but."

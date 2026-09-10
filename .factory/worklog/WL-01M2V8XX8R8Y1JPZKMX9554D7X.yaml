@@ -1,0 +1,69 @@
+entry: ban-giao
+ulid: 01M2V8XX8R8Y1JPZKMX9554D7X
+ngay: 2026-09-09
+module: [M12_chungcat, M03_web]
+don_vi: [T12-37, T03-135]
+wo: WO-081
+tieu_de: >-
+  Panel transcript hien chinh transcript; va danh sach viec sap theo id NGAU NHIEN
+
+object:
+  - .factory/wo/WO-081-thu-tu-viec-va-panel-transcript.md
+  - 07_plan/M12_chungcat/tasks/T12-37-thu-tu-viec-theo-tao-luc.md
+  - 07_plan/M03_web/tasks/T03-135-panel-transcript-xong.md
+  - chungcat/src/vong.py
+  - chungcat/tests/check_thu_tu_viec.py
+  - chungcat/tests/check_liet_ke_viec.py
+  - web/plugins/cctab/src/cctab.inline.ts
+  - web/styles/prototype.css
+
+viec_duoc_giao: |
+  Chu du an: (1) transcript xong thi hien KET QUA luon, thong bao rut thanh mot
+  hieu ung xanh la; (2) nut "Chung cat tu transcript" doi XANH LAM va xuong footer.
+
+lam: |
+  Panel dung chinh cue cua transcript (doc qua dung hai cua ma tab Transcript da
+  dung). Cau cu rut thanh mot dong `.vc-ok` xanh la — no van noi mot su that can
+  biet (transcript la hien vat cua ban ghi, khong vao hang nhap) nhung khong con
+  dung chan. Nut xuong `.bk-f .bt-bt`, mau `--c-video` (token da co, va dung
+  nghia: hanh dong tren mot ban ghi video).
+
+phat_hien_ngoai_y: |
+  KHONG mo noi panel vua sua de nghiem thu — dao ra mot bug that:
+
+  `vong.liet_ke` sap theo id giam dan, voi lap luan rat ky *"ULID mang thoi diem
+  trong chinh no, con mtime thi git checkout/touch doi duoc"*. Lap luan DUNG —
+  voi ULID that. Nhung id o day la `uuid.uuid4().hex` (`api.py`), NGAU NHIEN.
+  Chinh `tho-cua.mjs:326` da ghi ro dieu do; hai cho, hai hieu biet khac nhau ve
+  cung mot truong.
+
+  Do 2026-09-09: API tra 20 viec, mot viec VUA CHAY XONG khong len man vi id no
+  bat dau bang `9`, xep duoi `a…`-`d…`.
+
+  Sua: ghi `tao_luc` (UTC ISO) luc `nap()`, sap theo no. Do chinh la thu chu
+  thich cu MUON — mot thoi diem nam TRONG file, khong thao tac tep nao doi duoc.
+  Sua ca `nhan_viec`: no cung nhat theo id, tuc hang doi FIFO chay ngau nhien.
+  Viec cu khong co truong => roi ve id, khong vo va khong bien mat.
+
+ve_cu_ma_hoa_tien_de_sai: |
+  `check_liet_ke_viec.py` co ve "mới nhất trước, theo ULID" — XANH suot, vi
+  fixture tu dat id `01AAA…`/`01CCC…` TANG DAN theo thoi gian nen hai phep sap
+  trung nhau. Mot ve chi dung khi fixture tinh co dep. Doi CHO do: id dat NGUOC
+  chieu thoi gian, chi phep sap theo thoi diem that moi qua duoc.
+
+cong_bat_duoc_mot_loi_that_cua_toi: |
+  `chunk-tu-chua` DO: ham moi dung `esc` tran, ma `esc` den tu cau `mw()`. Chunk
+  `cctab` la mot IIFE rieng nen no se nem `ReferenceError` NGAY LAN BAM DAU.
+  Da sua bang `const { esc } = mw()`.
+
+chua_nghiem_thu_duoc: |
+  Panel "sinh transcript da xong" CHI hien khi mot viec xong TRONG LUC quick-view
+  cua no dang mo — the cua mot viec transcript DA xong mang `data-cctr` va mo
+  thang cua so ban ghi, khong mo panel. Toi thu bat dung khoanh khac do nhieu lan
+  va khong duoc. Ma da vao chunk `cctab.inline.js` (kiem: co `cc-tu-tr`), cong
+  chunk/token/markup deu xanh — nhung day KHONG phai nghiem thu tren man that,
+  va toi ghi ra thay vi noi da chay.
+
+do_do: |
+  M12 56/56 xanh. core 49. `chunk-tu-chua` xanh lai sau khi va `esc`.
+  `page-weight` do dung mot loi cu (trang chu 63 198/61 440, chu WO-055).

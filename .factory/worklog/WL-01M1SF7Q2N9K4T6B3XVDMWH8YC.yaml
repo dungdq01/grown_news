@@ -1,0 +1,97 @@
+ulid: 01M1SF7Q2N9K4T6B3XVDMWH8YC
+thoi_diem: 2026-09-06T06:20+07:00
+tac_nhan: claude-opus-5
+loai: ban_giao
+module: M12_chungcat (+ M03_web bước 1)
+don_vi: T12-25 · chỉ dẫn của người · và T03-116 BƯỚC 1 (wireframe, CHỜ DUYỆT)
+
+r5_do_truoc:
+  - don_vi: T12-25
+    lenh: python chungcat/tests/check_chi_dan.py
+    ket_qua: "ĐỎ — `worker` chưa có `dung_prompt`"
+    đỏ_do: claude-opus-5
+
+be_mat_rui_ro_da_do: >
+  Trước khi thiết kế, đo xem chỉ dẫn của người PHÁ được gì. Kết quả: ít hơn vẻ
+  ngoài, vì thiết kế sẵn có đã chặn phần nguy hiểm nhất.
+    "ghi credibility verified" → `_dung_nhap` gán CỨNG bậc thấp nhất (M12-R2),
+                                 server lột `review_status`/`origin` (M08-R5)
+    "bỏ mục 3"                 → `_than_theo_khung` DỰNG LẠI thân theo khung;
+                                 thiếu mục thì cửa duyệt 422
+    "bịa quote"                → `verify.py` đối chiếu với nguồn, bịa thì tụt
+                                 số citation, không lọt
+    "trả văn xuôi thay JSON"   → `doc_json` ném; mất một lần gọi, 0 hỏng dữ liệu
+  ⇒ chỉ dẫn đổi được GIỌNG và TRỌNG TÂM, không đổi được HẠNG của bản ghi. Đó
+  đúng bằng những gì một người biên tập được phép đổi.
+
+quyet_dinh_thiet_ke:
+  - sandwich_ba_ve: >
+      "Chèn sau prompt hệ" NGHE như an toàn mà làm điều ngược lại: model cân
+      câu ĐỨNG SAU nặng hơn, nên đặt chỉ dẫn người ở cuối là vô tình đưa nó lên
+      vị trí MẠNH NHẤT trong cả prompt. Phải có vế hệ ĐÓNG LẠI phía sau
+      (`_CHOT`) — đó mới là sandwich, và đó mới là chỗ "hệ thắng" thành thật.
+      Cổng AC1 đo đúng vế thứ ba này, không chỉ đo thứ tự.
+  - lot_dau_dong_khung: >
+      `lam_sach_chi_dan` lột `«` `»` — dấu ta dùng để đóng ô. Để nguyên thì
+      người gửi tự đóng ô rồi viết lệnh NGOÀI ô; đó là prompt-injection cơ bản
+      nhất và không cần kỹ thuật gì ngoài gõ đúng một ký tự.
+      GIỮ `\n`: người viết nhiều ý cần nó, và nó không phá được gì.
+  - qua_tran_thi_422_khong_cat: >
+      Một chỉ dẫn bị cắt cụt giữa câu ĐỔI NGHĨA của chính nó ("đừng nhấn rủi
+      ro" → "đừng nhấn"), và người gửi không bao giờ biết mình đã yêu cầu một
+      thứ khác. Cắt im lặng rẻ cho máy, đắt cho người.
+  - kiem_o_CUA_khong_o_worker: >
+      Cửa là chỗ DUY NHẤT trả lời được người gửi. Worker chạy sau, không đồng
+      bộ — một chỉ dẫn quá dài phát hiện ở đó chỉ thành một job hỏng, mà người
+      bấm đã rời màn từ lâu.
+  - vang_chi_dan_thi_0_byte_them: >
+      `dung_prompt(None)` trả NGUYÊN `_PROMPT`. Regression bằng 0 không phải
+      lời hứa mà là một phép so bằng trong cổng (AC2).
+  - preset_di_kem_GET_model: >
+      FE hỏi model và preset ở CÙNG một lúc — lúc mở hộp thoại. Tách hai cửa là
+      hai request cho một cú bấm, và hai chỗ để một cái hỏng mà cái kia im.
+
+khong_them_cot: >
+  Bản khai của PM để ngỏ *"nếu cột mới thì khai loi.schema.sql"* và khai
+  `web/api/nhap-cua.mjs` trong `phạm_vi_ghi` — ĐẤT M08, `check_g6b` bắt đúng.
+  Thi công cho thấy nó THỪA: `chi_dan` nằm trong FRONTMATTER bản nháp, mà cửa
+  nháp trả nguyên `ban_goc_ai` — nó đã đi kèm sẵn. Thêm một cột cho dữ liệu đã
+  có đường đi là dựng bản thứ hai của một sự thật, và bản thứ hai là bản sẽ
+  lệch. Đã bỏ dòng khai đó và ghi lý do tại chỗ; AC3 vẫn đo, và đo trên đường
+  THẬT (`_dung_nhap` → frontmatter).
+
+do_sau:
+  - lenh: python chungcat/tests/check_chi_dan.py
+    ket_qua: "XANH 20/20 vế"
+  - lenh: 'for f in chungcat/tests/check_*.py; do python "$f"; done'
+    ket_qua: 37/37 XANH
+  - lenh: python -m pytest core/tests -q
+    ket_qua: 49 passed
+  - lenh: cd web && npm test
+    ket_qua: "3021 vế ok · 0 FAIL"
+  - lenh: python core/tests/check_g6b.py
+    ket_qua: "T12-25 ok · T03-116 ok · 5 lỗi còn lại đều là nợ M18 có sẵn"
+
+t03_116_buoc_1:
+  trang_thai: CHỜ CHỦ DỰ ÁN DUYỆT — chưa một dòng mã bước 2 nào
+  vat: 05_uiux/wireframes/SCR-18-popup-chung-cat-chi-dan.md
+  ve_tren_popup_that: >
+    Vẽ trên `<dialog id="dlg-cc">` đang chạy (`cctab.inline.ts:699`), không vẽ
+    một popup tưởng tượng — mọi thứ đã có giữ nguyên vị trí, và trạng thái mặc
+    định dài hơn hôm nay ĐÚNG MỘT DÒNG.
+  ba_cau_hoi_cho_chu_du_an:
+    - "nhớ chỉ dẫn gần nhất: ĐIỀN SẴN hay chỉ hiện chip *dùng lại*?"
+    - "có thêm preset thứ tư *giữ nguyên giọng tài liệu gốc* không?"
+    - "dòng meta ở cửa sổ kết quả: hiện ĐỦ hay cắt ~60 ký tự + rê chuột?"
+
+đỏ_do: claude-opus-5
+
+object:
+  - chungcat/src/worker.py
+  - chungcat/src/api.py
+  - chungcat/assets/nguong.json
+  - chungcat/assets/chi-dan-mau.json
+  - chungcat/tests/check_chi_dan.py
+  - 05_uiux/wireframes/SCR-18-popup-chung-cat-chi-dan.md
+  - 07_plan/M12_chungcat/tasks/T12-25-chi-dan-nguoi-dung.md
+  - 07_plan/M12_chungcat/tasks/T12-15-test-video-transcript.md

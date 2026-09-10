@@ -1,0 +1,160 @@
+entry: ky-gate
+ulid: 01KB43T130KYGATE
+ngay: 2026-09-09
+module: M13_truyhoi
+don_vi: [T13-0]
+fr: FR-072 · FR-073
+tieu_de: >-
+  T13-0 (don vi GIAY): ap FR-072 + FR-073 vao spec/rules M13, ra
+  truyhoi.sample.v3.json, va ky lai FROZEN.lock (56 -> 57 file)
+
+object:
+  - 06_modules/M13_truyhoi/spec.md            # FROZEN — hash 39d5579463bb09cc -> 1a52f722e41e96fe
+  - 06_modules/M13_truyhoi/rules.md           # FROZEN — hash e207d1922a0ecb02 -> 5e02045f2ed7ae5e
+  - 06_modules/M13_truyhoi/model_flow.md
+  - 06_modules/M13_truyhoi/data_flow.md
+  - 06_modules/M13_truyhoi/testcases.md
+  - 06_modules/M13_truyhoi/backlog.md         # +6 o keo theo
+  - 05_uiux/contracts/truyhoi.sample.v3.json  # MOI — hash 029f9297720292c2
+  - truyhoi/README.md
+  - 07_plan/M13_truyhoi/tasks/T13-0-hop-dong-va-bang-khai.md   # tieu_chi 4 AC -> 7 AC
+  - 07_plan/M13_truyhoi/tasks/T13-1-test-unit.md               # 18 -> 19 cong (+check_hop_dong_v3)
+  - FROZEN.lock
+  - .factory/fr/FR-072-m13-mot-hop-dong-cho-moi-client-va-doc-hien-vat.md
+  - .factory/fr/FR-073-dang-dia-chi-anchor-vao-dia-chi-json.md
+
+uy_quyen: |
+  `CLAUDE.md` chot *"Gate do NGUOI ky. Agent chuan bi evidence, khong ky, khong tu dong"*.
+  Chu du an UY QUYEN TUONG MINH luot nay (2026-09-09, tra loi cau hoi cua PM ve ai chay
+  `--ky`): **"Uy quyen cho toi ky luot nay"** — kem ba rang buoc chinh chu du an chon:
+  kiem cong do DUNG 3 dong TRUOC khi ky · ghi cau uy quyen nguyen van vao day ·
+  `git diff FROZEN.lock` sau khi ky phai dung 2 dong doi + 1 dong them; dong lech thu
+  TU la DUNG, khong ky.
+  Ghi ra day de trace khong nhap nhem: NGUOI quyet, agent thi cong phep may.
+  (Tien le: chu ky T12-0 tung bi nghi "ky ho" — `M12/backlog.md:554-557`, phai quet
+  transcript moi phien de minh oan. Nen ai ky + hash truoc/sau ghi thanh mot khoi.)
+
+ba_quyet_dinh_KHONG_thuoc_FR_nao: |
+  Ba dieu di vao spec FROZEN ma khong § nao cua FR-072/073 phu. Chu du an chon
+  (2026-09-09): GHI TRICH DAN DUNG CHO, khong mo FR-081 — mot so § khong ton tai la
+  mot trich dan gia, te hon mot trich dan thieu.
+   1 ten ham `chuan_hoa_tim` — spec ghi *(chot PM 2026-09-09 · research_summary §5.2)*.
+     Do: `chungcat/src/verify.py:55` DA CO `def chuan_hoa(s)` nghia khac (NFKC ·
+     ligature · casefold cho verify-quote). Cung ten hai nghia la dung lop loi M13-R1 cam.
+   2 `pham_vi` danh san khoa `space` — spec ghi *(chot PM 2026-09-09 · khao Space §6)*.
+     Cot `space` chi co sau FR-080 ⇒ ve "doi space thi tap ung vien doi" CHUA do duoc;
+     T13-5 khai `phu_thuoc: FR-080 da AP`.
+   3 `AC-6.3` ve tieng Trung nhan PHON THE HOAC GIAN THE — noi mot chu cua FR-072 §5
+     (viet "phon the"). Ghi *(chu du an 2026-09-09)*.
+  Hai quyet dinh hinh dang khac, cung chu du an chot cung luc:
+   4 chunk hien vat giu DU 10 khoa, `anchor`/`line_start`/`line_end` = **null tuong minh**
+     (cung loi `nguon: null`), `dia_chi` dung dang `slug-moc` da co ⇒ 0 khoa moi, 0 doi
+     hop dong, khong can FR moi.
+   5 chu `nguon` mang HAI nghia (facet loai nguon vs tap nguon Knowledge): GIU theo
+     FR-072 da duyet, chi viet hai truc thanh chu o ba cho + mot o backlog. Doi ten la
+     dao mot FR da duyet, va M14/model_flow §2 dang khai `nguon` la khoa bat buoc.
+
+hai_phat_hien_chan_truoc_khi_sua: |
+  Do TRUOC khi cham mot dong nao, va ca hai lam doi `tieu_chi` cua chinh T13-0:
+   A `AC2` cu khai `cmd: core/tests/check_nguon_hop_dong.py` cho ve "sample v3 khop
+     model_flow" — cong DO do truong `nguon` trong `core/assets/frontmatter.schema.json`
+     bang jsonschema; no KHONG doc `05_uiux/contracts/` mot byte nao. Va CHUA cong nao
+     trong repo doc `truyhoi.sample.*` (grep ⇒ chi check_frozen bam qua glob). Tuc AC do
+     XANH OAN CO BAO DAM — dung lop `#cong-xanh-vi-neo-sai`.
+     Xu: cong T1 that (`check_hop_dong_v3.py`, doi chieu HAI CHIEU sample ↔ model_flow §2)
+     ve **T13-1** — vi tao file dau tien trong `truyhoi/tests/` lat 5 rule con lai sang DO.
+     AC5 moi cua T13-0 do dung thu no lam ra: JSON parse duoc + `version` 3 + giu khoa
+     `chunks`; phep doi chieu hai chieu ghi thanh evidence o duoi.
+   B `AC1` cu khai bon menh de (het "khach hang duy nhat" · grep doc_id · khoa nguon/space ·
+     ba ve rule) ma `check_g6a` KHONG grep mot chu nao trong do — no chi kiem nhan
+     `hard|soft` la token dau dong blockquote, su co mat cua literal `cmd:`, va ba field
+     `vi_pham`/`be_mat`/`why`. `do_khi`/`xanh_khi` KHONG cong nao kiem. Va chu "khach hang
+     duy nhat" con khong nam trong spec.md — no o model_flow.md.
+     Xu: AC1 moi do mot SO dem duoc (6 rule · 23 hard/1 soft), khong do mot loi khai.
+
+doi_chieu_hai_chieu_sample_v3_va_model_flow: |
+  Evidence cua AC5, lam bang tay lan nay (cong may hoa o T13-1):
+  khoa `ket_qua[]` trong sample v3 = doc_id · file · anchor · line_start · line_end ·
+    dia_chi · heading_path · body · nguon_van_ban · bm25  (10)
+  khoa `ket_qua[]` trong spec §1a + model_flow §2 = DUNG 10 khoa do, cung ten, cung thu tu.
+  Khoa goc: cau_hoi · pham_vi · nguon · k (request) · ket_qua · so_ban_ghi_trong_pham_vi ·
+    tong (response) — khop ca hai phia. `chunk_id` cua v2 da bo o CA HAI.
+  Le mot chieu: 0.
+
+trinh_tu: |
+  1 Viet `truyhoi.sample.v3.json` TRUOC — chot moi ten truong roi moi mo file frozen.
+  2 spec.md qua Edit (KHONG di vong Bash heredoc — ly do ton tai cua check_frozen:
+    21 file frozen tung bi ghi qua heredoc ma deny list khong chan lan nao):
+    blockquote dau (Ap FR + ba quyet dinh) · §1 Vao/Ra · §1a hop dong MOT hinh dang +
+    AC-1.6 · §2a hien vat + AC-2.5/2.6 · AC-2.3 ve them · §3 ten ham + AC-3.1/3.4 ·
+    AC-5.2/5.3 ve them · §6 AC-6.1 hep lai + AC-6.3 soft · §7 sua so "3 ban ghi" -> 13
+    (nhan luc spec mo thi sua cau da sai — tien le T12-0) · §8 them hai dong CO Y KHONG.
+  3 rules.md: M13-R6 MOI (du vi_pham/be_mat/lenh/do_khi/xanh_khi/why) · M13-R1 doi theo
+    ten ham · M13-R2 vi_pham do duoc (bo ve "renderer M03 sinh" — M03 chua sinh id) ·
+    "Nam rule" -> "Sau rule".
+  4 model_flow (§1 diagram: dai Han ve LOI/M01, them nut hien vat + subgraph KHACH;
+    §2 bang contract; §3 hai duong TIM/HOI, hang rao doi cho; §5 no) ·
+    data_flow (§1 vao: them hien vat + dai-han.json chu M01; §2 ba cot moi; §3 mo ve DOC;
+    §4 dan xuat) · testcases (+AC-1.6 · AC-2.5 · AC-2.6 · AC-6.3; NOI THEM vao §cuoi,
+    khong viet lai bang chung cua mot quyet dinh da dung).
+  5 truyhoi/README.md: key model co -> khong · Z8 gach + Z8'/Z9 · muc "Lenh — hom nay
+    chay duoc gi" (3 cong GIAY) · canh bao dung 19 cong mot luot.
+  6 backlog.md: mo 6 o keo theo; bo dong "dai Han" khoi bang CHO (nay la o that).
+  7 T13-0 tieu_chi 4 AC -> 7 AC; T13-1 18 -> 19 cong.
+  8 Chay 7 cong. 9 Ky. 10 Chay lai check_frozen.
+
+hash:
+  spec_md:   {truoc: 39d5579463bb09cc, sau: 1a52f722e41e96fe}
+  rules_md:  {truoc: e207d1922a0ecb02, sau: 5e02045f2ed7ae5e}
+  sample_v3: {truoc: KHONG_CO, sau: 029f9297720292c2}
+  lock:      {truoc: 56 file, sau: 57 file}
+
+canh_bao_ghi_lai: |
+  `check_frozen.py --ky` (`:59-63`) ghi de TOAN BO lock va KHONG kiem gi truoc khi ky —
+  khong kiem co FR, khong kiem branch, khong diff. `subprocess` duoc import o `:13` ma
+  khong dung: dau vet cua mot ve kiem git bi bo. Luot nay an toan vi cong xac nhan TRUOC
+  do dung 3 dong lech va ca 3 deu thuoc FR-072/073. Ai ky khi co dong lech thu tu la dong
+  dau cho mot file khong co FR nao — KIEM CONG TRUOC KHI KY la buoc BAT BUOC, khong phai
+  buoc lich su. (Cung canh bao o WL-01M2TKDMNVJV2GW8NB7AEKPG8P.)
+
+do_do:
+  - lenh: python core/tests/check_g6a.py
+    ket_qua: "M13_truyhoi 6/6 artifact · 6 rule · AC 23 hard/1 soft (baseline: 5 rule · 20 hard/0 soft) · exit 0"
+  - lenh: python core/tests/check_rule_surfaces.py
+    ket_qua: "OK 25 · CHO 53 · DO 0 · exit 0. M13-R6 xuat hien dung o CHO ('thu muc chua dung, cho s8'); baseline CHO 52"
+  - lenh: python core/tests/check_ba.py
+    ket_qua: "M13_truyhoi 'doc 0 truong' · m-ba sach, khong diem treo · exit 0 — ba cot moi trong data_flow §2 deu co TU CHI LOAI dung truoc"
+  - lenh: python core/tests/check_mermaid.py
+    ket_qua: "exit 0 — model_flow blok#1 24 dong, blok#2 16 dong (viet lai ca hai)"
+  - lenh: "python -c json.load(truyhoi.sample.v3.json)"
+    ket_qua: "parse OK · version 3 · giu khoa `chunks` (4 chunk) · 7 truy_van_mau"
+  - lenh: python core/tests/check_frozen.py
+    ket_qua: |
+      TRUOC khi ky: FAIL · DUNG BA DONG lech, MAT rong —
+        DOI 06_modules/M13_truyhoi/rules.md
+        DOI 06_modules/M13_truyhoi/spec.md
+        MOI 05_uiux/contracts/truyhoi.sample.v3.json
+      SAU khi ky: pass · 57 file · "khong file frozen nao doi".
+      `git diff FROZEN.lock` = 3 insertions, 2 deletions — dung 2 dong doi + 1 dong them.
+  - lenh: python core/tests/check_g6b.py
+    ket_qua: "exit 1 · 14 loi · 0 loi nao mang ma M13/T13. W5 in 'ok M13_truyhoi spec 17 cmd' (baseline 15 — them check_ai_goi_vao + check_chunk_hien_vat). T13-0 hard 7 AC/7 cmd"
+đỏ_do: >
+  14 loi cua check_g6b KHONG thuoc luot nay: T01-50 · T03-129 · T03-130 · T03-131 ·
+  T08-36 · T08-38 · T12-31 · T12-33 · T12-34 · T12-35. Baseline dau phien la 13 loi
+  (9 task); T12-35 la task team M12 vua them trong luc toi lam — quy chu bang
+  `git log --oneline -3` (9352c88 · 4b5cb59 T12-33 · 8ccc653) + `git status`.
+  MOT CONG KHAC DANG VO, khong phai loi tôi va khong phai cua M13:
+  `core/tests/check_ky_tu_vo_hinh.py` chet o `R.rglob("*")` voi
+  NotADirectoryError [WinError 267] tren `web/_quartz/.quartz/plugins/WORKLOG.md`.
+  `web/_quartz` la thuong nguon ngoai git (.gitignore:21) nen CI khong thay, chi vo
+  tren may nay — nhung nghia la mot cong dang chet ma khong ai biet. Cong thuoc M01;
+  de nghi PM M01 cho no bo qua duong ignore. Vi vay AC5 cua T13-0 KHONG dung cong nay.
+
+khong_lam:
+  - "KHONG cham truyhoi/tests/** — do la T13-1, va file dau tien tao o do lat 5 rule sang DO."
+  - "KHONG cham core/assets/** (dai-han · dia-chi · dich-vu) — boundary M01, la T01-51/T01-52."
+  - "KHONG sua M14 spec.md/rules.md (FROZEN) — khong can luot nay."
+  - "KHONG sua chungcat/src, web/render, 05_uiux/prototype, 03_docs — mo 6 o backlog tro chu that."
+  - "KHONG sua 06_modules/M13_truyhoi/ui_flow.md — ngoai pham_vi_ghi luot nay, o backlog tro T13-4."
+  - "KHONG bump project_map — PM-Space giu but (rule.md muc 13); luot nay khong can bump."
+  - "KHONG tao FR moi — FR max = 080, va ba quyet dinh khong-co-FR da duoc chu du an chot la ghi trich dan."

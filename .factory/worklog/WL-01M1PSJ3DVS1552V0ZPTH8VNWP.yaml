@@ -1,0 +1,118 @@
+ulid: 01M1PSJ3DVS1552V0ZPTH8VNWP
+thoi_diem: 2026-09-05T00:38+07:00
+tac_nhan: claude-opus-5
+loai: ban_giao
+module: M01_core + M03_web
+don_vi: T01-45 (AC4) · T03-109 · T03-108
+viec: >
+  Đóng ba đơn vị còn nợ của gói PM S7. T01-45 AC4: bảng mime nhận năm định dạng
+  nghe/xem + `validate.py` chặn MP4-lạc-bảng. T03-109: ô file mp4 ở màn nạp
+  video, `accept` dẫn xuất từ bảng, trần chặn phía FE. T03-108: bật nút Sinh
+  transcript cho bản ghi video, phiếu xác nhận, tab Transcript đọc `.vtt` theo
+  cue và chèn được mốc `[t=mm:ss]`.
+
+r5_do_truoc:
+  - don_vi: T01-45 AC4
+    lenh: python -m pytest core/tests/test_gates.py -k "media_video or media_audio"
+    ket_qua: 2 failed (luật chưa có), 2 passed (hai ca chiều dương đã đúng)
+    đỏ_do: claude-opus-5 (ca âm viết trước mã, đúng R5)
+  - don_vi: T01-45 AC4 (bảng)
+    lenh: python core/tests/check_dinh_dang_mo.py
+    ket_qua: 3 vấn đề — thiếu `video/mp4` · thiếu `audio/mpeg` · thiếu `magic_bu`
+    đỏ_do: claude-opus-5
+  - don_vi: T03-109
+    lenh: node web/test/nap-video.test.js
+    ket_qua: 4 lỗi — không ô file · accept gõ tay · không trần FE · không cửa media
+    đỏ_do: claude-opus-5
+  - don_vi: T03-108
+    lenh: node web/test/sinh-transcript-ui.test.js
+    ket_qua: "10 lỗi — nút còn `bat: false`, không hàm phiếu, không hàm vẽ transcript"
+    đỏ_do: claude-opus-5
+
+do_sau:
+  - lenh: python -m pytest core/tests -q
+    ket_qua: 49 passed (45 cũ + 4 ca quyết 2)
+  - lenh: python core/tests/check_dinh_dang_mo.py
+    ket_qua: pass — thêm vế "trần KHỚP hai chỗ" và vế `magic_bu`
+  - lenh: node web/test/nap-video.test.js
+    ket_qua: pass — 6 vế T03-109
+  - lenh: node web/test/sinh-transcript-ui.test.js
+    ket_qua: pass — 14 vế T03-108
+  - lenh: cd web && npm test
+    ket_qua: exit 0 (đã đăng ký hai cổng mới vào `scripts.test`)
+  - lenh: 'for f in chungcat/tests/check_*.py; do python "$f"; done'
+    ket_qua: 30/30 XANH
+  - lenh: python core/src/source_distiller/validate.py kb/ --strict
+    ket_qua: 3 file · 0 lỗi · 1 cảnh báo
+  - lenh: python core/src/source_distiller/validate.py kb-mock/ --strict
+    ket_qua: 16 file · 0 lỗi · 7 cảnh báo
+
+ngan_sach_byte:
+  ghi_chu: >
+    Năm dòng mime video đẩy `gn.js` lên 102460/102400 và trần HTML trang chủ lên
+    62713/61440. `FR-061` cấm nới bundle chung ⇒ phải sửa bằng Ý NGHĨA rồi DỌN
+    CHỖ, không bằng nới trần.
+  buoc:
+    - "lọc `nhom_thu_vien` khỏi chip/dòng chữ TÀI LIỆU ⇒ trang chủ 61433/61440"
+    - "dời hộp thoại chưng cất (2986B) sang chunk `cctab` ⇒ gn.js 99175/102400"
+  cuoi: "gn.js 99175/102400 (dư 3225) · gn.css 102372/102400 (dư 28)"
+
+chan_lai:
+  ly_do: >
+    Ba chỗ hợp đồng cần chủ dự án xác nhận, ghi ở FR-063: quyết 2 chỏi FR-052
+    (đã chọn nghĩa hẹp), ô file mp4 do chunk dựng chứ không phải `trang.mjs`,
+    thân transcript ở chunk `cctab` chứ không phải `chungcat.inline.ts`.
+  ngoai_pham_vi:
+    - web/plugins/cctab/src/cctab.inline.ts
+    - web/api/dungchung.mjs
+    - web/build-fe.mjs
+    - web/render/trang.mjs
+    - core/tests/test_gates.py
+  fr: FR-063 — CHỜ KÝ. Không nới tại chỗ.
+
+nguoi_phai_ky:
+  - >
+    `core/assets/frontmatter.schema.json` — `so_byte.maximum` 26214400 →
+    1073741824, khớp `tran_byte` của `media-mime.json` (FR-054 §9). check_frozen
+    đang ĐỎ đúng. Lệnh: `PYTHONIOENCODING=utf-8 ./.venv/Scripts/python.exe
+    core/tests/check_frozen.py --ky`. Agent KHÔNG ký (R2).
+
+keo_theo:
+  - >
+    `check_frozen.py` exit 1 OAN trên console mặc định Windows: in tiếng Việt ra
+    cp1252 ⇒ UnicodeEncodeError SAU KHI đã kết luận xanh. `#cổng-đỏ-oan`, và nó
+    chặn đúng gate người phải ký. Đáng một WO.
+  - >
+    Trần HTML trang chủ 61433/61440 — 7 byte. Đây là ngưỡng THẬT đang chặn mọi
+    ô/chip mới, không phải `gn.js`.
+  - >
+    `esc2` (multiwindow:2366) KHÔNG phải bản trùng của `esc`: `esc` ném trên
+    non-string, `esc2` ép `String(s ?? "")`. Ghi để lần sau không ai "dọn trùng".
+  - >
+    Bảy cổng đo SAI CHỖ đã sửa cùng lượt (chi tiết FR-063 §4) — đo tên hàm,
+    khoảng cách ký tự, hoặc một trong hai đường nạp. Không cổng nào bị làm yếu;
+    phép chiếu `xem_truoc` từng làm một cổng đỏ đã được HOÀN NGUYÊN thay vì sửa
+    cổng cho vừa.
+
+object:
+  - core/assets/media-mime.json
+  - core/assets/frontmatter.schema.json
+  - core/src/source_distiller/validate.py
+  - core/tests/test_gates.py
+  - core/tests/check_dinh_dang_mo.py
+  - web/api/dungchung.mjs
+  - web/build-fe.mjs
+  - web/render/trang.mjs
+  - web/plugins/napvideo/src/napvideo.inline.ts
+  - web/plugins/cctab/src/cctab.inline.ts
+  - web/plugins/multiwindow/src/scripts/multiwindow.inline.ts
+  - web/styles/prototype.css
+  - web/test/sinh-transcript-ui.test.js
+  - web/test/nap-video.test.js
+  - web/test/chung-cat-ui.test.js
+  - web/test/page-weight.test.js
+  - web/test/bang-khai-khong-mo.test.js
+  - web/test/bon-chieu-facet.test.js
+  - web/test/tab-theo-doi-chung-cat.test.js
+  - web/package.json
+  - .factory/fr/FR-063-quyet-2-hep-hon-va-nha-cua-transcript.md

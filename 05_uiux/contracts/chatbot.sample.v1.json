@@ -1,0 +1,113 @@
+{
+  "$comment": "Data contract v1 — màn Hỏi kho (M14). Hợp đồng JSON: blocks[]{text, citations[]} + tu_choi nullable (enum 3). Gate LÕI: block KHẲNG ĐỊNH mà citations rỗng => không render kiểu thường. Session theo account (FR-045).",
+  "version": 1,
+  "phien": [
+    {
+      "id": "ph-01",
+      "nguoi_dung": "dung.dang",
+      "kenh": "web"
+    },
+    {
+      "id": "ph-02",
+      "nguoi_dung": "dong.nghiep-a",
+      "kenh": "telegram",
+      "$edge": "FR-045: hai người cùng hỏi — hai phiên, không thấy ngữ cảnh của nhau"
+    }
+  ],
+  "hoi_dap": [
+    {
+      "phien": "ph-01",
+      "cau_hoi": "Vì sao XGBoost dùng khai triển Taylor bậc hai?",
+      "blocks": [
+        {
+          "text": "XGBoost xấp xỉ hàm mất mát quanh dự đoán hiện tại bằng khai triển bậc hai để giữ thông tin độ cong.",
+          "citations": [
+            {
+              "doc_id": "kb/docs/xgboost-taylor-bac-hai.md",
+              "anchor": "vi-sao-bac-hai",
+              "cited_text": "khai triển bậc hai giữ được thông tin độ cong",
+              "start": 2101,
+              "end": 2148
+            }
+          ]
+        },
+        {
+          "text": "Nhờ đó mỗi vòng boosting giải được nghiệm đóng cho trọng số lá.",
+          "citations": [
+            {
+              "doc_id": "kb/docs/xgboost-taylor-bac-hai.md",
+              "anchor": "trong-so-la",
+              "cited_text": "nghiệm đóng w* = -G/(H+lambda)",
+              "start": 3300,
+              "end": 3327
+            }
+          ]
+        }
+      ],
+      "tu_choi": null,
+      "model": "claude-sonnet-5",
+      "sha256_payload": "e410bb…02cd"
+    },
+    {
+      "phien": "ph-01",
+      "cau_hoi": "Giá Bitcoin hôm nay bao nhiêu?",
+      "blocks": [],
+      "tu_choi": {
+        "ly_do": "khong-co-trong-kho",
+        "giai_thich": "Kho không có bản ghi nào về chủ đề này.",
+        "goi_y": []
+      },
+      "model": "claude-sonnet-5",
+      "sha256_payload": "b7f1aa…8d13"
+    },
+    {
+      "phien": "ph-01",
+      "cau_hoi": "Walk-forward hay k-fold tốt hơn cho chuỗi thời gian?",
+      "blocks": [],
+      "tu_choi": {
+        "ly_do": "co-nhung-mau-thuan",
+        "giai_thich": "Hai bản ghi kết luận ngược nhau — người đọc tự đối chiếu.",
+        "dia_chi": [
+          {
+            "doc_id": "kb/paper/walk-forward-validation-k-fold.md",
+            "anchor": "ket-luan"
+          },
+          {
+            "doc_id": "kb/paper/storm-multi-perspective.md",
+            "anchor": "danh-gia"
+          }
+        ]
+      },
+      "model": "claude-sonnet-5",
+      "sha256_payload": "31c9de…77e2",
+      "$edge": "decisions 09-01: model được KHAI mâu thuẫn nhưng phải kèm >=2 địa chỉ thuộc HAI bản ghi khác nhau — code kiểm điều kiện cần"
+    },
+    {
+      "phien": "ph-01",
+      "cau_hoi": "Viết hộ email xin nghỉ phép",
+      "blocks": [],
+      "tu_choi": {
+        "ly_do": "ngoai-pham-vi",
+        "giai_thich": "Câu hỏi không thuộc phạm vi tra cứu kho.",
+        "goi_y": []
+      },
+      "model": null,
+      "sha256_payload": null,
+      "$edge": "chặn TRƯỚC retrieval — không gọi model, không có sha256"
+    },
+    {
+      "phien": "ph-02",
+      "cau_hoi": "Tóm tắt bài XGBoost",
+      "blocks": [
+        {
+          "text": "KHẲNG ĐỊNH THIẾU NGUỒN (demo gate): XGBoost nhanh nhất mọi bài toán.",
+          "citations": []
+        }
+      ],
+      "tu_choi": null,
+      "model": "claude-sonnet-5",
+      "sha256_payload": "90ab34…11f0",
+      "$edge": "gate render: block khẳng định citations RỖNG => render kiểu gắn-cờ, khác hẳn block đã xác minh (decisions: đo markup, không đo ý định)"
+    }
+  ]
+}

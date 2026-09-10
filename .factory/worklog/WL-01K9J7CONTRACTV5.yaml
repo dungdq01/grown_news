@@ -1,0 +1,120 @@
+id: WL-01K9J7CONTRACTV5
+at: 2026-08-19
+by: claude
+buoc: s8 (M02_kb + M04_ci) + s5 (contract G5)
+loai: fix + amend-frozen
+fr: FR-015-contract-v5-du-truong-M1.md
+
+viec: >
+  `validate kb-mock/ --strict` đỏ 37 lỗi. Người dùng: "fix luôn giúp tôi đi".
+  Sửa tận gốc, không chỉ dọn hiện tượng.
+
+pham_vi_ghi:
+  - 05_uiux/contracts/analyses.sample.v5.json   # MỚI (FROZEN — đã ký)
+  - core/tools/sinh_kb_mock.py                  # tự tính word_count
+  - core/tests/check_kb_mock.py                 # MỚI — cổng máy
+  - .github/workflows/ci.yml                    # thêm bước
+  - Makefile                                    # validate-mock + check
+  - RUNNING.md                                  # bảng lệnh
+  - 06_modules/M03_web/spec.md                  # FROZEN — trỏ v5, đã ký
+  - project_map.yaml · 05_uiux/README.md · web/README.md
+  - web/test/_seed.mjs · web/test/page-weight.test.js
+  - kb-mock/**                                  # sinh lại
+
+truy_nguon_goc:
+  hien_tuong: 37 lỗi khi validate kb-mock/
+  bon_nhom:
+    - "21 · thiếu insight_new/skill_installed/review_minutes trên 6 bản approved"
+    - "14 · word_count khai lệch số đếm được"
+    - "1  · id src_qz001 sai pattern (5 ký tự, cần >=6)"
+    - "1  · spot-check trượt — CỐ Ý, ca âm của cổng 7"
+  goc: >
+    Contract thiếu 3 trường M1. Kiểm v3 (bản trước FR-009): cũng thiếu ĐÚNG 6
+    bản đó ⇒ lỗi phát sinh từ FR-001 khi thêm 3 trường vào schema + ràng buộc
+    `approved ⇒ required` mà KHÔNG cập nhật contract.
+  vi_sao_song_lau: >
+    validate.py chạy trên kb/ (0 bài) ở mọi lệnh RUNNING.md và CI. kb-mock/
+    chưa từng được validate — nó mới tách thành kho riêng gần đây.
+
+gia_tri_M1_co_can_cu_khong_bia:
+  can_cu: priority + verdict của chính bản đó
+  quy_tac: >
+    priority >= 50 với verdict DEEPEN = có ứng viên skill đáng làm ⇒ đúng định
+    nghĩa "insight chưa biết và SẼ hành động theo". priority 0 thì không.
+  skill_installed: >
+    true cho ĐÚNG MỘT bản (priority cao nhất, 65). M1.2 chỉ đòi >=1/10; khai
+    nhiều hơn là nói dối về thứ M1.2 đo ("sinh VÀ cài VÀ output tốt hơn — cả ba").
+  review_minutes: tỷ lệ nghịch word_count — bài dài đọc lâu hơn
+  ket_qua_tren_9_ban: "4/9 insight (>=3 ✓) · 1/9 skill (>=1 ✓) · TB 12.3 phút (<20 ✓)"
+  neo_vao_expected_render: >
+    Thêm khối `m1` vào _expected_render để TEST kiểm được, không phải tin lời
+    khai. Kèm cảnh báo: đây là dữ liệu MẪU, đừng đọc như kết quả M1 thật của
+    dự án (07_curate đo trên kb/).
+
+sua_tan_goc_khong_don_hien_tuong:
+  van_de: >
+    Lượt đầu tôi sửa word_count bằng `validate --fix`. Nhưng sinh lại kb-mock/
+    thì nó ĐÈ NGƯỢC LẠI — generator chép word_count nguyên xi từ contract, mà
+    thân bài nó sinh là TEMPLATE ~130 từ dùng chung, còn contract khai số của
+    bài GỐC (380-1800 từ).
+  sua: >
+    `sinh_kb_mock.py` tự tính word_count từ thân THẬT nó sinh ra, dùng LẠI
+    `count_words` của M01 qua import (không viết bản thứ hai — cùng lý do M05-R3:
+    hai bản đếm sẽ lệch nhau im lặng).
+  kiem_chung: sinh lại 2 lần liên tiếp — vẫn sạch (idempotent)
+
+cong_may_moi_hai_lan_TU_BAT_LOI:
+  vi_sao_can: >
+    Không lệnh nào từng validate kb-mock/. Đó chính là lỗ làm lỗi FR-001 sống
+    tới hôm nay. Thêm cổng là chặn được đúng lớp lỗi vừa gặp.
+
+  lan_1_nguong_dem_qua_long:
+    viet: 'test "${n:-0}" -le 1  (cho phép <=1 lỗi)'
+    tu_kiem: >
+      Tôi tạo một file cố tình làm hỏng (đổi tên insight_new) rồi chạy lại:
+      nó CHO QUA. Ngưỡng đếm cho qua một lỗi BẤT KỲ, không riêng ca âm đã biết.
+    bai_hoc: lọc theo NỘI DUNG lỗi, không theo SỐ LƯỢNG
+
+  lan_2_nuot_loi:
+    viet: 'validate ... > mock.log 2>&1 || true'
+    ai_bat: >
+      check_rule_surfaces.py — "M04-R1 · ci.yml:62 nuốt lỗi". Cổng mà nuốt exit
+      code thì không phải cổng. Đây đúng là thứ luật đó chặn.
+    sua: tách thành `core/tests/check_kb_mock.py`, exit code là của chính phép kiểm
+
+  ban_cuoi:
+    loc: theo nội dung — mọi dòng ✗ TRỪ "Spot-check trượt"
+    kiem_hai_chieu:
+      - "kho thật → exit 0"
+      - "file hỏng → exit 1, in cách sửa"
+    noi_cam: ci.yml · Makefile (validate-mock + check) · RUNNING.md
+
+ca_am_KHONG_sua:
+  what: blog-prompt-caching có citations_verified(1) < sampled(2)
+  vi_sao: >
+    Contract khai rõ ở khoá `$case`: "EDGE — DẢI CẢNH BÁO: external + trích dẫn
+    không kiểm được + có phản biện". Đó là dữ liệu mẫu để test dải cảnh báo —
+    sửa nó là bỏ mất một phép kiểm.
+
+verify:
+  loai: hard
+  ket_qua:
+    cong_may: 12/12 (gồm check_running và check_rule_surfaces vốn đỏ)
+    pytest: 30/30
+    web_test: 22/22
+    npm_run_check: sạch
+    validate_kb: OK
+    validate_kb_mock: 37 lỗi → 1 ca âm cố ý
+  frozen: >
+    2 file frozen đổi (M03_web/spec.md trỏ v5 · contract v5 mới).
+    check_frozen ĐỎ đúng như phải, ký lại bằng --ky SAU khi FR-015 mở.
+    27 file trong FROZEN.lock.
+
+no:
+  - "FR-015 trạng thái ĐÃ THI HÀNH nhưng chưa ai duyệt. Nếu bác thì revert
+     contract v5 + spec + ký lại baseline."
+  - "Contract v4 GIỮ LẠI (như v1/v2/v3). Code trỏ v5; v4 còn để đọc git diff."
+  - "check_running yêu cầu mọi lệnh trong RUNNING.md exit 0. Nên bảng lệnh ghi
+     `check_kb_mock.py` chứ không phải `validate.py kb-mock/ --strict` — lệnh
+     sau exit 1 vì ca âm. Ai đọc bảng lệnh sẽ dùng đúng cổng, không dùng lệnh
+     thô rồi tưởng kho bẩn."

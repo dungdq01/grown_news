@@ -1,0 +1,84 @@
+id: WL-01K9NQWO015
+at: 2026-08-28
+by: claude
+buoc: WO-015 (C8) — hai bug không cổng đọc-chuỗi nào thấy được
+loai: bàn giao WO-015
+wo: WO-015-hai-bug-hien-that.md
+
+object:
+  wo:
+    - .factory/wo/WO-015-hai-bug-hien-that.md
+  task:
+    - 07_plan/M03_web/tasks/T03-42-hien-that.md        # code
+    - 07_plan/M03_web/tasks/T03-43-test-hien-that.md   # test
+  code:
+    - web/styles/prototype.css    # [hidden]{display:none !important} — BẤT BIẾN
+    - web/render/shell.html · web/plugins/home-pages/shell.html   # data-dem mỗi lưới
+    - web/plugins/multiwindow/src/scripts/multiwindow.inline.ts   # apLoc đếm theo lưới
+  test:
+    - web/test/hien-that.test.js   # MỚI — 4 mục, 14 phép
+
+may_xanh:
+  - "cd web && node test/hien-that.test.js  ->  pass (14 phép)"
+  - "cd web && npm test  ->  exit 0 (61 file)"
+  - "gn.css 94726 / 102400 byte — dư 7674"
+  - "gn.js  101222 / 102400 byte — dư 1178"
+  - >
+    trình duyệt, `body.api-co`, `/bai-viet/nap/` trên KHO TẠM:
+    `#f-bai` hidden=true display=none · phần tử mang `hidden` mà display≠none = 0
+  - "trình duyệt: #acount 7 bản = 7 thẻ trong #grid2; lọc pl=bai-viet ⇒ 5 bản"
+
+bug1_doi_huong:
+  - >
+    Bản sửa ĐẦU thêm `:not([hidden])` vào ba luật `.api-only`. Cổng xanh, trình
+    duyệt vẫn `display: grid` — luật thắng là `.np-form{display:grid}`, một luật
+    THỨ TƯ tôi không nghĩ tới. Đó là bằng chứng `:not([hidden])` từng luật là
+    cuộc đua không có đích
+  - >
+    Đổi sang BẤT BIẾN `[hidden]{display:none !important}`. WO-015 ban đầu xếp
+    `!important` là anti-pattern — phép đo cho thấy phương án thay thế TỆ HƠN,
+    nên đảo hướng và ghi lý do vào chính chỗ mã, không để trong đầu
+  - >
+    Ca âm giữ `!important` không rải sang luật khác: hai `!important` là đua
+    trọng số lần nữa, và lần đó không còn bất biến nào phân xử
+
+bug2_ket_qua:
+  - "mỗi lưới khai ô đếm của nó bằng `data-dem`; FE không gõ `acount` cứng"
+  - "`apLoc` đếm `.cd:not(.off)` TRONG lưới — trước đó đếm trên `document`"
+
+kiem_hai_chieu:
+  - "bỏ `!important` ⇒ đỏ đúng câu 'bất biến, không đua trọng số' (exit 1)"
+  - "xoá hẳn luật `[hidden]` ⇒ đỏ đúng câu 'có đúng một luật' (exit 1)"
+  - "rải `!important` sang `.api-only` ⇒ đỏ đúng câu ca âm (exit 1)"
+  - "phục nguyên: sha256 a057fc9d8b16cb37 TRƯỚC = SAU, cổng xanh lại"
+
+tu_bat_duoc:
+  - >
+    PHÉP ĐO CỦA TÔI NUỐT DẤU PHÂN CÁCH. Mẫu mở đầu `(?:^|\})` khớp và do đó
+    TIÊU THỤ dấu `}` của luật trước, nên nó chỉ bắt được luật CÁCH MỘT —
+    `[hidden]{…}` rơi đúng nhịp bị bỏ. Cổng báo "thấy 0 luật" trong khi luật có
+    thật trong file. Bỏ dấu phân cách khỏi mẫu: từ 3 luật lên 5 luật nhìn thấy
+  - >
+    CHÚ THÍCH PHÁ MÃ, ba lần trong một lượt: (a) khối `/* … */` trước luật đi
+    lọt vào phần bắt selector ⇒ `sel` thôi bằng `[hidden]` · (b) chuỗi đóng khối
+    viết trong chú thích làm khối tự đóng ⇒ SyntaxError · (c) hai chú thích CSS
+    còn khai bản sửa là `:not([hidden])` sau khi thứ đó đã bị bỏ — đúng bệnh
+    WO-015 mở ra để chữa, lần này là chú thích của tôi
+  - >
+    Dòng `chot()` của cổng khai "hidden thắng bằng trọng số" trong khi bản sửa
+    thắng bằng BẤT BIẾN. Lời tổng kết của một phép đo cũng là một lời khai
+  - >
+    Phép đo facet đầu tiên tôi chạy lấy phạm vi CẢ TRANG nên năm màn in ra cùng
+    một danh sách; và nó đọc `data-tang` (0 chỗ) rồi rơi sang nhánh dự phòng
+    `data-loc` mà không nói. Phải cắt theo từng `v-*` mới thấy khác biệt
+
+backlog_mo:
+  - >
+    `page-weight` so `Math.round(byte/1024) <= 100` nên cho lọt tới 511 byte quá
+    trần. Cổng mới của WO-015 đo BYTE; cổng cũ chưa sửa
+
+do_do:
+  - cong: check_skill.py
+    do_do_boi: agent khác
+  - cong: check_danh_muc (bản schema thứ hai core/skill-src/)
+    do_do_boi: agent khác

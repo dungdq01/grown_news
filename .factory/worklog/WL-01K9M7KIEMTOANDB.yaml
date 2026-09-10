@@ -1,0 +1,110 @@
+id: WL-01K9M7KIEMTOANDB
+at: 2026-08-26
+by: claude (AI thu hai — KHONG phai ben lam FR-034)
+buoc: s8 — kiem toan doc lap ket qua FR-034 do agent khac giao
+loai: doi chieu loi khai (R6 — ben cham khong phai ben lam)
+fr: FR-034-db-nguon-chan-ly.md   # cua agent khac; toi chi CHAM, khong sua
+
+# ══ VI SAO CO ENTRY NAY ═══════════════════════════════════════════════════
+# Nguoi dung: "kiem tra DB agent kia vua lam -> test ky tung DB, API, trang
+# thai khong bo sot cai nao". Day la mot lan CHAM, va R6 doi ben cham khac ben
+# lam. Git thay ma nguon doi; git khong thay ai da doi chieu no voi loi khai.
+
+object:
+  loi_khai_duoc_cham:
+    - .factory/worklog/WL-01K9M4FR034A.yaml
+    - .factory/worklog/WL-01K9M5FR034B.yaml
+    - .factory/worklog/WL-01K9M6FR034C.yaml
+  vat_the_do:
+    - kb/_kho.sqlite            # 90.112 byte · 2 bai · integrity_check ok
+    - core/assets/kho.schema.sql        # 109 dong DDL
+    - core/tools/dung_lai_db.py         # file -> DB
+    - core/tools/xuat_kho.py            # DB -> file
+    - web/api/router.mjs                # 14 route
+    - web/api/status.mjs                # BANG_CHUYEN
+    - web/test/*.test.js                # 45 file · 177 loi goi HTTP
+
+# ══ LOI KHAI DUOC XAC NHAN ════════════════════════════════════════════════
+xac_nhan_dung:
+  bo_test: "npm test exit 0 · 45/45 file xanh khi chay RIENG · 14/14 cong python · pytest 32 passed"
+  db_rang_buoc: >
+    Thu tren BAN SAO DB: moi rang buoc khai ra deu BAN THAT — enum 6 source_type ·
+    hai CHECK dong bo frontmatter<->cot · PK kep (source_type,slug) · NOT NULL
+    than/etag · cot GENERATED sinh dung · VIEW nhan · trigger audit_log chan CA
+    UPDATE lan DELETE · recycle autoincrement cho xoa cung slug hai lan.
+  db_khop_dia: "2 bai, than khop tung bai; integrity_check ok; foreign_key_check sach; WAL da checkpoint"
+  export_on_dinh: "xuat_kho.py --kiem: hai lan cung hash d9c0bdab203ee6c9"
+  api_phu_that: >
+    Boc 177 loi goi HTTP tu bo test: MOI route x method deu duoc goi, ke ca PATCH
+    tren CA concepts va categories (danh-muc-crud lap qua hai loai).
+  trang_thai_du: >
+    luong-day-du chay du ma tran 4x4 = 16 cap, tap cho-phep DOC TU BANG_CHUYEN
+    trong status.mjs (khong go tay), cong `to` vang va `to` la.
+  ban_sua_cua_toi_song_sot: >
+    7/7 (tach cur/muc · banDangDoc · data-act=prev · guard bat bien duongBai ·
+    loc trung theo data-slug · khong con .bk-f button · khong con so h4.textContent).
+    Ho con CHUYEN hai test cua toi sang harness SSR (_render.mjs) va DAO CHIEU
+    api-guard §6 (gio khang dinh dungLaiTrang KHONG con) — xu ly dung, khong xoa rang.
+
+# ══ BA PHAT HIEN — do duoc, khong phai y kien ═════════════════════════════
+phat_hien:
+  F1_review_status_khong_co_CHECK:
+    do: >
+      Nap mot .md co `review_status: KHONG-PHAI-TRANG-THAI` qua dung_lai_db.py:
+      vao DB, exit 0, khong mot loi. validate.py CO bat (enum draft|approved|
+      edited|rejected, exit 1) — khe ho dung o cho trinh nhap bo qua validate.
+    ha_nguon: "API an toan khi hong: BANG_CHUYEN[...] ?? [] => bai KET, khong sap"
+    vi_sao_dang_ke: >
+      Header DDL tu viet "cuong che bang engine thay vi ky luat", va da CHECK
+      source_type. Bat doi xung nay khong co ly do nao giai thich.
+    duong_sua_ngan_nhat: "CHECK (review_status IN (...)) trong DDL, HOAC dung_lai_db goi validate"
+  F2_dung_lai_db_unlink_DB_dang_song:
+    do: >
+      dung_lai_db.py:98 `duong.unlink(missing_ok=True)` — xoa chinh file DB roi
+      dung lai. Voi mot writer khac dang giu khoa: chet 0.40s bang
+      PermissionError WinError 32. xuat_kho.py cung tinh huong: exit 0 sau 0.17s.
+    vi_pham_hop_dong_nao: >
+      DDL dong 10 doi MOI connection dat busy_timeout=5000 va moi txn ghi dung
+      BEGIN IMMEDIATE. dungchung.mjs (3+5), gate.py (1+1), xuat_kho.py (1, ro-only)
+      deu tuan. dung_lai_db.py: 0 va 0 — writer DUY NHAT vi pham.
+    nhung: >
+      busy_timeout KHONG chua duoc. Goc la chien luoc xoa-roi-dung-lai. Tren Linux
+      unlink se THANH CONG va de reader dang mo phuc vu mot DB BONG da bi xoa —
+      te hon la that bai. Cung lam napLaiDb trong test la nguon flaky tiem an.
+    duong_sua_ngan_nhat: "ghi ra .tmp roi os.replace, thay vi unlink tai cho"
+  F3_backup_chua_nap_dan:
+    do: >
+      git ls-files kb/ giu trang thai TRUOC khi xoa sach: theo doi 2 bai da xoa
+      (nop-qua-web, thu-nghiem-gpt), THIEU ca hai bai dang co (hermes-agent.md
+      14 KB viec that, thu-realtime.md).
+    khong_phai_loi_ma: >
+      He qua cua lenh "khong commit" nguoi dung dat. Nhung nhu hien tai: mat
+      kb/_kho.sqlite (gitignore CO CHU DICH theo FR-034) la phuc hoi ra KHO SAI.
+    quyet_o_nguoi_dung: true
+  diem_nho_foreign_keys: >
+    DDL doi PRAGMA foreign_keys=ON, khong code nao bat. Hien VO HAI vi DDL co 0
+    khai bao FOREIGN KEY/REFERENCES. Thanh bay dung ngay ai do them REFERENCES.
+
+# ══ HAI LAN TOI TU SAI TRONG LUC KIEM — ghi lai vi phuong phap moi la thu ═
+toi_tu_rut_lai:
+  lan_1: >
+    "Hai test cua toi doc hien vat chet (site/gn.js cu 80 phut)" — SAI. Ho da
+    chuyen ca hai sang harness SSR. Chung minh bang cach pha file bundle duoc
+    phuc vu THAT: ca hai DO.
+  lan_2: >
+    "GET /api/health khong ai goi" va "PATCH /api/categories trang" — SAI ca hai.
+    Cach do cua toi (regex tim loi goi theo mot khuon) bo sot helper `lay()` va
+    duong dung bang bien. Do lai bang cach BOC MOI loi goi HTTP moi ra so dung.
+  bai_hoc: >
+    Ca hai lan deu la lop loi "dem mot chuoi roi ket luan ve hanh vi". Trong mot
+    lan kiem toan, do sai theo huong BAO DONG GIA con dat hon binh thuong: no
+    to cao oan mot ben khac.
+
+khong_lam:
+  - "KHONG sua F1/F2 — nguoi dung giao tang DB cho agent khac (xem memory/decisions.md cung ngay)"
+  - "KHONG sua test cua ho, KHONG dung DDL/tool cua ho"
+  - "khong commit, khong push"
+
+van_hanh_da_lam:
+  - "Tat 2 server Grown_news theo yeu cau: PID 45540 (cong 8787, code CU) + PID 24356 (cong 8899). Chua tat PID 18968 (Playwright cua SmartlogSCP.Frontend) va PID 9768 (python http.server 8099) — khong thuoc kho nay."
+  - "Ghi nhan: /gn.js server tra ve khop TUNG BYTE voi site/gn.js cu (14:13) va con chua NHAC_BUILD (ho da xoa) => server dang chay code TRUOC FR-034."

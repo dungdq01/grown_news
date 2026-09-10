@@ -1,0 +1,88 @@
+id: WL-01K9Y1S7M12
+at: 2026-09-03
+by: claude
+buoc: "s7 — plan M12_chungcat (C4a duong tai lieu); PM"
+loai: plan; SOFT — cho NGUOI duyet G6B truoc khi ban task
+gate: "G6B — phan M12 sach trong check_g6b; 30 loi con lai la cua module khac/no cu"
+
+object:
+  - 07_plan/M12_chungcat/README.md          # so do phu thuoc + bang CHO (video/FR-054, 5 cua con lai, UI, batch)
+  - 07_plan/M12_chungcat/tasks/T12-0..T12-8 # 8 don vi (0=giay ap FR-053; 8=don vi TEST sinh 17 cong spec)
+  - 07_plan/M08_api/tasks/T08-2-cua-loi-va-ddl-nhap.md   # DDL nhap + 2 cua FR-047 — dat DUNG dat M08
+
+xac_nhan_truoc_khi_chia:
+  - "s6 M12 done (9 artifact, 29 AC hard+cmd, backlog sach, data_flow da theo FR-046)"
+  - "FR-047 DA DONG => s7 het bi chan · FR-053 DA DUYET nhung spec CHUA ap (con Citations-duong-tat + os.replace-nguyen-tu) => T12-0 la don vi giay dau tien, kem NGUOI ky lai FROZEN.lock (spec.md f91a9fae / rules.md a9f81ad5 dang trong lock)"
+  - "FR-054 (video) CHO DUYET + phu thuoc FR-052 chua ap => C4b/C4c KHONG tao task (bai hoc S18) — ghi o bang CHO"
+
+check_g6b_bat_toi_3_lan_va_da_sua:
+  - "17 lenh cong spec khong ai sinh => T12-8 don vi TEST so huu chungcat/tests/** + du 17 cmd trong tieu chi"
+  - "don vi code cham file test (R1) => go tests/ khoi pham_vi 6 don vi code, cmd tro ve dung ten cong spec"
+  - "T12-3 dat nham dat (web/** trong plan M12) => doi thanh T08-2, doi sang 07_plan/M08_api/"
+
+evidence:
+  - "check_g6b: 9 don vi M12 + T08-2 deu ok (hard, du cmd); grep FAIL/CHU-Y cua M12 => 0"
+  - "30 loi con lai cua G6B: M13..M18 chua co plan (dung — chua toi luot) + T08-10/T08-11 ID TRUNG (dat agent khac, da bao) + T04-6 cham test (no cu)"
+
+cho_NGUOI:
+  - "duyet plan (G6B soft) roi ban task; T12-0 can ky lai FROZEN.lock sau khi ap FR-053"
+  - "duyet FR-054 de mo C4b/C4c"
+  - "nap them PDF truoc khi do M6.1 (kho co 1 tai lieu, thuoc do can 10)"
+
+luot_2_theo_review_chu_du_an:
+  bon_diem_va_cach_xu:
+    - "CHAN — tong-hop co cong khong ai lam xanh: +T12-9 (tong_hop.py + nhanh vong.py + phep dia-chi-mang-ten-nguon trong verify); chan cu 'truoc S8' het dung vi dia-chi.json da ton tai + validate doc no"
+    - "CAO — T12-0 lam loi thoi chinh phep do G6B: +AC5 cho T12-0 (ap xong PHAI chay lai check_g6b va sach); AC-4.5 khai truoc vao T12-5, AC-4.6 vao T12-6 (cmd tro cong se co)"
+    - "VUA — cong viet sai thi sao: CHOT mo-lai-T12-8 la duong duy nhat (giu luat goc: khong ai so huu thuoc do minh); ghi thang vao T12-8"
+    - "NHO — hai nha nguong: GIU TACH, ly do ghi vao T12-2 (nguong_lech_schema la cot THEO NHA; nguong fuzzy la tham so cua PHEP, khong thuoc nha nao)"
+  fr054_regression_da_sua: >
+    trang_thai tra ve DA DUYET (chu du an xac nhan lai) · dong lap 11 xoa ·
+    header "FR-052 chua ap" doi theo phep do cua chinh §7.3 (da ap).
+  readme_cap_nhat: "T12-9 vao chuoi sau T12-6; C4b/C4c doi trang thai cho: chia o dot bo sung ngay khi T12-6 xong (FR-054 da duyet, FR-052 da ap — khong con cho gi)"
+  evidence:
+    - "check_g6b sau va: T12-0 5AC/5cmd · T12-9 4AC/4cmd ok; grep FAIL/CHU-Y M12 => 0"
+
+luot_3_plan_FE:
+  chi_dao: "ban len plan FE di, toi se bao agent kia test backend"
+  object_them:
+    - 07_plan/M03_web/tasks/T03-92-nut-chung-cat-ngu-canh.md
+    - 07_plan/M03_web/tasks/T03-93-man-xuong.md
+    - 07_plan/M03_web/tasks/T03-94-man-hang-doi-nhap.md
+    - 07_plan/M03_web/tasks/T03-95-khoi-viec-dashboard.md
+    - 07_plan/M03_web/tasks/T03-96-test-fe-dot-hai.md    # don vi TEST rieng (R1)
+    - 07_plan/M12_chungcat/README.md                     # UI het CHO, tro sang T03-92..96
+  hinh_dang: >
+    Port tu prototype dot-hai/ theo ma tran. Rang buoc chung ghi trong tung
+    task: man/nut vao man-hinh.json CUNG LUOT dung (S18) · token-only · gn.css
+    con ~150B — CSS viet sat, vuot tran mo don vi giam-beo rieng · nhan qua
+    cong chu-giao-dien TRUOC khi chot (canh bao rieng T03-94: cum "cho duyet"
+    bi cam tu FR-033 — dat "Hang doi nhap") · deep-link ?job= hai chieu ·
+    badge :empty khong if (khuon FR-027g) · thu tu: T03-96 (test, do truoc)
+    -> 92 -> 93 -> 94 -> 95.
+  luu_y_R1: >
+    T03-93/94 khai core/assets/man-hinh.json — NGOAI boundary fe M03 nhu tien
+    le T03-90: khai tuong minh trong task (bang khai man, them man la ngu phap
+    cua bang); check_g6b CHU Y (khong FAIL) — chap nhan, da co tien le va ly do.
+  dieu_kien_ban: "T12-0 xong + NGUOI ky lock + backend duoc agent kia test (:8790 song) — UI can API that de goi"
+  evidence: "check_g6b: 5 don vi hard du cmd, 0 FAIL; 2 CHU Y da giai trinh"
+
+luot_4_fr056_dat_man_hinh:
+  nguoi_quyet: "chu du an duyet FR-056 (2026-09-03)"
+  object_them:
+    - .factory/fr/FR-056-chu-cho-man-hinh-json.md   # DA DUYET
+    - project_map.yaml                               # v27 -> v28: M03_web.fe += core/assets/man-hinh.json
+    - 07_plan/M03_web/tasks/T03-90,93,94             # ghi chu tu khai -> tro FR-056
+  ly_do_mot_cau: "ba task cung vi pham mot cho = dat sai, khong phai ba loi task; moi ben doc lan ghi man-hinh.json deu la M03"
+  evidence:
+    - "check_map: 18 module khop hai chieu, map v28"
+    - "check_g6b: T03-90/93/94 het FAIL boundary; tong FAIL 32 -> 6 (con lai: M13..M18 chua co plan + T08 ID trung dat agent khac)"
+
+luot_5_ba_don_vi_chan:
+  nguon: "review chan cung truoc dot UI (2026-09-03): hai man qua G6B sach trong khi NGUON DU LIEU khong ton tai — check_g6b khong do lop do; gn.css con 39B du"
+  object_them:
+    - 07_plan/M08_api/tasks/T08-21-proxy-doc-job.md        # GET /api/job + /api/viec/<ulid> — chan cua T03-93
+    - 07_plan/M08_api/tasks/T08-22-cua-nhap-chung-cat.md   # doc nhap (kem ban_goc_ai) + 4 hanh dong — chan cua T03-94
+    - 07_plan/M03_web/tasks/T03-99-giam-beo-gn-css.md      # 8 icon mask lap ~960B boilerplate SVG; muc tieu >=600B, CAM noi tran
+    - 07_plan/M03_web/tasks/T03-93,94                      # +dong CHAN CUNG (sau T08-21/22 + T03-99)
+  thu_tu_ban_cap_nhat: "T03-97(giay,xong) -> T08-21 + T08-22 + T03-99 (song song duoc) -> T03-96 -> 92 -> 93 -> 94 -> 95 -> T03-98 (thao /dot-hai/ cuoi)"
+  evidence: "check_g6b: 3 don vi moi hard du cmd, 0 FAIL"

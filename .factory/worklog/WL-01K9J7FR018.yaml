@@ -1,0 +1,230 @@
+id: WL-01K9J7FR018
+at: 2026-08-19
+by: claude
+buoc: s8 (M03_web) + s5 (sửa hợp đồng UI)
+loai: sửa lệch yêu cầu gốc + amend UI contract
+fr: FR-018-mot-ho-chu.md
+
+viec: >
+  Người dùng: "TÔI CẦN 1 font chữ - kiểu chữ apply cho tất cả các màn, tôi đã
+  nói rất rõ từ đầu rồi." Đúng — và tôi đã không làm suốt nhiều đợt.
+
+vi_sao_lech_lau_den_the: >
+  Hợp đồng G5 ghi "2 họ chữ" ở BA chỗ: TYPOGRAPHY.md §Font, DESIGN.md §2, và
+  project_map.ui_frozen.verified. Dòng `verified:` là dòng nguy hiểm nhất — nó
+  tuyên bố hai họ chữ là tính chất ĐÃ NGHIỆM THU, nên mọi đợt sửa sau (FR-013,
+  014, 016, 017) đều coi đó là nền và không ai hỏi lại. Yêu cầu của người dùng
+  bị chôn dưới một dòng hợp đồng.
+  Bài học: `verified:` phải ghi thứ ĐO ĐƯỢC (số cỡ chữ gõ tay, tỉ lệ tương
+  phản), không ghi thứ là LỰA CHỌN (mấy họ chữ). Lựa chọn thì phải hỏi lại
+  được; nghiệm thu thì không.
+
+vi_sao_nhin_khong_ra_tren_giay: >
+  TYPOGRAPHY.md khai mono cho "số, mã, nhãn, locator" — nghe hẹp. Thực tế
+  "nhãn" phình thành gần như mọi thứ không phải thân bài: 59 luật CSS. Nút sắp
+  xếp, nhãn vùng, mục lục cửa sổ, số đếm, mốc thời gian, ghi chú, tiêu đề cửa
+  sổ, danh mục khái niệm. Nên mỗi màn trông một kiểu chữ — đúng như ảnh chụp.
+
+sua:
+  - "prototype.css: 56 luật → --f-ui, giữ mono 3 luật"
+  - "tokens.css: .lbl/.note → --f-ui; ghi rõ --f-mn chỉ còn vai MÃ THẬT"
+  - "custom.scss: tách code,pre,kbd (mono) khỏi .locator,time,.tabular (--f-ui + tabular-nums)"
+  - "nhãn tách khỏi nội dung bằng HOA + --tr-lb + tabular-nums, không bằng đổi họ chữ"
+  - "TYPOGRAPHY.md · DESIGN.md · project_map.verified: bỏ '2 họ chữ', ghi luật mới"
+
+bug_bat_duoc_giua_duong:
+  trieu_chung: "mọi <code> trên trang emitter mất mono — không ai thấy"
+  nguyen_nhan: >
+    Luật mono cho khối lệnh viết là `.np-c code`. Class `.np-c` bị bỏ khi màn
+    Nạp nguồn chuyển sang tab (FR-016) ⇒ luật thành xác. Và trang do emitter
+    phát ra CHỈ nạp gn.css, không nạp index.css, nên rule `code,pre,kbd` của
+    custom.scss không với tới. Hai điều đó cộng lại: lệnh chép được hiện bằng
+    Inter từ FR-016 mà không test nào biết.
+  sua: "viết theo THẺ (code,kbd,samp,pre) thay vì theo class bao ngoài — thẻ không đổi tên được"
+
+rang_buoc_giu_lai:
+  mono_cho_ma_that: >
+    code/pre/kbd + output nguyên văn gate.py/validate.py (.up-kq, .f-kq). Ở đó
+    bề rộng ký tự cố định là CHỨC NĂNG: cột thẳng hàng, phân biệt 0/O và 1/l.
+    Đổi chỗ đó sang sans là làm hỏng thứ đang có tác dụng.
+  khong_cham: "cỡ chữ, weight, màu — thang 10 bậc và contrast-audit nguyên vẹn"
+
+rang_may_moi:
+  - "markup-matches-css: luật nhãn HOA đổi --f-mn → --f-ui (sửa CÓ CHỦ ĐÍCH)"
+  - >
+    markup-matches-css: THÊM phép kiểm — `--f-mn` xuất hiện ngoài danh sách
+    ĐÓNG (code|kbd|samp|pre|.up-kq|.f-kq) ⇒ đỏ. Danh sách đóng nghĩa là thêm
+    chỗ mono thứ sáu phải sửa test, tức là có hồ sơ, không lan âm thầm.
+
+evidence:
+  - cd web && npm test                  # 22/22 xanh
+  - "CSS phát ra: chỉ 4 luật dùng --f-mn (code,kbd,samp · pre · .up-kq · .f-kq) + :root"
+  - python core/tests/check_worklog.py  # số liệu khớp thực tế
+
+no_con_lai:
+  - Webfont JetBrains Mono vẫn nạp (Quartz typography.code) vì mã thật còn dùng.
+    Bỏ hẳn mono thì gỡ được một webfont — chưa làm, vì mã thật là chỗ nó có tác dụng.
+  - FR-016, FR-017, FR-018 đều trạng thái MỞ — chờ người ký.
+
+# ── Tiếp theo cùng ngày: dọn màn Nạp nguồn + hết chữ trắng trên nền trắng ──
+lan_ra_soat_2:
+  yeu_cau: >
+    "trang nạp nguồn xoá header giới thiệu đi" + "các nhãn và text hạn chế
+    conflict màu component (hình ảnh mô tả màu trắng đấy)"
+
+  bo_header_gioi_thieu: >
+    Đoạn .np-intro nhắc lại đúng thứ ba tab bên dưới đã nói, cộng câu "mọi lối
+    kết thúc ở draft" vốn đã có ở nhãn header và dòng .note cuối màn — ba lần
+    một ý. Bỏ đoạn, GIỮ lại câu lệnh bật API vì đó là thứ người đọc CẦN khi
+    lối B/C đang mờ.
+
+  chu_trang_tren_nen_trang:
+    trieu_chung: "nhãn `announcement` và `docs` trên thẻ gần như vô hình"
+    nguyen_nhan: >
+      Bảng màu loại nguồn chỉ có BỐN token: --c-repo/paper/video/article. Thẻ
+      loại nguồn viết `background:var(--c-<loai>)` với chữ #fff. Với `docs` và
+      `announcement` thì đó là tham chiếu HỎNG ⇒ khai báo vô hiệu lực ⇒ mất
+      luôn nền ⇒ chữ trắng nằm trên thẻ trắng. Sáu giá trị enum, bốn màu —
+      lệch từ đầu, chỉ lộ khi kho có đủ cả sáu loại.
+    sua: >
+      Thêm màu dự phòng NGAY TẠI CHỖ DÙNG: var(--c-<loai>, var(--ink-2)) — ở
+      cả ba nơi (thẻ loại nguồn, viền trên thẻ bài, bar biểu đồ). Không thêm
+      token màu mới: thêm màu là phải đo tương phản, mà script đo 50 cặp không
+      có trong repo (FR-014 đã khai).
+    kem_theo: >
+      Hai chỗ gõ #fff cứng → var(--primary-foreground). #fff đúng ở tone sáng
+      (nền chip đậm) nhưng SAI ở tone tối: ở đó --c-* là pastel sáng, chữ trắng
+      trên nó gần như không đọc được. primary-foreground đổi theo tone.
+
+  don_css_mo_coi: >
+    6 nhóm class (.np-intro .np-l .np-i .np-n .np-c .np-3) không còn markup nào
+    dùng — mồ côi do chính FR-016/FR-018 tạo ra, xoá theo CLAUDE.md §3.
+
+  bug_tu_gay_va_bat_lai: >
+    Script dọn mồ côi khớp regex trên CẢ COMMENT của luật. Comment của luật
+    `code,kbd,samp` có nhắc tên class chết `.np-c code` (kể lại lịch sử) ⇒
+    luật MÃ THẬT bị xoá nhầm. Test cũ vẫn XANH vì nó chỉ hỏi "mono có lan ra
+    ngoài không", không hỏi "mã có còn mono không".
+    ⇒ Thêm phép kiểm chiều ngược: thẻ <code> PHẢI có luật --f-mn. Đã thử phá
+    (đổi sang --f-ui) để xác nhận nó đỏ thật, rồi khôi phục.
+    Và viết lại comment không nhắc tên class chết — comment kể lịch sử bằng
+    lời, không bằng định danh còn khớp regex được.
+
+# ── Câu hỏi: "các bài chờ duyệt → làm sao xử lý được luôn trên web?" ──────
+duyet_tren_web_kho_thay:
+  kiem_truoc_khi_sua: >
+    Dựng bản sao kho THẬT ở thư mục tạm + server cổng 8811, chạy đúng luồng:
+    PATCH thiếu review_minutes ⇒ 422 nêu đúng trường; PATCH đủ 3 trường M1 ⇒
+    200 approved. Dây chuyền FE cũng đủ trong bản build (data-act="duyet" ·
+    moPhieu · phieu-gui · .bk-phieu ở cả gn.js lẫn gn.css).
+    ⇒ KHÔNG phải hỏng. Là KHÓ THẤY.
+  van_de_that: >
+    Muốn duyệt phải đoán ba bước: vào Chờ duyệt → bấm dòng (không có dấu hiệu
+    gì cho biết bấm được) → tìm bốn nút nhỏ cùng sắc xám ở đáy cửa sổ.
+  sua:
+    - >
+      Mỗi dòng ở màn Chờ duyệt có nút "✓ đọc & duyệt" (.api-only) — mở bài VÀ
+      mở luôn phiếu khai 3 trường M1. Vẫn phải nhìn nội dung vì phiếu nằm ngay
+      dưới thân bài (B-B1: chỗ duy nhất một người đọc thật), nhưng không phải
+      đi tìm nút.
+    - >
+      Chân cửa sổ: "duyệt" thành nút CHÍNH (nền --success), "loại" viền đỏ.
+      Bốn nút cùng sắc xám thì mắt phải đọc từng cái mới biết đâu là việc chính.
+  giu_nguyen: "không có API ⇒ nút không tồn tại, màn trở lại vai chỉ-hiện-danh-sách"
+
+phieu_duyet_bot_lang_nhang:
+  nguoi_dung: '"sao lằng nhằng logic vậy — chỉ cần bấm duyệt hay ko duyệt là được mà, thôi là sao?"'
+  loi_cua_toi: >
+    Quy ước đặt tên nút tôi viết ở FR-016 (§"Đặt tên nút") chỉ được áp cho form
+    viết bài; nút trong PHIẾU duyệt vẫn để "thôi" — đúng cái từ mà quy ước cấm.
+    Viết luật rồi áp một nửa thì luật chưa có tác dụng.
+  sua_nhan: "thôi → Đóng · 'xác nhận duyệt' → Duyệt · 'xác nhận loại' → Loại"
+  bo_viec_go_tay: >
+    M1.3 ghi "bấm giờ, không ước" — mà bấm giờ thì ĐO được. Cửa sổ nhớ mốc mở
+    (WIN.moLuc), phiếu điền sẵn số phút đo được kèm dòng "đo được X phút Y
+    giây — sửa nếu bạn đọc ở nơi khác". Đo là PHÉP TÍNH, không phải quyết định
+    hộ: giá trị hiện rõ và sửa được trước khi gửi.
+    Hai câu hỏi còn lại là phán đoán nên vẫn để người trả lời — nhưng bỏ trống
+    = "không", đó là câu trả lời hợp lệ chứ không phải thiếu dữ liệu.
+    Cộng Enter = gửi, và ô số phút được focus sẵn.
+    ⇒ Duyệt nhanh nhất giờ là: bấm "duyệt" → Enter. Hai thao tác, không gõ gì.
+  vi_sao_khong_bo_han_buoc_xac_nhan: >
+    Schema (FR-001) đòi đủ 3 trường M1 khi review_status = approved, và ba
+    trường đó LÀ thước đo của chính dự án. Một cú bấm thẳng ra approved nghĩa
+    là máy điền hộ cả ba — đúng thứ M08-R3 và B-B1 cấm. Muốn một-cú-bấm thì
+    phải chấp nhận mất M1; đó là quyết định của người dùng, không phải của tôi.
+
+phieu_duyet_chua_style_nut:
+  nguoi_dung: '"what? sửa UI chưa đó cha"'
+  hai_nguyen_nhan_that:
+    1_nut_khong_co_css: >
+      .bk-phieu có luật cho HỘP, NHÃN, Ô NHẬP — nhưng KHÔNG có luật nào cho
+      NÚT. Chúng rơi về nút mặc định trình duyệt: xám, vuông, lạc hẳn khỏi
+      giao diện. Đây là lần thứ ba tôi style vỏ mà quên phần bấm được.
+    2_cache_khong_co_dau_phien_ban: >
+      Trang nạp `gn.css`/`gn.js` KHÔNG có tham số phiên bản. Tách file ra để
+      trình duyệt cache — nhưng cache không có dấu phiên bản thì thành cache
+      HỎNG: sửa xong, build lại, mở trang vẫn thấy bản cũ. Người dùng tưởng
+      "sửa chưa thấy khác" — và đúng là họ đang xem bản cũ thật.
+  sua:
+    - "nút phiếu: Duyệt/Loại nền đặc (success / destructive theo data-kieu), Đóng viền mỏng"
+    - "dòng 'đo được X giây' thành chú thích nhỏ, hai nút đẩy về cuối hàng"
+    - >
+      dấu phiên bản theo NỘI DUNG: gn.css?v=<băm>, gn.js?v=<băm>. Băm theo nội
+      dung chứ không theo giờ build — nội dung không đổi thì dấu không đổi nên
+      vẫn cache được; đổi một ký tự là trình duyệt tải lại.
+  rang_may_moi: >
+    markup-matches-css §6: mỗi khối điều khiển phải có luật cho nút của nó —
+    danh sách ĐÓNG (.bt, .bk-phieu .f-act, .bt-bt, .sortb, .np-tab). Thêm khối
+    có nút mà quên style ⇒ đỏ. Chốt này bắt ngay lần đầu chạy: .qr không có
+    luật riêng — hoá ra nút ở đó dùng class .bt chung (đã style), nên sửa phép
+    kiểm cho đúng thực tế thay vì thêm CSS thừa.
+
+hai_nut_duyet_chong_nhau:
+  nguoi_dung: '"2 nút duyệt khác gì nhau à?"'
+  van_de: >
+    Nút "✓ duyệt" ở chân cửa sổ MỞ phiếu; nút "Duyệt" trong phiếu GỬI. Cùng một
+    chữ, cách nhau 40px, hiện cùng lúc — không ai đoán được cái nào làm gì.
+    Lỗi của tôi: thêm phiếu mà không nghĩ lại trạng thái của thứ đã mở nó ra.
+  sua:
+    - "phiếu mở ⇒ .bk nhận class dang-phieu ⇒ CSS giấu hẳn hàng nút chân cửa sổ"
+    - "giấu chứ không làm mờ: nút mờ mà vẫn nằm đó vẫn là một câu hỏi"
+    - "nút chân cửa sổ đổi thành '✓ duyệt…' / '✕ loại…' — dấu … là quy ước 'bấm vào sẽ mở một phiếu', không phải làm ngay"
+    - "một hàm dongPhieu() dùng chung cho cả nhánh Đóng lẫn nhánh gửi xong — hai chỗ tự gõ lại sẽ lệch nhau, và bỏ sót classList.remove là chân cửa sổ mất nút cho tới khi mở lại bài"
+
+# ── FR-020 · dựng lại form viết bài ──────────────────────────────────────
+form_viet_bai_dung_lai:
+  nguoi_dung: '"tôi cần chuyên nghiệp và khoa học chứ không phải làm bừa một cái để ghi vào là được"'
+  bo_cuc_moi: >
+    4 nhóm đánh số, mỗi nhóm MỘT câu hỏi, thứ tự theo thứ người viết biết trước:
+    bài này là gì → cất ở đâu trong kho → bạn đánh giá thế nào → nội dung.
+    Mỗi hàng xếp DỌC (nhãn → chú thích → ô nhập) thay vì nhãn trái / chú thích
+    văng sang mép phải. Ô nhập cụt ở --w-read: dòng quá 70 ký tự thì mắt mất
+    điểm neo khi nhảy dòng.
+  cot_theo_doi: >
+    Cột phải dính khi cuộn, cập nhật lúc gõ: 9 mục đã có/thiếu · số từ so trần
+    1800 · tỉ lệ mục 5+6 so ngưỡng 35%. Đúng ba lỗi validate hay gặp nhất, và
+    cả ba đếm được ngay trên trình duyệt.
+    KHÔNG phải bản kiểm thứ hai (M05-R3): không chặn gì, không quyết gì, và tự
+    khai "ước tính — lời cuối là validate.py". Nó trả lời SỚM câu cổng sẽ hỏi,
+    thay vì để người dùng đi vòng gửi → 422 → đọc lỗi → sửa.
+  hai_bug_that_lo_ra_khi_lam:
+    form_hien_o_ban_khong_co_API: >
+      `.np-form{display:block}` đứng SAU `.api-only{display:none}` và cùng độ ưu
+      tiên ⇒ nó thắng ⇒ form hiện cả ở /mock/ và ở bundle deploy, lại nuốt luôn
+      thuộc tính `hidden`. Sửa: bỏ `display` khỏi .np-form (form vốn là block) +
+      khai `[hidden]{display:none}` ở tầng tác giả, đặt sau.
+    trang_chu_47KB: >
+      Đo mới thấy: khối v-nap là 12.5KB trên 21.9KB shell — 57% — và đi theo MỌI
+      trang, cho một màn chỉ dùng được khi API local chạy. Emitter giờ chỉ nhúng
+      nó vào /nap/; doiView() rơi về location.href khi không thấy màn (có chốt
+      chống lặp). Trang chủ 47 → 35 KB.
+  bug_test_bat_duoc_ngay: >
+    Chốt FR-020 mới đỏ ngay lần đầu: /tat-ca/ VẪN mang v-nap. Hoá ra trang đó
+    được sinh ở HAI chỗ (vòng MAN + vòng phân trang) và tôi chỉ sửa một. Đúng
+    loại lỗi test sinh ra để bắt.
+  sua_test_co_chu_dich: >
+    Luật "form ngủ" cũ đòi ĐÚNG MỘT form và bắt buộc có `hidden`. Nó bắt nhầm
+    form thêm nhãn (#f-cat-moi, FR-019) — form đó `api-only` và ngủ đúng nghĩa,
+    chỉ không đóng sẵn. Đếm form là đếm sai thứ. Luật đúng: MỌI <form> trong
+    bundle tĩnh phải mang `api-only`.

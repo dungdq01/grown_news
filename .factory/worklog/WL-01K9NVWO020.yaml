@@ -1,0 +1,122 @@
+id: WL-01K9NVWO020
+at: 2026-08-28
+by: claude
+buoc: WO-020 — lối `file` có mô tả + nhãn · thiết kế lại panel Loại nguồn
+loai: bàn giao WO-020
+wo: WO-018-o-mo-ta-va-nut-nap-chet.md · WO-019-loai-nguon-vao-db-va-thiet-ke-lai.md
+
+object:
+  wo:
+    - .factory/wo/WO-019-loai-nguon-vao-db-va-thiet-ke-lai.md   # CÒN MỞ (vế DB)
+  code:
+    - web/render/shell.html · web/plugins/home-pages/shell.html   # ba ô lối `file`
+    - web/render/trang.mjs        # panel Loại nguồn dựng lại thành THẺ
+    - web/server.mjs              # ghepBoSung() — luật FILE THẮNG
+    - web/styles/prototype.css    # .ln-* · dọn 3 luật rác · 8 token chưa khai
+    - web/plugins/multiwindow/src/scripts/multiwindow.inline.ts   # G() · x-bo-sung
+    - web/build-fe.mjs            # chiếu `magic` ra khỏi bundle
+    - 05_uiux/tokens.css          # khai `--hov` hai theme
+  test:
+    - web/test/mo-ta-va-nut-nap.test.js   # +§7, và §7 đo HÀNH VI qua HTTP
+    - web/test/token-only.test.js         # +răng TOKEN CHUA KHAI
+    - web/test/bon-chieu-facet.test.js · nut-song · four-screens  # nới mẫu sau `G()`
+
+may_xanh:
+  - "cd web && node test/mo-ta-va-nut-nap.test.js  ->  pass (7 mục)"
+  - "cd web && node test/token-only.test.js  ->  105 token dùng · 125 khai · không thiếu"
+  - "quét từng file: 67/68 xanh (chỉ `he-kinh` — ảnh của người dùng)"
+  - "gn.css 98000 / 102400 — dư 4400 · gn.js 99703 / 102400 — dư 2697"
+  - >
+    HTTP thật: POST một .md CÓ `category` + header đề nghị `category` khác ⇒ giá
+    trị trong FILE sống, giá trị bổ sung KHÔNG chen vào. POST một .md THIẾU
+    `category` ⇒ phần bổ sung được điền. Hai lần đều 200
+  - >
+    trình duyệt: panel Loại nguồn thành BA THẺ cạnh nhau (418px mỗi thẻ), viền
+    trên màu module (ô liu · mòng · xanh), hàng 31px, panel từ ~500px xuống 251px
+
+loi_file:
+  - >
+    Template `mau-nap-nguon.md` ĐÃ khai `one_liner` · `concepts` · `category`, nên
+    ba ô ở lối này KHÔNG phải nguồn thứ hai — chúng chỉ điền khoá file THIẾU. Luật
+    được NÓI RA trên màn ("Ba ô dưới chỉ dùng khi file thiếu.")
+  - >
+    Ghép ở `server.mjs` trước khi ghi vào `_inbox/`: gate đọc file từ đó, nên bổ
+    sung phải xảy ra TRƯỚC, không phải sau
+  - >
+    Không dùng thư viện YAML: câu hỏi duy nhất là "khoá này có ở cột 0 của
+    frontmatter không". Một parser đầy đủ ở đây là một phụ thuộc mới cho một câu
+    hỏi có/không
+
+thiet_ke_lai:
+  - >
+    Bốn điều sai đo được ở bản cũ: 14 dòng xếp dọc × 36px = 500px một cột trong
+    khi nửa phải màn hình trống · số đếm sát lề trái cách tên 40px · ba nhóm không
+    gì phân biệt ngoài chữ đậm · `0 bài` × 11 dòng
+  - >
+    Hướng: bảng công cụ DÀY ĐẶC, không trang trí — đây là màn quản lý. Mỗi phân
+    loại một THẺ (quan hệ tập-con là quan hệ NHÓM, và nhóm đọc bằng khối cạnh
+    nhau) · ba cột `auto-fit` chứ không `repeat(3,…)` vì ba là số phân loại HÔM
+    NAY · số áp lề phải để mắt quét một đường thẳng đứng · thanh tỷ lệ TRONG nhóm
+    (thang chung làm nhóm nhỏ trông như lỗi) · nhóm chưa dùng gì thì NÓI RA
+
+sieet_va_don:
+  - >
+    `document.getElementById(` xuất hiện **128 lần** — 23 ký tự × 128 ≈ 2.9 KB
+    trong bundle trần 100 KB. Gom về `G()` ⇒ `gn.js` từ 102450 (VƯỢT trần 50) về
+    99703, dư 2697. Đây là phép BỎ: mọi lời gọi giữ nguyên id và ngữ cảnh
+  - >
+    Chiếu `magic` ra khỏi bảng media nhúng: soi byte mở đầu là việc SERVER
+    (M09-R2), nên 58 byte hex đó nằm không trong bundle trình duyệt
+
+rang_moi_va_bay_loi_no_tim_ra:
+  - >
+    RĂNG: mọi `var(--x)` phải có khai báo `--x:`. `var()` trỏ vào token chưa khai
+    là lỗi IM LẶNG — không cảnh báo, không đỏ, chỉ một thuộc tính rơi về giá trị
+    thừa hưởng
+  - >
+    Nó tìm ra **tám** token chưa khai, và chỉ hai là của tôi:
+    `--f-mono` GÕ SAI TÊN (`tokens.css` khai `--f-mn`) ⇒ hai chỗ đang KHÔNG phải
+    mono · `--mono` cùng lỗi · `--hov` dùng 3 chỗ cho hover tab rail ⇒ hover không
+    đổi màu gì · `--e-out` tên sai cho một easing (namespace `--e-*` là ĐỔ BÓNG)
+    ⇒ hai transition dùng easing mặc định · `--lh-meta` · `--bg` · `--fs-xs` ×4
+  - >
+    Của tôi: `--c-docs` (bịa tên — viền thẻ Tài liệu ra `rgb(23,23,26)` gần như
+    đen) và `--r-md` · `--glass-1` · `--f-body`
+  - >
+    Ánh xạ chỉ dùng token ĐÃ KHAI, không bịa giá trị. `--hov` khai lại theo giá
+    trị thu hồi từ `trang-chu.html` — nguồn gốc của token đó
+
+tu_bat_duoc:
+  - >
+    CỔNG KHỚP VĂN XUÔI: §7 tìm chữ "thiếu"/"chỉ khi" quanh `x-bo-sung` trong
+    `server.mjs`, và chú thích của tôi viết "THIEU" không dấu nên không khớp. Một
+    phép kiểm khớp văn xuôi KỂ VỀ luật thì đổi một chữ là nó nói sai, còn luật đổi
+    thì nó vẫn xanh — cả hai chiều đều vô dụng. Đổi sang gọi HTTP thật
+  - >
+    `.ln-mo{opacity:.62}` trên `--ink-2` ra **3.63:1**, dưới AA 4.5:1. Cổng
+    `opacity-khong-pha-contrast` bắt. `opacity` chồng lên một token đã audit là
+    làm hỏng đúng thứ audit bảo đảm; bỏ hẳn vì `.ln-0` đã làm mờ bằng `--ink-3`
+  - >
+    Ba luật CSS rác do chính tôi để lại ở WO-016 (`r-nguon` · `rc-h-pl`) — 0 lần
+    trong markup sau khi thiết kế mới thay. Dọn mớ của chính mình
+  - >
+    Import `server.mjs` để kiểm cú pháp làm nó LISTEN và treo 600s. `node --check`
+    là công cụ đúng
+  - >
+    Hai cổng ghim chuỗi `document.getElementById(` — đo HÌNH THỨC nên phép gom làm
+    chúng đỏ vì lý do không liên quan. Nới mẫu để nhận cả hai hình dạng
+
+con_lai_cua_WO019:
+  - >
+    **Loại nguồn vẫn CHƯA vào bảng DB** — yêu cầu tường minh của người dùng. Nội
+    dung nay ĐÚNG và dẫn xuất từ bảng khai, nhưng master chưa phải một bảng như
+    `concepts`/`categories`, và chưa có đường thêm/sửa/xoá
+  - "Thêm host `fb` + `douyin`: mỗi host cần `nhung` + `id_mau` + `id_tu` (M09-R3)"
+
+do_do:
+  - cong: he-kinh.test.js
+    do_do_boi: ảnh 724 KB người dùng thêm — `python core/tools/toi_uu_anh_nen.py`
+  - cong: check_frozen.py
+    do_do_boi: chờ NGƯỜI ký sau khi FR-039 duyệt
+  - cong: check_danh_muc.py · check_skill.py · check_running.py
+    do_do_boi: agent khác · và hệ quả của hai cổng trên

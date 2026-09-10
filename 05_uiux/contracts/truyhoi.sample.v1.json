@@ -1,0 +1,99 @@
+{
+  "$comment": "Data contract v1 — màn Tra cứu kho (M13). Chunk = một mục heading, mang địa chỉ file#anchor + dòng. Phạm vi (facet) là control HIỂN THỊ. bm25 càng ÂM càng khớp (SQLite).",
+  "version": 1,
+  "chunks": [
+    {
+      "id": 1,
+      "file": "kb/docs/xgboost-taylor-bac-hai.md",
+      "anchor": "vi-sao-bac-hai",
+      "heading_path": "XGBoost Taylor bậc hai › 3.2 Vì sao bậc hai",
+      "line_start": 84,
+      "line_end": 121,
+      "phan_loai": "tai-lieu",
+      "loai_nguon": "pdf",
+      "trang_thai": "approved",
+      "concepts": [
+        "gradient-boosting"
+      ]
+    },
+    {
+      "id": 2,
+      "file": "kb/video/thien-duong-chuot-tuong-lai-nhan-loai-giai-ma-loi-tien-tri-d.md",
+      "anchor": "loi-tien-tri",
+      "heading_path": "Thiên đường chuột › 2. Lời tiên tri",
+      "line_start": 40,
+      "line_end": 66,
+      "phan_loai": "video",
+      "loai_nguon": "youtube",
+      "trang_thai": "approved",
+      "concepts": [
+        "ai-x-risk"
+      ]
+    },
+    {
+      "id": 3,
+      "file": "kb/tai-lieu/xgboost-stap-by-step.md",
+      "anchor": "muc-tieu-huan-luyen",
+      "heading_path": "XGBoost step by step › Mục tiêu huấn luyện",
+      "line_start": 12,
+      "line_end": 30,
+      "phan_loai": "tai-lieu",
+      "loai_nguon": "pdf",
+      "trang_thai": "approved",
+      "concepts": [
+        "gradient-boosting"
+      ]
+    }
+  ],
+  "truy_van_mau": [
+    {
+      "q": "vì sao khai triển bậc hai",
+      "pham_vi": {
+        "phan_loai": "tai-lieu",
+        "trang_thai": "approved"
+      },
+      "ket_qua": [
+        {
+          "chunk_id": 1,
+          "bm25": -7.41,
+          "snippet": "…khai triển «bậc hai» giữ được thông tin độ cong mà gradient «bậc» nhất bỏ mất…"
+        },
+        {
+          "chunk_id": 3,
+          "bm25": -3.02,
+          "snippet": "…hàm mất mát xấp xỉ «bậc hai» quanh dự đoán hiện tại…"
+        }
+      ],
+      "tong": 2
+    },
+    {
+      "q": "bac hai khong dau",
+      "pham_vi": {},
+      "ket_qua": [
+        {
+          "chunk_id": 1,
+          "bm25": -7.41,
+          "snippet": "…khai triển «bậc hai»…"
+        }
+      ],
+      "tong": 1,
+      "$edge": "chuan_hoa() một hàm: không dấu vẫn hit — remove_diacritics 2 + đ→d tầng ứng dụng"
+    },
+    {
+      "q": "記憶體 最佳化",
+      "pham_vi": {},
+      "ket_qua": [],
+      "tong": 0,
+      "$edge": "§13: tiếng Trung — chuan_hoa chèn cách quanh chữ Hán; kho chưa có bài Trung => state EMPTY phải NÓI RÕ đã tìm trên phạm vi nào"
+    },
+    {
+      "q": "retry vô hạn",
+      "pham_vi": {
+        "phan_loai": "video"
+      },
+      "ket_qua": [],
+      "tong": 0,
+      "$edge": "empty CÓ phạm vi: gợi ý nới phạm vi — bài về retry nằm ở phan_loai khác"
+    }
+  ]
+}

@@ -1,0 +1,72 @@
+ulid: 01K9SD4T0399T0395
+khi: 2026-09-04T02:10+07:00
+tac_nhan: agent-thi-cong (Claude, phiên 6c7880c5)
+loai: ban-giao
+module: M03_web
+don_vi: thi hành DEV LÀM của WL-01K9Z1PMQUYET4 — gỡ §5 · T03-99 · T03-95 (CHẶN)
+
+viec: |
+  ① `nut-song §5` GỠ về nghĩa gốc (`rule.md` mục 8). Bản "có CHỦ không?" của
+     T03-100 đã bỏ; §5 lại đo *"mọi file test đều được `npm test` gọi"*.
+     Và làm nốt phần còn lại của mục 8: `web/test/cai-dat.test.js` (cổng
+     viết-trước của T08-26b) DỜI về `07_plan/M08_api/tasks/T08-26b-cai-dat.test.js`,
+     ghi vào chính task file chỗ nó đang đỗ + luật dời-vào-cùng-lượt-với-mã.
+     ⇒ §5 xanh mà KHÔNG phải nới nghĩa: một file trong `web/test/` mà ngoài
+     chuỗi `npm test` nay là cổng THẬT SỰ mồ côi.
+
+  ② `T03-99` XONG — phép BỎ boilerplate trong 8 mask data-URI:
+     `stroke='%23000'` → `stroke='red'`: màu VÔ NGHĨA với mask (mask chỉ đọc
+       alpha; `.tb::before` tô bằng `currentColor`) — 8 mask × 4 byte
+     bỏ `stroke-linecap/linejoin` ở 7 mask — dấu nét tròn ở 16px không phân
+       biệt được — 7 × 46 byte
+     `stroke-width='1.6'` GIỮ: nó ĐỔI hình nhìn thấy, mà `AC2` cấm đổi hình.
+     Đo: `gn.css` **102391 → 102038** (bớt 353, dư 9 → 362).
+
+  ③ `T03-95` CHẶN — hai tiền đề của quyết (a) không đo được. Xem `do_do`.
+
+object:
+  - web/test/nut-song.test.js                       # §5 về nghĩa gốc
+  - 07_plan/M08_api/tasks/T08-26b-cai-dat.test.js   # cổng dời khỏi web/test/
+  - 07_plan/M08_api/tasks/T08-26b-test-cai-dat.md   # ghi chỗ cổng đỗ
+  - web/styles/prototype.css                        # T03-99
+  - 07_plan/M03_web/tasks/T03-95-chung-cat-quan-ly.test.js  # cổng đỏ-trước
+  - 07_plan/M03_web/tasks/T03-95-khoi-viec-dashboard.md     # khối ⛔ ba lối
+  - 06_modules/M03_web/backlog.md                   # +2 ô, tick T03-99
+
+bang_chung:
+  - "BẰNG CHỨNG ĐỎ-TRƯỚC (rule.md mục 8) · T03-95, mốc 2026-09-04T01:5x:
+     node 07_plan/M03_web/tasks/T03-95-chung-cat-quan-ly.test.js → 7 lỗi
+     ('đọc được thân hàm dựng khối' · 'ba con số' · 'có MỘT link' · 'có hàm
+     ccBadge' · 'badge mang data-mount' · 'badge trỏ mục nav Chưng cất')
+     — ĐỎ vì THIẾU MÃ, không vì lỗi cú pháp"
+  - "cd web && npm test → exit 0 · 2734 ok · 0 FAIL"
+  - "gn.css 102038/102400 · gn.js 100947/102400 · trang chủ 61430/61440"
+  - "tổng tải đầu nặng nhất 272525/280576 · 1/13 MÀN xin chunk"
+  - "rail-trai xanh: 8 tab đủ icon, mask vẫn currentColor · token-only xanh"
+  - "check_g6b 28 lỗi (PM đánh số lại đã xoá 4 cặp trùng; đầu phiên 33)"
+
+do_do: T03-95 — tường dung lượng, KHÔNG phải mã viết phí
+do_do_chi_tiet: |
+  Quyết PM ghi *"gn.css 91380/102400 (dư 11KB sau T03-99)"* — `T03-99` CHƯA
+  chạy lúc đó: 8 luật icon còn nguyên, `gn.css` thật **102391 (dư 9)**.
+
+  Và lối (a) không lọt cho TRANG CHỦ, đo bằng máy:
+    thẻ `<script>` chunk thêm vào HTML trang chủ = **+48 byte**, dư **9**
+    chunk cộng vào TỔNG tải đầu của `/`          = **+8010 byte**, dư **326**
+    (tổng của `/` = 265914/266240 trước khi thêm gì.)
+
+  Lối bundle chung thiếu **59 byte**: khối 1512, `gn.js` dư 1453. Gọt ba lần
+  (bỏ thẻ bọc `display:contents` · đưa nút ra ngoài `.kpi` · bỏ `esc2()` trên
+  nhãn hằng) — KHÔNG hội tụ, và gọt tiếp là gọt tính năng.
+  ⇒ Mã đã viết xong rồi HOÀN NGUYÊN để suite không đỏ; nguồn 3595 byte giữ ở
+    thư mục tạm phiên. Ba lối chờ NGƯỜI quyết, ghi trong task file.
+
+keo_theo:
+  - "M03 backlog: `v-dothai` tốn 598 byte HTML trên MỌI trang — ứng viên chunk
+     T03-102, và là 598 byte trả lại cho trang chủ"
+  - "T08-22 (cửa nháp) là đơn vị kế tiếp không bị chặn — T03-94 chờ nó"
+
+chua_xong: |
+  T03-95 chờ quyết. T03-94 chờ T08-22. Gate G6C do NGƯỜI ký.
+  ⚠️ `FROZEN.lock` ký lúc 23:29 — KHÔNG phải tôi (tôi sửa spec 22:51 rồi dừng
+  chờ người). Nếu chủ dự án chưa ký thì đó là một gate bị ký hộ.

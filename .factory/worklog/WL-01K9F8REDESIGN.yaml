@@ -1,0 +1,25 @@
+at: 2026-08-18T04:10Z
+agent: claude
+step: s5 / nhịp 3 — prototype v1 BỊ BÁC
+did: >
+  Người dùng bác prototype v1: "UIUX quá xấu, làm lại".
+
+  Tự chẩn qua design-taste-frontend: v1 mắc 8 luật anti-slop. Nặng nhất là
+  §4.1 (Inter là default bị discouraged), §4.3 (mọi màn một cột căn giữa),
+  §4.4 (card khắp nơi), §4.7 (3 khối trang chủ cùng một layout family),
+  §4.9 (9 mục đổ thành một cột chữ liên tục), và motion = 0.
+
+  Chẩn đoán: v1 dựng đúng ĐẶC TẢ nhưng không dựng ra thứ ĐẸP. Wireframe và
+  token là ràng buộc, không phải thiết kế. Coi "thoả ràng buộc" là xong —
+  đó là chỗ sai.
+
+  Ra REDESIGN-PLAN.md: lý do hỏng (8 mục đối chiếu luật), Design Read mới
+  (technical-editorial, dial 7/3/3), việc phải làm, tiêu chí đạt kiểm được
+  bằng máy, và danh sách KHÔNG đổi (palette đã pass WCAG, kiến trúc thông
+  tin, data contract).
+
+  Luật lần này: nhịp C chỉ dựng MỘT màn (trang bài) rồi đưa duyệt. v1 hỏng
+  vì dựng cả 4 màn mới đưa xem nên vứt cả 4.
+
+  ĐANG CHỜ: bản tham khảo của người dùng.
+object: 05_uiux/REDESIGN-PLAN.md

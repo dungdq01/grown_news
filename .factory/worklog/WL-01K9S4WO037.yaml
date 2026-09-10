@@ -1,0 +1,122 @@
+id: WL-01K9S4WO037
+at: 2026-08-29
+by: claude
+buoc: s8 (M03_web T03-82/83 · T03-84/85 · M01_core T01-38) — WO-037
+loai: form viet bai CHI NHAN VAN XUOI; bo han che do soan tho
+wo: .factory/wo/WO-037-form-chi-van-xuoi.md
+
+chi_dao_nguoi_dung: >
+  Nguyen van: "user chi nhap text, tuyet doi ko nhap dau markdown nhu ### hay
+  ##, ***... de dinh nghia header. form cua ta dinh nghia san con UI mo len
+  read and write chi co nhap text nhu nhap van ban thoi." Va che do tho:
+  "Bo han".
+
+object:
+  - web/plugins/multiwindow/src/scripts/multiwindow.inline.ts   # o con cho tinh tuy · gomKhung TRA VE chuoi · bo doiSoan/SOAN · doThan · chiaKhuc · layMuc
+  - web/plugins/multiwindow/src/scripts/multiwindow.inline.js   # san pham cua build-fe
+  - web/render/shell.html · web/plugins/home-pages/shell.html   # go [data-soan] + #f-tho-o/#f-than; cmp = byte-identical
+  - web/build-fe.mjs                # T03-85 — chieu bang khai xuong truong FE that doc
+  - web/test/form-van-xuoi.test.js  # cong MOI (T03-84 cua WO nay)
+  - web/test/bang-khai-khong-mo.test.js  # cong MOI
+  - web/test/four-screens.test.js   # phep kiem [data-soan] doi DICH sang chot an toan
+  - core/tests/check_khung.py       # T01-38 — bo phep kiem nhan nut da go
+  - web/{,plugins/,test/}WORKLOG.md · web/package.json
+  - 07_plan/M03_web/tasks/T03-8{2,3,4,5}* · 07_plan/M01_core/tasks/T01-38*
+
+do_duoc_truoc_khi_sua: >
+  7/8 o DA dung — `gomKhung()` van tu sinh `## 1.` va `### 3.1`. Sai dung MOT
+  o: `3.4 Tinh tuy`, vi cau truc long cua no nam BEN TRONG mot textarea nen
+  goi y cua o do buoc phai la markdown that. Khong do thi de sua ca form, va
+  bay o kia von khong hong.
+
+# ══ PHAN DANG GIA NHAT ═════════════════════════════════════════════════
+cong_cua_toi_XANH_MU_ba_lan: >
+  Ca ba lan deu la loi DO, khong phai loi ma, va ca ba deu bat duoc bang mot
+  phep TU KIEM VAT LIEU:
+    1. hop cat thieu `define_KHUNG_default` (ten esbuild noi `__KHUNG__` thanh)
+       => dungKhung() nem, form 0 byte, BA phep "khong co markdown" dung VO
+       DIEU KIEN va hien mau xanh.
+    2. hop cat thieu addEventListener/createElement => themTinhTuy() khong
+       chay, O CON KHONG TON TAI de ma do.
+    3. §3 doc than `gomKhung` tim `####` — nhung `####` do `gomTinhTuy()` sinh
+       => DO OAN trong khi ma dung.
+  Chot vat lieu gio `process.exit(1)`, khong chi canh bao. Mot bang toan `ok`
+  dung tren 0 byte form con te hon mot cong do.
+
+do_HANH_VI_khong_doc_MA: >
+  Cong cuoi cung CHAY `dungKhung()` / `gomTinhTuy()` / `raiTinhTuy()` trong hop
+  cat va do VONG KHEP: o con -> markdown -> o con, roi so tung gia tri. Doc ma
+  chi cho biet chuoi nao CO MAT; no khong cho biet ham SINH RA gi.
+
+tran_byte_khong_noi: >
+  WO nay ton ~2,1 KB JS trong khi `gn.js` chi con 1,8 KB duoi tran. Tien le du
+  an la "SIET, khong noi" (page-weight.test.js:85-89) va plan FR-038/R2 noi
+  thang: siet hoac tach bundle. Da lam, theo thu tu do duoc:
+    103244 (sau khi them tinh nang)
+    102860  gop `chiaKhuc()` — soiThanBai va raiKhung moi ham mot ban sao
+    102762  doc THANG tu o (`layMuc`) thay vi rap markdown roi che lai
+    102724  gop ba ban sao "rai than bai" thanh `doThan()`
+    102314  T03-85 chieu bang khai (bo $magic_la · locator · 3 tran · loai_thu_vien)
+  Con du 86 byte. Lan them FE toi phai TACH BUNDLE, khong con cho siet re nua.
+
+truu_tuong_hoa_LAM_TO_hon: >
+  Mot buoc siet bi HOAN LAI: gop khuon `<label class="f-m1">` cua dungKhung va
+  themTinhTuy thanh mot ham `oNhap()` — do duoc, no TON THEM 76 byte. Bundle
+  khong minify nen ten ham + tham so dat hon chuoi no thay the. "Bot lap = bot
+  byte" khong dung o day, va chi do moi biet.
+
+id_task_TRUNG_lan_thu_hai: >
+  Toi dat T03-76/77 trong khi hai so do DA co (WO-034). `check_g6b` dung
+  `tasks[tid] =` nen file sau ghi de file truoc — `pham_vi_ghi` cua mot trong
+  hai KHONG duoc kiem. Dung lop loi S24 da ghi. Danh lai T03-82/83. Va T01-10
+  cung trung (T01-10-ho-so-thu-vien) — `ls | tail` sap theo chu nen toi khong
+  thay; phai `sed | sort -n`.
+
+pham_vi_KHAI_TRUOC_khi_cham: >
+  Ba lan phai ghi ngoai `pham_vi_ghi` ban dau: four-screens (hop dong cu),
+  build-fe.mjs (chieu bang khai), ba file WORKLOG (so lieu check_worklog dem).
+  Khong noi tai cho: build-fe.mjs thanh don vi RIENG (T03-84/85, co cong hai
+  chieu cua no); hai cai kia khai vao task file KEM LY DO truoc khi mo file.
+
+cong_moi_phai_do_duoc_ca_chieu_NGUOC: >
+  `bang-khai-khong-mo` co hai chieu vi phep chieu co hai cach sai. Chieu A
+  (thua) chi ton bang thong; chieu B (thieu — FE doc mot khoa vua bi bo) tra
+  `undefined` luc chay, form thieu mot o, va KHONG cong nao do. Chi lam chieu A
+  la lam nua viec nguy hiem hon khong lam.
+  Ba do OAN cua ban dau, ca ba la loi DO:
+    - cat khai bao kieu bang /interface|type/ — file dung `declare const X: {}`
+      => cat 0 byte, phep tu kiem §0 to dung cho.
+    - tim khoa bang regex tren van ban CHUA tach chuoi => "Chuyen giao:" thanh
+      mot "khoa" ten `giao`.
+    - doi FE nhac ten tung khoa cua `__DUONG__` — do la bang TRA, khoa la DU
+      LIEU. Do nham LOAI BANG.
+
+bo_mot_phep_kiem_thi_phai_noi_no_canh_CAI_BONG: >
+  `check_khung:97` doi chuoi `>8 o<` — nhan cua nut che do vua bi go. Bo, khong
+  doi so, vi phep do ton tai de bat mot BAN GO TAY THU HAI cua so muc la; go nut
+  xong thi shell khong noi con so do o dau nua. Ban sao bien mat => canh tiep la
+  canh cai bong. Da kiem cong VAN DO DUOC: pha `nap khung 5 muc` tren ban sao o
+  thu muc tam => exit 1.
+
+evidence:
+  - "node web/test/form-van-xuoi.test.js => pass (do 12 loi, chi dich danh o 3.4)"
+  - "node web/test/bang-khai-khong-mo.test.js => pass (do 2 loi, 6 khoa chet)"
+  - "node web/test/page-weight.test.js => gn.js 102314/102400 · gn.css 102207/102400"
+  - "cmp web/render/shell.html web/plugins/home-pages/shell.html => giong nhau"
+  - "python core/tests/check_khung.py => exit 0; fixture pha rang => exit 1"
+  - "python core/tests/check_g6b.py => 5 dieu kien tren 153 task"
+  - "pytest core/tests => 42 passed"
+  - "npm test => 79/80 xanh"
+
+do_do:
+  he_kinh: "chua quy duoc chu — anh nen 708 KB co tu 08-28, truoc moi lan cham cua toi; can `python core/tools/toi_uu_anh_nen.py`, viec cua chu anh"
+  check_worklog: "agent khac — so dong prototype.css 2963 lech tai lieu; file sua luc 19:04, SAU shell.html cua toi (18:43) va toi khong cham prototype.css. Don vi FR-041/WO-036 dang do."
+  check_danh_muc + check_skill: "agent khac — hai ban schema core/skill-src lech core/assets"
+  check_frozen: "cho NGUOI ky; toi khong ky"
+  check_running: "he qua cua hai muc tren, khong phai loi rieng"
+
+no_con_lai:
+  - "NGUOI CHOT: mo form viet bai — muc 3.4 phai la nhom o con (Ten + 5 nhan), khong con nut o/tho, va SUA mot bai cu phai giu nguyen muc 3.4"
+  - "khung-than-bai.json:74 `goi_y` cua muc tinh tuy VAN chua markdown mau (`#### 3.4.1 …`) — nay khong con o nao hien no. Byte chet trong bang khai, va la M01. Chua sua: khong phai module cua don vi nay."
+  - "`.f-che` trong prototype.css thanh CSS mo coi sau khi go nut che do (6 dong, ~350 byte). markup-matches-css khong bat vi no doi chieu theo huong khac. Chua sua: ngoai pham_vi_ghi."
+  - "gn.js con du 86 byte — lan them FE toi phai tach bundle"

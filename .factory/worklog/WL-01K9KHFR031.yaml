@@ -1,0 +1,237 @@
+id: WL-01K9KHFR031
+at: 2026-08-26
+by: claude
+buoc: s8 (M03_web) + M08_api — nut chet, danh muc mo khoa, kho rong
+loai: sua mot bug lam chet 4 nut, mo khoa sua/xoa nhan, xoa sach danh muc, va bit mot lo o cong dong bang
+fr: FR-031-nut-chet-danh-muc-va-kho-rong.md
+
+viec: >
+  Nguoi dung gui 5 anh + danh sach viec tren 4 man. Dung dau: "cac button: sua /
+  bo khoi kho / dua lai vao hang cho: hien tai click vo dung". Kem: don chu, mo
+  khoa sua-xoa nhan da gan, them phan trang API, them dashboard tu chuyen, va
+  "clear all category va concept hien tai, toi se nhap tung cai sau".
+
+# ══ BUG LON NHAT: FE dung URL thieu MOT DOAN ═══════════════════════════════
+nut_chet:
+  nguyen_nhan: >
+    Route la `/api/articles/<type>/<slug>` (router.mjs:78 doi `phan.length >= 4`),
+    FE dung URL chi bang `ban.slug` o NAM cho.
+  do_duoc_bang_curl:
+    GET_slug_tran: 404
+    GET_type_slug: 200
+    PATCH_slug_tran: "400 — type phai thuoc: ..."
+    PATCH_type_slug: "409 — route KHOP, handler xet tiep"
+  vi_sao_ca_BON_nut_chet_cung_luc: >
+    `docChiTiet` la buoc DAU cua ca bon nut (no lay `etag` cho If-Match). No tra
+    `null` va moi nut dung ngay do.
+  sua_GOC_khong_sua_tay: >
+    Mot helper `duongBai(b) = b.source_type + "/" + b.slug`. Sua tay nam cho thi
+    cho thu sau viet sau nay lai thieu — chi mot noi biet cach dung duong.
+
+vi_sao_41_test_khong_bat:
+  su_that: >
+    `vong-doi-bai.test.js` goi API TRUC TIEP bang duong tu go dung. No chung minh
+    API tot — va API tot that. Khong phep kiem nao hoi "FE dung duong NAO".
+  lop_loi: >
+    Ban MOT-MAT cua loi "ban song sinh": khi hai ben phai khop nhau, kiem tung
+    ben xanh KHONG suy ra cho noi xanh.
+  rang_moi: >
+    `duong-api-khop-route.test.js` — §1 soi BUNDLE DA BUILD va cam dung hinh dang
+    da gay loi; §2 dung server that chung minh router THAT SU doi `type`, de §1
+    co LY DO. Ai noi router cho nhan 3 doan thi §1c tu khai het hieu luc.
+  kiem_hai_chieu: "tra mot call site ve `ban.slug` => do, neu dung chuoi vi pham"
+
+# ══ HANG DANH MUC CAO GAP DOI: nguyen nhan la SPECIFICITY ═══════════════════
+hang_90px:
+  do_duoc: >
+    `.rc-act` cung la mot `<span>`, nen `.rc-r span` (0,1,1) khop no VA THANG
+    `.rc-act{grid-column:4}` (0,1,0). O hanh dong bi dat vao COT 2 cung nhan;
+    grid khong xep hai thu vao mot o nen day no xuong DONG 2.
+  khong_phai: "loi padding — do la thu toi se sua neu khong doc specificity"
+  sua: >
+    `:not(.rc-act)` o selector, KHONG doi thu tu dong: thu tu chi quyet khi
+    specificity bang nhau, nen mot luat thang-do-dung ben hon thang-do-dung-sau.
+
+mo_khoa_sua_xoa:
+  sua_nhan: >
+    API DA CHO tu dau (`suaNhan` chi chan doi `id`). Chi GIAO DIEN khoa: hang
+    `#cb` la mot `<button>` loc, va `<button>` khong long duoc `<button>` nen
+    khong co cho dat nut. Tuc giao dien tu cam mot viec he thong van cho lam.
+  xoa_nhan: >
+    `?force=1` — nguoi dung chon "ep xoa kem canh bao". Ba dieu bat buoc: mac
+    dinh KHONG doi (khong co thi van 409) · 409 tra DANH SACH bai chu khong chi
+    con so · 200 tra `gay_hong`.
+  phep_kiem_dang_gia_nhat: >
+    Chung minh he qua la THAT: bai tro hut PUT => 422. Khong co no thi canh bao
+    chi la mot loi noi suong.
+  nhat_ky: >
+    Ban truoc hardcode "0 bai dung". Voi `force` thi cau do thanh LOI KHAI SAI
+    trong dung file dung de tra lai sau nay.
+
+khoi_phuc_ten_khac:
+  ba_dieu:
+    1: "`slug` trong frontmatter phai doi theo TEN FILE — API tra slug tu quetKho, form sua doc fm.slug; lech la file tu khai hai dia chi"
+    2: "CHI rename + write, KHONG unlink — `no-write-path` bat dung, va cong dung: guard chi dang tin khi khong co ngoai le 'truong hop cua toi thi khac'"
+    3: "`banIndex()` ngay sau TUNG lan di chuyen, ke ca nhanh hoan nguyen"
+
+ba_dashboard_moi:
+  hinh_dang_khac_nhau: "thoi gian -> cot doc · ti le 3 phan -> thanh chia doan · 3 muc co thu tu -> hang"
+  tach_thuoc_tinh_la_bat_buoc: >
+    `data-kpane`/`data-ktab` chu khong dung lai `data-pane`/`data-tab`. shell.html
+    la CHUNG cho moi trang nen vong xoay cua Trang chu CO MAT tren /kho/ (do:
+    3 `data-pane` trong site/kho/index.html). Dung chung ten = hai vong tron mot
+    tap, bam tab o Kho doi pane o Trang chu. Va loi do KHONG hien o man Kho.
+  opacity_inline_khong_trong_CSS: >
+    Theo khuon vong Trang chu. Hai ly do that: khong JS thi pane 0 van doc duoc;
+    va `opacity-khong-pha-contrast` quet LUAT CSS (opacity:0 cho phan tu co chu
+    la 1.00:1). Khong them mien tru nao.
+
+# ══ PHAN DANG GIA NHAT CUA CA LUOT ═════════════════════════════════════════
+xoa_sach_danh_muc:
+  toi_lam_gi_truoc_khi_hoi: >
+    Lam THAT, do duoc 33 loi validate o kb-mock/, roi HOAN NGUYEN de cay khong
+    nam do, roi moi hoi. Hai rang buoc toi khong tu quyet: sinh_kb_mock.py COPY
+    danh muc cua kb/ sang kb-mock/; va enum `category` nam trong schema DUNG
+    CHUNG nen xoa chu de lam 12 ban ghi mau sai schema bat ke mock co danh muc
+    rieng hay khong.
+  nguoi_dung_chot: "xoa sach ca hai, chap nhan /mock/ mat bieu do nhan"
+
+kho_rong_la_TRANG_THAI_HOP_LE:
+  xay_ra_gi: >
+    Xoa xong, 22 phep kiem do CUNG LUC va khong cai nao tim ra bug. Chung chi mat
+    thu de do, vi fixture dang MUON du lieu cua nguoi dung.
+  danh_sach_vay_muon:
+    _api.mjs: "ban ghi seed tro `idempotency` — fixture gio tu viet danh muc 6 muc co aliases"
+    dungSchema: "enum that (gio rong) => 'khoi dau 6 chu de — duoc 0'; gio bom CAT_FX vao schema TAM"
+    test_gates.py: "doc kb/concepts.yaml => None => 18 test ERROR; gio doc tap id TU CHINH fixtures/dat-chuan.md"
+    check_index_dan_xuat: "'0 bai co nhan'; fixture gio tu chen concepts cho moi bai"
+    danh-muc-them: "go id that `agent-llm`; gio lay CAT_FX[0][0]"
+  nguyen_tac_rut_ra: >
+    Phep kiem KHONG duoc muon du lieu nguoi dung. Kho that rong la trang thai hop
+    le — no khong duoc lam bo test mu.
+  va_khi_phai_nhanh_hoa: >
+    CAM `if (co) {...}` khong co else: dieu kien mat thi ca khoi tu bien mat va
+    phep kiem tu vo hieu (lop loi da bat o open-card.test.js). Nhanh nao cung
+    phai co rang — vd "0 nhan => tang loc phai VANG VA man Danh muc phai noi ra".
+  toi_tu_vi_pham_mot_lan: >
+    Viet `ok(da_chen > 0 or True, ...)` trong check_index_dan_xuat — dung cai vua
+    phe. Sua lai thanh khang dinh that: sau khi chen, MOI bai phai co nhan.
+
+hai_cho_SAP_vi_danh_muc_rong:
+  loi: "`{c['id'] for c in None}` — TypeError, khong phai mot cau noi kho sai dau"
+  cho_1: "core/src/source_distiller/validate.py:279"
+  cho_2: "05_intake/gate.py:152 — cong nop bai chet giua duong"
+  sua: >
+    `or []` o ca hai. RONG KHAC THIEU: rong = danh muc dong, chua co muc nao
+    (moi `concepts` trong bai bi chan, dung M02-R3); thieu file moi la cong TAT,
+    va `catalog_missing` lo ca do.
+  day_la_defect_that: "khong phai he qua cua viec xoa — no cho san o do"
+
+# ══ LO O CONG DONG BANG — "no khong keu, no CHUC PHUC" ═════════════════════
+lo_frozen:
+  co_che: >
+    `kyLaiBaseline()` goi `check_frozen.py --ky` VO DIEU KIEN voi cwd=GOC. Moi
+    lan mot test POST/DELETE mot nhan — tren kho TAM, schema TAM, khong cham mot
+    byte nao cua repo — no van ky lai FROZEN.lock cua repo.
+  do_duoc: >
+    Toi sua 3 file frozen, check_frozen DO dung thiet ke; chay `npm test` mot
+    luot va no XANH tro lai. Cong co nhiem vu doi "doi file frozen phai qua FR"
+    bi vo hieu boi chinh bo test.
+  vi_sao_te_nhat: "mot cong khong keu ma chuc phuc thi te hon khong co cong"
+  sua: >
+    Co KB_DIR hoac SCHEMA_DIR => dang lam viec tren thu muc tam => KHONG ky.
+    Fail closed: bo mot lan ky dang ra phai lam thi check_frozen keu va nguoi sua
+    biet; ky thua thi im lang.
+  kiem_hai_chieu: >
+    Dua FROZEN.lock ve HEAD, chay tron npm test (43/43 xanh), `git hash-object`
+    KHONG doi.
+
+ba_cong_bat_dung_va_toi_sua_MINH:
+  no-write-path: "unlinkSync trong web/api (M08-R4); va dich cua loi goi ghi phai DOC DUOC ngay tai cho goi"
+  api-guard: "renameSync moc ngoai ba ham duoc thiet ke"
+  page-weight: "cat-theo-so-cung trong emitter"
+  hai_lan_bao_dong_GIA_vi_COMMENT_cua_toi: >
+    Chung quet nguyen van nguon, nen mot dong giai thich nhac ten ham goi mang /
+    cach cat cu la du de do. Da sua `page-weight` boc comment truoc khi quet —
+    boc comment khong lam cong yeu di (mot .slice trong comment thi khong chay),
+    nhung khong boc thi cong DAY NGUOI TA DUNG VIET chu thich ve doan ma vua sua.
+  api-guard_con_khai_SAI_TEN: >
+    Danh sach cu ghi `ghiSauValidate`. Do lai thi ham do KHONG goi renameSync, no
+    goi `doiTenBenBi`. Con so 3 khop nen khong ai phat hien ten sai — mot phep
+    kiem xanh vi CON SO, trong khi cau no khai ve he thong thi sai.
+    Gio dem HAM thay vi dem SO LAN GOI.
+  man-danh-muc_§6a_cung_xanh_SAI: >
+    No so chuoi tren nguyen van nguon, va comment toi vua viet co chua may chu
+    "dang dung" de giai thich cai vua bo. Mot phep kiem doi chieu hai ban CAI DAT
+    lai di doc hai ban VAN XUOI. Gio boc comment truoc khi so.
+
+don_chu:
+  bo: "12 doan van giai thich"
+  doi_nhan: "id->Ma bai · slug->Ten duong dan · Conformance->Muc day du · Category->Chu de · Concepts->Khai niem"
+  rang_buoc_khong_mat: "`pattern` van chan, `placeholder` van lam mau, he qua vao `title`"
+  do_duoc: "chu phu tro 145 -> 73 ky tu moi man; /nap/ 498 -> 426"
+  rang_moi_do_KY_TU_khong_dem_phan_tu: >
+    Gop ba cau thanh mot `<em>` thi man hinh khong doi. Ban dau cua rang nay BAO
+    DONG GIA (dem `<em>dang dung</em>` cua hang danh muc) nen /mock/nap/ do vi
+    kho mau CO DU LIEU — sua THUOC DO, khong nang nguong.
+  loi_hien_thi_khong_ai_bao: >
+    "Loi cuoi van la Bai duoc kiem tu dong ngay khi ban bam ghi." — mot lan sua
+    truoc cat mat chu ngu va de lai hai nua cau dinh nhau.
+  cau_SAI_tren_man: >
+    "Chua doc duoc danh muc khai niem" la cau ve mot LOI DOC FILE. Danh muc rong
+    la trang thai hop le. Noi sai nguyen nhan thi nguoi dung di tim loi khong co.
+
+evidence:
+  - "npm test => 43/43 · chay DOC LAP tung file => 0 file do"
+  - "npm run check => sach"
+  - "14/14 cong Python · pytest core/tests => 30 passed"
+  - "contrast-audit => 62 cap · 0 truot"
+  - "validate kb --strict => 3 file · 0 loi"
+  - "check_kb_mock => 14 file · 1 ca am CO Y · 0 loi that"
+  - "curl chung minh: PATCH type/slug => 409 (route khop) vs slug tran => 400"
+  - "duong FE ghep bang `.slug` tran: 0"
+  - "FROZEN.lock khong doi sau khi chay tron npm test"
+
+files:
+  - "web/plugins/multiwindow/src/scripts/multiwindow.inline.ts (duongBai + 5 cho; chan cua so 2 hang; nhan co dau; barCptFE/hangNhanFE hang co nut; xoaNhanTuWeb hai muc; bo khoi chu thich popup)"
+  - "web/plugins/home-pages/index.ts (hangNhan + #cb co nut xoa; 3 pane Dong chay kho; NGUONG.thangKho; o KPI thung rac; cau trang thai danh muc rong; bo cau M1)"
+  - "web/plugins/home-motion/src/home-motion.inline.ts (veKPane + vong rieng 7s + treoKPane + clearInterval)"
+  - "web/plugins/home-pages/shell.html (khoi Dong chay kho; don 12 doan van; doi 5 nhan; opacity inline)"
+  - "web/styles/prototype.css (.bk-f 2 hang; .rc-loc subgrid; :not(.rc-act) SUA LOI THAT; .kf-*; .tp-r.rac; XOA 3 luat button.rc-r + 3 luat .tp-x)"
+  - "web/api/articles.mjs (catTrang — phan trang, mac dinh KHONG cat)"
+  - "web/api/danhmuc.mjs (baiDangDung; ?force=1; nhat ky ep xoa)"
+  - "web/api/dungchung.mjs (phucHoi + slug_moi, rename-only; kyLaiBaseline BIT LO)"
+  - "web/api/recycle.mjs (khoiPhuc doc slug_moi)"
+  - "web/api/router.mjs (truyen `u` cho 2 handler)"
+  - "core/src/source_distiller/validate.py + 05_intake/gate.py (`or []` — rong khac thieu)"
+  - "core/tests/test_gates.py (fixture concepts tu so huu) · check_index_dan_xuat.py (fixture tu gan nhan)"
+  - "web/test/duong-api-khop-route.test.js (MOI) · danh-muc-phan-trang-ep-xoa.test.js (MOI)"
+  - "web/test/_api.mjs (CPT_FX/CAT_FX + tuy chon chuDe) · _seed.mjs (ghi chu do duoc)"
+  - "web/test/ 9 file doi thuoc do: bon-trang-thai · cua-so-doc · chu-giao-dien · api-guard · page-weight · filter-counts · url-va-tuong-tac · man-danh-muc · nhan-dai-khong-tran · cac-man-con-lai"
+  - "kb/concepts.yaml 24->0 · kb/categories.yaml 6->0 · 2 ban schema enum 6->0 · 3 bai that · contract mau 13 ban ghi"
+  - ".factory/fr/FR-031-*.md · 06_modules/M03_web/spec.md AC-2.3.12/13 · 07_plan/.../T03-5 AC19/20"
+
+khong_dung_vao:
+  - "khong them mien tru cho opacity-khong-pha-contrast"
+  - "khong noi guard 'kho rong thi khong xoa nhan'"
+  - "khong doi `id` cua nhan"
+  - "khong cascade go nhan khoi bai (nguoi dung chon ep xoa kem canh bao)"
+  - "khong doi mac dinh GET danh muc — /nap/ can DU nhan de ve checkbox"
+  - "khong noi tran page-weight"
+  - "khong commit, khong push"
+
+no_con_lai:
+  - "NGUOI CHOT: bam that 4 nut o chan cua so doc · Khoi phuc doi ten o Kho · sua va xoa mot nhan dang dung o /khai-niem/"
+  - >
+    /mock/ mat bieu do nhan cho toi khi ban mau duoc gan lai nhan. He qua nguoi
+    dung DA CHAP NHAN khi chot "xoa sach ca hai" — nhung neu muon demo day lai,
+    noi toi mot cau la gan lai duoc.
+  - >
+    Emitter doc kho TU REPO, khong tu thu muc build (`duongKho()` =
+    join(GOC, "..", "kb"|"kb-mock")). Nen moi phep kiem ve dashboard that ra dang
+    do kb-mock/, va fixture KHONG the tu so huu du lieu dashboard. Da ghi o
+    _seed.mjs de khong ai thu lai. Sua duoc nhung la doi kien truc emitter.
+  - "no-write-path va api-guard VAN quet nguyen van (chua boc comment) — hai lan bao dong gia luot nay deu tu do"
+  - "/nap/ CHUA dung lai bo cuc (muc 4 'Noi dung' 9 o) — chi don chu va doi nhan"
+  - "con no tu truoc: canvas particles (ui_guide §6d/§8) · scroll parallax (§7) · luoi bat doi xung trang bai · nguong red-as-ink (REDESIGN-PLAN §3.3, la quyet dinh THIET KE cua nguoi dung)"
+  - "FR-025 cho nguoi dung chot"

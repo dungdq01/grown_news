@@ -1,0 +1,92 @@
+ulid: 01M1W8N4K2R7T5Q3V9XZPBDF82
+thoi_diem: 2026-09-07T05:30+07:00
+tac_nhan: claude-opus-5
+loai: ban_giao
+module: M12_chungcat + M04_ci
+don_vi: dọn đường đóng M12 — bước 1 (CI) · bước 2 (phân loại nợ) · bước 3 (FR)
+
+viec: >
+  Chủ dự án hỏi *"còn việc gì để done M12?"* rồi chốt thứ tự: CI trước, phân
+  loại nợ, rồi vá FR/spec — *"không lại dễ nhầm lẫn"*.
+
+buoc_1_ci:
+  phat_hien: >
+    CI **không chạy một cổng M12 nào**. Đo: `grep -c chungcat ci.yml` = **0**.
+    Nghĩa là mọi câu "39/39 xanh" trong worklog của tôi suốt phiên này là xanh
+    TRÊN MÁY TÔI — và `R2` nói thẳng thứ đó không tính.
+  da_lam:
+    - "bước `cài chungcat (M12)` — KHÔNG kèm extra `[asr]` (torch >2 GB cho một bộ cổng không dùng tới)"
+    - "vòng lặp chạy CẢ THƯ MỤC `chungcat/tests/check_*.py`, không liệt kê tay — cổng thứ 41 ra đời sẽ tự được canh"
+    - "E2E `--mock` (0 token, 0 egress). `--that` KHÔNG vào CI: nó tiêu tiền."
+  do_truoc_khi_them: >
+    Chạy cả 40 cổng với env RỖNG (`env -u CHUNGCAT_KHOA_LOI -u BEEKNOEE_API_KEY
+    -u KHOA_DICH_VU`) ⇒ 40/40 XANH. Nên chúng CHẠY ĐƯỢC ở CI, không phải hy vọng.
+
+buoc_2_phan_loai:
+  cach: "đo lại từng ô trông lỗi thời, không đoán"
+  dong_duoc_8_o:
+    - "`./chungcat` chưa vào CI → vừa vá"
+    - "`git ls-files chungcat` = **67 file** (ô khai 0)"
+    - "không có worker → `worker.py --vong` chạy, job đi trọn vòng hôm nay"
+    - "T12-7 nhà thứ hai → `adapter/` có `google.py` + `openai.py`"
+    - "ba phụ thuộc chưa khai → `pyproject.toml` đủ rapidfuzz · pdfplumber · httpx · yt-dlp"
+    - "`check_nghe_loopback` đỏ oan → nay XANH"
+    - "hai hàng đợi song song → quét cả repo chỉ thấy MỘT"
+    - "`GET /viec?n=abc` sập → sửa thật, xem dưới"
+  con_lai: "45 → **37 ô**"
+  hinh_dang_37:
+    hop_dong_can_FR: 13
+    viec_chua_lam: 5
+    thieu_cong: 2
+    chua_phan_loai: 17
+
+o_736_sua_that:
+  truoc: >
+    `GET /api/job?n=abc` → **502 · TypeError**; thợ đóng kết nối không trả gì
+    (`RemoteDisconnected`). Trong `http.server`, ngoại lệ không bắt ở handler
+    GIẾT LUỒNG đang phục vụ — một ký tự gõ nhầm thành sự cố máy chủ.
+  sua: >
+    `api.doc_so(gt, mac_dinh, tran=500)` — ba phép chặn, ba lý do khác nhau:
+    không-phải-số ⇒ mặc định (người gõ nhầm) · ÂM ⇒ mặc định (đẩy chỗ hỏng
+    xuống sâu hơn là làm nó khó truy hơn) · quá trần ⇒ cắt (`n=999999` bắt đọc
+    cả hàng đợi vào bộ nhớ cho MỘT lời gọi).
+  sau: "`?n=abc` → **200** · cổng mới `check_tham_so_hong.py` (7 vế)"
+
+buoc_3_fr:
+  mo: FR-069
+  vi_sao: >
+    Đo: `grep -i "tai-video" spec.md` = 0 · `chat_luong` = 0. Một loại việc
+    ĐANG CHẠY TRONG SẢN XUẤT mà hợp đồng không nhắc là đúng chỗ chủ dự án lo:
+    người đọc spec để biết hệ làm gì sẽ đếm thiếu một loại, và người sửa
+    `BANG_LOAI` sẽ tưởng ba loại là đủ.
+  noi_dung: >
+    `loai` thứ tư `tai-video` (không gọi model — nên `M12-R6` áp theo nghĩa
+    EGRESS, không theo token) · bậc là THẬT không transcode · kết quả KHÔNG
+    vào kho (đo: `goc` = 463 MB) · `tien_do` cùng khoá khác hình dạng · hai
+    rule mới `M12-R8`/`M12-R9` · cửa web thuộc M08 (`T08-34`).
+  chan_lai: "spec + rules M12 đang FROZEN ⇒ NGƯỜI ký `<freeze-check> --ký` sau khi duyệt FR"
+
+do_sau:
+  - lenh: 'for f in chungcat/tests/check_*.py; do python "$f"; done'
+    ket_qua: 40/40 XANH
+  - lenh: cd web && npm test
+    ket_qua: exit 0 · 0 FAIL
+  - lenh: python -m pytest core/tests -q
+    ket_qua: 49 passed
+  - lenh: python core/tests/check_g6b.py
+    ket_qua: 5 lỗi — TẤT CẢ M18, 0 lỗi M12
+
+con_chan_G6C:
+  - "**37 ô backlog** còn mở — G6C đòi backlog SẠCH"
+  - "`FR-069` chưa duyệt, `FROZEN.lock` chưa ký lại"
+  - "worklog **đóng module** chưa có (0)"
+  - "`project_map` chưa bump be/fe thật"
+  - "14 rule khai `S3` chưa đối chiếu từng cái với bằng chứng bề mặt"
+  - "`--that` của E2E chưa bật — chất lượng chưa đo bằng một lần chạy thật"
+
+object:
+  - .github/workflows/ci.yml
+  - chungcat/src/api.py
+  - chungcat/tests/check_tham_so_hong.py
+  - 06_modules/M12_chungcat/backlog.md
+  - .factory/fr/FR-069-loai-viec-tai-video-va-bac-chat-luong.md

@@ -1,0 +1,136 @@
+id: WL-01K9J3FR010
+at: 2026-08-19
+by: claude
+buoc: s8 (M03_web + M05_intake)
+loai: feature + amend-frozen
+fr: FR-010-upload-qua-web.md
+
+viec: >
+  Hai việc người dùng nêu: (a) tự chạy gate khi build, (b) nộp file qua web ở màn
+  Nạp nguồn. Kèm một lỗi thật phát hiện khi chạy thử luồng end-to-end.
+
+pham_vi_ghi:
+  - web/server.mjs                    # MỚI — site tĩnh + /api/inbox, một cổng
+  - web/package.json                  # nap + api
+  - web/plugins/home-pages/shell.html # khu kéo-thả ở màn Nạp nguồn
+  - web/plugins/home-pages/index.ts   # parser đọc YAML block style
+  - web/plugins/multiwindow/src/scripts/multiwindow.inline.ts
+  - web/styles/prototype.css
+  - web/test/no-write-path.test.js    # nới ĐÚNG chỗ + siết chỗ bỏ sót
+  - web/test/filter-counts.test.js
+  - 05_intake/gate.py                 # khung mẫu thêm category/concepts
+  - 06_modules/M03_web/rules.md       # FROZEN — đã ký lại sau FR
+  - project_map.yaml · RUNNING.md
+  - .factory/fr/FR-010-upload-qua-web.md
+
+quyet_dinh_1_gate_khong_vao_build:
+  nguoi_dung_hoi: "mỗi lần npm run build là tự chạy gate.py? ok chứ?"
+  do_duoc_truoc_khi_lam: >
+    `npm run build` hiện CHỈ ĐỌC — chạy bao nhiêu lần cũng không đổi gì. CI dùng
+    đúng lệnh đó (ci.yml). Nối gate vào thì:
+      · CI sẽ GHI vào kb/ mỗi lần chạy
+      · M03_web thành phụ thuộc M01_core (project_map:38 ghi rõ "KHÔNG phụ thuộc core")
+      · build mất tính idempotent
+      · mọi máy build phải có Python
+  chon: >
+    Script RIÊNG `npm run nap` = gate + build. `build`/`serve` giữ nguyên chỉ đọc.
+    Người dùng được tiện lợi, CI/deploy không bao giờ ghi kb/. Không cần FR.
+
+quyet_dinh_2_upload_qua_web:
+  diem_mau_chot: >
+    Upload KHÔNG phải "duyệt trên web". M03-R2 nêu HAI mối lo; upload chỉ chạm một.
+      "cổng duyệt có đường vòng"  KHÔNG chạm — file vào `_inbox/`, chưa vào kb/.
+                                  gate.py cưỡng chế origin: external ⇒ schema
+                                  khoá review_status const draft. Kiểm thật:
+                                  POST /api/approve → 404.
+      "hai nhánh dính nhau"       CHẠM — web có một đường ghi đĩa. Đó là lý do
+                                  FR-010 tồn tại thay vì sửa lặng.
+  mot_cong_khong_hai: >
+    server.mjs phục vụ CẢ site tĩnh VÀ /api/inbox trên một cổng. Vì sao không để
+    Quartz serve lo phần tĩnh: hai cổng thì FE phải gọi API bằng URL tuyệt đối có
+    host, mà test no-write-path canh literal ngay sau `fetch(` — ghép host từ
+    biến làm nó không đọc được đích, nghĩa là mọi endpoint ghi thêm sau này lọt
+    qua im lặng. Một cổng ⇒ FE gọi `/api/inbox` tương đối, cổng còn răng.
+  bon_chan_bu_da_kiem:
+    - "bind 127.0.0.1 — kiểm: không có '0.0.0.0' trong mã"
+    - "tên file WHITELIST [a-z0-9-] — kiểm 10 ca: ../../kb/x.md, traversal
+       Windows, /etc/passwd, url-encoded, tiếng Việt, rỗng, quá dài, đuôi kép
+       ⇒ 10/10 AN TOÀN"
+    - "đích ghi cố định _inbox/, không nhận tham số đường dẫn"
+    - "gọi gate.py làm tiến trình con, KHÔNG viết lại cổng bằng JS (M05-R3)"
+  chan_khac:
+    - "trùng tên ⇒ 409 kèm cách sửa, KHÔNG ghi đè — kiểm thật"
+    - "không frontmatter ⇒ 400 kèm hướng tải template"
+    - "trần 1 MB, hủy kết nối khi vượt (không đọc tiếp vào RAM)"
+    - "thoát thư mục ở đường tĩnh ⇒ 400 — kiểm ..%2f..%2fkb → 400"
+
+loi_that_phat_hien_khi_chay_thu:
+  what: >
+    Chạy thử luồng end-to-end (tạo file như GPT sinh → _inbox/ → gate) thì thấy:
+    `05_intake/gate.py` ghi YAML BLOCK style (yaml.dump mặc định):
+        concepts:
+        - context-management
+    nhưng parser web chỉ đọc FLOW style `[a, b]`.
+  hau_qua_do_duoc: >
+    Bài lên web với data-cat="" và data-cpt="" — MẤT cả category và concepts,
+    sidebar không có tầng chủ đề. Và 15/15 test vẫn XANH, vì sample + kb-mock
+    đều dùng flow style.
+  vi_sao_dang_no: >
+    Đúng loại lỗi tôi cảnh báo ở plan: chỉ lộ ra với file THẬT. Nếu không chạy
+    thử luồng này thì nó nằm im tới khi người dùng nạp bài thật.
+  sua: >
+    Parser đọc cả hai dạng (gom dòng `- item` theo sau khoá không có giá trị).
+    Kiểm lại trên đúng file đó: data-cat=["agent-llm"], data-cpt=["context-management"],
+    sidebar có tầng chủ đề.
+  test_moi: >
+    filter-counts.test.js canh nhánh block list trong mã parser. Không build lại
+    site để kiểm được vì bản real đọc kb/ cứng, bản mock đọc kb-mock/ cứng —
+    không có đường tiêm kho tạm vào.
+
+siet_test_no_write_path:
+  truoc: >
+    Quét MỘT file FE hardcode; chỉ bắt writeFile/mkdir với literal chứa `kb/`.
+    Không bắt writeFileSync, path ghép động, child_process. Miễn trừ emitter
+    nhưng không canh gì.
+  sau:
+    - "quét 2 file FE (thêm backdrop.inline.ts)"
+    - "fetch ghi CHỈ được tới /api/inbox — bắt mọi method ghi rồi loại trừ đúng
+       một đường, nên thêm endpoint là phải sửa test, không lọt im"
+    - "7 phép kiểm MỚI canh chính server.mjs: không nhắc kho ngoài comment ·
+       writeFileSync ghi đường đã chuẩn hoá · bind 127.0.0.1 · không 0.0.0.0 ·
+       có hàm chuẩn hoá tên · whitelist không phải tìm-và-chặn · gọi gate.py"
+  ghi_chu: >
+    Test này bắt được HAI lỗi của tôi trong lúc làm: (1) server.mjs in đường dẫn
+    kho trong dòng log — vô hại nhưng test không phân biệt được với đường ghi
+    thật, đã bỏ dòng đó; (2) FE ghép `API + "/api/inbox"` từ biến, đã đổi thành
+    literal. Cả hai lần test đúng khi nghiêm.
+
+verify:
+  loai: hard
+  lenh:
+    - "cd web && npm run check"                      # sạch
+    - "cd web && npm test"                           # 15/15
+    - "python core/src/source_distiller/validate.py kb/ --strict"   # OK
+    - "python core/tests/check_frozen.py"            # + 8 cổng, 9/9 OK
+    - "python 05_intake/test_gate.py"                # OK
+  end_to_end_da_chay: >
+    Build → SITE=... node server.mjs → GET / /nap/ /gn.css /tat-ca/ đều 200 →
+    POST /api/inbox với file .md thật → gate_ma=0, vao_kho=true →
+    kb/article/nop-qua-web.md có origin:external + review_status:draft.
+    POST /api/approve → 404. Nộp lại cùng tên → 409.
+  frozen: >
+    M03_web/rules.md đổi (thêm khối ngoại_lệ_duy_nhất cho M03-R2).
+    check_frozen ĐỎ đúng như phải, ký lại bằng --ky SAU khi FR-010 mở.
+
+no:
+  - "FR-010 trạng thái MỞ — chờ người duyệt. Đã thi hành trước theo yêu cầu.
+     Bác thì revert server.mjs + rules.md + ký lại baseline."
+  - "gate.py CỐ Ý không xoá file khỏi _inbox/ sau khi chép vào kb/ (thiết kế M05).
+     Hệ quả: nộp lần hai chạy lại gate cho MỌI file cũ trong _inbox/, và output
+     liệt kê cả chúng — dễ tưởng vừa nạp nhiều bài. Chưa sửa vì đó là hành vi của
+     M05, không thuộc phạm vi FR-010."
+  - "Hai file thử nghiệm còn trong kb/article/ và _inbox/ (thu-nghiem-gpt.md,
+     nop-qua-web.md). Tôi tạo để kiểm luồng; người dùng từ chối lệnh xoá — hợp lý
+     vì kb/ là nguồn chân lý. Cần xoá tay."
+  - "web/site bị EBUSY khi build (tiến trình cũ giữ thư mục). Không liên quan
+     FR-010; đã ghi trong RUNNING.md §5 từ trước."

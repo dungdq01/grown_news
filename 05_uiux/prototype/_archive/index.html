@@ -1,0 +1,527 @@
+<title>Grown_news Prototype</title>
+<style>
+/* ═══ TOKENS — đồng bộ với 05_uiux/tokens.css ═══ */
+:root{
+  --bg:#FFFFFF;--surface:#F7F7F8;--text:#18181B;--text-2:#52525B;--text-3:#71717A;
+  --brand:#C81E1E;--brand-hover:#A61B1B;--btn-bg:#C81E1E;--btn-fg:#FFFFFF;
+  --border:#D4D4D8;--warn:#854D0E;--warn-bg:#FFFBEB;--ok:#15803D;
+  --font-body:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;
+  --font-mono:"JetBrains Mono",ui-monospace,"Cascadia Code",monospace;
+  --fs-h1:clamp(2rem,4.5vw,2.6rem);--fs-h2:1.66rem;--fs-h3:1.328rem;
+  --fs-lead:1.328rem;--fs-body:1.0625rem;--fs-meta:.85rem;
+  --lh-h1:1.12;--lh-h2:1.3;--lh-h3:1.4;--lh-lead:1.6;--lh-body:1.7;--lh-meta:1.5;
+  --w-prose:640px;--w-page:1200px;
+  --gap-section:96px;--gap-block:64px;--gap-inner:24px;--pad-x:24px;
+  --radius-sm:4px;--radius:6px;--radius-lg:8px;--accent-bar:3px;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0A0A0B;--surface:#161618;--text:#FAFAFA;--text-2:#A1A1AA;--text-3:#8B8B93;
+  --brand:#F87171;--brand-hover:#FCA5A5;--btn-bg:#DC2626;--btn-fg:#FFFFFF;
+  --border:#2E2E33;--warn:#FBBF24;--warn-bg:#1C1917;--ok:#4ADE80;}}
+:root[data-theme="dark"]{
+  --bg:#0A0A0B;--surface:#161618;--text:#FAFAFA;--text-2:#A1A1AA;--text-3:#8B8B93;
+  --brand:#F87171;--brand-hover:#FCA5A5;--btn-bg:#DC2626;--btn-fg:#FFFFFF;
+  --border:#2E2E33;--warn:#FBBF24;--warn-bg:#1C1917;--ok:#4ADE80;}
+
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--text);font-family:var(--font-body);
+  font-size:var(--fs-body);line-height:var(--lh-body);-webkit-font-smoothing:antialiased}
+
+/* ═══ THANH TRÊN ═══ */
+.top{position:sticky;top:0;z-index:50;background:var(--bg);
+  box-shadow:0 1px 0 var(--border);padding:12px var(--pad-x)}
+.top-in{max-width:var(--w-page);margin:0 auto;display:flex;align-items:center;gap:20px}
+.logo{font-weight:700;font-size:1.0625rem;letter-spacing:-.02em;text-decoration:none;color:var(--text)}
+.logo span{color:var(--brand)}
+.top nav{margin-left:auto;display:flex;gap:4px;align-items:center}
+.nav-btn{background:none;border:0;font:inherit;font-size:var(--fs-meta);color:var(--text-2);
+  padding:7px 12px;border-radius:var(--radius);cursor:pointer}
+.nav-btn:hover{background:var(--surface);color:var(--text)}
+.nav-btn[aria-current="page"]{color:var(--text);font-weight:600;background:var(--surface)}
+.icon-btn{background:none;border:1px solid var(--border);border-radius:var(--radius);
+  padding:6px 10px;cursor:pointer;color:var(--text-2);font:inherit;font-size:var(--fs-meta)}
+.icon-btn:hover{border-color:var(--brand);color:var(--brand)}
+
+/* ═══ CHUNG ═══ */
+.page{max-width:var(--w-page);margin:0 auto;padding:0 var(--pad-x) var(--gap-section)}
+.prose{max-width:var(--w-prose);margin:0 auto}
+.meta{font-size:var(--fs-meta);line-height:var(--lh-meta);color:var(--text-3)}
+h1{font-size:var(--fs-h1);line-height:var(--lh-h1);font-weight:700;
+  letter-spacing:-.025em;margin:0 0 var(--gap-inner)}
+h2{font-size:var(--fs-h2);line-height:var(--lh-h2);font-weight:600;
+  letter-spacing:-.015em;margin:var(--gap-block) 0 var(--gap-inner)}
+h3{font-size:var(--fs-h3);line-height:var(--lh-h3);font-weight:600;margin:32px 0 12px}
+p{margin:0 0 var(--gap-inner)}
+.view{display:none}.view.on{display:block}
+
+/* ═══ SCR-01 TRANG BÀI ═══ */
+.kicker{font-size:var(--fs-meta);color:var(--text-3);letter-spacing:.06em;
+  text-transform:uppercase;margin:var(--gap-section) 0 12px;display:flex;
+  gap:8px;align-items:center;flex-wrap:wrap}
+.kicker b{color:var(--brand);font-weight:600}
+.lead{border-left:var(--accent-bar) solid var(--brand);padding-left:var(--gap-inner);
+  font-size:var(--fs-lead);line-height:var(--lh-lead);color:var(--text-2);
+  margin:0 0 var(--gap-block)}
+.lead strong{color:var(--text);font-weight:600}
+
+.metabox{background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius-lg);padding:16px 20px;margin:0 0 var(--gap-inner);
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px 20px}
+.metabox div{font-size:var(--fs-meta);line-height:var(--lh-meta)}
+.metabox dt{color:var(--text-3);margin:0 0 2px}
+.metabox dd{margin:0;color:var(--text);font-weight:500}
+.badge{display:inline-block;font-size:.75rem;border:1px solid var(--border);
+  border-radius:999px;padding:1px 9px;color:var(--text-3);font-weight:400}
+
+.warning{border-left:var(--accent-bar) solid var(--warn);background:var(--warn-bg);
+  color:var(--warn);padding:14px 18px;border-radius:0 var(--radius) var(--radius) 0;
+  margin:0 0 var(--gap-block);font-size:var(--fs-meta);line-height:1.6}
+.warning b{display:block;margin-bottom:4px;font-size:var(--fs-body)}
+.warning ul{margin:6px 0 0;padding-left:18px}
+
+.bigidea{font-size:var(--fs-lead);line-height:var(--lh-lead);color:var(--text);
+  border-left:var(--accent-bar) solid var(--brand);padding-left:var(--gap-inner)}
+
+.tbl-wrap{overflow-x:auto;margin:0 0 var(--gap-inner);
+  border:1px solid var(--border);border-radius:var(--radius-lg)}
+table{width:100%;border-collapse:collapse;font-size:var(--fs-meta);line-height:1.55}
+th,td{text-align:left;padding:10px 14px;border-bottom:1px solid var(--border)}
+th{color:var(--text-3);font-weight:600;background:var(--surface);white-space:nowrap}
+tr:last-child td{border-bottom:0}
+
+.loc{font-family:var(--font-mono);font-size:.8rem;background:var(--surface);
+  border:1px solid var(--border);border-radius:var(--radius-sm);padding:1px 6px;
+  color:var(--brand);text-decoration:none;white-space:nowrap}
+.loc:hover{background:var(--brand);color:var(--btn-fg);border-color:var(--brand)}
+
+ol.steps{padding-left:0;list-style:none;counter-reset:s;margin:0 0 var(--gap-inner)}
+ol.steps li{counter-increment:s;position:relative;padding-left:38px;margin-bottom:14px}
+ol.steps li::before{content:counter(s);position:absolute;left:0;top:1px;
+  width:24px;height:24px;border-radius:50%;background:var(--surface);
+  border:1px solid var(--border);color:var(--text-2);font-size:.8rem;
+  font-weight:600;display:grid;place-items:center}
+
+.essence{border-left:var(--accent-bar) solid var(--brand);background:var(--surface);
+  border-radius:0 var(--radius-lg) var(--radius-lg) 0;padding:18px 20px;margin:0 0 16px}
+.essence h4{margin:0 0 12px;font-size:var(--fs-body);font-weight:600;line-height:1.45}
+.essence dl{margin:0;display:grid;grid-template-columns:auto 1fr;gap:7px 12px;
+  font-size:var(--fs-meta);line-height:1.55}
+.essence dt{color:var(--text-3);white-space:nowrap}
+.essence dd{margin:0;color:var(--text-2)}
+.tag-skill{display:inline-block;background:var(--btn-bg);color:var(--btn-fg);
+  font-size:.72rem;font-weight:600;border-radius:var(--radius-sm);padding:1px 7px;
+  text-transform:uppercase;letter-spacing:.04em}
+.tag-know{display:inline-block;border:1px solid var(--border);color:var(--text-3);
+  font-size:.72rem;border-radius:var(--radius-sm);padding:1px 7px;
+  text-transform:uppercase;letter-spacing:.04em}
+
+.check{list-style:none;padding:0;margin:0 0 var(--gap-inner)}
+.check li{display:flex;gap:12px;align-items:flex-start;padding:9px 0;
+  border-bottom:1px solid var(--border)}
+.check li:last-child{border-bottom:0}
+.check input{width:17px;height:17px;margin:5px 0 0;accent-color:var(--brand);flex:none;cursor:pointer}
+.check label{cursor:pointer;flex:1}
+.check .why{display:block;color:var(--text-3);font-size:var(--fs-meta);margin-top:2px}
+.check input:checked+label{color:var(--text-3);text-decoration:line-through}
+
+details.quiz{border:1px solid var(--border);border-radius:var(--radius-lg);
+  padding:14px 18px;margin-bottom:10px;background:var(--surface)}
+details.quiz summary{cursor:pointer;font-weight:500;list-style:none}
+details.quiz summary::-webkit-details-marker{display:none}
+details.quiz summary::after{content:"hiện đáp án";float:right;font-size:var(--fs-meta);
+  color:var(--brand);font-weight:400}
+details.quiz[open] summary::after{content:"ẩn"}
+details.quiz p{margin:12px 0 0;color:var(--text-2);font-size:var(--fs-meta);line-height:1.6}
+
+.skillbox{border:1px dashed var(--border);border-radius:var(--radius-lg);
+  padding:20px;margin:var(--gap-block) 0 0;background:var(--surface)}
+.skillbox .hd{display:flex;justify-content:space-between;align-items:baseline;
+  gap:12px;margin-bottom:6px;flex-wrap:wrap}
+.skillbox h4{margin:0;font-size:var(--fs-body);font-weight:600}
+.prio{font-family:var(--font-mono);font-size:var(--fs-meta);color:var(--btn-fg);
+  background:var(--btn-bg);border-radius:var(--radius-sm);padding:2px 8px;font-weight:600}
+.verdict{font-size:var(--fs-meta);color:var(--text-3);margin-bottom:10px}
+
+.chips{margin:var(--gap-block) 0 0;padding-top:var(--gap-inner);border-top:1px solid var(--border)}
+.chip{display:inline-block;border:1px solid var(--border);border-radius:999px;
+  padding:4px 13px;font-size:var(--fs-meta);color:var(--text-2);
+  margin:0 6px 8px 0;text-decoration:none;cursor:pointer}
+.chip:hover{border-color:var(--brand);color:var(--brand)}
+
+.tabs{display:flex;gap:2px;border-bottom:1px solid var(--border);margin:0 0 var(--gap-inner)}
+.tab{background:none;border:0;border-bottom:2px solid transparent;font:inherit;
+  font-size:var(--fs-meta);padding:9px 14px;cursor:pointer;color:var(--text-3);margin-bottom:-1px}
+.tab[aria-selected="true"]{color:var(--brand);border-bottom-color:var(--brand);font-weight:600}
+
+hr.orn{border:0;text-align:center;margin:var(--gap-block) 0}
+hr.orn::before{content:"◆";color:var(--border);font-size:.7rem}
+
+/* ═══ SCR-02 TRANG CHỦ ═══ */
+.sec-hd{display:flex;align-items:baseline;gap:12px;margin:var(--gap-section) 0 var(--gap-inner)}
+.sec-hd h2{margin:0;font-size:1.15rem;letter-spacing:.04em;text-transform:uppercase}
+.sec-hd .line{flex:1;height:1px;background:var(--border)}
+.sec-hd .cnt{font-size:var(--fs-meta);color:var(--text-3);font-family:var(--font-mono)}
+
+.feat{border:1px solid var(--border);border-radius:var(--radius-lg);padding:32px;
+  background:var(--surface);cursor:pointer}
+.feat:hover{border-color:var(--brand)}
+.feat h3{font-size:clamp(1.5rem,3vw,2rem);line-height:1.2;margin:12px 0;
+  letter-spacing:-.02em;font-weight:700}
+.feat .lead{border:0;padding:0;margin:0 0 16px;font-size:var(--fs-body);color:var(--text-2)}
+
+.tl{list-style:none;padding:0;margin:0}
+.tl li{border-bottom:1px solid var(--border);padding:20px 0;cursor:pointer;
+  display:grid;grid-template-columns:1fr auto;gap:6px 20px}
+.tl li:hover h3{color:var(--brand)}
+.tl h3{margin:4px 0;font-size:var(--fs-h3);line-height:1.35;font-weight:600}
+.tl p{margin:0;color:var(--text-2);font-size:var(--fs-meta);line-height:1.55}
+.tl time{color:var(--text-3);font-size:var(--fs-meta);font-family:var(--font-mono);white-space:nowrap}
+
+.cats{display:grid;grid-template-columns:repeat(6,1fr);gap:1px;background:var(--border);
+  border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden}
+.cat{background:var(--bg);padding:16px 14px;min-height:150px}
+.cat h4{margin:0 0 12px;font-size:var(--fs-meta);text-transform:uppercase;
+  letter-spacing:.05em;color:var(--text-3);display:flex;justify-content:space-between}
+.cat h4 b{color:var(--brand);font-family:var(--font-mono)}
+.cat a{display:block;font-size:var(--fs-meta);line-height:1.45;color:var(--text-2);
+  text-decoration:none;margin-bottom:9px}
+.cat a:hover{color:var(--brand)}
+.cat .none{color:var(--text-3);font-size:var(--fs-meta);opacity:.5}
+
+/* ═══ SCR-03 TRA CỨU ═══ */
+.search{position:relative;margin:var(--gap-section) 0 var(--gap-inner)}
+.search input{width:100%;font:inherit;font-size:var(--fs-lead);padding:16px 18px;
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);color:var(--text)}
+.search input:focus{outline:2px solid var(--brand);outline-offset:2px;border-color:transparent}
+.filters{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:var(--gap-inner)}
+.filters select{font:inherit;font-size:var(--fs-meta);padding:7px 11px;
+  background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);color:var(--text-2)}
+.active-filter{display:inline-flex;align-items:center;gap:9px;background:var(--surface);
+  border:1px solid var(--brand);color:var(--brand);border-radius:999px;
+  padding:5px 8px 5px 14px;font-size:var(--fs-meta);margin-bottom:var(--gap-inner)}
+.active-filter button{background:none;border:0;color:inherit;cursor:pointer;
+  font-size:1rem;line-height:1;padding:0 4px}
+.res{border-bottom:1px solid var(--border);padding:20px 0;cursor:pointer}
+.res:hover h3{color:var(--brand)}
+.res h3{margin:5px 0 8px;font-size:var(--fs-h3);line-height:1.35;font-weight:600}
+.snip{border-left:2px solid var(--border);padding-left:14px;color:var(--text-2);
+  font-size:var(--fs-meta);line-height:1.6;margin:0 0 10px}
+.snip mark{background:transparent;color:var(--brand);font-weight:600}
+.cgroup{margin-bottom:28px}
+.cgroup h4{font-size:var(--fs-meta);text-transform:uppercase;letter-spacing:.05em;
+  color:var(--text-3);margin:0 0 12px}
+.cnt-badge{font-family:var(--font-mono);font-size:.75rem;color:var(--text-3);margin-left:5px}
+.proposed .chip{opacity:.45;cursor:not-allowed;border-style:dashed}
+
+/* ═══ EMPTY ═══ */
+.empty{text-align:center;padding:80px var(--pad-x);max-width:520px;margin:0 auto}
+.empty h2{margin:0 0 12px;border:0;font-size:var(--fs-h3)}
+.empty p{color:var(--text-2)}
+.steps-box{text-align:left;background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius-lg);padding:20px 24px;margin-top:var(--gap-inner)}
+.steps-box b{font-size:var(--fs-meta);text-transform:uppercase;letter-spacing:.05em;color:var(--text-3)}
+.steps-box ol{margin:12px 0 0;padding-left:20px;font-size:var(--fs-meta);line-height:1.9;color:var(--text-2)}
+.steps-box code{font-family:var(--font-mono);font-size:.8rem;background:var(--bg);
+  padding:1px 5px;border-radius:var(--radius-sm);border:1px solid var(--border)}
+
+.foot{border-top:1px solid var(--border);margin-top:var(--gap-section);
+  padding:var(--gap-inner) 0;font-size:var(--fs-meta);color:var(--text-3);
+  display:flex;gap:16px;flex-wrap:wrap;justify-content:space-between}
+.foot a{color:var(--text-3)}
+
+:where(a,button,input,select,summary,[tabindex]):focus-visible{
+  outline:2px solid var(--brand);outline-offset:2px}
+
+@media(max-width:900px){.cats{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:640px){
+  :root{--gap-section:56px;--gap-block:40px}
+  .cats{grid-template-columns:1fr 1fr}
+  .tl li{grid-template-columns:1fr}
+  .metabox{grid-template-columns:1fr 1fr}
+  .top nav .nav-btn{padding:7px 8px}
+}
+</style>
+
+<header class="top">
+  <div class="top-in">
+    <a class="logo" href="#" onclick="go('home');return false">Grown<span>_news</span></a>
+    <nav>
+      <button class="nav-btn" onclick="go('home')" data-nav="home">Trang chủ</button>
+      <button class="nav-btn" onclick="go('article')" data-nav="article">Bài</button>
+      <button class="nav-btn" onclick="go('search')" data-nav="search">Tra cứu</button>
+      <button class="nav-btn" onclick="go('empty')" data-nav="empty">Kho rỗng</button>
+      <button class="icon-btn" onclick="tog()" id="tg">tone</button>
+    </nav>
+  </div>
+</header>
+
+<!-- ══════════ SCR-02 TRANG CHỦ ══════════ -->
+<main class="view on page" id="v-home">
+  <div class="sec-hd"><h2>Tiêu điểm</h2><span class="line"></span>
+    <span class="cnt">priority cao nhất 7 ngày</span></div>
+
+  <article class="feat" onclick="go('article')">
+    <div class="meta">paper · 14 trang · 2 phút đọc</div>
+    <h3>Cố định ranh giới thời gian trước khi sinh đặc trưng, không phải sau</h3>
+    <p class="lead">Rò rỉ dữ liệu xảy ra ở bước tính đặc trưng trượt chứ không ở bước chia
+      tập — nên kiểm tra tỷ lệ train/test không bao giờ phát hiện được.</p>
+    <div class="meta">plausible · 2 nguồn độc lập · <span style="color:var(--brand);font-weight:600">ưu tiên 65</span></div>
+  </article>
+
+  <div class="sec-hd"><h2>Mới phân tích</h2><span class="line"></span><span class="cnt">5 bài</span></div>
+  <ul class="tl">
+    <li onclick="go('article')">
+      <div><div class="meta">repo · application · 8 phút</div>
+        <h3>Khử trùng bản ghi bằng khoá lũy đẳng ở tầng staging</h3>
+        <p>Consumer đọc hàng đợi có khả năng gửi trùng. Verified · 1 nguồn.</p></div>
+      <time>08-18</time></li>
+    <li onclick="go('article')">
+      <div><div class="meta">paper · 2 phút</div>
+        <h3>Ví dụ đạt chuẩn</h3>
+        <p>File mẫu minh họa đầy đủ ràng buộc của protocol 2.0.</p></div>
+      <time>08-17</time></li>
+    <li onclick="go('article')">
+      <div><div class="meta">article · 5 phút · <span class="badge">external</span></div>
+        <h3>Prompt caching giảm 40% chi phí</h3>
+        <p>Bài vendor, số liệu thiếu điều kiện đo. <span style="color:var(--warn)">⚠ có nguồn phản biện</span></p></div>
+      <time>08-16</time></li>
+    <li onclick="go('article')">
+      <div><div class="meta">paper · 7 phút · <span class="badge">2 bản</span></div>
+        <h3>STORM: tổng hợp đa góc nhìn</h3>
+        <p>Mô phỏng phỏng vấn chuyên gia để sinh bài dài có trích dẫn.</p></div>
+      <time>08-16</time></li>
+    <li onclick="go('article')">
+      <div><div class="meta">video · 42 phút · 9 phút đọc</div>
+        <h3>Quản lý ngữ cảnh trong hệ thống agent chạy production</h3>
+        <p>Cắt gì khi tràn ngữ cảnh và vì sao nén thua cắt. 3 nguồn độc lập.</p></div>
+      <time>08-14</time></li>
+  </ul>
+
+  <div class="sec-hd"><h2>Theo chuyên mục</h2><span class="line"></span></div>
+  <div class="cats">
+    <div class="cat"><h4>repo <b>1</b></h4><a href="#" onclick="go('article');return false">Khử trùng bản ghi bằng khoá lũy đẳng</a></div>
+    <div class="cat"><h4>paper <b>2</b></h4><a href="#" onclick="go('article');return false">Ví dụ đạt chuẩn</a><a href="#" onclick="go('article');return false">STORM: tổng hợp đa góc nhìn</a></div>
+    <div class="cat"><h4>video <b>1</b></h4><a href="#" onclick="go('article');return false">Quản lý ngữ cảnh production</a></div>
+    <div class="cat"><h4>article <b>1</b></h4><a href="#" onclick="go('article');return false">Prompt caching giảm 40%</a></div>
+    <div class="cat"><h4>docs <b>0</b></h4><span class="none">—</span></div>
+    <div class="cat"><h4>thông cáo <b>0</b></h4><span class="none">—</span></div>
+  </div>
+
+  <div class="foot"><span>5 bài · cập nhật 2026-08-18</span><a href="#">xem kho trên git →</a></div>
+</main>
+
+<!-- ══════════ SCR-01 TRANG BÀI ══════════ -->
+<main class="view page" id="v-article">
+ <div class="prose">
+  <div class="tabs">
+    <button class="tab" aria-selected="true">bản pipeline</button>
+    <button class="tab">bản Gemini</button>
+  </div>
+
+  <div class="kicker">paper · 14 trang · 2 phút đọc · <b>plausible</b></div>
+  <h1>Cố định ranh giới thời gian trước khi sinh đặc trưng, không phải sau</h1>
+
+  <div class="lead"><strong>60 giây.</strong> Rò rỉ dữ liệu xảy ra ở bước tính đặc trưng
+    trượt chứ không ở bước chia tập — nên kiểm tra tỷ lệ train/test không phát hiện được.
+    Dành cho ai đang dựng pipeline dự báo chuỗi thời gian.</div>
+
+  <dl class="metabox">
+    <div><dt>Tác giả</dt><dd>Nguyen Van A</dd></div>
+    <div><dt>Xuất bản</dt><dd>2025-11-03</dd></div>
+    <div><dt>Giấy phép</dt><dd>CC-BY-4.0</dd></div>
+    <div><dt>Độ tin</dt><dd>plausible · 2 nguồn</dd></div>
+    <div><dt>Mục rữa</dt><dd>medium</dd></div>
+    <div><dt>Phân tích</dt><dd>2026-08-17 · v2 <span class="badge">pipeline</span></dd></div>
+  </dl>
+
+  <div class="warning"><b>⚠ Cần lưu ý trước khi đọc</b>
+    <ul><li>Số liệu ở Bảng 2 chưa có ai tái lập độc lập</li>
+    <li>Kết luận §5.2 mở rộng sang miền dữ liệu chưa thử</li></ul></div>
+
+  <h2>1 · Bối cảnh</h2>
+  <p>Pipeline dự báo chuỗi thời gian thường chia train/test theo tỷ lệ ngẫu nhiên như
+    bài toán phân loại thông thường. Cách này giấu một lỗi mà không phép kiểm nào bắt
+    được: đặc trưng cửa sổ trượt đã nhìn thấy tương lai từ trước khi chia tập.</p>
+
+  <h2>2 · Ý tưởng lớn</h2>
+  <p class="bigidea">Ranh giới thời gian phải được cố định <em>trước</em> khi sinh đặc
+    trưng. Đảo thứ tự hai bước này là nguồn gốc của phần lớn mô hình chạy tốt khi
+    backtest nhưng sập khi ra dữ liệu thật.</p>
+
+  <h2>3 · Bản đồ</h2>
+  <div class="tbl-wrap"><table>
+    <tr><th>Khối</th><th>Nội dung</th><th>Địa chỉ</th></tr>
+    <tr><td>§2</td><td>Giả thuyết và ký hiệu</td><td><a class="loc" href="#">§2.1</a></td></tr>
+    <tr><td>§3</td><td>Phương pháp — cửa sổ trượt</td><td><a class="loc" href="#">§3.1</a></td></tr>
+    <tr><td>§4</td><td>Thí nghiệm, điều kiện đo</td><td><a class="loc" href="#">§4.1</a></td></tr>
+    <tr><td>§5</td><td>Kết luận và giới hạn</td><td><a class="loc" href="#">§5.2</a></td></tr>
+  </table></div>
+
+  <h2>4 · Trục khái niệm</h2>
+  <p>Trục chính là <strong>cửa sổ trượt</strong> <a class="loc" href="#">§3.1</a> và
+    <strong>ranh giới rò rỉ</strong> <a class="loc" href="#">§3.4</a>. Bỏ trục thứ hai
+    thì toàn bộ lập luận về tính hợp lệ của kết quả sụp.</p>
+
+  <h2>5 · Cơ chế</h2>
+  <p class="meta">Chuỗi lập luận, mỗi bước neo vào một mục cụ thể.</p>
+  <ol class="steps">
+    <li>Dựng giả thuyết: đặc trưng trượt gây rò rỉ ngay cả khi chia tập đúng
+      <a class="loc" href="#">§2.1</a></li>
+    <li>Thiết kế thí nghiệm, nêu rõ phần cứng và kích thước dữ liệu
+      <a class="loc" href="#">§4.1</a></li>
+    <li>Kết quả so với baseline <a class="loc" href="#">§4.3 Bảng 2</a></li>
+    <li><strong>Chỗ đứt gãy:</strong> kết luận mở rộng sang miền dữ liệu chưa thử
+      <a class="loc" href="#">§5.2</a></li>
+  </ol>
+
+  <h2>6 · Tinh túy</h2>
+  <div class="essence">
+    <h4>6.1 Cố định ranh giới thời gian trước khi sinh đặc trưng</h4>
+    <dl>
+      <dt>Không hiển nhiên vì</dt><dd>rò rỉ xảy ra ở bước tính đặc trưng trượt chứ không
+        ở bước chia tập, nên kiểm tỷ lệ train/test không phát hiện được</dd>
+      <dt>Chuyển giao</dt><dd>mọi pipeline dự báo có đặc trưng cửa sổ trượt</dd>
+      <dt>Tin cậy</dt><dd>plausible · 2 nguồn độc lập</dd>
+      <dt>Bằng chứng</dt><dd><a class="loc" href="#">§3.4</a> <a class="loc" href="#">§4.1</a></dd>
+      <dt>Loại</dt><dd><span class="tag-skill">skill</span></dd>
+    </dl>
+  </div>
+  <div class="essence">
+    <h4>6.2 Kiểm tỷ lệ train/test không chứng minh được tính hợp lệ</h4>
+    <dl>
+      <dt>Không hiển nhiên vì</dt><dd>đây là phép kiểm mặc định trong hầu hết tutorial,
+        và nó cho cảm giác an toàn giả</dd>
+      <dt>Chuyển giao</dt><dd>mọi bài toán có thứ tự thời gian</dd>
+      <dt>Tin cậy</dt><dd>plausible · 2 nguồn độc lập</dd>
+      <dt>Bằng chứng</dt><dd><a class="loc" href="#">§3.4</a></dd>
+      <dt>Loại</dt><dd><span class="tag-know">knowledge</span></dd>
+    </dl>
+  </div>
+
+  <h2>7 · Dè chừng</h2>
+  <div class="tbl-wrap"><table>
+    <tr><th>Vấn đề</th><th>Loại</th><th>Địa chỉ</th></tr>
+    <tr><td>Số liệu Bảng 2 chưa ai tái lập</td><td>chưa kiểm chứng</td><td><a class="loc" href="#">§4.3</a></td></tr>
+    <tr><td>Kết luận vượt bằng chứng</td><td>đứt gãy lập luận</td><td><a class="loc" href="#">§5.2</a></td></tr>
+  </table></div>
+
+  <h2>8 · Lộ trình tiếp thu</h2>
+  <ul class="check">
+    <li><input type="checkbox" id="c1"><label for="c1">Đọc §3 trước
+      <span class="why">Phương pháp là phần đóng góp thật · 10 phút</span></label></li>
+    <li><input type="checkbox" id="c2" checked><label for="c2">Bỏ qua §2
+      <span class="why">Ký hiệu chuẩn, đã biết · 0 phút</span></label></li>
+    <li><input type="checkbox" id="c3"><label for="c3">Đối chiếu §4.1 với pipeline hiện tại
+      <span class="why">Đây là chỗ áp dụng được ngay · 15 phút</span></label></li>
+  </ul>
+
+  <h2>9 · Tự kiểm</h2>
+  <details class="quiz"><summary>Vì sao kiểm tỷ lệ train/test không bắt được rò rỉ?</summary>
+    <p>Vì rò rỉ xảy ra ở bước <em>tính đặc trưng</em>, trước khi chia tập. Tỷ lệ đúng
+      không nói gì về việc đặc trưng đã nhìn thấy tương lai hay chưa.</p></details>
+  <details class="quiz"><summary>Chỗ nào trong bài kết luận vượt quá bằng chứng?</summary>
+    <p>§5.2 — mở rộng sang miền dữ liệu chưa thử nghiệm.</p></details>
+
+  <div class="skillbox">
+    <div class="hd"><h4>walk-forward-cv-design</h4><span class="prio">ưu tiên 65</span></div>
+    <div class="verdict">DEEPEN → ml-engineer · plausible</div>
+    <p style="margin:0 0 10px"><strong>Vì sao lúc này:</strong> pipeline dự báo UNIS đang
+      chia train/test theo tỷ lệ ngẫu nhiên.</p>
+    <p class="meta" style="margin:0">Kích hoạt khi thiết kế cross-validation cho dữ liệu chuỗi thời gian</p>
+  </div>
+
+  <div class="chips">
+    <a class="chip" onclick="go('search')">walk-forward-validation</a>
+    <a class="chip" onclick="go('search')">data-leakage</a>
+  </div>
+
+  <hr class="orn">
+  <div class="foot"><span>nguồn: arxiv.org/abs/2411.00002</span><a href="#">xem .md thô →</a></div>
+ </div>
+</main>
+
+<!-- ══════════ SCR-03 TRA CỨU ══════════ -->
+<main class="view page" id="v-search">
+ <div class="prose" style="max-width:760px">
+  <div class="search"><input value="idempotency" aria-label="Tìm kiếm"></div>
+  <div class="filters">
+    <select><option>tất cả loại</option><option>repo</option><option>paper</option></select>
+    <select><option>tất cả độ tin</option><option>verified</option><option>plausible</option></select>
+    <select><option>tất cả mục rữa</option><option>low</option><option>high</option></select>
+  </div>
+
+  <div class="active-filter">khái niệm: idempotency <button>×</button></div>
+  <div class="meta" style="margin-bottom:8px">2 kết quả</div>
+
+  <article class="res" onclick="go('article')">
+    <div class="meta">repo · application · <span style="color:var(--ok)">verified</span></div>
+    <h3>Khử trùng bản ghi bằng khoá lũy đẳng ở tầng staging</h3>
+    <p class="snip">…consumer đọc từ hàng đợi có khả năng gửi trùng, dedupe bằng
+      <mark>idempotency-key</mark> ở tầng staging trước khi ghi vào bảng chính…</p>
+    <a class="chip">idempotency</a><a class="chip">staging-table-pattern</a>
+  </article>
+
+  <article class="res" onclick="go('article')">
+    <div class="meta">paper · <span style="color:var(--brand)">plausible</span></div>
+    <h3>STORM: tổng hợp đa góc nhìn</h3>
+    <p class="snip">…<mark>exactly-once</mark> delivery đạt được bằng cách kết hợp
+      khoá lũy đẳng với cửa sổ khử trùng…</p>
+    <a class="chip">eval-harness</a>
+  </article>
+
+  <div class="sec-hd" style="margin-top:var(--gap-block)"><h2>Khái niệm trong kho</h2><span class="line"></span></div>
+
+  <div class="cgroup"><h4>hệ thống và tích hợp</h4>
+    <a class="chip">idempotency<span class="cnt-badge">1</span></a>
+    <a class="chip">staging-table-pattern<span class="cnt-badge">1</span></a>
+    <a class="chip">eventual-consistency<span class="cnt-badge">1</span></a></div>
+
+  <div class="cgroup"><h4>AI agent và LLM</h4>
+    <a class="chip">context-management<span class="cnt-badge">2</span></a>
+    <a class="chip">eval-harness<span class="cnt-badge">2</span></a>
+    <a class="chip">retrieval-chunking<span class="cnt-badge">1</span></a></div>
+
+  <div class="cgroup"><h4>dữ liệu và ML</h4>
+    <a class="chip">walk-forward-validation<span class="cnt-badge">1</span></a>
+    <a class="chip">data-leakage<span class="cnt-badge">1</span></a></div>
+
+  <div class="cgroup proposed"><h4>chờ duyệt vào danh mục</h4>
+    <span class="chip">retry-jitter</span><span class="chip">prompt-caching</span>
+    <span class="chip">plugin-lifecycle</span>
+    <div class="meta" style="margin-top:6px">3 khái niệm chờ — duyệt lô theo tuần</div></div>
+ </div>
+</main>
+
+<!-- ══════════ EMPTY ══════════ -->
+<main class="view page" id="v-empty">
+  <div class="empty">
+    <h2>Chưa có bài nào được duyệt</h2>
+    <p>Kho có <strong>3 bản</strong> ở trạng thái draft. Duyệt một bản để nó xuất hiện ở đây.</p>
+    <div class="steps-box"><b>Cách thêm bài</b>
+      <ol><li>Mở Claude Code, dán một link</li>
+        <li>Đọc bản phân tích trong <code>kb/</code></li>
+        <li>Đổi <code>review_status</code> thành <code>approved</code></li>
+        <li><code>git push</code></li></ol></div>
+  </div>
+</main>
+
+<script>
+function go(v){
+  document.querySelectorAll('.view').forEach(function(e){e.classList.remove('on')});
+  document.getElementById('v-'+v).classList.add('on');
+  document.querySelectorAll('[data-nav]').forEach(function(b){
+    b.setAttribute('aria-current', b.dataset.nav===v?'page':'false')});
+  window.scrollTo(0,0);
+}
+function tog(){
+  var r=document.documentElement;
+  var dark=r.getAttribute('data-theme')==='dark'
+    || (!r.hasAttribute('data-theme') && matchMedia('(prefers-color-scheme:dark)').matches);
+  r.setAttribute('data-theme', dark?'light':'dark');
+}
+document.querySelectorAll('.tab').forEach(function(t){t.onclick=function(){
+  document.querySelectorAll('.tab').forEach(function(x){x.setAttribute('aria-selected','false')});
+  t.setAttribute('aria-selected','true')}});
+go('home');
+</script>

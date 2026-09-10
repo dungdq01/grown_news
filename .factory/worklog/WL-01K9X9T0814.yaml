@@ -1,0 +1,145 @@
+id: WL-01K9X9T0814
+at: 2026-09-02
+by: claude
+buoc: "T08-14 — hai cua con lai C1 + C2; KHOA_DICH_VU vao env_plan. FR-047 du BAY CUA."
+loai: don vi CODE + mo rong don vi TEST
+gate: khong ky gate — FR-047 chua dong, cho NGUOI
+
+object:
+  - web/api/loi-cua.mjs        # +cuaNhap (C1) +cuaNhapChungCat (C2)
+  - web/api/router.mjs         # dau 2 route
+  - web/test/loi-cua.test.js   # +V1 (5 ca) +V3b (2 ca)
+  - 04_system/env_plan.md      # KHOA_DICH_VU + LOI_DB
+
+evidence:
+  - "7/7 handler xuat khau, va 0 handler quen goi quaCong (do bang dem, khong bang mat)"
+  - "V1: C1 lot review_status, dat draft, KHONG co literal approved"
+  - "api-guard xanh · duong-api-khop-route xanh"
+
+C1_khac_taoBai_o_DUNG_MOT_CHO: >
+  taoBai dat review_status = "approved" — va do la DUNG, vi no la CUA CUA NGUOI
+  (chu du an ngoi o ban bien tap local).
+  C1 la CUA CUA MAY (M15_kenh) nen ep `draft` VO DIEU KIEN.
+  Hai duong, hai luat. Cong V1 do CA HAI ve: C1 khong co literal "approved",
+  VA taoBai VAN co — de khong ai "thong nhat" hai cua lai roi lam vo B-B1.
+
+LOT_chu_khong_TU_CHOI: >
+  FR-047 §2 C1 khai "review_status trong payload bi LOT, khong phai bi tu choi".
+  Khac biet co chu y: tu choi DAY nguoi goi rang truong do ton tai va dang thu
+  lai; lot thi truong do don gian khong co tac dung gi.
+
+THU_TU_XOA_TRUOC_DAT: >
+  Cong V1 do ca THU TU: `delete fm.review_status` phai dung TRUOC
+  `fm.review_status = "draft"`. Nguoc lai thi mot payload khai review_status
+  SAU origin van lot — cung lop loi "hai buoc, mot khe" cua M18-R1.
+  Mot cong chi do "co dong delete khong" se XANH tren ban dat-roi-xoa.
+
+KHOA_DICH_VU_la_lo_VAN_HANH_toi_tu_tao: >
+  T08-12 dung mot cong xac thuc doi bien KHOA_DICH_VU ma KHONG khai o dau.
+  Nguoi van hanh khong co cach nao biet phai dat bien nao => M15/M17 se 401 het
+  va khong ai hieu vi sao.
+  Da ghi vao env_plan: hai file .env, lenh sinh khoa, va — quan trong nhat —
+  hanh vi khi CHUA dat: loiKiemKhoaDichVu tra false => 401. FAIL-CLOSED.
+  Quen dat bien thi M15/M17 khong goi duoc LOI, va do la hong DUNG CHIEU.
+
+do_do:
+  khong_co_do_moi: "api-guard + duong-api + loi-cua deu xanh"
+
+no_con_lai:
+  - "FR-047 du bay cua nhung CHUA DONG — nguoi ky, khong phai agent"
+  - "M18-R1 + M18-R3 van S4; bang da ton tai nen promote lai S3 duoc"
+  - "chua ai GOI xuatLoi tu dong sau moi lan ghi — hien phai goi tay"
+  - "C1 chua co test HTTP that (dung server) — hien do tren MA NGUON handler"
+  - "FR chua mo: du lieu ca nhan vao git truoc lan push dau tien (ADR-06 he qua 3)"
+
+# ══ BO SUNG — promote M18-R1 + M18-R3 tro lai S3 ════════════════════
+promote_trong_cung_ngay:
+  object:
+    - web/api/dungchung.mjs        # +loiDatVai (thao tac co ten, KHONG phai cong)
+    - web/test/loi-cua.test.js     # +3 ca AC-6.1 do HANH VI
+    - 06_modules/M18_nguoidung/rules.md
+    - 06_modules/M18_nguoidung/backlog.md
+  evidence:
+    - "check_rule_surfaces: S3 lenh CHAY DUOC = 15 · DO = 0"
+    - "AC-6.1 do hanh vi: bon `vai` (null, admin, doc, gia-tri-chua-tung-co) => OK|OK|OK|OK"
+    - "bay cong Python xanh · pytest 42"
+  vong_doi_mot_ngay: >
+    khai S3 luc viet spec  -> lenh chua ton tai, RULE NOI SAI VE CHINH NO
+    T04-6 bat rang          -> cong DO dung hai rule nay
+    ha xuong S4             -> R3: "hard ma khong co lenh chay duoc thi no la soft"
+    T08-11 + T08-12         -> thu can do CO THAT
+    promote lai S3          -> lenh `cd web && node test/loi-cua.test.js` chay duoc
+  diem_dang_giu: >
+    Buoc HA XUONG S4 khong phai noi long. No lam rules.md ngung noi sai ve chinh
+    no, va bien mot loi hua thanh mot nghia vu CO DIA CHI.
+    Khong co buoc do thi hai rule o lai S3 voi mot lenh khong ton tai — va truoc
+    T04-6 thi KHONG CONG NAO BIET.
+  loiDatVai_khong_pha_M18_R3: >
+    Ham nay DAT `vai`, khong DOC `vai` de quyet dinh gi. No ton tai de man admin
+    hien thi duoc, VA de cong AC-6.1 gieo duoc bon gia tri khac nhau roi doi
+    CUNG mot ket qua — khong co no thi luat "vai khong phai cong" KHONG DO DUOC.
+    Cong con do them mot ve doc lap: khong cau SQL nao trong dungchung.mjs loc
+    theo `vai`.
+
+# ══ BO SUNG 2 — backup TU CHAY (ADR-06 c hoan chinh) ════════════════
+backup_tu_chay:
+  object:
+    - web/api/dungchung.mjs      # +sauGhiLoi() dau vao 5 thao tac
+    - web/test/loi-cua.test.js   # +4 ca do backup CO TU CHAY khong
+  lo_da_do: >
+    xuatLoi() ton tai nhung KHONG AI GOI. Mot backup khong bao gio chay thi
+    khong phai backup — ADR-06 (c) khi do chi la mot HAM.
+    Day la loai lo IM LANG NHAT: moi test khac van xanh, va nguoi ta chi biet
+    vao ngay o cung hong.
+  cach_lam: >
+    sauGhiLoi() goi NGOAI khoi dungLoiDb cua thao tac goi no — xuatLoi tu mo DB,
+    va mo long nhau la cho khoa tu cho chinh minh.
+    Dau vao DUNG NAM thao tac cham ba bang phai-xuat: loiTaoNguoiDung, loiThuHoi,
+    loiDatVai, loiBuocDinhDanh, loiTaoNhap, loiSuaNhap.
+    KHONG dau vao loiCapMaMoi / loiMoPhien / loiGhiAudit — chung cham ba bang
+    KHONG xuat, va mot cong do dung dieu do (cap ma moi KHONG lam doi ban lui).
+  nuot_loi_co_chu_dich: >
+    Xuat hong (dia day, quyen) KHONG duoc lam hong phep ghi DA COMMIT. Nhung no
+    phai KEU: console.error noi thang "du lieu goc dang KHONG co backup".
+    Im lang o day la mat backup ma khong ai biet — dung thu ADR-06 sinh ra de
+    tranh.
+
+# ══ MOT CONG CUA TOI DO VI DO SAI THU ══════════════════════════════
+cong_do_THAO_TAC_thay_vi_KET_QUA: >
+  Ca "ghi du 3 file" (viet o T08-13) DO ngay khi backup bat dau tu chay: ba file
+  da ton tai TRUOC dong do, nen xuatLoi tra ghi=0.
+  Cong do dang do SO FILE MOT LAN GOI GHI — tuc THAO TAC — thay vi do KET QUA
+  ("ba file co mat va khop DB").
+  Do la mot cong se DO moi khi he thong tro nen TOT HON, va do la dau hieu phep
+  do sai chu khong phai ma sai. Da doi sang do `a.bang === 3` (khai du ba bang)
+  + giu nguyen ve diem bat dong.
+
+# ══ BO SUNG 3 — do tren SERVER THAT, khong do tren ma nguon ═════════
+T08_14b:
+  object:
+    - web/test/loi-cua-http.test.js   # MOI
+    - web/test/_api.mjs               # batServer nhan `loi`
+    - web/package.json · web/test/WORKLOG.md · web/WORKLOG.md
+  evidence:
+    - "7/7 cua tra 401 khi thieu khoa — do bang HTTP vao server that"
+    - "khoa SESSION va `aud` sai deu 401"
+    - "C1 khong duong nao tra approved; C3 hai ca giong het tung byte; C6 404 than rong"
+    - "POST /api/articles VAN song, khong bi cong khoa-dich-vu nuot"
+  vi_sao_can_file_nay: >
+    loi-cua.test.js do V1 bang REGEX TREN MA NGUON handler. Luat bang chung cua
+    du an noi thang: "TINH: output may — he thong CHAY THAT / KHONG: unit test
+    pass · agent tu khai".
+    Mot regex /fm.review_status = "draft"/ XANH ke ca khi route chua dau, ke ca
+    khi quaCong chan mat request truoc khi toi dong do, ke ca khi mot lop phia
+    tren ghi de. No do SU CO MAT CUA MOT DONG MA, khong do HANH VI.
+  ve_do_thu_hai_dang_gia_nhat: >
+    "POST /api/articles VAN song va KHONG bi cong khoa-dich-vu chan".
+    Do la ve de vo nhat khi them mot cong xac thuc: rat de dat quaCong o cho
+    chung roi khoa nham cua cua NGUOI. FR-024 da mot lan lam vo dung duong do
+    (FE dung URL thang o bon cho). Cong nay bat truoc khi no xay ra.
+  hai_loi_nho_da_sua: >
+    1. dung `ket()` trong khi _api.mjs xuat `chot(ten)` — doc API truoc khi dung
+       thi khong mat mot luot.
+    2. gui body cho GET => undici NEM ("Request with GET/HEAD method cannot have
+       body"), giet ca file test truoc khi ca nao chay. Cung lop loi
+       `if-none-match: undefined` da ghi o WORKLOG:228.

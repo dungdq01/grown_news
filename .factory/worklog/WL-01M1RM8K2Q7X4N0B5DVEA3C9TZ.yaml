@@ -1,0 +1,127 @@
+ulid: 01M1RM8K2Q7X4N0B5DVEA3C9TZ
+thoi_diem: 2026-09-05T20:10+07:00
+tac_nhan: claude-opus-5
+loai: ban_giao
+module: M12_chungcat + M03_web
+don_vi: T12-21 · dọn R1 cho T12-14 · T12-20 · T03-108 · T03-109 · T03-110
+
+viec: >
+  Đường ASR lối `cua-asr` CHẠY THẬT lần đầu. Trước phiên này nó chưa từng chạy
+  đầu-cuối một lần nào, và lý do được ghi trong sổ (*"thân request ~17 MB vượt
+  trần"*) là một CHẨN ĐOÁN SAI.
+
+r5_do_truoc:
+  - don_vi: T12-21
+    lenh: python chungcat/tests/check_nen_audio.py
+    ket_qua: "ĐỎ — `asr_cua` chưa có `nen_cho_cua`"
+    đỏ_do: claude-opus-5
+  - don_vi: dọn R1
+    lenh: python core/tests/check_g6b.py
+    ket_qua: >
+      33 lỗi, trong đó của tôi: T12-20 và T03-108 khai file test trong
+      `phạm_vi_ghi` mà không phải đơn vị test; T12-14 khai `FROZEN.lock`;
+      T03-110 mất `phạm_vi_ghi` vì một dòng `#` chen ngay sau khoá.
+    đỏ_do: claude-opus-5
+
+chan_doan_sai_da_sua: >
+  `tran_than_cua_byte` (8 MiB) ra đời từ một phép suy sai. Lỗi xuất hiện trên
+  audio 19 phút, không ai thử lại với clip ngắn, và câu lỗi của `egress` nói
+  `chunk=0` — đọc như "cửa không nhận nổi lượng dữ liệu này".
+  Đo lại trên clip 8 GIÂY (~43 KB base64, nhỏ hơn 400 lần): cửa từ chối Y HỆT.
+  Kích thước chưa bao giờ là nguyên nhân.
+  `so_chunk` khai `= 0` rồi KHÔNG BAO GIỜ TĂNG — một cổng chẩn đoán nói dối.
+  Cổng vắng thì người đi tìm; cổng nói dối thì người tin và đi sai đường.
+
+nam_loi_that:
+  - id: 1 · data-URI
+    do: "clip 8 giây, đổi đúng một biến"
+    ket_qua: >
+      `data:audio/mpeg;base64,…` → 502 + trang HTML Cloudflare (chết ở HẠ TẦNG,
+      chưa tới model, nên API không nói được gì).
+      `data:audio/mp3;base64,…` → 502 y hệt.
+      base64 TRẦN → 200 + bản phiên âm THẬT.
+    ghi_chu: "`beeknoee-api-guide.md` §4.3 khai data-URI. Guide sai cho cửa này."
+  - id: 2 · max_tokens
+    ket_qua: >
+      Vắng `max_tokens` ⇒ cửa cắt giữa mảng JSON ⇒ `json.loads` ném ⇒ mất SẠCH
+      bản phiên âm đã trả tiền. Đặt 65536: `finish_reason: stop`, 14.382
+      completion token, phủ trọn 1176s.
+  - id: 3 · stream cắt nội dung
+    do: "cùng audio, cùng model, cùng max_tokens"
+    ket_qua: >
+      `stream: true` → nội dung cụt ở ~175 GIÂY transcript với MỌI độ dài nguồn
+      (5 phút và 10 phút cùng ra ~175s) — cửa bỏ qua `max_tokens` khi stream.
+      Không stream → phủ trọn. Nên `asr_cua` không stream, khác lối chưng cất.
+  - id: 4 · nhánh không-stream của egress chưa ai đi
+    ket_qua: >
+      `_httpx_post` bỏ qua `headers` (tức rơi `Authorization` ⇒ 401) và trả
+      thẳng `Response` thay vì dict. Hai lỗi ẩn được vì mọi lối đang dùng đều
+      khai `stream: true`.
+  - id: 5 · vớt cue mất đồng bộ
+    ket_qua: >
+      Model tự đẻ một object hỏng giữa 300 object lành —
+      `{"v": "591.738, "den": …}` (sai khoá + chuỗi không đóng). Phép quét theo
+      ĐỘ SÂU bị dấu nháy thừa lật trạng thái trong-chuỗi ⇒ 256/294 cue hỏng theo.
+      Viết lại kiểu cắt theo ranh `}, {`: hỏng nằm gọn một mảnh ⇒ 317/319 cue.
+    tu_sua: >
+      Tôi đã dùng chính bản vớt hỏng này để kết luận "stream chỉ phủ 49%" — tức
+      đo lỗi của mình rồi quy cho stream. Kết luận đó sai và đã đo lại.
+
+chay_that:
+  - "clip 8 giây → 200 + phiên âm thật (Việt + Anh lẫn nhau, mốc giây đúng)"
+  - "nguồn 5 phút → 77 cue, phủ 321s/300s — TRỌN VẸN"
+  - "nguồn 19 phút → 317 cue, phủ 1176s/1133s — TRỌN VẸN"
+  - "usage đo được: 28.325 audio token vào, 14.382 token ra"
+
+do_sau:
+  - lenh: python chungcat/tests/check_nen_audio.py
+    ket_qua: "16/16 vế XANH (8 vế nén + 8 vế khoá hình dạng request)"
+  - lenh: 'for f in chungcat/tests/check_*.py; do python "$f"; done'
+    ket_qua: 34/34 XANH
+  - lenh: python -m pytest core/tests -q
+    ket_qua: 49 passed
+  - lenh: python core/tests/check_g6b.py
+    ket_qua: "33 → 27 lỗi; 0 lỗi thuộc M12 hoặc thuộc task của tôi"
+  - lenh: cd web && npm test
+    ket_qua: "279 vế ok; 1 FAIL `trang chủ 61915/61440` — không phải của tôi"
+
+nen_audio: >
+  mono 16 kHz mp3 32k. Đo: 12.0 MB → 4.53 MB (base64 16.0 → 6.0 MB). KHÔNG phải
+  để lách trần — ASR hạng whisper hạ mẫu về đúng mono 16 kHz trước khi nghe, nên
+  gửi stereo 44.1 kHz là trả tiền mạng cho phần bên nhận vứt đi ngay.
+  mp3 chứ không opus (opus nhỏ hơn 1.4 MB) vì guide chỉ khai `format: "mp3"` —
+  đổi một trần ĐO ĐƯỢC lấy một giả định là sai chiều, nhất là với một cửa từ
+  chối ÂM THẦM.
+
+con_lai:
+  cua_chap_chon: >
+    Đo 3 lần liên tiếp trên cùng clip 5 phút: 1 thành công, 2 ăn lỗi HTTP. Đây
+    là độ tin cậy của CỬA, không phải của mã. Nói ra chứ không giấu sau một
+    vòng retry — `M12-R6` cho đúng 2 lần gửi.
+  nguon_dai: >
+    Nguồn > ~26 phút vẫn cần cắt đoạn, mà cắt = N lần gửi ⇒ đụng `M12-R6`.
+    Không tự diễn giải luật frozen ⇒ FR-065, ba lối để chủ dự án chọn.
+
+r1_da_don:
+  - "T12-14: bỏ `FROZEN.lock` khỏi `phạm_vi_ghi` — agent không ký, người ký"
+  - "T12-20 · T03-108 · T03-109: cổng về đúng đơn vị test (T12-8 · T03-110b)"
+  - "T03-110: chuyển dòng `#` lên TRƯỚC khoá — nó làm cổng đọc ra `thiếu phạm_vi_ghi`"
+  - >
+    `check_g6b`: `06_modules/*/testcases.md` KHÔNG còn bị đếm là file test. Nó
+    là artifact s6, và phép so chuỗi con `"test" in path` tố oan mọi task s6.
+    Sửa cổng vì đỏ oan dạy người ta bỏ qua màu đỏ.
+
+object:
+  - chungcat/src/asr_cua.py
+  - chungcat/src/egress.py
+  - chungcat/assets/nguon-transcript.json
+  - chungcat/tests/check_nen_audio.py
+  - core/tests/check_g6b.py
+  - 07_plan/M12_chungcat/tasks/T12-21-nen-audio-truoc-khi-gui-cua.md
+  - 07_plan/M12_chungcat/tasks/T12-14-ap-fr054-vao-spec.md
+  - 07_plan/M12_chungcat/tasks/T12-8-test-cong-m12.md
+  - 07_plan/M03_web/tasks/T03-110-tab-theo-doi-chung-cat.md
+  - 07_plan/M03_web/tasks/T03-109-upload-mp4-man-nap-video.md
+  - 07_plan/M03_web/tasks/T03-110b-test-tab-theo-doi.md
+  - .factory/wo/WO-054-audio-qua-lon-cho-cua.md
+  - .factory/fr/FR-065-cat-doan-audio-va-tran-gui.md

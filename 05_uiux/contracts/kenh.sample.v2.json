@@ -1,0 +1,71 @@
+{
+  "$comment": "v2 — ui_flow M15: giao diện của M15 là TIN NHẮN, và tin nhắn là hợp đồng. Bốn cảnh §2 a-d, mỗi cảnh một hội thoại demo. Adapter chỉ GỌI RA.",
+  "version": 2,
+  "adapters": [
+    {
+      "kenh": "telegram",
+      "trang_thai": "dang-poll",
+      "offset": 88231407,
+      "update_cuoi": "2026-09-01T09:41:22+07:00",
+      "tran_file": "50 MB"
+    },
+    {
+      "kenh": "discord",
+      "trang_thai": "tat",
+      "offset": null,
+      "update_cuoi": null,
+      "tran_file": "10 MiB"
+    }
+  ],
+  "dinh_danh_kenh": [
+    {
+      "kenh": "telegram",
+      "chat_id": "1290077431",
+      "nguoi_dung": "dung.dang",
+      "buoc_luc": "2026-08-31"
+    },
+    {
+      "kenh": "telegram",
+      "chat_id": "8823140055",
+      "nguoi_dung": "dong.nghiep-a",
+      "buoc_luc": "2026-09-01"
+    }
+  ],
+  "hoi_thoai_mau": [
+    {
+      "canh": "a-chua-buoc",
+      "tu": "5550001234 (chưa buộc)",
+      "nguoi_gui": "https://spam.example/x",
+      "bot_tra_loi": "Chat này chưa được buộc vào tài khoản nào. Nếu bạn được mời dùng, hãy nhắn mã mời nhận từ chủ hệ thống.",
+      "$luat": "từ chối VÀ NÓI — nhưng không tiết lộ gì về kho; 0 bản ghi được tạo"
+    },
+    {
+      "canh": "b-validate-truot",
+      "tu": "1290077431 (dung.dang)",
+      "nguoi_gui": "bao-cao-noi-bo.pdf (3.1MB)",
+      "bot_tra_loi": "Chưa nạp được — thiếu 2 trường bắt buộc: title, source_type. Gửi lại kèm một dòng: tiêu đề | loại nguồn.",
+      "$luat": "trả NGUYÊN VĂN lỗi — 'có lỗi xảy ra' là xoá đúng thông tin người gửi cần"
+    },
+    {
+      "canh": "c-nap-xong-o-nhap",
+      "tu": "8823140055 (dong.nghiep-a)",
+      "nguoi_gui": "https://arxiv.org/abs/2410.99999",
+      "bot_tra_loi": "Đã nhận: arxiv-2410-99999 — đang ở bản NHÁP, chưa lên kho. Chủ kho duyệt xong mới đọc được trên web.",
+      "$luat": "nói rõ đang ở nháp — không thì người gửi tưởng xong và không ai quay lại duyệt"
+    },
+    {
+      "canh": "d-vuot-tran-noi-truoc",
+      "tu": "1290077431 (dung.dang)",
+      "nguoi_gui": "video-demo.mp4 (72MB) [Discord]",
+      "bot_tra_loi": "File 72MB vượt trần Discord (10MiB). Kênh Telegram nhận tới 50MB — hoặc đưa link để hệ tự kéo.",
+      "$luat": "nói TRƯỚC khi kênh tự trả lỗi — lỗi của Telegram/Discord không nói được câu gợi ý này"
+    },
+    {
+      "canh": "hoi-dap",
+      "tu": "8823140055 (dong.nghiep-a)",
+      "nguoi_gui": "walk-forward là gì?",
+      "bot_tra_loi": "Walk-forward giữ thứ tự thời gian khi kiểm chứng… (2 nguồn kèm địa chỉ — cùng JSON với web, phiên ph-02)",
+      "$luat": "cùng endpoint, cùng hợp đồng JSON với cửa sổ chat web"
+    }
+  ]
+}

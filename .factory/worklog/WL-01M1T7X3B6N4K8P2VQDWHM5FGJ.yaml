@@ -1,0 +1,38 @@
+ulid: 01M1T7X3B6N4K8P2VQDWHM5FGJ
+thoi_diem: 2026-09-06T12:10+07:00
+tac_nhan: chủ dự án (ghi hộ bởi claude-opus-5)
+loai: ky_gate
+module: M03_web
+don_vi: T03-117 · AC0 — DUYỆT WIREFRAME SCR-19
+
+moc_duyet: >
+  Chủ dự án duyệt `05_uiux/wireframes/SCR-19-tai-xuong-va-print.md` và trả lời
+  đủ ba câu hỏi. Bước 2 được phép bắt đầu từ đây, KHÔNG sớm hơn.
+
+ba_quyet_dinh:
+  - cau: "Ca tài-liệu chỉ một mục — giữ menu xổ hay đổi thành nút thẳng?"
+    chon: GIỮ MENU XỔ
+    hieu_qua: >
+      Nút "Tải xuống ▾" đứng CÙNG MỘT CHỖ, CÙNG MỘT HÌNH ở mọi loại bản ghi.
+      Người học một lần rồi dùng ở khắp nơi; đổi hình theo loại thì họ phải
+      nhận diện lại mỗi lần mở một bản ghi khác kiểu.
+  - cau: "Bài viết có thêm `File gốc` không?"
+    chon: CÓ
+    lam_ro_nghia: >
+      Lúc hỏi tôi cho rằng đây là "hai tên cho một thứ" — SAI, và câu trả lời
+      của chủ dự án làm lộ ra sự khác biệt thật:
+        `dang=md`  → THÂN BÀI, không frontmatter
+        `dang=goc` → NGUYÊN FILE `.md` như trên đĩa, CÓ frontmatter
+      Ai cần đọc thì lấy `md`; ai cần NẠP LẠI ở nơi khác thì cần frontmatter —
+      thiếu nó thì bản ghi mất `id`, `nguon`, `category`, `concepts`.
+      Hai thứ khác nhau, và tên gọi nay nói ra điều đó.
+  - cau: "Nút đặt ở đâu?"
+    chon: TẠM THỜI chỉ trong cửa sổ đọc/xem
+    hieu_qua: >
+      Thẻ ngoài lưới tiện hơn nhưng thêm byte cho MỌI trang, kể cả trang người
+      chỉ lướt. `gn.css` còn 22 byte — thêm ở đó là mua tiện lợi bằng tốc độ
+      tải của mọi độc giả. Để dành, không bỏ.
+
+object:
+  - 05_uiux/wireframes/SCR-19-tai-xuong-va-print.md
+  - 07_plan/M03_web/tasks/T03-117-nut-tai-xuong-va-print-view.md

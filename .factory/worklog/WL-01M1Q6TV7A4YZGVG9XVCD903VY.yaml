@@ -1,0 +1,96 @@
+ulid: 01M1Q6TV7A4YZGVG9XVCD903VY
+thoi_diem: 2026-09-05T05:00+07:00
+tac_nhan: claude-opus-5
+loai: ban_giao
+module: M03_web
+don_vi: T03-112
+viec: >
+  Cửa sổ chưng cất chạy SONG SONG cạnh cửa sổ đang đọc: dây chuyền 5 chặng có
+  nhịp + đồng hồ elapsed, xong thì kết quả trải ra ngay trong cửa sổ đó, nút
+  "Duyệt vào kho" tại chỗ. `/chung-cat/` thành nơi lưu trữ + quản lý.
+
+r5_do_truoc:
+  luc: 2026-09-05T04:2x+07:00
+  lenh: node web/test/tab-theo-doi-chung-cat.test.js
+  ket_qua: >
+    ĐỎ 2 vế — cổng còn đòi "đổi tab" của T03-110, hình dạng mà T03-112 ĐÈ.
+  đỏ_do: claude-opus-5 (đổi hợp đồng, sửa cổng trước khi sửa mã)
+
+do_sau:
+  - lenh: cd web && npm test
+    ket_qua: exit 0 — gồm cả `trang chủ 61433/61440` (AC5 xanh, xem FR-064)
+  - lenh: 'for f in chungcat/tests/check_*.py; do python "$f"; done'
+    ket_qua: 31/31 XANH
+  - lenh: python -m pytest core/tests -q
+    ket_qua: 49 passed
+  - lenh: "E2E trên trình duyệt thật (Playwright)"
+    ket_qua: >
+      2 cửa sổ song song (trái x=20, phải x=656) · cửa sổ nguồn GIỮ NGUYÊN bài ·
+      dây chuyền 5 chặng · đèn nhịp chạy · xong ⇒ `1/1 trích dẫn đối chiếu`,
+      thân 297 ký tự đổ bằng textContent, nút "Duyệt vào kho" hiện.
+
+ac_dat:
+  AC1: >
+    XANH — đo trên trình duyệt: 2 cửa sổ, nguồn nguyên vẹn, cửa sổ mới ở cạnh.
+  AC2: XANH — ban_hien_tai + citations, `<pre>` + textContent.
+  AC4: XANH — khối BẢN CHƯNG CẤT 4 số tách + lối vào /chung-cat/nhap/; thẻ xong mang data-ccnhap.
+  AC5: XANH — npm test exit 0, trần trang chủ về xanh (FR-064).
+  AC6: XANH — mọi animation trong khối prefers-reduced-motion, chỉ transform/opacity.
+  AC7: chưa — vế NGƯỜI chấm.
+
+ac_chua_dat:
+  AC3:
+    trang_thai: MỘT NỬA
+    dat: >
+      Nút gọi ĐÚNG cửa duyệt sẵn có (`POST /api/nhap-chung-cat/<id>/duyet`),
+      KHÔNG thêm đường ghi — `api-guard` whitelist không đổi.
+    chua_dat: >
+      Bấm xong nhận 422: cửa chạy `validate.py --fix` và từ chối vì bản nháp
+      THIẾU TRƯỜNG (`id`, `url` là bắt buộc). Cửa làm đúng; thiếu sót ở phía
+      TẠO (`worker._dung_nhap`).
+    xu_ly: >
+      Mở T12-20 (M12 dev lấy 20-29 theo quy ước chủ dự án 2026-09-05). KHÔNG
+      nới thước để lọt: nới `validate` là bỏ phép kiểm cho MỌI đường nạp, không
+      riêng chưng cất.
+
+chan_lai:
+  ly_do: >
+    AC5 đòi trần trang chủ xanh, nhưng phần vỡ trần là hai chip `md`/`txt` của
+    T03-111 (phiên khác) và hai file phải sửa nằm NGOÀI `phạm_vi_ghi` của
+    T03-112.
+  ngoai_pham_vi:
+    - core/assets/media-mime.json
+    - web/render/trang.mjs
+    - core/tools/dung_lai_db.py
+    - web/test/bon-chieu-facet.test.js
+    - web/test/loai-nguon-api.test.js
+  fr: FR-064 — CHỜ KÝ. Đã áp để AC5 xanh; hoàn nguyên được nếu không duyệt.
+
+keo_theo:
+  - >
+    KHOÁ MỘT-WORKER (`worker.chiem_khoa`): tìm ra một worker MỒ CÔI từ 03:35
+    vẫn sống và nhặt việc bằng mã CŨ — việc chạy xong mà thiếu `ket_qua` trong
+    khi mã mới rõ ràng có ghi. Tôi đã đi kiểm `ghi_ket_qua`/`dong_viec`/
+    `_ghi_nguyen_tu` trước khi nghĩ tới chuyện có hai worker. Nay worker thứ
+    hai tự thoát (mã 4) kèm câu nói rõ pid đang giữ.
+  - >
+    Cổng `sinh-transcript-ui` vế "toast mang ?job=" đã đổi theo hợp đồng mới:
+    chỗ theo dõi là CỬA SỔ, và chủ dự án đã yêu cầu bỏ ULID khỏi toast hai lần.
+  - >
+    Còn lại trong plan: T12-19 (tiến độ transcript từng phần) và T03-108 (cửa
+    sổ transcript + chuỗi 3 cửa sổ). T12-20 chen vào trước nếu muốn AC3 trọn.
+
+object:
+  - web/plugins/cctab/src/cctab.inline.ts
+  - web/plugins/chungcat/src/chungcat.inline.ts
+  - web/plugins/multiwindow/src/scripts/multiwindow.inline.ts
+  - web/test/tab-theo-doi-chung-cat.test.js
+  - web/test/sinh-transcript-ui.test.js
+  - web/test/loai-nguon-api.test.js
+  - web/test/bon-chieu-facet.test.js
+  - web/render/trang.mjs
+  - core/assets/media-mime.json
+  - core/tools/dung_lai_db.py
+  - chungcat/src/worker.py
+  - .factory/fr/FR-064-tach-vai-render-va-vai-chip-loc.md
+  - 07_plan/M12_chungcat/tasks/T12-20-nhap-du-truong-de-duyet-duoc.md

@@ -1,0 +1,164 @@
+id: WL-01K9KEFR028
+at: 2026-08-25
+by: claude
+buoc: s8 (M08_api + M03_web) + s6 (M02_kb/rules.md FROZEN · project_map v11 -> v12)
+loai: danh muc song bang API + go cong bang chung
+fr: FR-028-danh-muc-song-va-khai-tu-do.md
+
+viec: >
+  Nguoi dung: "toi muon concept hay topic deu co API crud chu ko phai doc tu
+  .yaml ra nua. user se khai bao va update lien tuc cac key cho vao API"
+
+cau_hoi_doc_sai_thi_lam_sai_het: >
+  Cau do doc nhu "chua co CRUD". Khao sat noi nguoc lai: CRUD da du bon cho ca
+  hai danh muc tu FR-019 + FR-021. Neu tin cau chu va di dung API moi thi da
+  dung mot ban sao cua thu da co, va van KHONG chua duoc benh.
+  Benh nam o hai cho khac han — va phai tach ra thi moi sua dung.
+
+hai_benh_that:
+  mot_man_doc_ban_chup: >
+    Emitter doc concepts.yaml/categories.yaml LUC BUILD roi in vao 10 moc HTML
+    (home-pages/index.ts:738-856). Ghi qua API xong man hinh khong doi, nen 5
+    toast phai dinh kem "chay npm run build". Do dung la "doc tu .yaml ra":
+    khong phai API doc sai, ma MAN HINH doc ban chup yaml cua lan build gan nhat.
+    CUNG LOP BENH FR-024 da chua cho BAI VIET, chua chua cho NHAN.
+  hai_cong_bang_chung: >
+    POST /api/concepts tu choi neu nhan chua nam trong concepts_proposed cua >=N
+    bai. "Khai bao lien tuc" bi chan ngay tu key dau tien.
+
+phat_hien_quyet_dinh_huong_lam: >
+  Ba nut tren hang nhan (data-suanhan · data-xoanhan · data-ketnap) DA dung
+  event delegation — t.closest(...) trong MOT handler tren document. Nghia la
+  hang nhan ve lai bao nhieu lan cung van bam duoc, KHONG phai gan lai listener
+  nao, no-leak.test.js khong co gi de phan nan.
+  Neu nut gan theo tung phan tu thi bai toan da khac han — huong "ve lai moc"
+  se dat gap may lan va co the phai chon huong khac.
+
+ba_nhanh_nguoi_dung_chot:
+  nguon_su_that: "GIU yaml. validate.py, check_danh_muc.py, enum trong schema FROZEN, FROZEN.lock deu doc yaml — doi sang SQLite la viet lai ca chuoi cong Python, ma cai dau that (phai build moi thay) khong can toi do."
+  cong_bang_chung: "BO — khai tu do"
+  topic: "= chu de/category san co, khong phai chieu phan loai thu ba"
+
+khong_them_endpoint_moi: >
+  Noi hai GET da co (/api/concepts, /api/categories) them gom/aliases/dang_dung
+  thay vi dung /api/danhmuc thu ba. Form viet bai da goi chung roi; mot danh muc
+  thi mot cua doc. Va napMotDanhMuc TRA LAI danh sach thay vi goi them mot luot
+  — hai luot goi la hai anh chup o hai thoi diem, nguoi dung them nhan giua hai
+  luot thi form va man hinh noi hai chuyen khac nhau.
+
+# ══ PHAN DANG GIA NHAT: hai phep dem giong het nhau, phai KHAC nhau ═══════
+hai_phep_dem_dang_dung:
+  van_de: >
+    Sau FR nay repo co HAI ham dem "bao nhieu bai dung nhan nay", nam o hai file
+    canh nhau. Chung PHAI khac nhau, va do la chu y — nhung do dung la hinh dang
+    ma ai do se "don dep" bang cach gop lai.
+  demDangDung:
+    o: "api/danhmuc.mjs"
+    dem_tren: "MOI trang thai"
+    cau_hoi: "co bai nao TRO VAO nhan nay khong?"
+    vai: "guard chan xoa nhan con bai dung"
+    gop_nham_thi: "loc approved vao day => xoa duoc nhan ma mot bai draft dang dung => bai do tro vao hu khong, validate chan MOI lan ghi no ve sau"
+  demDaDuyet:
+    o: "api/articles.mjs"
+    dem_tren: "chi approved"
+    cau_hoi: "nhan nay DUOC DUNG TOT chua?"
+    vai: "con so man Danh muc hien"
+    vi_sao_approved: "emitter dem tren `appr` (index.ts:730-740, ly do ghi san: chi bai da duyet moi len web). Con so nay THAY con so do khi API song => dem khac di la bat API len thi so tren man NHAY"
+    gop_nham_thi: "bo loc o day => so tren man nhay so voi ban build"
+  rang: >
+    Khong ghim bang loi hua. api-index-khong-can-build muc 7 gieo 2 bai cung
+    nhan (1 approved, 1 draft) roi doi GET tra 1 va DELETE tra 409/2, KEM mot
+    phep kiem noi thang "hai con so KHAC nhau la chu y". Gop lai la do ngay.
+  ghi_chu_o_CA_HAI_file: "co, tro cheo nhau — nguoi doc mot trong hai deu thay canh bao"
+
+luat_ve_lai_thay_cho_danh_sach_ad_hoc:
+  luat: "ve lai DUNG nhung moc ma noi dung la ham cua DANH MUC"
+  ve_lai: [cb, ccount, cchua, catlist, catcount, dmn-cpt, dmn-cat]
+  de_nguyen: [cprop, pcount, pnguong, "phan chu va khoi 3D cua mbdm"]
+  vi_sao_khong_ve_khoi_3D: >
+    data-bar duoc hoat hinh doc LUC TAI TRANG. Thay markup la bar ve 0 va khong
+    bao gio dung len nua. Day la quirk da duoc ghi ten o FR-027e ("goi reveal luc
+    load") — biet truoc nen tranh, khong phai phat hien lai.
+  nhung_ten_trong_3D_van_phai_dung: >
+    Khoi 3D lay TEN tu danh muc nhung CHIEU CAO tu bai viet. Sua label_vi ma
+    khong dung toi thi man hinh mau thuan voi chinh no. Giai: doiNhan3D() thay
+    DUNG CHU, khong dung markup — doc ten cu tu o nhap truoc khi ve lai.
+  no_da_khai: "sua yaml bang editor roi F5 => ten trong khoi 3D van cu cho toi lan build ke. Ghi o FR-028, khong giau."
+
+markup_song_sinh:
+  chap_nhan: "hangNhan (emitter) / hangNhanFE (FE) + bar khai niem"
+  vi_sao_khong_dung_chung_code: "emitter la TS chay luc build trong Node, FE la TS goi vao bundle trinh duyet — hai dich bien dich. Du an da chon khuon nay o the()/theFE()."
+  cong: "man-danh-muc muc 6a — so 10 marker cua hang + 7 marker cua bar"
+  kiem_HAI_CHIEU: "lam lech data-gom o ban FE => test DO dung dong do; phuc hoi => xanh"
+
+go_cong_bang_chung:
+  cai_mat: "nguong tung la bang chung 'nhan co that trong kho'. Bo => kb/_nhat-ky-danh-muc.md la lop bao ve DUY NHAT con lai."
+  cai_khong_mat: "M02-R3 cam concepts.yaml bi sua BOI MAY. Endpoint chua bao gio sinh ten — no ghi cai nguoi go. Bo nguong khong dua may vao vai chu the."
+  vi_sao_chiu_duoc: >
+    FR-021 da mo duong SUA va XOA. O FR-019 them nham la nhan o lai vinh vien
+    nen cong vao phai chat; gio nhan thua xoa duoc, nhan sai chinh ta sua duoc.
+    Cong vao chat khong con la cach duy nhat giu danh muc sach.
+  ba_rang_GIU: "id kebab-case · label_vi do NGUOI khai (M08-R3) · trung id hoac trung ALIAS => 409"
+  cong_xac_nhan_cua_CHU_DE_giu: "FE tu gui xac_nhan:true sau khi nguoi dung xac nhan trong popup => khong phai ma sat, ma la buoc hai chong bam nham khi sua enum schema FROZEN"
+
+hai_thu_de_quen_ma_toi_bat_duoc:
+  cau_huong_dan_trong_popup: >
+    #dlg-canh van noi "khai niem phai da xuat hien trong concepts_proposed cua
+    du so bai (nguong M07)". Go cong ma de nguyen cau do la de lai mot LOI KHAI
+    SAI ve he thong ngay tren man hinh — te hon khong co cau nao. Da thay bang
+    cau noi rang CON THAT (trung id/alias).
+  cot_bang_chung_trong_nhat_ky: >
+    Dong nhat ky ghi "N bai de xuat" — con so vua het vai quyet dinh. Nhat ky gio
+    la lop bao ve duy nhat nen no phai noi THAT: "nguoi khai truc tiep (FR-028)".
+
+don_mo_coi_do_chinh_thay_doi_nay_tao_ra:
+  - "nguongGop() + demDeXuat() trong danhmuc.mjs — XOA (chi cong da go dung)"
+  - "hai file gieo dx-3/dx-4 trong danh-muc-them.test.js — chung ton tai CHI de vuot cong bang chung roi moi cham toi phep kiem alias. Cong go => mo coi => bo."
+  - "KHONG dung toi 6 toast con lai cua bai viet/thung rac — chung noi ve man khac, chua chua"
+
+evidence:
+  - "node web/test/danh-muc-them.test.js => pass (muc 3 lat chieu: 0 bai de xuat => 200; muc 4: 3 rang con lai van chan)"
+  - "node web/test/man-danh-muc.test.js => pass (muc 6 moi: 42 phep kiem)"
+  - "node web/test/api-index-khong-can-build.test.js => pass (muc 7 moi: hai phep dem)"
+  - "cd web && npm test => exit 0, toan bo file xanh"
+  - "npm run build => Emitted 72 files, exit 0"
+  - "14/14 check_*.py exit 0 (sau khi FR + bump v11->v12 + --ky 27 file)"
+  - "pytest core/tests => 30 passed"
+  - "kiem HAI CHIEU cong song sinh: lam lech data-gom => DO dung dong; phuc hoi => xanh"
+  - >
+    VONG DOI DAY DU tren BAN SAO cua kho THAT (KB_DIR tro temp, cong 8799):
+    POST khoa moi 0 bai de xuat => 200 · GET thay no · PATCH label => 200 ·
+    DELETE => 200 · nhat ky co du 3 dong (them/SUA/XOA).
+    kb/ THAT: 0 byte thay doi — da kiem bang grep.
+  - "GET /api/concepts tren kho that: 24 muc, co aliases + dang_dung; GET /api/categories: 7 muc co gom + dang_dung"
+
+luu_y_khong_phai_bug: >
+  Payload tieng Viet goi bang curl tren Windows bi meo dau ("Kho? th?"). Do la
+  shell cua toi, khong phai API: dong nhat ky do SERVER sinh ("nguoi khai truc
+  tiep") hien dung dau, va danh-muc-them.test.js co phep kiem rieng cho
+  "dau tieng Viet nguyen ven" qua duong Node.
+
+files:
+  - "web/api/articles.mjs (demDaDuyet + docDanhMuc; hai GET tra them gom/aliases/dang_dung)"
+  - "web/api/danhmuc.mjs (go nguongGop + demDeXuat + nhanh 422; ghi chu cheo o demDangDung; doi cot nhat ky)"
+  - "web/plugins/multiwindow/src/scripts/multiwindow.inline.ts (MucDm · hangNhanFE · barCptFE · datMoc · veDanhMuc · doiNhan3D · NHAN_CU; napMotDanhMuc tra danh sach; 5 toast bo NHAC_BUILD; cau #dlg-canh)"
+  - "web/test/danh-muc-them.test.js (muc 3 lat chieu, muc 4 moi)"
+  - "web/test/man-danh-muc.test.js (muc 6a/6b/6c/6d)"
+  - "web/test/api-index-khong-can-build.test.js (muc 7)"
+  - "06_modules/M02_kb/rules.md — FILE FROZEN (M02-R3: go mot rang khoi danh sach S3, ghi ro mat gi con gi)"
+  - "project_map.yaml (version 11 -> 12) · FROZEN.lock (ky lai 27 file)"
+  - ".factory/fr/FR-028-danh-muc-song-va-khai-tu-do.md"
+
+no_con_lai:
+  - "NGUOI CHOT: mo 127.0.0.1:8787/danh-muc/ — them mot key moi, no phai hien NGAY va con do sau F5, toast khong con cau 'chay npm run build'"
+  - >
+    RUI RO DA KHAI: khong con nguong thi concepts.yaml phinh tu do va bai toan
+    rag/RAG/retrieval-augmented quay lai. Chan no bay gio chi con trung id +
+    trung alias, va mat nguoi doc man Danh muc. Do la danh doi nguoi dung chon
+    co y thuc — neu danh muc phinh that thi mo FR nguoc lai, dung sua len.
+  - >
+    man-danh-muc.test.js KHONG duoc khai trong AC cua task nao (T03-5 khong co
+    dong nao tro toi no). Loi CO SAN, khong phai do FR nay tao ra — nhung gio no
+    mang 42 phep kiem nen dang mot dong AC. Chua sua vi ngoai pham vi.
+  - "6 toast cua bai viet/thung rac VAN nhac 'npm run build' — man do chua chua, cau do van dung"
+  - "Moi lan ghi nhan van spawn check_danh_muc.py + check_frozen --ky. 'Khai bao lien tuc' nghia la chuoi Python do chay lien tuc — do duoc ~2-3s/luot tren Windows. Chua toi uu; neu vuong thi do la FR rieng."

@@ -1,0 +1,87 @@
+id: WL-01K9XAKY4FR
+at: 2026-09-02
+by: claude
+buoc: "Ky FROZEN.lock (56 file) · dong FR-047 · mo FR-049..052 · do va tra loi cau 22-rule"
+loai: bon quyet dinh cua chu du an, thi hanh + ghi bien
+gate: FROZEN da ky; FR-047 DA DONG (chu du an quyet)
+
+object:
+  - FROZEN.lock                        # 32 -> 56 file, chu du an chi dao "ky"
+  - .factory/fr/FR-047-bay-cua-cho-may-o-loi.md      # -> DA DONG + §6 bang chung
+  - .factory/fr/FR-049-rate-limit-entropy-log-that-bai.md   # MOI (a)
+  - .factory/fr/FR-050-du-lieu-ca-nhan-vao-git.md           # MOI (b)
+  - .factory/fr/FR-051-vai-nao-lam-duoc-gi.md               # MOI (c)
+  - .factory/fr/FR-052-mot-ban-ghi-nhieu-hien-vat.md        # MOI (d)
+
+evidence:
+  - "check_frozen --ky => da ky 56 file; chay lai => pass"
+  - "28 file lech truoc khi ky: 24 MOI + 4 DOI"
+  - "4 file DOI da quy chu bang mtime, CA BON deu co FR: M08_api/rules.md (hom nay, ADR-06) · contrast-audit.json (30-08, FR-042) · M03_web/spec.md (29-08) · frontmatter.schema.json (28-08, FR-039)"
+
+# ══ CAU 4 — DO TRUOC KHI TRA LOI ═══════════════════════════════════
+do_22_rule: >
+  Cau hoi: 22 rule khai S3 ma khong co `lenh:` — chuyen sang bo ba
+  lenh/do_khi/xanh_khi hay giu nguyen? Rui ro?
+  Cach do: voi moi rule, quet 110 file cong (29 py + 82 js) xem co file nao NHAC
+  TEN rule do khong. Co => rang CO THAT, chi thieu con tro.
+  Ket qua: 13/22 co cong nhac ten. Cong M01-R3 (PHAN A cua chinh
+  check_rule_surfaces) va M04-R4 (check_version_pin.py) => 15/22.
+  Them M06-R2 (check_skill.py) va M07-R2 (07_curate/test_curate.py) => ~17/22.
+  Con ~5 chua ro: M05-R2, M06-R1, M06-R3, M07-R1, M07-R3.
+
+duong_tinh_gia_cua_chinh_toi: >
+  Luot do DAU TIEN cho ket qua 22/22 "co rang" — SAI, vi
+  check_rule_surfaces.py bay gio CHUA danh sach GRANDFATHER nen no khop moi id.
+  Toi do chinh danh sach cua minh roi tuong do la bang chung.
+  Da loai file do ra khoi tap quet va do lai: 13/22.
+  Bai hoc: khi mot cong vua duoc SUA, no thanh mot nguon nhiem trong moi phep
+  do lien quan toi no. Phai loai chinh no ra.
+
+tra_loi: >
+  CHUYEN — nhung SAU a..d, va lam THEO TUNG MODULE khi co viec cham module do,
+  khong quet mot luot.
+  Vi sao chuyen: rui ro THAP (voi ~17/22 cong viec la "tim cong dang cuong che
+  roi ghi lenh cua no vao `lenh:`" — khong cong moi, khong doi hanh vi).
+  Khong chuyen thi sao: danh sach dong bang DA cam mau (rule MOI do ngay), nen
+  he thong an toan ve sau. Nhung check_rule_surfaces KHONG biet cong nao cuong
+  che rule nao => ngay ai do XOA hoac DOI TEN mot test, rule mat rang IM LANG.
+  Do dung la thu bo ba lenh/do_khi/xanh_khi sinh ra de chan.
+  Vi sao KHONG lam ngay: rules.md cua M01-M08 VUA duoc ky frozen, nen sua 8 file
+  do can MOT FR nua. Va FR-049 la lo an ninh DANG SONG — dat mot refactor 22 muc
+  truoc mot lo an ninh la sai thu tu.
+
+# ══ HAI DIEU DO LAI LAM DOI NOI DUNG FR ════════════════════════════
+FR_049_hai_trong_ba_ve_DA_XONG: >
+  Do truoc khi viet FR: entropy DA la 256 bit (randomBytes(32)) va log that bai
+  DA co (loiGhiAudit ok:false o C4/C7) — ca hai den tu FR-047, khong co y.
+  Chi RATE LIMIT la chua co gi.
+  NHUNG chua cong nao canh entropy => no la tinh chat DANG DUNG chu khong phai
+  tinh chat DUOC BAO VE: doi randomBytes(32) thanh Math.random() thi moi test
+  van xanh.
+  => FR-049 lam HAI viec: dung rate limit, va DAT RANG cho hai ve dang dung.
+
+FR_052_toi_khai_no_SAI_o_s6: >
+  WL-01K9X2S6DONG ghi: "media co dung BA cot, KHONG cot nao tro ve slug, nen
+  'liet ke artifact cua bai X' KHONG viet noi testcase".
+  Hai cho sai:
+    a) media co BON cot (them so_byte GENERATED)
+    b) chieu "artifact cua bai X" THUC RA tra loi duoc — hien vat nam trong
+       frontmatter.media cua chinh ban ghi:
+       SELECT json_extract(frontmatter,'$.media') FROM bai_viet WHERE slug=?
+  No THAT sac hon: frontmatter.media la MOT OBJECT, khong phai mang. Mot ban
+  ghi chua DUNG MOT hien vat. Ma M16 sinh slide + giong doc + video cho MOT bai.
+  => Khong phai "khong truy van duoc". La "KHONG LUU DUOC".
+  Va no lam M16-R1 yeu: voi media la mot object, GHI DE la duong MAC DINH —
+  khong phai mot loi ai do mac, ma la thu xay ra khi lam DUNG theo schema.
+  M16 AC-2.2 dang canh mot luat ma CAU TRUC dang day nguoc lai.
+  Khong sua worklog cu: bien ghi sai thi dinh chinh o ban moi (FR-052 §0).
+
+do_do:
+  khong_co_do_moi: "check_frozen tu do sang xanh sau khi ky"
+
+no_con_lai:
+  - "FR-049 (a) — LAM TIEP NGAY, la lo an ninh dang song"
+  - "FR-050 (b) — cho chu du an chon 1 trong 3 duong o §2c"
+  - "FR-051 (c) — cho chu du an dien 6 dau `?` trong ma tran §2"
+  - "FR-052 (d) — cho chu du an chon cach 1 (media thanh mang) hay cach 2 (bang hien_vat)"
+  - "Chuyen 22 rule sang bo ba lenh/do_khi/xanh_khi: SAU a..d, theo tung module, can mot FR"

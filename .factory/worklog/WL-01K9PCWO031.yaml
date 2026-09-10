@@ -1,0 +1,71 @@
+id: WL-01K9PCWO031
+at: 2026-08-29
+by: claude
+buoc: WO-031 — bản ghi được tạo mà màn báo "máy chủ chưa chạy"; hai lỗi kèm ở đường tài liệu
+loai: bàn giao WO-031
+wo: WO-031-ban-ghi-tao-duoc-ma-man-bao-loi.md
+
+object:
+  wo:
+    - .factory/wo/WO-031-ban-ghi-tao-duoc-ma-man-bao-loi.md
+  task:
+    - 07_plan/M03_web/tasks/T03-70-test-chay-that-ham-gui.md   # test
+    - 07_plan/M03_web/tasks/T03-71-xoa-oS-va-duong-tai-lieu.md # code
+  code:
+    - web/plugins/multiwindow/src/scripts/multiwindow.inline.ts
+  test:
+    - web/test/moc-fe-con-that.test.js   # §6 MỚI
+
+may_xanh:
+  - >
+    ĐỎ TRƯỚC (R5), và tái hiện ĐÚNG câu người dùng thấy: *"Không gọi được
+    /api/video — máy chủ chưa chạy?"*
+  - >
+    TRÌNH DUYỆT THẬT (cổng 8801, kho tạm), điền đúng URL người dùng dán rồi bấm
+    nút: màn báo *"Đã ghi video/thien-duong-chuot-…-tien-tri-d.md vào kho."* ·
+    `url_normalized` = `youtube.com/watch?v=85kbC_s8Ldg` — CHỮ HOA còn nguyên ·
+    `category` `["aitalkshow"]` · `concepts` `["talkshow"]`
+  - "quét web 75/76 (chỉ `he-kinh`) · dọn sạch kho tạm và server 8801 sau khi đo"
+
+hoi_quy_cua_chinh_toi:
+  - >
+    WO-028 xoá dòng khai `const oS = G("vd-slug")` nhưng ĐỂ SÓT
+    `if (oS) oS.value = ""`, và dòng đó nằm SAU lời gọi POST. Bản ghi được tạo
+    thật, rồi `ReferenceError` bị `try/catch` của chính hàm nuốt và đổ cho máy
+    chủ. Cả `ghiVideo` lẫn `ghiBanGhiThuVien` đều sót
+  - >
+    `node --check` chỉ bắt CÚ PHÁP. Và tôi vừa ĐỌC chính đoạn đó khi sửa WO-028
+    mà không thấy — đọc không phải phép đo
+
+cong_moi_GOI_ham_thay_vi_doc:
+  - >
+    Sandbox `with` trên một `Proxy`: `has` trả true cho mọi tên, `get` trả stub
+    cho tên module biết trước và NÉM cho tên lạ. Một biến mất khai báo lộ ngay
+  - >
+    VẾ QUYẾT ĐỊNH, và là vế lượt đầu tôi đo THIẾU: hàm có `try/catch` RIÊNG nên
+    lỗi bên trong KHÔNG ném ra ngoài — cổng đầu tiên của tôi xanh dù bug còn.
+    Đo "có ném không" là đo sai chỗ; phải đo THỨ NGƯỜI DÙNG THẤY: câu cuối
+    `kqTV` phải là "Đã ghi …"
+  - >
+    Hai lỗi harness lượt đầu, cả hai là ĐO SAI chứ không phải mã sai: phép cắt
+    bỏ mất từ khoá `async`, và ô nhập giả thiếu `setAttribute`
+
+hai_loi_kem_o_duong_tai_lieu:
+  - >
+    `ghiBanGhiThuVien` POST vào `/api/articles` (bí danh) thay vì `/api/tai-lieu`
+    ⇒ CỔNG RIÊNG CỦA MODULE TÀI LIỆU KHÔNG CHẠY. Đúng cái bẫy `nap-video.test.js`
+    đã ghi cho video: *"đường cũ vẫn tạo được bản ghi nên tính năng TRÔNG đúng"*
+  - >
+    Nhánh PUT đặt `title` làm TUỲ CHỌN CỦA `fetch`, không nằm trong `body`.
+    `fetch` bỏ qua khoá lạ không cảnh báo gì ⇒ SỬA MỘT TÀI LIỆU LÀ MẤT TIÊU ĐỀ,
+    im lặng. Chỉ lộ ra vì cổng mới GỌI hàm và nhìn vào đường nó gọi
+
+đỏ_do: claude  # `oS` sót là hồi quy của WO-028, cùng phiên
+
+do_do:
+  - cong: he-kinh.test.js
+    do_do_boi: ảnh 724662 byte người dùng thêm — `python core/tools/toi_uu_anh_nen.py`
+  - cong: check_frozen.py
+    do_do_boi: chờ NGƯỜI ký sau khi FR-039 duyệt
+  - cong: check_danh_muc.py · check_skill.py · check_running.py
+    do_do_boi: agent khác · và hệ quả của hai cổng trên

@@ -1,0 +1,81 @@
+id: WL-01K9X1UIMATRIX
+at: 2026-09-02
+by: claude
+buoc: "s1-research dot nam — UI hai mat (ngu canh + quan ly) cho M12-M16 + ma tran module x man"
+loai: artifact khao sat + ma tran thiet ke; KHONG dong ma san pham
+
+object:
+  - 01_research/ui-embed-matrix-scan.md    # MOI — raw dot nam, 47 patterns, phan bien 30/36 confirm
+  - 01_research/research_summary.md         # +§12 con tro
+  - 05_uiux/ma-tran-module-man.md           # MOI (v2) — ma tran surface x nang luc, o da do pattern
+
+chi_dao_goc: >
+  "module hoat dong khong chi dang checklist/danh sach ma con len loi vao cac
+  module khac… ngoai trang rieng de quan ly va chinh sua chi tiet, no overlap
+  cung bai viet/tai lieu/video — doc bai thi dung luon chung cat hay chatbot
+  qua button di kem, nhu vay moi nhanh. Can lap ma tran reference module."
+
+ket_qua_dang_gia_nhat:
+  - "NHIP DOI la luat xuong song: tac vu GIAY (M14) song inline trong panel; tac vu PHUT (M12/M16) khoi phat tai cho nhung SONG o trang quan ly — KHONG optimistic UI cho job LLM"
+  - "Trang quan ly theo LOAI VIEC chu khong theo module: Xuong (job M12+M16, 4 vung kieu GitHub Actions + dead-letter kieu Sidekiq) · Hang doi duyet nhap (2 cot kieu Linear Triage, luu ban AI goc bat bien de diff) · Kenh & tai khoan · Hoi thoai · Cau hinh read-only tro file"
+  - "Cua so doc: nut one-click Chung cat TACH khoi nut chat (Comet) · rail phai gap duoc 2 tab Hoi/Sinh (NotebookLM rut 3 cot con 2 vung) · boi den -> chip ngu canh dinh vao chat, KHONG replace vi kho chi-doc (Dia/Notion) · Ctrl+F nang cap tim-hoac-hoi (Arc Max)"
+  - "Noi hai mat: job id sinh ngay + trang thai o DB + MOT endpoint; deep-link HAI CHIEU (?job= sang Xuong · cot Nguon mo cua so doc — loi the multiwindow); thong bao 3 tang (inline / toast-co-Xem / badge tren MOT muc nav), gop toast khi >=2 job xong"
+  - "Phuong phap ma tran co ten chuan: CRUD-style surface x nang luc + OOUX CTA Inventory + taxonomy GitLab Pajamas; thi cong bang 3 component khai mot cho (Nut nang luc · Chip trang thai job · Nhan AI sinh)"
+  - "Luat ba-module-tach-biet an vao ma tran: component chung nhung bo hanh dong khai theo loai (video khong co boi den — vao tu transcript)"
+
+phan_bien: "36 kiem: 30 CONFIRMED · 1 REFUTED (mo ta Notion AI cu — trang nguon da doi sang Notion Agent; ban confirm qua Zapier van dung) · 5 PLAUSIBLE"
+
+cau_cho_NGUOI_chot:
+  - "Nhap chung cat luu dau (DB vs yaml) — chan man Hang doi duyet; chi dao upgrade.md chua thanh FR, choi B-C1/FR-028 => can FR truoc"
+  - "M12 co checkpoint theo giai doan khong — quyet Chay-lai tu dau hay tu giai doan hong"
+  - "Panel chat M14 = loai cua so noi thu hai — luat focus/z-order phai vao spec M03 truoc khi code"
+  - "Rail phai o cua so doc hep: gap duoc hay bottom-sheet — do tren breakpoint that khi port"
+
+evidence:
+  - "workflow w8p7l6fb3: 9/9 agent, 0 loi, 164 tool, ~500k token"
+  - "wc: ui-embed-matrix-scan.md ~84k chars · ma-tran v2 ~8k"
+
+no_con_lai:
+  - "NGUOI duyet ma tran v2 -> sua prototype dot-hai/ theo (cua so doc thanh man trung tam: rail phai 2 tab + boi den; them trang Xuong + Hang doi duyet) -> roi moi port tung module vao web"
+
+luot_2_chot_va_dung_prototype_v3:
+  nguoi_quyet_2026-09-02: "1) nhap chung cat luu DB · 2) M12 co checkpoint giai doan · 3+4) apply"
+  object_them:
+    - .factory/fr/FR-046-nhap-chung-cat-luu-db.md   # MOI — da duyet; cat ranh: nhap o DB, bai da vao kho thi file van la chan ly (B-C1 nguyen ven, FR-028 khong cham)
+    - memory/decisions.md                            # entry 09-02 bon quyet dinh + doi-thi
+    - 05_uiux/ma-tran-module-man.md                  # §4 doi thanh DA CHOT
+    - 05_uiux/contracts/chungcat.sample.v2.json      # +log_mau +chay_lai_tu +nhap[] (ban_goc_ai bat bien / ban_hien_tai)
+    - 05_uiux/contracts/chatbot.sample.v2.json       # +lich_su_phien
+    - 05_uiux/prototype/sinh_dot_hai.py              # viet lai theo ma tran — 10 trang
+    - 05_uiux/prototype/dot-hai/                     # index · cua-so-doc (TRUNG TAM) · tai-lieu · tong-hop · dashboard · xuong · hang-doi-duyet · hoi-thoai · tin-nhan-kenh · cau-hinh
+  hinh_dang_v3: >
+    Cua so doc = trung tam mat [N]: thanh tieu de co nut one-click + Hoi bai nay,
+    rail phai gap duoc 2 tab Hoi/Sinh, BOI DEN doan van -> toolbar noi -> chip
+    ngu canh dinh vao chat (khong replace), citation bam nhay ve doan TRONG bai,
+    nut hop le theo loai bai (thu-vien co Chung cat, draft khong tile nao + noi
+    ly do). Xuong = 4 vung + muc Can xu ly + badge nav + deep-link ?job= +
+    chi tiet timeline log + Chay-lai-tu-checkpoint. Hang doi duyet = 2 cot +
+    diff del/ins voi ban-AI-goc + duyet -> toast "file gio la chan ly".
+    Hoi thoai = lich su phien. Cau hinh = read-only co bang model x ngon ngu
+    (tieng Trung -> kimi/deepseek, du phong cung khu vuc — khop §13).
+  evidence:
+    - "Playwright cua-so-doc: 3 block/1 gan co · citation nhay ve doan (h3.diem true) · 3 tiles + 2 artifact cua bai · hoi-truoc mo dung chu 'roi may' · toast + link xuong.html?job=moi · thu-vien co nut CC · draft 0 tile"
+    - "Playwright xuong?job=CHUNGCAT03: hang duoc to, chi tiet log 4 dong, nut 'Chay lai tu dang-goi-model' + tu-dau + ghi chu vi sao; screenshot da xem"
+    - "Playwright hang-doi-duyet: 3 nhap · diff del/ins hien · ban chua sua noi 'trung ban AI goc' · duyet doi trang thai 'da vao kho' + toast 'chan ly'"
+  no_con_lai:
+    - "NGUOI duyet bo v3 -> frozen G5 dot hai -> apply tung module vao web lan luot"
+    - "FR-046 can agent s6 (M12/M03) tieu thu: khai lai data_flow M12 (nhap qua API vao DB, khong tha file) + schema bang nhap"
+
+luot_3_hoan_thien_doc_s5:
+  chi_dao: "hoan thien doc cho s5-prototype, chua dung them html"
+  object_them:
+    - 05_uiux/ui_kit.md                    # MOI — ve hard G5 tung DO vi thieu tu dot mot; dang bang-tra, tro nguon khong chep gia tri; §4 = 3 component khai-mot-cho + luat hai mat
+    - 05_uiux/wireframes/SCR-12..17        # 6 wireframe MOI theo ma tran (be mat, khong theo module)
+    - 05_uiux/wireframes/SCR-07..11        # gan nhan SUPERSEDED tai cho (luat G5: gian giao phai khop prototype hoac mang nhan)
+    - 05_uiux/screen_inventory.md          # bang dot hai thay bang SCR-12..17
+    - 05_uiux/backlog.md                   # MOI — ve gate 2 co cho quet; 4 o [x] deu co object, 0 o mo
+    - 05_uiux/README.md                    # +muc doc dot hai (append, phan FROZEN dot mot giu nguyen)
+  gate_G5_hard_tu_kiem:
+    - "test -f ui_kit.md && ls contracts/*.json => OK"
+    - 'grep o-mo backlog.md => rong (sach)'
+  cho_NGUOI: "duyet prototype + ma tran => frozen v2 dot hai; SCR-12..17 la gian giao, prototype thang khi lech"

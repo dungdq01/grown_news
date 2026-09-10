@@ -1,0 +1,119 @@
+id: WL-01K9NAFR036B7B
+at: 2026-08-27
+by: claude
+buoc: s8 — FR-036/B7b FE nạp thư viện (tab thứ tư màn Nạp nguồn)
+loai: bàn giao B7b
+fr: FR-036-khung-than-bai-5-muc.md
+
+object:
+  task:
+    - 07_plan/M03_web/tasks/T03-15-fe-nap-thu-vien.md          # code
+    - 07_plan/M03_web/tasks/T03-16-test-fe-nap-thu-vien.md     # test
+  code:
+    - web/build-fe.mjs                 # + __MEDIA__ (cùng đường __KHUNG__)
+    - web/plugins/multiwindow/src/scripts/multiwindow.inline.ts   # lối 4
+    - web/render/shell.html            # tab + pane thứ tư
+    - web/plugins/home-pages/shell.html
+    - web/styles/prototype.css         # .np-tab.t-tv · .np-p.t-tv · .tv-meta · .tv-hv
+  test:
+    - web/test/thu-vien-nap.test.js    # MỚI — 26 phép kiểm
+    - web/test/cac-man-con-lai.test.js # phép kiểm 3/2/1 hết thoả được với 4 lối
+    - web/package.json
+    - web/test/WORKLOG.md
+    - web/WORKLOG.md                   # "| Test | 50 |"
+    - web/styles/WORKLOG.md            # 2531 -> 2544 dòng
+    - web/plugins/WORKLOG.md           # 39157 -> 41624 ký tự
+  plan:
+    - "C:/Users/Admin/.claude/plans/c-c-users-admin-downloads-grown-news-up-bright-newt.md"
+
+may_xanh:
+  - "cd web && node test/thu-vien-nap.test.js  ->  pass (26 phép kiểm)"
+  - "cd web && npm test  ->  exit 0 (50 file)"
+  - "pytest core/tests -q  ->  42 passed · 18/19 cổng check_*.py xanh"
+  - >
+    7/7 răng ĐỎ được khi phá (5 lượt đầu + 2 lượt cho khối guard sau khi
+    siết), ba file gốc khôi phục nguyên byte
+    (inline.ts b70838b44944738d · build-fe 7621a33ec03581ac · shell 9b7cf5c4eaf2a044)
+
+do_do:
+  - cong: core/tests/check_skill.py
+    do_do_boi: agent khác
+    quy_chu: không nằm trong tập file tôi đổi ở lượt này
+
+con_lai:
+  - "B8 — FE xem trước: iframe PDF · video click-to-load · thẻ ppt/word + tải về · bản ghi mock (media phải viết FLOW JSON — xem WL-01K9N9FR036B7A)"
+  - "B9 — tổng hợp All: số đếm trên `tatCa`, chất lượng chỉ trên `phan-tich` (M09-R4)"
+  - "B10 — tài liệu + hồ sơ quyết định"
+
+# ══ Ba tầng escaping cắn trong MỘT đơn vị, và lần này để lại byte điều khiển ══
+#
+# Lần thứ 11, 12, 13 của cùng lớp lỗi. Ghi ra để nó thành LUẬT, không thành
+# kỷ niệm. (Cố ý KHÔNG viết ví dụ bằng chính các chuỗi escape đó — viết chúng
+# vào đây đã làm file này hỏng thêm một lần nữa lúc soạn.)
+#
+# 1 · articles.mjs (B5) — tôi dán KÝ TỰ ĐIỀU KHIỂN THẬT vào một character class
+#     của regex. git và grep lập tức coi cả file là "binary file". Sửa: viết
+#     bằng escape dạng chữ u cộng bốn chữ số hex, không dán ký tự thật.
+#
+# 2 · shell.html dùng CRLF (770 trên 771 dòng). Mọi mốc tìm-thay gõ bằng ký tự
+#     xuống dòng đơn KHÔNG khớp. Sửa: đổi mốc sang CRLF ngay trước khi so.
+#
+# 3 · thu-vien-nap.test.js — một dấu gạch chéo cộng chữ b, đi qua một tầng công
+#     cụ nữa, thành BYTE 0x08 (backspace) trong nguồn; regex ranh-giới-từ thành
+#     regex tìm ký tự backspace. Nhìn bằng Read KHÔNG thấy — chỉ cat -A thấy.
+#     Sửa: bỏ hẳn ranh giới từ, dùng mốc có dấu chấm phẩy (esbuild phát ra dấu
+#     chấm phẩy nên mốc đó CHÍNH XÁC hơn), rồi đếm byte dưới 32 phải bằng 0.
+#
+# LUẬT rút ra — FR-033 §6 đã ghi mà tôi vẫn vi phạm: MỖI LẦN một dấu gạch chéo
+# phải đi qua một tầng công cụ, hãy chọn cách viết KHÔNG CÓ dấu gạch chéo.
+# Và sau mỗi lần ghi file bằng script: đếm byte dưới 32. Read không thấy chúng.
+
+# ══ Cổng của tôi yếu, và kiểm hai chiều bắt được — hai lần ══════════════════
+#
+# Bản đầu của §3 chỉ so VỊ TRÍ: `.size` xuất hiện trước `fetch(`.
+#
+# Lượt phá thứ nhất: đổi `if (f.size > MEDIA.tran_byte)` thành `if (false)` —
+# cổng **VẪN XANH**. Vì `f.size` và `MEDIA.tran_byte` còn nằm trong CÂU THÔNG
+# BÁO của nhánh đã chết. Một nhánh chết thoả mãn mọi phép kiểm dạng "có nhắc
+# tên". Siết: đòi một PHÉP SO (toán tử thật).
+#
+# Lượt phá thứ hai: bỏ hết `return` trong hàm — cổng lại **VẪN XANH**, dù tôi
+# đã đòi "so rồi return theo thứ tự". Vì một `return` của nhánh KHÁC
+# (`if (!f.size) { …; return }`) còn nằm trong đoạn và thoả điều kiện thứ tự.
+# **Một phép kiểm theo THỨ TỰ không biết `return` nào thuộc về ai.**
+# Siết lần hai: CẮT KHỐI GUARD theo ngoặc khớp, rồi đòi `return` NẰM TRONG nó.
+# Giờ bỏ đúng `return` của khối size ⇒ đỏ, còn nhánh kia giữ nguyên ⇒ không đỏ oan.
+#
+# Đây là lý do "xanh không chứng minh gì" phải áp cho CẢ cổng mình vừa viết.
+
+# ══ Một phép kiểm cũ HẾT THOẢ ĐƯỢC, không phải bị vi phạm ═══════════════════
+#
+# `cac-man-con-lai.test.js:441` ghim `np-au` đúng 3 vạch và dãy 3/2/1. Thang có
+# BA mức; màn giờ có BỐN lối ⇒ bốn mức khác nhau là điều **không thoả được**.
+#
+# Đây khác hẳn "cổng mất răng": cổng mất răng thì điều kiện thành hiển nhiên
+# đúng; ở đây điều kiện thành hiển nhiên SAI. Cả hai đều phải sửa, nhưng lý do
+# ngược nhau, và nhầm lẫn giữa chúng dẫn tới nới cổng khi đáng lẽ phải siết.
+#
+# Viết lại theo ý định mà chính bình luận cũ đã khai: số vạch DẪN XUẤT từ số
+# tab · mỗi vạch trong 1..3 · ≥2 mức khác nhau · "Tự viết bài" thấp nhất.
+# Giữ được mệnh đề còn giá trị ("lối người viết tay là lối máy làm ít nhất") và
+# bỏ phần con số đã hết đúng. Hai lối ĐƯỢC cùng mức — "dán link" và "nạp tài
+# liệu" đều là máy làm gần hết, và đó là sự thật về sản phẩm.
+
+# ══ Ba quyết định thiết kế của lối 4 ════════════════════════════════════════
+#
+# 1 · KHÔNG dùng form viết bài. Ba lối kia nhận một BẢN PHÂN TÍCH (thân bài theo
+#     khung 5 mục); lối này nhận một HIỆN VẬT + nhãn. Tái dùng form 8 ô ở đây là
+#     bắt người nạp một PDF điền tám mục về chính cái PDF đó.
+#
+# 2 · `hienVatCho` là một BIẾN, không phải `dataset` trên DOM. Nó là trạng thái
+#     của MỘT luồng đang chạy, và DOM sống qua SPA nav trong khi luồng thì không
+#     — để nó trên DOM là cách một sha256 cũ dính lại sau khi người dùng đã đi
+#     sang màn khác rồi quay lại.
+#
+# 3 · KHÔNG gửi `review_status`/`origin` trong payload. Server LỘT hai trường đó
+#     (M08-R5); gửi lên chỉ để chúng bị xoá là một lời khai SAI về ai quyết định.
+#     `textContent` thay `innerHTML` cho `ten_goc` — chuỗi của người gửi
+#     (`no-dangerous-html.test.js` canh đúng điều này).
+

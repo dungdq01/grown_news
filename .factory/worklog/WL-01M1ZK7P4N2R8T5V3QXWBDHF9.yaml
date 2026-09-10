@@ -1,0 +1,220 @@
+ulid: 01M1ZK7P4N2R8T5V3QXWBDHF9
+thoi_diem: 2026-09-08
+tac_nhan: claude-opus-5 (dev)
+loai: ban_giao
+module: M03_web (chính) · M12_chungcat (T12-29 chờ đợt 2)
+don_vi: T03-126 — thẻ 2 tầng (SCR-25) · bước 1 wireframe + bước 2 mã
+
+viec: >
+  Chủ dự án 2026-09-08, kèm ảnh mẫu YouTube/TikTok: *"giao diện menu danh sách
+  quá đơn giản… video youtube/tiktok/douyin cần có nền tab, tài liệu doc/pdf/.md
+  cũng vậy"*. Bước 1 dựng wireframe cho NGƯỜI duyệt; duyệt xong mới code.
+
+quyet_dinh_cua_nguoi:
+  1: "bài viết giữ 1 TẦNG"
+  2: "video dùng chung --c-video, chỉ khác ICON"
+  3: "tỉ lệ 4:3"
+  4: "hoãn vùng lưới 4 thẻ trang chủ"
+  pham_vi: "duyệt cả ba dòng phạm_vi_ghi (SCR-25 · tokens.css · cổng vào T03-110b)"
+
+dinh_tuyen: >
+  PATCH, KHÔNG cần FR. Hai mệnh đề trong task file HẾT ĐÚNG, đo 2026-09-08:
+  (a) `media-mime.json` là *"đất M01, cần FR"* — `project_map` v29 đã chuyển nó
+  sang chủ M03 (`modules.M03_web.fe`); (b) không file nào trong phạm vi nằm
+  trong `FROZEN.lock` (grep: 0 khớp). Task file đã có sẵn ⇒ vào thẳng bước 5.
+
+object:
+  - 05_uiux/wireframes/SCR-25-the-hai-tang.md   # MỚI · 6 ca · ĐÃ DUYỆT
+  - 05_uiux/tokens.css                          # --c-pdf/docx/pptx/md/txt · hai hệ
+  - core/assets/media-mime.json                 # cột `mau` cho 7 dòng tài liệu
+  - web/render/trang.mjs                        # nenThe() + cờ coNen
+  - web/styles/prototype.css                    # .cd-n · nới 19 luật mask
+  - web/test/the-hai-tang.test.js               # cổng MỚI, 25 vế
+  - web/package.json                            # đăng ký cổng
+  - 07_plan/M03_web/tasks/T03-126-the-hai-tang-thumbnail.md   # SCR-23→25 · bỏ cột icon
+  - 07_plan/M03_web/tasks/T03-110b-test-tab-theo-doi.md       # nhận cổng mới
+  - 06_modules/M03_web/backlog.md               # 3 ô
+
+r5_do_truoc: >
+  `the-hai-tang.test.js` viết TRƯỚC mã, chạy ĐỎ **14/25 vế** (thiếu `.cd-n`,
+  thiếu ytimg, thiếu cột `mau` ở 5 dòng bảng khai, thiếu luật CSS). Xanh 25/25
+  sau khi cắm mã.
+
+do_duoc: >
+  8 fixture hỏng, dựng ở thư mục tạm rồi HOÀN NGUYÊN — cả 8 ĐỎ, và mỗi cái đỏ
+  đúng vế của nó: bài-viết-cũng-có-nền(1c) · id-hạ-chữ(2·2b·2c·2d·2e) ·
+  bỏ-lazy(2b) · onerror-rỗng(2e) · FE-gõ-cứng-định-dạng(3b) ·
+  hiện-vật-thua-ytimg(4a) · trang-chủ-bật-nền(6a·6b) · bỏ-aspect-ratio(5a).
+
+ba_ve_chet_bat_duoc_nho_phep_thu_do:
+  - >
+    Lượt đầu BA vế xanh một cách RỖNG, và cả ba cùng một gốc: chúng tra thẻ trên
+    CẢ TRANG. Một `shell` chứa markup của MỌI màn, và vùng lưới TRANG CHỦ đứng
+    TRƯỚC trong tài liệu — nên `html.indexOf('data-nguon="article"')` bắt trúng
+    thẻ của lưới trang chủ, đúng vùng mà tầng nền CỐ Ý tắt. Vá: mọi phép tra
+    chạy trên vùng `grid2`.
+  - >
+    Vế `6a` cũ đếm "vùng lưới trang chủ có 0 cd-n" — bốn thẻ đó trong `kb-mock`
+    HIỆN đều là `bai-viet`, loại vốn không có nền, nên nó xanh dù cờ bật hay
+    tắt. Thay bằng ba vế CẤU TRÚC (`coNen` có mặt · đúng MỘT chỗ truyền `false`).
+  - >
+    Vế `3b` cũ đo 1200 ký tự SAU chuỗi "cd-n" — mà "cd-n" nằm ở CUỐI hàm, nên
+    cửa sổ bỏ sót toàn bộ phần suy màu/suy icon. Thay bằng THÂN HÀM `nenThe`.
+
+do_sau:
+  - lenh: node web/test/the-hai-tang.test.js
+    ket_qua: pass — 25/25 vế
+  - lenh: cd web && npm test
+    ket_qua: "exit 1 · ĐÚNG MỘT FAIL: page-weight vế `trang chủ`"
+
+đỏ_do: >
+  `page-weight` vế *"trang chủ"* — **chủ: KHÔNG phải đơn vị này** (nợ có sẵn),
+  cộng thêm phần của đơn vị này. Ba số đo tách bạch, không ước:
+    trần                        61 440
+    TRƯỚC khi có tầng nền       61 708   (vượt 268 — nợ CÓ SẴN)
+    SAU  khi có tầng nền        62 360   (vượt 920)
+    ⇒ đơn vị này thêm             652 byte
+  Quy chủ phần 268: `web/render/shell.html` · `server.mjs` · 5 file `web/api/**`
+  · 2 plugin đều SỬA CHƯA COMMIT từ phiên khác (`FR-011`, bàn biên tập chung);
+  `shell.html` mtime **2026-09-08 01:14**, trước phiên này. Đo lần đầu của tôi
+  (trước khi chạm bất cứ gì) đã là 61 708.
+  KHÔNG sửa file của họ, KHÔNG nới trần, KHÔNG tự nhận xong.
+
+vi_sao_khong_tu_tra_duoc_652_byte: >
+  Chủ dự án chốt câu 4 (*hoãn lưới trang chủ*) trên giả định của wireframe §6 là
+  việc đó CÔ LẬP được chi phí. Đo xong thì giả định ấy SAI: một `shell` chứa
+  markup của mọi màn (`trang-chu` 62 724 · `tat-ca` 62 731 — chênh 7 byte), nên
+  24 thẻ của màn Tất cả nằm trong HTML của trang chủ dù người dùng không thấy.
+  Tắt lưới 4 thẻ vẫn đáng làm (nó bớt 4 thẻ trên MỌI trang) nhưng nó không
+  chuyển vế đỏ thành xanh — và kể cả gỡ SẠCH tầng nền thì trang vẫn vượt 268.
+  ⇒ Vế này KHÔNG xanh được từ bên trong đơn vị này. Để NGƯỜI quyết, không tự xử.
+
+da_lam_de_giam_byte:
+  - "`data-i` đặt lên chính `.cd-n` (dùng `::before`) thay vì một `<i>` con"
+  - "video KHÔNG mang thuộc tính `style` — `[data-pl=video] .cd-n` khai màu MỘT lần trong CSS"
+  - "nới 19 luật mask bỏ tiền tố `.fl-b` ⇒ chip và thẻ dùng CHUNG: TIẾT KIỆM 114 byte CSS thay vì tốn ~560 cho 19 luật mới"
+  - "gộp một dòng cho `the()` chỉ bớt 34 byte ⇒ HOÀN NGUYÊN, không đánh đổi dễ đọc lấy 34 byte (CLAUDE.md §3)"
+
+ba_dinh_chinh_cho_task_file:
+  - "SCR-23 → SCR-25: số 23 và 24 đã có chủ, sinh SAU khi task soạn. `rule 9` cấp id cho TASK, không nói gì về SCR — ô backlog giữ luật còn thiếu."
+  - "BỎ cột `icon`: `trang.mjs:1337` dựng `ICON_CO` bằng cách ĐỌC thư mục `public/icon/`, và `XUAT-XU.md` khai luật *tên file = đúng giá trị của chip*. Một cột `icon` là bản thứ hai của danh sách file — thứ chính file đó cấm. 20 icon có sẵn đủ cả 6 ca, 0 icon phải vẽ, 0 hotlink thesvg.org."
+  - "KHÔNG cần FR: `media-mime.json` về chủ M03 từ `project_map` v29."
+
+bay_da_tranh_duoc: >
+  `WO-022` — `nguonCua()` hạ chữ thường CẢ URL để so host. Mượn lại chuỗi ấy để
+  rút id ytimg thì `dQw4w9WgXcQ` thành `dqw4w9wgxcq`, VẪN khớp
+  `^[A-Za-z0-9_-]{11}$` nên không cổng nào kêu, và thẻ hiện thumbnail của một
+  video KHÁC. `nenThe` hạ riêng phần host, giữ nguyên phần còn lại; mock có sẵn
+  đúng id ấy làm fixture, và vế 2c đỏ được (đã chứng minh).
+
+hop_dong_de_lai_cho_T12-29: >
+  FE nhận hiện vật thumbnail bằng `media[].mime` bắt đầu `image/`, KHÔNG bằng
+  `kieu_moc` — `kieu_moc` là CỘT CỦA BẢNG `media` (FR-054 §9.2) còn frontmatter
+  khai `additionalProperties: false` với đúng bốn khoá, nên cờ ấy không bao giờ
+  tới được FE. T12-29 chỉ cần gắn ảnh vào `media[]` với mime `image/*`; thẻ tự
+  nâng cấp, 0 dòng FE (AC3 đã xanh trên fixture gieo tay).
+
+lo_thu_hai_cua_cong_MAT_GLYPH: >
+  Chủ dự án nhìn màn thật và bắt được thứ cổng không thấy: thẻ tài liệu ra ĐÚNG
+  MÀU nhưng MẤT GLYPH. Nguyên nhân: 19 luật mask nay là `[data-i=x]::before`,
+  còn phần khai `content`/`background`/`mask-size` vẫn nằm ở
+  `.fl-b[data-i]::before` — luật ấy KHÔNG còn khớp `.cd-n`. Một `::before`
+  thiếu `content` thì KHÔNG TỒN TẠI, nên nền vẫn đúng màu và glyph biến mất.
+  Ba vế CSS cũ (`5`·`5a`·`5b`) đều xanh suốt: chúng đo *"có luật `.cd-n`"*,
+  *"aspect-ratio 4/3"*, *"object-fit cover"* — không vế nào đo được rằng cái
+  pseudo có RA HÌNH hay không.
+  ⇒ Vá CSS (`.cd-n[data-i]::before` tự khai đủ) + mở BỐN vế mới `5c`-`5f`.
+  Cùng hạng lỗi với `#cổng-xanh-vì-neo-sai`: cổng đo thứ CẠNH cái nó bảo vệ.
+  object: `web/styles/prototype.css` (`.cd-n[data-i]::before`) ·
+  `web/test/the-hai-tang.test.js` vế 5c-5f
+
+do_sau_lan_hai:
+  - lenh: node web/test/the-hai-tang.test.js
+    ket_qua: pass — 29/29 vế
+  - lenh: cd web && npm test
+    ket_qua: "exit 1 · vẫn ĐÚNG MỘT FAIL: page-weight vế `trang chủ` (62 359)"
+  - lenh: "bash chay.sh + curl :8787"
+    ket_qua: "LÕI 200 · THỢ 200 · 5 id YouTube parse đúng, GIỮ hoa-thường · md/pdf ra glyph"
+
+dao_cau_1_va_gia_cua_no: >
+  Chủ dự án nhìn màn thật rồi ĐẢO câu 1: *"tài liệu và bài viết chưa có"* ⇒ MỌI
+  loại có nền, không chỉ video + tài liệu. Lưới đều một nhịp thắng lý lẽ
+  *"khung trống là hứa hão"* của wireframe.
+  Cài bằng thứ RẺ NHẤT có thể: thẻ ĐÃ mang `--c: var(--c-<source_type>)`, nên
+  `.cd-n` đọc `var(--nm, var(--c))` và bài viết + video có màu riêng với **0
+  byte HTML thêm**. Chỉ TÀI LIỆU trả byte cho `--nm`, và đó là ngoại lệ THẬT:
+  `source_type` của cả 5 định dạng đều là `tai-lieu` nên `--c` nói *"tài liệu"*
+  chứ không nói *"pdf hay docx"*.
+  Bỏ luôn luật `[data-pl=video] .cd-n{--nm:var(--c-video)}` — nó là bản THỨ HAI
+  của một sự thật `--c` đã mang.
+  Thêm `--c-docs` + `--c-announcement` (hai `source_type` chưa có màu; ba loại
+  bài viết còn lại đã có sẵn).
+
+byte_sau_khi_dao:
+  tran: 61440
+  truoc_don_vi: 61708      # nợ CÓ SẴN 268 — shell.html mtime 2026-09-08 01:14
+  sau_don_vi: 63200        # vượt 1 760
+  don_vi_nay_them: 1492    # 652 (video+tài liệu) + 840 (bài viết, sau khi đảo)
+  ghi_chu: >
+    Con số tăng 652 → 1 492 là GIÁ TRỰC TIẾP của việc đảo câu 1, không phải một
+    hồi quy. Nói ra vì nó đổi cỡ của việc còn lại: trước khi đảo, một đơn vị
+    giảm béo ~900 byte là đủ; nay cần ~1 760.
+
+do_sau_lan_ba:
+  - lenh: node web/test/the-hai-tang.test.js
+    ket_qua: pass — 34/34 vế (thêm 1d·1e·3e)
+  - lenh: cd web && npm test
+    ket_qua: "exit 1 · vẫn ĐÚNG MỘT FAIL: page-weight `trang chủ` 63 200"
+  - lenh: "bash chay.sh + xem màn thật"
+    ket_qua: >
+      9/9 thẻ có nền — article vàng-olive · repo đỏ `<>` · md xám `M↓` ·
+      pdf nâu-cam tờ-giấy · 5 video ảnh YouTube thật. Lưới đều một nhịp.
+
+gon_the_vong_hai: >
+  Chủ dự án sau khi nhìn màn: *"hạ height, tỉ lệ ảnh nền và vùng text 6/4, cho
+  nhỏ text hơn, design lại cho gọn"*, rồi chỉ tiếp *"phần footer của tab chiếm
+  nhiều diện tích quá"*. Ba việc, mỗi việc một lý do đo được:
+
+  · CHIỀU CAO CỐ ĐỊNH `17.375rem` = **278px**, KHÔNG `aspect-ratio` trên `.cd` — aspect-ratio
+    nhân theo BỀ RỘNG cột (`minmax(15rem,1fr)`), nên ở màn 1600px cột rộng
+    ~290px và thẻ cao lại ~313px, tức đúng cái đang phải hạ.
+  · BADGE loại ĐÈ LÊN ảnh. Vòng đầu 40% (102px) không đủ cho badge + tít 2 dòng
+    + meta + chip: **tít bị cắt NGANG DÒNG** — lỗi tệ nhất trong ba, vì người
+    đọc mất CHỮ chứ không chỉ mất chỗ. Badge là thứ duy nhất trong bốn không
+    cần một dòng riêng.
+  · FOOTER MỘT DÒNG. `.mt` và `.cts` là hai hàng liên tiếp, ăn ~34px trong vùng
+    chữ ~90px — footer ngốn gần một nửa vùng chữ để nói hai mảnh siêu dữ liệu.
+    Neo cả hai vào đáy thẻ: chip trái, tin cậy phải, cùng một dòng ~16px.
+    Neo tuyệt đối chứ KHÔNG đổi thứ tự DOM: đổi thứ tự là sửa `the()`, mà
+    `the()` còn phục vụ lưới trang chủ (không nền).
+  · `:has(.cd-n)` chứ không áp cho mọi `.cd`: lưới TRANG CHỦ chạy `coNen=false`
+    nên thẻ ở đó không có nền — ép chúng cao 14rem là một ô trống 90px không
+    nói gì. Không có nền thì cao theo nội dung, như trước.
+
+do_bang_may_that_khong_bang_mat:
+  lenh: "playwright · page.evaluate trên :8787/tat-ca/"
+  ket_qua: >
+    9/9 thẻ: cao **278px** (từ ~314 ⇒ **-11%**) · nền **165px = đúng 60%** vùng
+    nội dung · footer 0 khối đè nhau và cùng một đáy · 0 thẻ tít tràn.
+    ⚠️ Vòng đầu tôi để **224px** và chủ dự án bác: *"hạ quá tay rồi, ~3.14 thì
+    giảm còn 2.78 thôi"*. Con số 278 là của NGƯỜI, không làm tròn lên 17.5rem
+    (280) — 278 là thứ họ nhìn và gật, giữ đúng nó.
+  ghi_chu: >
+    Cổng `7`-`7g` đo KHAI BÁO CSS, không đo bố cục dựng xong (node không có
+    trình duyệt). Số bố cục đo một lần bằng máy thật và ghi ở đây; cổng canh cho
+    các khai báo sinh ra con số ấy không đổi lặng lẽ.
+
+hai_smell_cua_chinh_toi_cong_bat_duoc:
+  - >
+    HAI luật `.cd-n{}` chồng nhau — đúng lớp lỗi mà khối `.cd` ở trên đã phải
+    viết một đoạn chú thích để bào chữa. Đổi sang selector CÓ PHẠM VI
+    (`.cd:has(.cd-n) .cd-n`), giữ `.cd-n{aspect-ratio:4/3}` làm đường lùi khi
+    `:has()` không được hỗ trợ.
+  - >
+    Vế `7a2` đếm luật bằng `/[\s}]\.cd-n\{/` — nó khớp CẢ
+    `.cd:has(.cd-n) .cd-n{` (dấu cách trước) nên đếm 2 và TỐ OAN. Sửa: so
+    SELECTOR nguyên vẹn. Một cổng đỏ oan dạy người ta bỏ qua cổng.
+
+con_lai: >
+  Vế `page-weight` trang chủ. Ba lối, NGƯỜI chọn — dev không tự chọn vì hai
+  trong ba lối động vào đất người khác hoặc vào một hợp đồng đã chốt.

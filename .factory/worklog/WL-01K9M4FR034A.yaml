@@ -1,0 +1,49 @@
+id: WL-01K9M4FR034A
+at: 2026-08-26
+by: claude
+buoc: s8 — FR-034 giai doan A0 + B1 + B2 + B3 (DB nguon chan ly)
+fr: FR-034-db-nguon-chan-ly.md
+plan: .claude/plans/ph-ng-n-b-l-n-sorted-swan.md   # nguoi dung duyet ExitPlanMode 26-08
+
+viec: >
+  Nguoi dung chot "phuong an B toan bo": SQLite la nguon chan ly cho bai +
+  danh muc; file .md/.yaml la export dan xuat commit git lam backup; FE bo dan
+  Quartz (100% API). Hai nhanh chot qua AskUserQuestion: bo site tinh · gitignore
+  DB + commit export.
+
+da_xong:
+  A0_hop_dong:
+    - ".factory/fr/FR-034-db-nguon-chan-ly.md (DUYET qua plan)"
+    - "brd.md B-C1 DAO + B-C2 + B-C3 + bang truy · adr.md khoi DA DOI FR-034"
+    - "env_plan.md du lieu/backup · M02 spec 2.1/2.5/4 + rules R2/R3"
+    - "M05 spec pham_vi + buoc 4 · M08 spec header/2.1/2.3 + rules R2/R4/R5"
+    - "M03 spec pham_vi/2.1/2.5/4 + rules R1(thu hep S2)/R2(doi doi tuong)/R3(escape md())"
+    - "project_map boundaries: db_writers/exporter/api_writes=[kb/_kho.sqlite]"
+    - "2 schema: enum category -> pattern kebab · FROZEN.lock: go kb/concepts.yaml, ky lai (26 file)"
+    - "check_danh_muc.py thu gon (keo tu B3 len vi enum roi schema lam no sap ngay)"
+    - "task moi thoa G6B: T01-4, T01-5, T05-3, T08-4, T03-8"
+  B1_ddl_tools_migrate:
+    - "core/assets/kho.schema.sql — articles(PK ghep, fm JSON+than la chan ly, cot GENERATED, version/etag bookkeeping) · nhan la VIEW json_each · article_versions · recycle(stt autoincrement) · concepts/categories(khong timestamps — audit_log ganh) · audit_log(trigger cam sua/xoa) · meta(header yaml nguyen van + nhat_ky_goc)"
+    - "core/tools/dung_lai_db.py — file->DB DUY NHAT; parser import tu validate.py (M05-R3)"
+    - "core/tools/xuat_kho.py — DB->file chi SELECT, deterministic, .tmp+os.replace+retry, xoa mo coi, --kiem"
+    - ".gitignore: +kb/_kho.sqlite* (giu _index toi B4)"
+    - "MIGRATE THAT: 2 bai (hermes-agent + thu-realtime cua AI kia) vao DB, export canonical hoa, fixpoint dat (lan 2 ghi 0, hash DB y het)"
+  B2_cong_truoc_code:
+    - "core/tests/check_export_dan_xuat.py — 4 rang; rang 3 in 'CHUYEN TIEP' to truoc khi dungchung.mjs co banXuat (B4)"
+    - "Makefile + ci.yml: chay song song check_index_dan_xuat (go o B4)"
+  B3_validate:
+    - "validate.py: check(path, schema, concepts, categories=None) + cong 5b; CLI --categories/--no-categories, catalog_missing rieng; go nhanh friendly() enum"
+    - "test_gates.py +2 (32 passed) · check_ci_teeth +1 ca · rule_surfaces xanh"
+
+trang_thai_cong: "g6a/g6b/ba/frozen/mermaid/rule_surfaces/reject_reason/ci_teeth/version_pin/kb_mock/danh_muc/index_dan_xuat/export_dan_xuat + 6 test module: XANH het"
+
+moi_truong_bay:
+  - "PATH python = venv hermes-agent (khong pytest). Pytest chay bang C:/Users/Admin/AppData/Local/Programs/Python/Python313/python. 4 muc check_running do la loi nay — co san, khong do FR-034, xu o C7."
+  - "make khong co trong Git Bash — chay tung cong truc tiep."
+  - "PYTHONIOENCODING=utf-8 bat buoc khi chay cong tu console Windows."
+
+con_lai: >
+  B4 flip API (dungchung.mjs -> DB, go banIndex/capNhatIndex/ghiHopDong/
+  kyLaiBaseline, banXuat(); _api.mjs seed bang dung_lai_db; api-guard/
+  no-write-path doi dich; go check_index_dan_xuat + sinh_index) · B5 gate.py
+  chay() INSERT · C1-C7 FE thoat Quartz theo plan. Chi tiet o plan file.

@@ -1,0 +1,58 @@
+{
+  "$comment": "BẢNG KHAI CỬA — nơi lời gọi model đi ra. Cùng khuôn model.json: một nguồn khai, mọi tầng đọc. Adapter thuộc CỬA chứ không thuộc NHÀ (FR-059), và `phuong_ngu` là thứ quyết file adapter nào phục vụ cửa đó.",
+
+  "$vi_sao_tach_khoi_model_json": "model.json trả lời 'gọi model NÀO'; file này trả lời 'gọi QUA ĐÂU'. Hai câu độc lập: đổi gateway thì 112 dòng model không đổi một chữ, và thêm một model không đụng cấu hình cửa. Gộp vào một file là mỗi lần đổi cửa phải sửa 112 dòng.",
+
+  "$vi_sao_phuong_ngu": "Thêm một CỬA nói tiếng OpenAI = 1 dòng ở đây + 0 FILE. Thêm một API nói tiếng khác (Gemini native, Anthropic native) = 1 dòng + 1 file adapter. Đó là `AC-3.1` đọc lại cho đúng thực tế: hôm nay phần lớn gateway và cả OpenAI gốc đều nói `POST /v1/chat/completions`, nên chi phí thật của 'thêm một nhà' là 0.",
+
+  "$vi_sao_bien_khoa_khong_phai_khoa": "Ở đây khai TÊN BIẾN MÔI TRƯỜNG, không khai khoá. Một khoá trong file bảng khai là một khoá trong git, và `.gitignore` không cứu được thứ đã commit một lần.",
+
+  "phien_ban": 1,
+  "mac_dinh": "beeknoee",
+
+  "cua": {
+    "beeknoee": {
+      "$vi_sao": "Gateway trung gian đang dùng (beeknoee-api-guide.md). MỘT key cho mọi endpoint; `/v1/models` mở, không cần khoá — đo 2026-09-04: HTTP 200 khi gọi trần.",
+      "host": "platform.beeknoee.com",
+      "duong_chat": "/v1/chat/completions",
+      "duong_danh_muc": "/v1/models",
+      "danh_muc_can_khoa": false,
+      "nhan_dien_nha": "owned_by",
+      "bien_khoa": "BEEKNOEE_API_KEY",
+      "kieu_auth": "bearer",
+      "phuong_ngu": "openai",
+      "gui_sampling": false,
+      "$vi_sao_gui_sampling": "guide §2: Claude Opus 4.7+ trả 400 nếu có `temperature`/`top_p`/`top_k`; Sonnet/Haiku 4.x chỉ nhận MỘT trong hai. Và chưng cất cần trích NGUYÊN VĂN — một `temperature` cao là chỗ quote bắt đầu bị viết lại. Nên cửa này khai KHÔNG gửi field sampling nào.",
+      "stream": true,
+      "$vi_sao_stream": "guide §2.1: model reasoning có thể think >120s, non-streaming dính Cloudflare 524."
+    },
+
+    "openai": {
+      "$vi_sao": "API GỐC của OpenAI — chỗ dừng khi không muốn qua trung gian. Cùng `phuong_ngu`, nên 0 file adapter mới. CHƯA CHẠY THẬT.",
+      "host": "api.openai.com",
+      "duong_chat": "/v1/chat/completions",
+      "duong_danh_muc": "/v1/models",
+      "danh_muc_can_khoa": true,
+      "nhan_dien_nha": "owned_by",
+      "bien_khoa": "OPENAI_API_KEY",
+      "kieu_auth": "bearer",
+      "phuong_ngu": "openai",
+      "gui_sampling": true,
+      "stream": true
+    },
+
+    "google": {
+      "$vi_sao": "API GỐC của Gemini — `generativelanguage.googleapis.com`, KHÔNG nói tiếng OpenAI (đường `:generateContent`, khoá ở query `?key=`, thân `contents[]` chứ không `messages[]`). Đây là ca cần MỘT FILE adapter riêng, và nó tồn tại trong bảng để chứng minh `phuong_ngu` là một cột thật chứ không phải trang trí. CHƯA CÓ FILE ⇒ phép chặn (b) của §4.0b từ chối, đúng thiết kế.",
+      "host": "generativelanguage.googleapis.com",
+      "duong_chat": "/v1beta/models/{model}:generateContent",
+      "duong_danh_muc": "/v1beta/models",
+      "danh_muc_can_khoa": true,
+      "nhan_dien_nha": "khong-co",
+      "bien_khoa": "GEMINI_API_KEY",
+      "kieu_auth": "query-key",
+      "phuong_ngu": "gemini",
+      "gui_sampling": true,
+      "stream": true
+    }
+  }
+}

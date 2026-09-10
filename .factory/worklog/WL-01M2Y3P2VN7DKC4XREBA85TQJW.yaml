@@ -1,0 +1,81 @@
+entry: ban-giao
+ulid: 01M2Y3P2VN7DKC4XREBA85TQJW
+ngay: 2026-09-10
+module: M03_web
+don_vi: T03-140
+wo: WO-087
+tieu_de: >-
+  Cua so transcript phat bo nut cua BAI KHO, bam la 404
+
+object:
+  - web/plugins/multiwindow/src/scripts/multiwindow.inline.ts
+  - web/test/cua-so-khong-phai-bai-kho.test.js
+  - web/test/chung-cat-nhap.test.js
+  - web/package.json
+  - 07_plan/M03_web/tasks/T03-140-cua-so-khong-phai-bai-kho.md
+  - .factory/wo/WO-087-cua-so-khong-phai-bai-kho.md
+
+trieu_chung: |
+  Chu du an 2026-09-10: *"loai, bo cac bai chung cat / transcript cung loi
+  luon?"*. Anh chup: hop *"Loai bai"* mo tren cua so **Transcript**, bam xong
+  nhan **"Khong doc duoc bai tu API."**
+
+quy_chu_TRUOC_khi_sua: |
+  Chu du an nghi day la he qua su co CRLF cung ngay. Kiem bang git, khong doan:
+    · `HEAD` da co `data-act="loai"` y het
+    · `veBienTap` CHUA BAO GIO re theo `kieu`
+    · 99 dong diff cua toi hom nay KHONG dong nao cham `veBienTap` · `bt-nguy`
+      · `data-act="loai"`
+  => Bug co TRUOC. Noi ra ro rang thay vi de nghi ngo treo o do.
+
+goc: |
+  `multiwindow.inline.ts:485`
+
+      if (tuyChon?.kieu !== "nhap") void tai(id, 0);
+
+  `tai()` la duong cua BAI TRONG KHO: no `fetch /api/articles/<loai>/<slug>`
+  roi phat bo nut *Dua len site · Sua · Loai · Bo khoi kho*.
+
+  `T03-113` da sua DUNG LOP LOI NAY — chu thich ngay tren dong ay con ghi
+  *"Mot ban NHAP khong ton tai trong kho… Sai CUA, khong sai API."* Nhung no
+  duoc viet thanh DANH SACH LOAI TRU CO MOT PHAN TU. `T03-122` them cua so
+  `kieu: "transcript"`, ca moi lot thang qua, goi `tai()`, nhan 404 — va bon
+  nut chan cua so chet dung cung cai cach da chet mot lan.
+
+  Hom nay co HAI `kieu` khong phai bai kho (`nhap`, `transcript`). Guard chi
+  biet mot.
+
+sua: |
+  Dao sang DANH SACH CHO PHEP:
+
+      if (!tuyChon?.kieu) void tai(id, 0);
+
+  Cua so BAI KHO la cua so KHONG khai `kieu`. Them loai cua so thu tu ma quen
+  sua day thi no hong theo chieu AN TOAN (thieu nut) chu khong theo chieu 404
+  (nut chet).
+
+cong:
+  them: web/test/cua-so-khong-phai-bai-kho.test.js — 12 ve
+  ve_quan_trong_nhat: |
+    Ve 2 KHONG do "transcript da bi chan chua". No TRICH bieu thuc trong
+    `if (…)` ngay truoc `tai(id, 0)` roi CHAY no voi nam `tuyChon`, trong do co
+    **mot `kieu` chua ai viet ra** (`so-sanh-hai-ban`). Do ca hien tai thi lan
+    thu ba lai hong y het ma cong van xanh suot — dung nhu lan nay.
+  do_duoc: chay truoc khi sua => 3 ve DO, gom ca ve `kieu` chua ton tai
+  chong_sua_qua_tay: ve 4 doi bai kho VAN du bon `data-act` (dang/sua/loai/xoa)
+
+cong_do_oan_da_doi_phep_do: |
+  `chung-cat-nhap` neo vao CHUOI `kieu !== "nhap"`. Ban moi chat hon han (chan
+  ca `transcript` va moi `kieu` chua ton tai) nhung khong con chuoi ay, nen ve
+  do du bat bien duoc giu MANH HON truoc. Da doi sang CHAY that dieu kien voi
+  `{kieu:"nhap"}`. Chung minh do duoc: thay guard bang `() => true` thi ve do.
+
+  `nut-song` do vi file test moi chua nam trong `npm test` — da them.
+
+ngoai_pham_vi: |
+  Them duong "mo ban ghi goc" tu cua so transcript: huu ich, nhung la tinh
+  nang, khong phai bug nay. Chua mo WO.
+
+do_do: |
+  Web 7 do nen, khong do moi. `cua-so-doc` · `mo-nhap-da-duyet` ·
+  `cua-so-transcript` · `mot-phieu-chung-cat` deu xanh (chong sua qua tay).

@@ -1,0 +1,68 @@
+id: WL-01K9S4FR042BE
+at: 2026-08-30
+by: claude
+buoc: s8 (M03_web T03-88) — FR-042
+loai: che do sang doi nen chu dao sang BE
+fr: .factory/fr/FR-042-nen-sang-mau-be.md
+
+object:
+  - 05_uiux/tokens.css                       # 10 gia tri be mat sang -> ho be
+  - 05_uiux/contracts/contrast-audit.json    # SINH LAI bang may — FROZEN, CHUA ky (cho ky chum)
+  - project_map.yaml                         # v17: 05_uiux/** ve chu M03 (ghi chu 'con thieu chu' tu chi duong)
+  - .factory/fr/FR-042-nen-sang-mau-be.md
+  - 07_plan/M03_web/tasks/T03-88-nen-sang-be.md
+
+nguyen_tac: >
+  Doi SAC, GIU DO SANG — lap luan alpha .8 cua FR-027b neo vao do sang nen
+  (do #C81E1E chi du 0.17 tren nen te nhat). Trong tai la
+  sinh_contrast_audit.py, khong phai mat.
+
+do_bang_may_thay_vi_chon_bang_mat:
+  baseline_truoc_khi_doi: "3 cap truot AA co san (no cu): light tab-active 4.14 · dark chu-mo 4.06 · dark tab-active 4.09"
+  ban_be_dau_tien: "rgba(250,246,236,.8) — LAM TE THEM 2 cap (light chu-mo 4.45, tab 4.03) => loai"
+  quet_do_sang: "251,248,240 => tab 4.10 van te hon · 252,249,242 => tab 4.14 DUNG BANG no cu, chu mo pass => chot"
+  chot: "nen rgba(252,249,242,.8) · card rgba(250,246,237,.72) · secondary/muted #F0EADC · border #DBD3C0 · veil gradient am"
+  khong_lam_te_hon: "tap cap truot SAU = tap cap truot TRUOC, dung tung gia tri"
+
+map_v17: "05_uiux/** ve M03 — dau file map tu ghi 'con thieu chu, khai khi co don vi viec can'; T03-88 la don vi dau tien ghi vao tokens.css. M03 la ben duy nhat tieu thu."
+
+gioi_han_khai_thang: >
+  Be o muc KEM SANG, khong dam bang anh tham chieu Checklist Design. Dam hon
+  la ha do sang nen => do thuong hieu #C81E1E truot AA (da do: 250,246,236 lam
+  chu mo truot). Muon be DAM that thi phai danh doi: doi do nhan hoac nang
+  alpha panel — quyet dinh cua nguoi dung, khong tu lam.
+
+evidence:
+  - "sinh_contrast_audit.py: tap truot = dung 3 cap no cu, 0 cap moi"
+  - "opacity · token-only · motion-polish · man-danh-muc · kho-hinh-dang xanh"
+  - "Playwright light mode: --background tra ve rgba(252,249,242,.8); screenshot da xem, kem am ro o cua so doc/popover"
+  - "he-kinh van do o anh 708KB — no cu, ngoai FR nay"
+
+no_con_lai:
+  - "KY FROZEN.lock mot lan cho chum: contrast-audit.json (FR-042) + spec.md (FR-041) + schema (phien kia)"
+  - "3 cap truot AA co san (light tab-active · dark chu-mo · dark tab-active) — no cu tu truoc, dang cho chu cua no"
+
+luot_2_anh_nen_mo_va_bong:
+  yeu_cau: "bo bot do mo, tang sang + net background — anh nen bi mo va hoi bong (2026-08-30)"
+  veil_khong_ha_duoc: >
+    Quet .26–.32 voi audit lam trong tai: chu-mo-tren-kinh truot AA ngay tu .32
+    (4.49 < 4.5) — veil la lop CHIU LUC cua tuong phan chu, khong phai trang tri.
+    Hoan .35/.6.
+  bug_cua_chinh_vong_quet: >
+    Vong quet dau anchor theo chuoi CO DINH nhung file da bi script truoc de o
+    gia tri khac => replace no-op, moi vong do CUNG mot file (trieu chung: so do
+    .24–.32 giong het nhau). Sua: anchor bang regex tren noi dung HIEN TAI +
+    phep kiem chuan (tra .35/.6 phai ra dung tap no cu).
+  ba_lop_giam_duoc: >
+    flare .5->.22 · vignette .34->.16 · grain .4->.18 — CHI ban sang, qua token
+    --flare-o/--vign-a/--grain-o (tokens.css), prototype.css doc var co fallback
+    so cu nen ban toi giu nguyen. Ba lop nay nam DUOI panel va audit khong mo
+    hinh => giam khong dung tuong phan chu.
+  object_them:
+    - 05_uiux/tokens.css                 # 3 token phu anh theo che do
+    - web/styles/prototype.css           # .flare/.vign/.grain doc token
+    - 07_plan/M03_web/tasks/T03-88-nen-sang-be.md   # scope noi +prototype.css
+  evidence_luot_2:
+    - "audit sinh lai: dung 3 cap no cu, 0 cap moi"
+    - "Playwright 8788 light: flare 0.22 · grain 0.18; screenshot nui sac net, het mang trang"
+    - "server tam 8788 rieng — khong dung 8787 cua nguoi dung"

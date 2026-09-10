@@ -1,0 +1,84 @@
+entry: ban-giao
+ulid: 01M2YFT6RB2XKPWN8CDHQ4A73E
+ngay: 2026-09-10
+module: M03_web
+don_vi: T03-144
+wo: WO-091
+tieu_de: >-
+  Tai "Ban goc" ra ten SHA va `inline` — sua bang RFC 5987 + cong theo y dinh
+
+object:
+  - web/api/articles.mjs
+  - web/api/xuat-cua.mjs
+  - web/test/ten-file-tai-xuong.test.js
+  - web/test/dinh-dang-mo.test.js
+  - web/package.json
+  - web/WORKLOG.md
+  - web/test/WORKLOG.md
+  - 07_plan/M03_web/tasks/T03-144-ten-file-tai-xuong.md
+  - .factory/wo/WO-091-ten-file-tai-xuong.md
+
+trieu_chung: |
+  O backlog M03 mo 2026-09-09: bam *Tai xuong > Ban goc* thi file luu thanh
+  `6714ee19086f.pdf`, va voi PDF trinh duyet MO TAB thay vi tai.
+
+goc_hai_nua: |
+  1 `articles.mjs` dat `filename="<sha12><duoi>"`. Chu thich ngay tren do ghi ly
+    do va LY DO AY DUNG: `ten_goc` la chuoi cua NGUOI GUI, mot `filename=` mang
+    `"` hay newline la duong tach dau de HTTP. Sua khong phai bo lop chan — sua
+    la dung **RFC 5987** `filename*=UTF-8''<phan-tram-ma-hoa>`, kem mot
+    `filename="…"` ASCII da loc lam duong lui.
+  2 Va nua con lai, TIM RA GIUA CHUNG: nut "Ban goc" khong goi cua hien vat —
+    no goi `/api/xuat/<loai>/<slug>?dang=goc`, roi nhanh do **302 sang
+    `/api/articles/media/<sha>` MA BO ROI `?dang=goc`**. Nen cua kia lai thay
+    PDF co `xem_truoc: iframe` => `inline`.
+    Sua moi cua hien vat la sua NUA DUONG. Da them ve 1b khoa mat xich nay.
+
+vi_sao_khong_ep_attachment_moi_luc: |
+  Cach sua de nhat. Nhung `<video src=…>` khong phat duoc khi cua tra
+  `attachment`, va the 2 tang cam — dung bug `WO-064` da sua mot lan. Y dinh
+  TAI phai noi ra o URL, khong suy tu mime. Ve 2 khoa dieu do.
+
+hai_loi_cua_toi_do_CONG_CU_BAT: |
+  Ban dau toi dan ca `ten_goc` vao `filename`. Hai cong CU do:
+
+  1 `media-dau-de` — *"filename mang duoi .pptx tu bang khai"*. Fixture nap mot
+    PPTX duoi ten `goc.bin`; tin duoi cua client thi file luu ra `.bin` va may
+    nguoi dung mo bang nham ung dung. `nosniff` ton tai dung vi loi khai cua
+    client co the sai — va DUOI cung la mot loi khai.
+    => Chi lay phan TEN tu `ten_goc`, DUOI luon tu bang khai. Da them ve 3b
+    khoa lai, de lan sau khong mat.
+  2 `dinh-dang-mo` — khuon `^…filename="[A-Za-z0-9._-]+"$` doi dau de KET THUC
+    ngay sau `filename=`, tuc no khoa luon ban thiet ke cu *"chi mot ten da loc,
+    khong gi khac"*. Da NOI khuon dung MOT tham so (`filename*` voi gia tri chi
+    gom ky tu da phan tram-ma hoa) va CHUNG MINH rang con:
+      qua   lanh
+      CHAN  nhay trong filename=
+      CHAN  them dau de (CR/LF)
+      CHAN  dau `;` trong filename*
+
+cong:
+  them: web/test/ten-file-tai-xuong.test.js — 12 ve
+  cach_do: |
+    Tach `dinhDanhTai(ten_goc, sha256, duoi)` thanh ham THUAN roi CHAY no. Mot
+    phep loc ky tu nam chim trong tay-nghe HTTP thi cong chi doc duoc chu, va
+    mot phep loc chua ai chay thu la mot phep loc chua biet dung.
+  do_duoc: 3 ve DO truoc khi sua, + ve 1b DO rieng khi tim ra nua thu hai
+  ve_am: |
+    Ve 4 gieo dung mot `ten_goc` mang `"`, `\`, CR va LF roi doi dau de di ra
+    van nguyen MOT dong.
+    Ve 4b ban dau cam chuoi con `Set-Cookie` — SAI, chu ay trong dau nhay thi vo
+    hai va cam no la cam mot ten file hop le. Da doi sang bat bien that: phan
+    `filename*` phai duoc ma hoa het.
+    Ve 5: ten rong / toan ky tu la => lui `<sha12><duoi>`, khong `filename=""`.
+
+do_do: |
+  Cua that sau restart, ca hai che do:
+    content-disposition: attachment; filename="cai-dat-va-thiet-lap-hermes-tren-vps.vtt";
+      filename*=UTF-8''cai-dat-va-thiet-lap-hermes-tren-vps.vtt
+  (`.vtt` co `xem_truoc` khong phai iframe nen `attachment` ca hai duong — dung.)
+  Web: 7 do nen, KHONG mot do moi. `check_worklog` xanh (test 136).
+
+chua_lam: |
+  FR-036a (khung theo loai nguon) da viet, CHO CHU DU AN KY — no noi mot phep
+  kiem nen khong tu quyet duoc. Xem `.factory/fr/FR-036a-khung-theo-loai-nguon.md`.

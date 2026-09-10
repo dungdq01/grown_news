@@ -1,0 +1,23 @@
+at: 2026-08-18T03:15Z
+agent: claude
+step: s5 / nhịp 1 — wireframe
+did: >
+  Nhịp 1 của s5 theo thứ tự người dùng yêu cầu: WIREFRAME TRƯỚC, THEME SAU.
+  Chốt trước: 3 màn, tông tạp chí kỹ thuật đọc sâu, data từ mau-dat-chuan.
+
+  Ra: screen_inventory.md (chỉ 3 màn — F1/F2 không có UI vì web chỉ đọc) +
+  3 wireframe SCR-01/02/03, mỗi màn có desktop, mobile, ba state, và bảng
+  "quyết định bố cục — và vì sao".
+
+  Data contract v1: 8 bản ghi phủ edge case thật — gộp 2 bản cùng
+  url_normalized, dải cảnh báo, badge external, draft và rejected không lên
+  web. Khối _expected_render là test của contract; kiểm bằng script cho khớp
+  mọi số: 8 bản ghi, 6 approved, 5 bài trên site (gộp 1 cặp), tiêu điểm
+  src_good01 priority 65.
+
+  Sửa 1 mâu thuẫn tự gây: _expected_render ban đầu có cả featured_id và
+  featured_id_corrected. Script đếm chốt src_good01.
+
+  CHƯA làm: theme, prototype. Dừng theo yêu cầu — người dùng sẽ mô tả màu
+  sắc và font size trước khi sang nhịp 2.
+object: 05_uiux/wireframes/ 05_uiux/contracts/ 05_uiux/screen_inventory.md

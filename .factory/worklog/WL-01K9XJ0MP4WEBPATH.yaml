@@ -1,0 +1,113 @@
+ulid: 01K9XJ0MP4WEBPATH
+ngay: 2026-09-03
+tac_nhan: claude-opus-5
+loai: ban_giao
+gate: FR-053 DUYET · FR-054 DUYET
+pham_vi: .factory/fr/FR-053 · FR-054 §10 · 06_modules/M12_chungcat/backlog.md
+
+viec: >
+  Ghi hai phe duyet cua chu du an, va do lai duong WEB cua upload MP4 sau khi
+  chu du an noi "tren web hien tai toi ko thay co chuc nang do".
+
+TU_SUA_LOI_CUA_MINH: >
+  Luot truoc toi khai "upload MP4 chay duoc" dua tren MOT LOI GOI HAM
+  (luuHienVat tren kho tam). Do KHONG phai bang chung cho mot chuc nang web —
+  dung thu luat bang chung cua du an noi: "unit test pass KHONG tinh — he thong
+  chay that moi tinh". Chu du an bat dung cho.
+  Da do lai qua SERVER THAT (API_PORT=8899, kho tam, MP4 3 MB magic ftyp mp42).
+
+do_end_to_end: |
+  FE  #up-tv-f  KHONG co accept=   -> hop chon file hien MOI dinh dang
+      napHienVatFE: mime = f.type  -> trinh duyet cho .mp4 la "video/mp4"
+      chan duy nhat o FE: f.size > MEDIA.tran_byte (25 MB)
+  POST /api/articles/media  content-type: video/mp4   -> HTTP 201
+       { sha256, so_byte: 3145740, mime: "video/mp4", ten_goc: "bai-giang.mp4" }
+  POST /api/articles  source_type: "tai-lieu"         -> HTTP 201
+       => MOT HANG TRONG BANG `tai_lieu`, KHONG phai bang `video`
+  GET  /api/articles/media/<sha256>                    -> HTTP 200
+       3 145 740 byte tra ve nguyen ven
+       content-type: application/octet-stream  (tu `mac_dinh`, khong phai video/mp4)
+       content-disposition: attachment; filename="6de79b75de72.mp4"
+       + nosniff · CSP default-src 'none' · etag · immutable
+
+tra_loi_cau_hoi_DB: >
+  Byte MP4 nam o bang `media`, cot `byte` (BLOB).
+  CREATE TABLE media (sha256 TEXT PK, byte BLOB NOT NULL,
+                      la_dan_xuat INTEGER, so_byte GENERATED);
+  BA cot that + mot GENERATED. KHONG CO COT `mime` — kho.schema.sql:164 khai thang
+  "KHONG COT METADATA NAO o day"; mime/ten_goc/so_byte song trong
+  <bang>.frontmatter.media[] dang JSON.
+  => Chu du an dung: KHONG co "chuc nang upload video" nao. Co mot O CHON FILE
+     KHONG LOC GI (#up-tv-f thieu accept=) gap mot CUA NHAN CO Y MO cho moi dinh
+     dang (FR-039). Hai thu do gap nhau thanh mot duong KHONG AI THIET KE.
+
+XUNG_DOT_can_chu_du_an_go: >
+  Chu du an noi voi TOI: "3. b" (loi b — khong cho byte video thanh hien vat kho).
+  Chu du an noi voi AGENT KHAC (FR-054 §8.1, "luot 2"): "giu no lai o kho: video /
+  audio / transcript tuong ung. Ta goi la file goc".
+  Hai chi dao DAO NHAU ve tien de: (b) ton tai de giu byte video RA KHOI kho.
+  VA MOT LOI CUA TOI lam chuyen nay te hon: §7.1 khai loi (b) la "ban ghi VIDEO
+  khong duoc co media mime video/*". Do end-to-end cho thay duong that di qua
+  bang TAI_LIEU => luat toi de nghi canh SAI BANG => ap dung nhu toi viet thi LO
+  CON NGUYEN va MOI CONG VAN XANH. Chu du an chon (b) dua tren mo ta sai do.
+  => Hoa giai KHA DI (suy luan cua toi, CHUA AI DUYET, chua cai gi):
+     ban ghi `tai-lieu` khong duoc khai media[].mime khop ^(video|audio)/;
+     ban ghi `video` thi duoc (file goc cua §8.1).
+     Cuong che o validate.py — lop ma CA BA duong ghi di qua (gate.py ·
+     dungchung.mjs · CI), khac api-guard von khong thay gate.py (plan S6).
+
+ba_tran_da_chot: |
+  Chi dao: "file video duoi 1Gb, audio duoi 500mb, thoi gian duoi 60 phut"
+  TRAN_NGUYEN_LIEU_VIDEO   1 073 741 824   ( 1 GB)
+  TRAN_NGUYEN_LIEU_AUDIO     524 288 000   (500 MB)
+  TRAN_THOI_LUONG_GIAY             3 600   (60 phut)
+  Ba he qua:
+   1. TRAN_THOI_LUONG_GIAY la tran thu ba VE BAN CHAT — khong suy ra tu hai tran
+      byte (200 MB co the la 20 phut hay 3 gio tuy bitrate) => cong co HAI NHIP:
+      byte o cua, thoi luong SAU KHI doc metadata.
+   2. 1 GB / 25 MB = 41. FR-054 §9.3 (agent khac) do duoc tran 25 MB nam o
+      frontmatter.schema.json -> media.items.so_byte.maximum — file FROZEN DUY
+      NHAT cua core/. Noi 41x khong phai mot lan noi, no la BO VAI TRO cua con so
+      cu => AC-9.2 phai chay tren con so moi.
+   3. git-lfs free 1 GB => voi tran video 1 GB, MOT video day han muc. §9.3 tinh
+      "day sau ~4 video" tren gia dinh 150-400 MB; o tran nay la 1.
+
+va_cham_voi_agent_khac: >
+  Agent kia them §8 va §9 vao FR-054 TRONG LUC toi soan muc cua minh => muc cua
+  toi bi trung so 8. Da doi thanh §10 va CAT hai phan da co cho tot hon:
+   - "sinh transcript lan hai" -> §9.1 tra du (THAY + article_versions, 0 thay doi
+     schema). Toi da danh dau cau hoi do DA DONG trong o backlog, khong mo o rieng.
+   - "cua nhan audio hay video" -> §8.2 giai bang HAI CUA khac nhau.
+  KHONG sua mot chu nao cua §0-§9.
+  Muc luc sau khi ghep: 0 · 1 · 2 · 3 · 4 · 5 · 7 · 8 · 9 · 10 · 6 — khong trung.
+
+object:
+  - .factory/fr/FR-053-nguoi-chon-model-va-bon-sua-m12.md   # trang thai -> DA DUYET + §0b
+  - .factory/fr/FR-054-duong-video-transcript-thanh-hien-vat.md  # DA DUYET · phu thuoc FR-052 -> DA AP · +§10 (774 dong)
+  - 06_modules/M12_chungcat/backlog.md   # 187 -> 251 dong · 13 o mo (11 cua toi + 2 cua agent kia)
+
+do_da_chay:
+  cong_s6: check_g6a · check_map · check_ba · check_rule_surfaces · check_mermaid — 5/5 XANH
+  pytest: 45 passed
+  do_moi: KHONG CO — cung 5 do nhu truoc (check_danh_muc · check_frozen · check_g6b · check_running · check_skill)
+  kho_that_khong_doi: "media=1 (van la PDF) · tai_lieu=1 · video=1 · bai-giang-mp4=0"
+
+canh_bao_van_hanh: >
+  8787 DANG BI CHIEM — server that cua chu du an dang chay. Probe cua toi dung
+  API_PORT=8899 va 8898 tren kho tam, khong cham no.
+
+khong_lam:
+  - "KHONG cai luat ^(video|audio)/ — §10.2 la CAU HOI, khong phai phan quyet:
+     chi dao (b) dua tren mo ta SAI cua toi, va §8.1 dao tien de."
+  - "KHONG noi so_byte.maximum — file FROZEN, va §9.3 da liet NAM thu phai tra
+     truoc khi ky."
+  - "KHONG AP FR-053/FR-054 vao spec.md/rules.md — ap la sua file FROZEN, va do la
+     mot don vi viec rieng can test do truoc (R5)."
+  - "KHONG ky FROZEN.lock. KHONG commit, KHONG push."
+
+cho_NGUOI_quyet:
+  - "GO XUNG DOT: (b) da chon vs 'giu file goc' cua §8.1. Hoa giai de xuat o §10.2."
+  - "Ky FROZEN.lock: M18/spec.md (§10 + hai cho tro FR-054 nghia cu) — va sau nay
+     ca frontmatter.schema.json neu noi so_byte.maximum."
+  - "Quyet git-lfs (§9.3 muc 3) — o tran 1 GB thi free tier day sau MOT video."
+  - "AP FR-053 + FR-054 vao spec: don vi viec rieng, chua bat dau."

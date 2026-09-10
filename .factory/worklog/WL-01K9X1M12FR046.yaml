@@ -1,0 +1,131 @@
+id: WL-01K9X1M12FR046
+at: 2026-09-02
+by: claude
+buoc: "ap FR-046 vao spec M12 + them luat MOT CHOKEPOINT tu khao sat dot nam"
+loai: doi hop dong tang tren (FR da duyet); KHONG dong ma chuc nang
+fr: [FR-046-nhap-chung-cat-luu-db.md]
+
+object:
+  - 06_modules/M12_chungcat/spec.md        # 11 cho: _inbox -> bang nhap; AC-1.3 viet lai; +AC-1.4/1.5 +§1.1
+  - 06_modules/M12_chungcat/rules.md       # M12-R2 ca ba ve + why; +M12-R7
+  - 06_modules/M12_chungcat/data_flow.md   # dong `ra` + vong doi payload
+  - 06_modules/M12_chungcat/diagram_flow.md # khoi O + BO gate.py khoi duong M12 + canh bao
+  - 06_modules/M12_chungcat/model_flow.md  # khoi IB + bang contract + BO gate.py
+  - 06_modules/M12_chungcat/ui_flow.md     # muc b
+  - 01_research/chatbot-pham-vi-tri-thuc.md  # MOI — raw dot nam
+  - 01_research/research_summary.md          # +§14
+  - 06_modules/M14_chatbot/spec.md           # +§8 Knowledge, +§8.2 nam luat cau truc, +§8.3, +§8.4
+  - 06_modules/M13_truyhoi/spec.md           # +AC-5.3 tap nguon la THAM SO
+
+evidence:
+  - "check_g6a · check_ba · check_rule_surfaces · check_mermaid · check_map => xanh"
+  - "grep _inbox trong 06_modules/M12_chungcat => chi con 2 cho, ca hai la CHU THICH co y ve FR-046"
+  - "grep gate.py trong M12 => 8 cho, ca 8 la van giai thich 'gate.py KHONG con tren duong M12'"
+  - "M12: 27 AC · 7 rule (truoc: 21 AC · 6 rule)"
+
+# ══ PHAN DANG GIA NHAT ═════════════════════════════════════════════════
+FR-046_lam_M12-R2_thanh_cong_KHONG_DO_DUOC: >
+  xanh_khi cu: "moi .md ra _inbox/ mang draft, ke ca khi payload doi approved".
+  Sau FR-046, M12 KHONG tha mot .md nao vao _inbox/ => dieu kien do dung MOT CACH
+  RONG, cong xanh ma khong do gi. Dung lop "cong khong do duoc".
+  Da viet lai ca ba ve: do_khi nay GIEO mot payload doi `approved` roi DOC LAI hang
+  da ghi — do hanh vi tren duong THAT, khong do mot duong khong con ton tai.
+
+FR-046_dua_M12_RA_KHOI_mot_rao_ma_no_khai_la_"khong dung": >
+  FR-046 §3 viet "Khong dung B-C1, FR-028, M05-R1". Dung ve CHU: luat M05-R1 khong
+  doi mot chu, va _inbox/ van ep draft cho ban NGOAI.
+  Nhung: TRUOC FR-046, M12 co HAI rao doc lap — no tu ghi draft, VA gate.py:133 ep
+  draft VO DIEU KIEN lan nua. Sau FR-046, gate.py KHONG CON tren duong cua M12.
+  Nen rao thu hai MAT, va rao con lai la mac dinh `trang_thai: nhap` cua bang nhap.
+  Khong phai vi pham FR — nhung la mot he qua FR khong neu, va nguoi thi cong doc
+  "khong dung M05-R1" se tuong con hai rao. Da ghi thanh mot khoi canh bao trong
+  spec §1 va trong M12-R2.why.
+
+hai_so_do_mermaid_van_ve_MOT_RAO_KHONG_CON_TON_TAI: >
+  diagram_flow: O --> G["05_intake/gate.py ep draft vo dieu kien"] --> KB
+  model_flow:   IB -->|"gate.py ep draft"| CUA
+  Ca hai ve gate.py tren duong cua M12 sau khi FR-046 da bo no. So do la thu nguoi
+  doc TIN NHANH NHAT — ve mot rao khong ton tai nguy hiem hon viet sai mot cau, vi
+  khong ai doc lai chu thich khi da thay mui ten.
+  Da sua ca hai (=> "NGUOI duyet") va them mot khoi canh bao ngay duoi so do, de
+  lan sau khong ai ve lai.
+
+de_xuat_dau_cua_toi_ve_QUYEN_DOC_NGUON_la_SAI_HUONG: >
+  Toi de xuat: "M12 xin LOI xac nhan quyen doc tung slug truoc khi goi model".
+  Khao sat dot nam (research_summary §14) rut ra luat MOT CHOKEPOINT (M14 AC-8.4):
+  bat M12 tu giai quyen la tao chokepoint THU HAI, va hai cho giai cung mot cau hoi
+  la hai cho CO THE LECH — dung lop loi dang lam check_danh_muc do (hai ban schema).
+  Duong dung: LOI giai quyen luc TAO job; M12 nhan danh sach da duoc cap phep va
+  KHONG giai lai. Viec cua M12 la khong mo mot cua thu hai cho ai khac dua nguon
+  vao => AC-1.4 (chi loi goi tu LOI) + AC-1.5 (nguoi_dung_id do LOI gan) + M12-R7.
+
+AC-1.2_"bind loopback"_KHONG_noi_duoc_AI_GOI: >
+  Bon dich vu THO (chungcat 8790 · chatbot 8788 · truyhoi 8791 · artifact 8792) CUNG
+  nam tren 127.0.0.1. Nen "bind loopback" chi chan Internet, KHONG chan mot THO khac
+  goi vao. Payload job mang `nguon: [slug...]` do nguoi goi neu — dung hinh dang
+  CVE-2026-44560 (scope identifier do client gui, ten doan duoc).
+  Do la ly do AC-1.4 ton tai rieng, khong gop vao AC-1.2.
+
+QUYET_DINH_hang_doi: giu MAILDIR (khong doi sang bang o LOI)
+ly_do_giu_maildir: >
+  1. Ranh gioi vung: bang job o LOI nghia la LOI om trang thai cua THO — choi cach
+     cat vung cua s4. Maildir giu dung "THO tu quan viec cua no, LOI chi hoi".
+  2. MOT lap luan cua toi SAI: toi lo bang `viec` lam churn export. Do lai —
+     xuat_kho.py vong theo LOAI (loai nguon), KHONG liet bang, nen mot bang moi don
+     gian khong duoc xuat. Lo lang do tu tan.
+  3. Ly do MANH NHAT cua toi da het: FR-046 DA cap tang trang thai ben
+     (`nhap_chung_cat` khoa theo job_ulid). Do chinh la thu toi muon bang `viec` de
+     co. Nen khong con ly do.
+  DINH CHINH mot cau cua phien kia: "trang thai BEN o hang doi cua THO" — sai.
+  Hang doi PHU DU theo thiet ke (job xong thi roi hang doi). BA tang, khong hai:
+    dang chay (Maildir, THO, phoi qua API) · ben (nhap_chung_cat, LOI, FR-046) ·
+    kho (kb/ file, B-C1). Noi bang job_ulid.
+  Va "log timeline song o dau": MOT NUA da co cho — `khang_dinh_bi_tia` trong
+  FR-046 la du kien timeline quan trong nhat ("AI viet gi ma bi tia"). Phan con lai
+  la tien do dang chay, phu du, canh Maildir la dung.
+
+do_do:
+  check_danh_muc + check_skill: "FR-039 cua toi; cho sua o core/skill-src (agent khac)"
+  check_frozen: "cho NGUOI ky"
+  check_running: "he qua hai muc tren"
+  check_g6b + check_khai_mot_noi + check_worklog: "AGENT KHAC — UI frame dot hai"
+
+no_con_lai:
+  - "Bang nhap (FR-046) chua co DDL trong kho.schema.sql — khong frozen, viec cua s8. Ten cot do s6 M12/M03 chot; FR-046 §3 noi ro 'khong chon ten cot cuoi'."
+  # ĐÃ ĐÓNG cùng phiên 2026-09-02 — xem muc `tach_hai_bo_dem` duoi day.
+  # (giu dong nay de thay no tung la mot no, khong phai mot y tuong moi)
+  - "Endpoint ghi bang nhap chua co o M08 => FR toi M08 (cung nhom voi bon cua M15 va bon cua M17)."
+  - "Phep giai quyen doc nguon o LOI chua ton tai (5 tai khoan doc ca kho). AC-1.4/1.5 la HINH DANG giu san; phep kiem that la FR toi M08 khi Knowledge/bai hoc co."
+  - "Khoa xac thuc service-to-service phai RIENG (CVE-2025-41258) => FR toi M08/M17, khong phai AC cua M12/M14."
+
+# ══ BO SUNG 2026-09-02 · dong no 1 ═══════════════════════════════════
+tach_hai_bo_dem: >
+  FR-046 §2.1 (checkpoint theo giai doan) va M12-R6 (tran thu lai 2) gop lam mot
+  bo dem thi mau thuan. Do lai: CHI MOT giai doan tieu egress — `dang-goi-model`.
+  Chay lai tu `dang-doc-nguon` ton 0; chay lai tu `dang-verify` ton 0 (voi dieu
+  kien phan hoi model da duoc luu).
+  => HAI bo dem: `lan_gui` (payload roi khoi may, tran 2, KHONG BAO GIO reset) va
+  so lan chay lai (khong tran).
+  Cho sac nhat: `lan_gui` KHONG reset la ca luat. Neu chay lai reset no, nguoi bam
+  muoi lan la tai lieu di ra muoi lan, va tran thanh trang tri — dung thu M12-R6
+  sinh ra de chan. Va 'chay lai tu dau' CO gui lai, nen khi lan_gui=2 nut do phai
+  TU CHOI KEM LY DO, khong im lang khong lam gi.
+  Khung dung: tran nay KHONG phai quota cua NGUOI — no chan vong lap TU DONG.
+  Nguoi that su can gui lan ba thi tao JOB MOI (ULID moi, log rieng), nen con so
+  egress van DUNG. May khong duoc tu quyet gui lan ba; nguoi thi duoc, va hanh
+  dong do de lai dau vet.
+
+lo_FR-046_khong_neu: >
+  "Do phi token" CHI dung neu PHAN HOI MODEL DUOC LUU. Job hong o `dang-verify` ma
+  khong co ban luu thi chay lai PHAI goi model lai — tuc ton dung cai no hua tiet
+  kiem. FR-046 khong noi luu o dau. Theo quyet dinh hang doi (Maildir o THO), ban
+  luu do nam CANH JOB trong Maildir, khong o LOI. Da khai thanh AC-5.4.
+
+object_bo_sung:
+  - 06_modules/M12_chungcat/spec.md        # §5.1 hai bo dem; AC-5.3 viet lai; +AC-5.4/5.5
+  - 06_modules/M12_chungcat/rules.md       # M12-R6 ca bon ve
+  - 06_modules/M12_chungcat/ui_flow.md     # lan_thu -> lan_gui; +muc d HAI nut chay lai
+
+evidence_bo_sung:
+  - "M12: 29 AC (truoc khi tach: 27) · 7 rule"
+  - "check_g6a · check_ba · check_rule_surfaces · check_mermaid · check_map => xanh"

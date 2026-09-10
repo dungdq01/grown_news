@@ -1,0 +1,123 @@
+id: WL-01K9K1FR022
+at: 2026-08-20
+by: claude
+buoc: s8 (M03_web)
+loai: sửa lớp giao diện + amend UI contract
+fr: FR-022-hop-thoai-cua-san-pham.md
+
+viec: >
+  Người dùng chỉ vào hộp thoại "127.0.0.1:8787 says" khi xoá bài: "tất cả những
+  cảnh báo như này vẫn design popup thông báo chứ ko phải thông báo kiểu dev
+  này đâu nhé".
+
+pham_vi_ghi:
+  - web/plugins/home-pages/shell.html          # <dialog id="dlg-hoi">
+  - web/plugins/multiwindow/src/scripts/multiwindow.inline.ts
+  - web/styles/prototype.css                   # .dlg-than · .hoi-chu · .bt.pri.pha
+  - web/test/four-screens.test.js              # chốt đếm lời gọi hộp thoại gốc
+  - .factory/fr/FR-022 · project_map.yaml (ui_frozen v1.9)
+
+khong_chi_la_tham_my: >
+  Từ lần thứ hai, Chrome hiện ô "Không cho trang này tạo hộp thoại nữa". Bấm
+  nhầm một lần thì MỌI confirm sau đó trả false IM LẶNG — nút Xoá thành nút
+  chết, không báo gì. Một lớp bảo vệ mà người dùng tự tắt được bằng một cú bấm
+  nhầm thì không phải lớp bảo vệ.
+
+khong_dung_moi_ma_tai_dung: >
+  Khảo sát tìm ra repo ĐÃ CÓ hệ <dialog> (#dlg-nhan, #dlg-sua — FR-019/FR-021)
+  kèm CSS .dlg + ::backdrop + nút đóng tập trung data-dlgdong. FR này thêm một
+  hộp thoại dùng chung theo đúng khuôn đó, không phát minh lại.
+
+vi_sao_khong_tu_dung_overlay: >
+  Cửa sổ đọc dùng z-index TĂNG KHÔNG TRẦN (let Z = 40, ++Z mỗi lần mở/focus/kéo).
+  Overlay position:fixed sẽ chui xuống dưới cửa sổ ngay khi người dùng mở đủ
+  nhiều. showModal() vào top layer — không có cuộc đua nào để thua, và có sẵn
+  focus-trap + Escape + inert.
+
+bon_bay_da_xu_ly:
+  promise_treo: >
+    Đóng bằng Escape / ✕ / bấm ra ngoài đều bắn `close` chứ không qua nút OK.
+    Không nghe `close` thì hàm gọi đứng chờ mãi một câu trả lời không bao giờ
+    tới — treo im lặng, loại khó truy nhất.
+  tra_loi_hai_lan: "dongHoi() xoá hoiXong TRƯỚC khi close(), nên handler close không trả lời chồng"
+  listener_chong: >
+    gan() chạy lại mỗi lần điều hướng SPA. Tôi suýt để listener `close` gắn mà
+    không gỡ — sau 10 lần nav là 10 bản cùng nghe. Đã thêm vào addCleanup cùng
+    chỗ với các listener khác.
+  escape_cua_so_doc: >
+    Handler `phim` đóng cửa sổ trên cùng khi Escape. Khi hộp thoại mở, `phim`
+    thoát sớm — Escape để <dialog> tự lo, không đóng nhầm cửa sổ phía sau.
+
+duong_du_phong_co_y: >
+  Trong chính hoi(): trang không có thẻ <dialog id="dlg-hoi"> (bản build cũ còn
+  trong cache) thì rơi về confirm/prompt. Thà hỏi bằng hộp thoại trình duyệt
+  còn hơn IM LẶNG LÀM LUÔN một việc xoá. Đây là hai lời gọi duy nhất còn lại;
+  test cho phép đúng hai, lời gọi thứ ba là đỏ.
+
+nguoi_dung_chot:
+  - "một mức xác nhận cho tất cả — không làm kiểu gõ-tên-để-xác-nhận cho xoá nhãn"
+  - "hỏi tên nhãn = hộp thoại có ô nhập (thay prompt 1-1)"
+  - "giữ toast: hoi() HỎI và chặn, bao() BÁO và tự tắt — hai vai khác nhau"
+
+evidence:
+  - cd web && npm test                  # 26/26 xanh
+  - node web/test/four-screens.test.js  # "2 loi goi hop thoai goc (toi da 2)"
+  - node web/test/no-leak.test.js       # listener có tên + gỡ được
+  - "kiểm bundle: hoi() · showModal · close listener · textContent · 4 chỗ gọi · 4 nhãn nút"
+
+no_con_lai:
+  - Chưa bấm thử bằng trình duyệt thật (phiên này không có công cụ trình duyệt).
+    Người chốt: mở bài → 🗑 xoá → phải ra hộp thoại của sản phẩm, Escape huỷ được,
+    và mở 5-6 cửa sổ rồi thử lại thì hộp thoại vẫn nổi trên tất cả.
+  - FR-016..FR-022 đều trạng thái MỞ — chờ người ký.
+
+# ── Cùng ngày: "xoá 2 bài rồi mà ĐÃ LOẠI vẫn 0" ─────────────────────────
+loai_khac_xoa:
+  nguoi_dung: '"tôi từ chối (xóa) 2 bài rồi mà trong đã loại thống kê vẫn là 0 nè. là sao?"'
+  chan_doan: >
+    KHÔNG phải bug đếm. Đọc đĩa: hai bài trong _recycle/ đều mang
+    review_status: draft — người dùng bấm XOÁ, không phải LOẠI. Con số đúng.
+    Nhưng cách viết chữ "từ chối (xóa)" cho thấy hai nút đọc ra là MỘT việc, và
+    đó là lỗi của giao diện chứ không phải của người dùng.
+  ba_viec_khac_nhau: >
+    Duyệt/Loại là PHÁN QUYẾT — bài Ở LẠI kho, đổi trạng thái, loại thì kèm lý do,
+    và đếm vào ô thống kê. Bỏ khỏi kho là DI CHUYỂN — file rời kb/ sang
+    _recycle/, không còn nằm trong ô nào.
+  sua:
+    - "nhãn: '✕ loại…' → '✕ Loại (ghi lý do)…' · '🗑 xoá' → '🗑 Bỏ khỏi kho…' + title nói hệ quả"
+    - "hộp thoại xoá nói thẳng: 'Đây KHÔNG phải loại bài' và chỉ sang nút kia"
+    - "ô KPI thứ năm 'trong thùng rác' (api-only, đếm từ /api/recycle) — thiếu nó thì xoá xong bài bốc hơi khỏi mọi con số"
+
+bug_thu_hai_tim_thay_khi_dieu_tra:
+  hien_tuong: "kb/docs/AIAgent-deploy-prototype.md nằm trong kho mà KHÔNG màn nào thấy"
+  nguyen_nhan: >
+    docTuDia() `continue` im lặng với file thiếu frontmatter / thiếu
+    review_status. Bài biến mất khỏi MỌI con số và MỌI màn, không một cảnh báo.
+    validate.py bắt ngay ("Không có frontmatter YAML") nhưng web thì im — người
+    dùng tưởng đã nạp xong.
+  sua: >
+    docTuDia nhận mảng `hong`, ghi tên file bỏ qua; màn Kho hiện dải cảnh báo
+    GỌI TÊN file + chỉ ra lệnh validate. Bỏ qua được thì phải nói ra đã bỏ qua
+    cái gì.
+  kiem_chung: "build bản real: dải hiện đúng 'docs/AIAgent-deploy-prototype.md'"
+
+bug_thu_ba_test_chap_chon:
+  hien_tuong: "api-crud khi xanh khi đỏ — PUT trả 404 ngay sau khi POST trả 201"
+  nguyen_nhan: >
+    Kho tạm mang TÊN CỐ ĐỊNH (gn-api-crud-kb). Hai lượt chạy song song — tôi và
+    phiên AI kia trong cùng repo — dùng chung một thư mục: lượt sau rmSync xoá
+    kho của lượt trước đang chạy dở.
+  sua: "tên kho tạm mang process.pid. Chạy 3 lượt liên tiếp: 25 ok / 0 fail mỗi lượt."
+  vi_sao_dang_sua: "test chập chờn tệ hơn không có test — nó dạy người ta bỏ qua màu đỏ"
+
+chot_may_moi:
+  - "four-screens: emitter phải ĐẾM file hỏng (hong?.push) + chèn dải cảnh báo + shell có mốc"
+  - "four-screens: nhãn nút phải ghi rõ 'Bỏ khỏi kho' và 'Loại (ghi lý do)'; có ô KPI kp-rac"
+  - >
+    Kiểm trên MÃ NGUỒN emitter chứ không trên trang đã build: dải cảnh báo chỉ
+    hiện khi kho CÓ file hỏng, mà cả hai kho test đều phải SẠCH (kb-mock còn bị
+    check_kb_mock.py validate trong CI). Gieo file hỏng vào đó là tạo fixture
+    chống lại chính cổng khác.
+  - >
+    Bẫy khi viết assertion: esbuild thoát chữ tiếng Việt bằng CẢ HAI dạng
+    \uXXXX và \xNN. Giải mã thiếu một dạng là test đỏ vì LÝ DO SAI — vừa xảy ra.

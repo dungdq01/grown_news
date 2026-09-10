@@ -1,0 +1,187 @@
+id: WL-01K9KCGOPKHO
+at: 2026-08-25
+by: claude
+buoc: s8 (M03_web) + s5 (spec.md frozen · ui_frozen v1.13 -> v1.14)
+loai: gop man Cho duyet vao man Kho
+fr: FR-027-he-kinh-tren-anh.md (muc FR-027g)
+
+viec: >
+  Nguoi dung: "Gop man cho duyet va kho lai voi nhau — vi kho da chua thung rac
+  -> thi ta nen de cho duyet in here cho de manager", va giua luot: "dua luon
+  url /cho-duyet vao /kho".
+
+vi_sao_dung_do_duoc: >
+  Hai man tach nhau nhung cung MOT VAI: noi nguoi dung THAO TAC tren kho, khong
+  phai noi DOC no. Kho da co mot danh sach thao tac (thung rac — khoi phuc bai
+  da xoa); Cho duyet la danh sach thao tac thu hai tren cung mot kho. Va con so
+  o o KPI "cho duyet" TRUOC DAY nam o man Kho con danh sach ma no dem nam o man
+  khac — nguoi doc phai doi man de xem thu ma con so vua noi toi.
+
+ba_quyet_dinh_nguoi_dung_chot:
+  tab_Duyet: "BO, tab Kho mang BADGE so. Bo tab la mat mot duong mot-bam toi viec hang ngay; badge tra lai tin hieu do ma khong ton mot tab."
+  url_cu: "GIU mot trang chuyen huong. 404 tren mot tool local doc ra nhu 'du lieu mat', khong phai 'trang da doi'."
+  vi_tri: "NGAY SAU KPI, truoc bieu do — viec-phai-lam dung TRUOC boi canh."
+
+hai_dai_tren_mot_man:
+  van_de: "FR-027f chot 'mot dai moi man'. Man Kho gio co HAI."
+  doi_luat: "dai thuoc MUC no dung dau, KHONG thuoc MAN"
+  vi_sao_khong_gop_hai_cau: >
+    Chung noi hai su that khac nhau, va gop se mat cau B-B1 ("ba truong M1 may
+    khong duoc dien ho") — cau quan trong nhat trong app.
+
+trang_chuyen_huong_bon_quyet_dinh:
+  meta_refresh_VA_link_that: "refresh co the bi chan, va trinh doc man hinh doc trang truoc khi no kip nhay. Chi mot trong hai la mot ngo cut."
+  khong_script: "trang khong nap gn.js; mot the script roi se buoc no-dangerous-html phai xet them mot ngoai le. meta refresh la HTML thuan."
+  khong_CSS_JS: >
+    Nap 84 KB roi nhay di ngay la lang phi thuan. NHUNG "trang khong co CSS"
+    cung chinh la trieu chung cua loi ma css-applied sinh ra de bat — nen ngoai
+    le nay duoc KHAI bang mot AC rieng (AC-2.3.6), khong phai chi bi bo khoi
+    danh sach.
+  duong_TUONG_DOI: "/mock/cho-duyet/ phai ve /mock/kho/, khong nhay sang ban real — nguoi dung se tuong du lieu bien mat. Va neo phai la #cho-duyet: tha nguoi dung o dau mot man co 5 muc roi de ho tu tim la hong dung thu viec gop dinh sua."
+  kich_thuoc: "469 byte (tran 1 KB — stub phinh ra la dau hieu ai do bat dau dung lai mot man o day)"
+
+840px_dat_len_KHOI_CHU_sau_khi_sai_hai_lan:
+  lan_1: "#v-queue > .pn — sai vi #v-queue khong con ton tai"
+  lan_2: ".qw .nw (ca DANH SACH) — SAI, va NGUOI DUNG THAY: dai .mb va dong ghi chu trai het panel con moi hang dung o 840px => mang trong lon ben phai MOI hang, doc ra nhu trang vo"
+  lan_3_dung: ".qw .qr > a > div{max-width:62ch} — chan CHU, hang trai het panel"
+  vi_sao: >
+    Doc lai §9 cho ky: ly do cua 840 la DO DAI DONG mat phai quet. Thu co do dai
+    dong la VAN BAN. Hang thi con co ngay, chip loai va nut — chung la COT THAO
+    TAC va thuoc ve mep phai.
+  bai_hoc: >
+    Khi be mot rang buoc sang ngu canh moi, phai hoi RANG BUOC DO NOI VE THUOC
+    TINH GI roi gan vao phan tu THUC SU mang thuoc tinh do. Be theo ten ("no von
+    o tren panel/danh sach") la be sai cho.
+  62ch: "cung con so va cung ly le da dung cho .feat-d o Trang chu"
+
+loi_that_thu_hai_ca_panel_Kho_bi_an:
+  nguoi_dung_gui_anh: "/kho/ bat dau thang bang muc Cho duyet — khong tieu de man, khong o KPI nao"
+  luat_sai: ".pn:has(> [data-mount]:empty:only-of-type){display:none}"
+  nguyen_nhan: >
+    ':only-of-type' hoi "co phai phan tu <p> DUY NHAT trong panel khong" — KHONG
+    phai "co phai MOC duy nhat khong", la dieu no dinh hoi. Panel dau man Kho co
+    <p class=khocanh> (RONG khi moi file doc duoc) nam canh <div id=mbkho> va
+    <div id=kpi2> day noi dung. <p> do la <p> duy nhat => khop => CA PANEL BIEN MAT.
+  sua: ".pn:has(> [data-mount]:empty):not(:has(> [data-mount]:not(:empty))){display:none}"
+  co_tu_TRUOC_luot_gop: >
+    Khong phai do gop. Man Kho truoc day bat dau bang cac panel bieu do nen khong
+    ai de y phan dau bi thieu. Gop Cho duyet vao lam no lo ra.
+  vi_sao_khong_test_nao_bat_duoc: >
+    Markup LUON co du — chi CSS an no. Bat bang markup thi phai chay trinh duyet
+    that. Nen rang dat len chinh LUAT: khong duoc dung :only-of-type, va phai co
+    ve :not(:has(> [data-mount]:not(:empty))).
+  kiem_hai_chieu: "tai tao :only-of-type => 2 phep kiem do; bo ve :not(...) => 1 phep kiem do; chan ca hang lai => 1 phep kiem do"
+
+mau_tieu_de_thang_bang_DAC_HIEU:
+  van_de: "#v-kho .pn-h h2{color:--success} ap cho MOI panel trong Kho, ke ca muc Cho duyet — ma vai cua muc nay khac han: viec dang treo, khong phai toan canh"
+  bay: "#cho-duyet .pn-h h2 co CUNG dac hieu (1,1,1) => chi THU TU NGUON quyet dinh — dung bay cascade du an da tra gia BA LAN"
+  sua: "#v-kho #cho-duyet .pn-h h2 => (2,1,1), thang dut khoat du ai do sap xep lai file"
+
+badge_mot_so_mot_nguon:
+  dat_canh_qcount: "co chu dich — hai cho in CUNG mot con so o hai vi tri. De canh nhau thi sua mot cai ma quen cai kia se lo ngay khi doc."
+  rong_khi_0: "luat [data-mount]:empty{display:none} an han. Khong can nhanh dieu kien nao, va KHONG co trang thai 'badge 0' de ai do phai dien giai."
+  contrast_cap_MOI_tinh_tay:
+    sang: "#FFFFFF tren #854D0E = 6.85:1 PASS"
+    toi: "#1A0B0B tren #FBBF24 = 11.47:1 PASS"
+    vi_sao_mot_cap_du_cho_hai_che_do: "CA --warning LAN --primary-foreground deu DAO theo che do"
+    luu_y: "day la cap CHUA co trong contrast-audit (generator co danh sach cap co dinh) nen phai tinh tay va ghi so ra"
+
+# ══ PHAN DANG GIA NHAT: bay phep kiem IM LANG ═════════════════════════════
+bay_phep_kiem_im_lang:
+  trieu_chung: "chay npm test sau khi gop => 1 loi. Nhung da dem 8 cho neo vao man cu."
+  nguyen_nhan_1: "npm test noi bang && => MOT CAI DO CHE HET PHAN SAU"
+  cach_thay: "chay doc lap tung file => 6 file do"
+  hai_file_van_XANH_du_da_hong:
+    open_card:
+      vi_sao: >
+        Phep kiem boc trong `if (dong > 0)`. Moc `queue` khong con o trang do =>
+        dong = 0 => PHEP KIEM TU LOAI MINH KHOI TON TAI.
+      bai_hoc: >
+        Mot phep kiem chi chay KHI DA CO du lieu thi no khong canh duoc viec du
+        lieu BIEN MAT — ma do dung la thu vua xay ra.
+      sua: "doi moc PHAI co (nw !== null), roi moi so dong voi so diem bam"
+    url_va_tuong_tac:
+      vi_sao: "chi hoi 'file co ton tai khong'. Trang stub ton tai => xanh, du cho-duyet khong con la mot man."
+      sua: "bo khoi danh sach 'man co URL rieng'; them khoi rieng kiem stub tro dung dich"
+
+ba_phep_kiem_MOI_cua_toi_cung_sai:
+  1_khop_vao_binh_luan_cua_chinh_minh:
+    sai: "neo #cho-duyet + thu tu trong Kho do tren `shell` tho"
+    hau_qua: "doi ten id cua <section> VAN XANH — vi chuoi id=\"cho-duyet\" con nam trong mot dong BINH LUAN TOI TU VIET ngay phia tren"
+    sua: "bo <!-- --> truoc khi do vi tri (shellSach)"
+    cung_lop_loi: "da mac o rail-trai luot truoc"
+  2_hoi_co_xuat_hien_thay_vi_khop_bieu_thuc:
+    sai: "badge doc choDuyet: chi hoi 'choDuyet.length co xuat hien trong 200 ky tu khong'"
+    hau_qua: "doi MOT VE (rej.length ? String(choDuyet.length)) van de lai ten dung trong cua so => lot"
+    sua: "khop CA bieu thuc"
+  3_lay_luat_cuoi_khi_co_hai_luat:
+    sai: "cuoi('.qw .nw') lay luat CUOI, ma .qw .nw co HAI luat khai hai thuoc tinh khac nhau => doc trung mot nua"
+    sua: "gop thanh MOT luat o NGUON — mot selector, mot su that"
+
+lop_loi_chung: "dem hoac tim mot CHUOI roi ket luan ve HANH VI — LAN THU BA lien tiep"
+lop_loi_MOI_can_ghi_ten: "phep kiem CO DIEU KIEN tu vo hieu hoa minh khi dieu kien bien mat"
+
+don_mo_coi_do_chinh_thay_doi_nay_tao_ra:
+  - ".tb[data-nav=\"queue\"]::before — luat icon cua tab da bo. XOA."
+  - "#v-queue > .pn va #v-queue .pn-h h2 — selector tro vao id khong con. XOA, co rang canh."
+  - "nav.queue trong bang i18n EN. XOA. pn.queue GIU — van la tieu de muc."
+  - >
+    iconMask >= 5 trong rail-trai — SO CUNG, va no vua sai (4 tab, 4 icon). Y
+    dinh that cua luat la "moi tab deu co icon", dong ngay duoi da noi dung dieu
+    do va khong bao gio lac hau. San chuyen sang SO TAB, noi no thuoc ve.
+
+doi_ten_test:
+  tu: "nam-man-con-lai.test.js"
+  sang: "cac-man-con-lai.test.js"
+  ly_do: "gop xong con BON man, ten mang so vua sai — va se sai lai lan sau. Ten mang so la ten se lac hau."
+  ngoai_pham_vi_nguoi_dung_neu: "co — da hoi truoc khi lam"
+  4_cho_tham_chieu: "package.json · test/WORKLOG.md · spec.md AC-2.4.4 · T03-5 AC12"
+  KHONG_sua: ".factory/worklog/WL-01K9KBNAMMAN.yaml van nhac ten cu — worklog la BIEN BAN LICH SU, khong phai tai lieu song. No ghi dung dieu da xay ra luc do."
+
+cong_bat_dung_toi:
+  W5_g6b: "AC-2.3.6 tro `css-applied.test.js` ma KHONG task nao khai sinh ra no => them AC13 vao T03-5"
+  frozen: "spec.md la file frozen; doi no phai qua FR -> bump version -> ky lai. Dung quy trinh: viet FR-027g, bump v1.13->v1.14, roi moi --ky."
+  worklog: "so dong prototype.css + so ky tu shell.html lac hau"
+
+evidence:
+  - "cd web && npm test => exit 0, 37/37 file"
+  - "chay DOC LAP tung file test => 0 file do"
+  - "npm run check => exit 0"
+  - "14/14 cong check_* exit 0 (sau khi FR + bump + ky lai)"
+  - "sinh_contrast_audit.py => 62 cap · 0 truot (KHONG doi token mau nao)"
+  - "trang chu 54 KB (tran 60) · trang lon nhat mock/nap 66 KB (tran 74) — KHONG DOI so voi truoc khi gop"
+  - "gn.css 84 KB · gn.js 72 KB (tran 100/100)"
+  - "rail 5 -> 4 tab; trang chuyen huong 469 byte"
+  - "kiem HAI CHIEU 7 phep: doi ten id · chuyen muc xuong duoi bieu do · hoi sinh data-nav=queue · DUONG co lai key · badge doc nua bieu thuc khac · bo max-width danh sach · mau tieu de chi mot id => ca 7 DO dung cho"
+
+gop_la_trung_tinh_ve_trong_luong: >
+  Shell mat mot .view, man Kho duoc them mot <section> — cung khoi markup, chi
+  doi cho. Do duoc: trang chu 54 KB va trang lon nhat 66 KB, y nhu truoc.
+
+files:
+  - "web/plugins/home-pages/shell.html (chuyen khoi v-queue vao v-kho; bo tab Duyet; them moc badge; bo nut 'xem cho duyet')"
+  - "web/plugins/home-pages/index.ts (MAN bo cho-duyet; chen tbn; sinh trang chuyen huong)"
+  - "web/plugins/multiwindow/src/scripts/multiwindow.inline.ts (DUONG bo key queue; i18n bo nav.queue)"
+  - "web/styles/prototype.css (840px doi vai; mau tieu de 2 id; .tb-n; xoa 3 luat mo coi)"
+  - "web/test/cac-man-con-lai.test.js (DOI TEN tu nam-man-con-lai + khoi 3b moi)"
+  - "web/test/{four-screens,bon-trang-thai,buttons,css-applied,open-card,rail-trai,url-va-tuong-tac}.test.js"
+  - "web/package.json · web/{,plugins/,styles/,test/}WORKLOG.md"
+  - "06_modules/M03_web/spec.md (§2.3 + AC-2.3.3 sua, AC-2.3.4/5/6 moi) — FILE FROZEN"
+  - "07_plan/M03_web/tasks/T03-5-test-api.md (AC12 doi ten lenh, + AC13)"
+  - "RUNNING.md (bang duong dan)"
+  - ".factory/fr/FR-027-he-kinh-tren-anh.md (muc FR-027g)"
+  - "project_map.yaml (ui_frozen v1.13 -> v1.14) · FROZEN.lock (ky lai 27 file)"
+
+khong_dung_vao:
+  - "web/api/** · core/** · kb/** · schema · index SQLite — 0 dong"
+  - "tap choDuyet (draft + edited) GIU nguyen — bon-trang-thai canh dieu do"
+  - "nut duyet VAN chi o cua so doc — B-B1 doi nguoi phai DOC roi moi duyet; gop man khong duoc bien duyet thanh thao tac mot-bam tu danh sach"
+  - "slug khai-niem va moi URL khac"
+
+no_con_lai:
+  - "NGUOI CHOT: mo 127.0.0.1:8787/mock/kho/ — muc Cho duyet nam ngay duoi KPI, bam mot bai mo duoc cua so doc, va /mock/cho-duyet/ nhay ve dung cho do"
+  - "REDESIGN-PLAN §3.3 VAN CHUA DAT: var(--brand) con 65 cho. Chua co rang canh TAN SUAT — nguong bao nhieu can NGUOI ban, khong tu quyet."
+  - "TRANG BAI chua dung lai luoi bat doi xung; thanh tien do doc chua co"
+  - "CANVAS HAT (ui_guide §6d/§8) chua co"
+  - "PARALLAX #hero/.tw-i theo cuon (§7) chua co"
+  - "FR-025 · FR-026 ve B va B2 — CHO NGUOI KY"

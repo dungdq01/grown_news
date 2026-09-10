@@ -1,0 +1,195 @@
+ulid: 01M22K8P5N3R9T6V4QXWCDHG1
+thoi_diem: 2026-09-09
+tac_nhan: claude-opus-5 (dev)
+loai: ban_giao
+module: M03_web · M08_api · M01_core (enum cong bang khai)
+don_vi: WO-057 (T03-127 + T08-36) · WO-058 + FR-075 (T03-128 + T08-37) · WO-064
+
+viec: >
+  Chu du an bao BA loi khi nap video, tren cung mot duong bam. Loi thu hai chi
+  lo ra SAU khi loi thu nhat duoc va; loi thu ba chi lo ra sau loi thu hai.
+  Chuoi nay dang ghi ra vi no la mot hinh dang: mot duong chay chua bao gio di
+  het lan nao thi moi lop chan mot lop.
+
+# ═════════ WO-057 · ten file co dau lam `fetch` NEM ═════════════════════
+wo_057:
+  hien_tuong: >
+    Nap `Thay on bai thi final .mp4` (55 MB) ⇒ *"Khong goi duoc
+    /api/articles/media — may chu chua chay?"*, trong khi may chu dang chay.
+  goc: >
+    Gia tri header HTTP chi nhan ISO-8859-1. Dau tieng Viet ngoai dai do ⇒
+    `fetch` NEM `TypeError` luc DUNG request — 0 byte roi may. Do bang
+    playwright tren `:8787` that: cung loi goi voi ten `t.mp4` thi gui duoc.
+  55mb_khong_lien_quan: >
+    `curl` POST 55 MB vao dung cua ay ⇒ 201 trong 1.61s. Tran bang khai 1 GB.
+    Loai tru gia thuyet kich co TRUOC khi sua gi.
+  ba_cho_khong_mot: >
+    `napvideo` (x-ten-goc) · `multiwindow` (x-ten-goc) · `multiwindow`
+    (x-ten-file). Mot `.pdf` hay `.md` ten tieng Viet hong y het, chua ai bao
+    vi chua ai thu. Va mot cho la de hai cho hong im lang.
+  ca_am_hon_ca_nem: >
+    `cafe.mp4` nam TRONG latin1 ⇒ gui DUOC, roi Node doc header theo latin1 nen
+    ten vao frontmatter bi mojibake. No THANH CONG voi du lieu sai.
+  loi_thu_hai_cua_lo_nay: >
+    `catch` gop moi thu thanh *"may chu chua chay?"* — `workflow §1a` cam cong
+    chan sai ly do do. Nguoi doc cau do di khoi dong lai may chu cho mot loi
+    nam hoan toan phia client. Da tach bang `e instanceof TypeError`.
+  khong_phat_minh_loi_moi: >
+    Chinh `multiwindow.inline.ts:1093` DA percent-encode `x-bo-sung` tu WO-020,
+    va `server.mjs::ghepBoSung` da co `try { decodeURIComponent } catch` lam
+    phong ho. Hai header ten file chi la cho bi bo sot.
+  ham_cuc_bo_chu_khong_dung_chung: >
+    `chunk-tu-chua.test.js` cam chunk goi ham cua chunk khac — moi chunk boc
+    IIFE rieng nen mot ham dung chung nem `ReferenceError` ngay lan bam DAU
+    TIEN. Nen hai ban `tenChoHeader` CUC BO la DUNG; cai cong chan la ban thu
+    ba (encodeURIComponent go thang vao literal header).
+  giai_ma_TRUOC_loc: >
+    Lam nguoc lai la mot LO THAT: `%2e%2e%2fx` khong chua `/` nen di qua phep
+    loc nguyen ven, roi phep giai ma bien no thanh `../x` SAU khi cua da mo.
+    Da chung minh do duoc bang cach dao thu tu ⇒ `ten_goc` ra `"../thoat.mp4"`.
+
+# ═════════ WO-058 + FR-075 · tai file roi khong ghi duoc ════════════════
+wo_058:
+  hien_tuong: >
+    Tai `.mp4` → Ghi vao kho ⇒ *"Noi phat nay khong nam trong danh sach nhan…"*
+    noi voi mot nguoi CHUA DAN noi phat nao. Cua ta sai trang thai, nen nguoi
+    bao bug di tim sai cho.
+  goc_ba_tang:
+    - "FE `ghiVideo()` mo dau bang `if (!hostVideoHopLe(tho)) return` VO DIEU KIEN"
+    - "`hienVatVideo` khai 331, gan 392, KHONG AI DOC ⇒ nhanh tai file la duong CHET: byte vao kho thanh cong roi khong ban ghi nao tro toi"
+    - "server `CONG.video`: `if (!u) return 422`"
+  hai_hop_dong_noi_nguoc: >
+    `frontmatter.schema.json allOf[6]` khai `anyOf [media|url]` va
+    `M11_video/spec:38` CHEP LAI dung cau do — nhung `spec:11` noi *"khong byte,
+    khong dong media"*. Spec tu choi, ban FROZEN. KHONG tu chot: dua hai loi
+    len ban, chu du an chon loi A ⇒ `FR-075`.
+  tang_thu_ba_doi_co_cua_FR_theo_chieu_TOT: >
+    Sau khi noi cong server, ban ghi VAN 422 — lan nay o `validate.py`:
+    `url is a required property` (o GOC). Nen ve `media` cua `allOf[6]` CHUA
+    BAO GIO fire duoc — cung lop `#cong-khong-do-duoc`. Va schema la file FROZEN
+    duy nhat cua `core/`.
+    ⇒ Nhung KHONG can sua no: `tai-lieu` da song voi dung rang buoc ay bang quy
+    uoc `kho://tai-lieu/<slug>`. Video co byte dung `kho://video/<slug>`.
+    0 dong sua file FROZEN, 0 chu ky, 0 phat minh.
+  hai_rang_buoc_them_cho_kho_scheme:
+    - "phai KEM media — mot dia chi trong kho khong co byte nao la ban ghi rong"
+    - "slug trong url phai la slug CUA CHINH ban ghi — `kho://video/khac` tro vao byte cua nguoi khac la mot con tro sai IM LANG"
+  ca_de_bo_sot_nhat: >
+    `media` KHONG duoc mien phep kiem host cho mot `url` da neu. Mien thi
+    `anyOf` thanh CUA SAU cho dung thu whitelist sinh ra de chan. Ve `9a` canh
+    no va no do duoc.
+
+# ═════════ WO-064 · mp4 trong kho khong xem duoc ════════════════════════
+wo_064:
+  hien_tuong: >
+    Chu du an: *"tai len nhung loi co xem duoc dau?"* · *"cua so xem ko duoc"*.
+    Cua so doc hien mot the *"Trinh duyet khong mo duoc dang nay — tai ve de
+    xem"* cho mot `.mp4` ma trinh duyet phat duoc hai chuc nam nay.
+  goc: >
+    `media-mime.json` khai nam dong nhom video `xem_truoc: "tai"`, va HAI cho
+    dan xuat tu cot do deu lam DUNG viec cua minh voi mot con so sai:
+    `articles.mjs:472` (`iframe ? inline : attachment`) ⇒ phuc vu `attachment`;
+    viewer roi nhanh cuoi.
+  tai_khong_phai_lua_chon_sai_luc_khai: >
+    `M11_video/spec` khi ay noi video *"khong byte, khong dong media"*, nen mp4
+    trong kho chi la ca bien cua `tai-lieu`. `FR-075` — do CHINH toi ap 30 phut
+    truoc — vua bien no thanh duong CHINH. Dung nghia *"viec vua lam khien
+    artifact khac loi thoi"*, va do la ly do o backlog ton tai.
+  cai_da_lam: >
+    Them gia tri `xem_truoc: "phat"` (the GOC `<video>`/`<audio>`), ba cho doc
+    no: bang khai (5 dong) · `articles.mjs` tra `inline` · viewer dung the phat.
+    Cong cua bang o dat M01 (`check_dinh_dang_mo.py:111`) phai NHAN gia tri moi,
+    khong thi no do vi chinh thu vua them.
+  khong_muon_iframe: >
+    Mot mp4 trong iframe la mot trang trong trang: khong `controls` cua ta,
+    khong `preload`, va `FR-039 §0` cam dung hinh dang do. `<video>` la the NOI
+    DUNG — no khong chay script va `nosniff` van dung.
+  audio_rieng_video: >
+    `<audio>` cho `audio/*`, khong dung `<video>` cho ca hai: mot mp3 trong the
+    `<video>` la mot khung den, va nguoi dung se tuong file hong.
+  preload_metadata: >
+    Du de co thoi luong + thanh keo, va KHONG tai ca file khi mo cua so. Voi
+    tran 1 GB (`FR-054`) thi `preload="auto"` la mot lan tai ca gigabyte.
+  the_phat_thieu_CSS_va_cong_bat_duoc: >
+    `.hv-p` KHONG co luat CSS — phep grep dau cua toi khop `hv-play` roi tuong
+    la co. `<video>` khong luat ra 300x150 mac dinh va tran khoi cua so: dung
+    hang loi `.cd-n[data-i]::before` thieu `content` cung ngay. Da them
+    `video.hv-p` + `audio.hv-p` RIENG, cong 3 ve canh (12d-12f), gom mot ve cam
+    ep `aspect-ratio` len `<audio>`.
+
+object:
+  - .factory/wo/WO-057-ten-file-co-dau-lam-fetch-nem.md
+  - .factory/wo/WO-058-tai-file-mp4-roi-khong-ghi-duoc.md
+  - .factory/wo/WO-064-mp4-trong-kho-khong-xem-duoc.md
+  - .factory/fr/FR-075-video-co-the-chi-co-byte.md          # DUYET · cho NGUOI sua spec M11
+  - 07_plan/M03_web/tasks/T03-127-ten-file-co-dau-qua-header.md
+  - 07_plan/M03_web/tasks/T03-128-nop-video-doc-hien-vat.md
+  - 07_plan/M08_api/tasks/T08-36-giai-ma-ten-file-co-phong-ho.md
+  - 07_plan/M08_api/tasks/T08-37-cong-video-anyof-media-url.md
+  - web/plugins/napvideo/src/napvideo.inline.ts
+  - web/plugins/multiwindow/src/scripts/multiwindow.inline.ts
+  - web/api/articles.mjs
+  - web/api/cong-module.mjs
+  - web/server.mjs
+  - core/assets/media-mime.json            # 5 dong -> `phat` + $comment_phat
+  - core/tests/check_dinh_dang_mo.py       # enum +phat  (dat M01)
+  - web/styles/prototype.css               # video.hv-p · audio.hv-p
+  - web/test/ten-file-co-dau.test.js       # cong MOI, 16 ve
+  - web/test/tai-file-video.test.js        # cong MOI, 24 ve (I FE · II server · III xem)
+  - web/package.json
+  - 07_plan/M03_web/tasks/T03-110b-test-tab-theo-doi.md     # nhan 2 cong
+
+r5_do_truoc:
+  - lenh: node web/test/ten-file-co-dau.test.js
+    ket_qua: "DO 11/16 truoc ma · xanh 16/16 sau"
+  - lenh: node web/test/tai-file-video.test.js
+    ket_qua: "DO 7/14 truoc ma (WO-058) · them PHAN III: DO 6 ve nua (WO-064) · xanh 24/24 sau"
+
+do_duoc: >
+  12 fixture hong, dung roi HOAN NGUYEN — 12/12 do, moi cai do dung ve cua no.
+  WO-057 (6): bo giai ma · bo phong ho · napvideo ten tho · multiwindow
+  x-ten-file tho · catch gop hai ca · DAO thu tu giai-ma/loc (⇒ `../thoat.mp4`).
+  WO-058 (6): bo nhanh kho:// · kho:// khong doi media · media mien kiem host ·
+  FE khong gui media · FE cau loi cu · FE kiem host vo dieu kien.
+
+hai_ve_XANH_OAN_phep_thu_bat_duoc:
+  - >
+    Ve `4b` neo bang mot mau long `[\s\S]{0,200}` — no khop CA khoi
+    `if (!tho && !hienVatVideo)` nam ngay tren, nen da-hoan-nguyen-bug ma cong
+    van xanh. Va: neo chinh xac `if\s*\(\s*tho\s*&&\s*!hostVideoHopLe\(`.
+  - >
+    Fixture dau cua WO-058 dung danh muc THAT (`aitalkshow`/`talkshow`) tren
+    kho TAM ⇒ ve 7 do vi `concepts.yaml` cua fixture, mot ly do khong lien quan
+    gi toi FR-075. Do OAN day nguoi ta bo qua cong. Va: `CAT_FX`/`CPT_FX` +
+    `dungSchema({chuDe:true})` ca hai phia.
+
+nghiem_thu_END_TO_END_tren_may_that:
+  - lenh: "bash chay.sh + playwright: tai .mp4 ten tieng Viet -> Ghi vao kho"
+    ket_qua: >
+      Dieu huong sang `/video/` (duong thanh cong). Ban ghi CO THAT:
+      `kb/video/thay-on-bai-thi-final.md` · `url: kho://video/thay-on-bai-thi-final`
+      · `media[0].ten_goc: "Thay on bai thi final .mp4"` — DAU NGUYEN VEN.
+  - lenh: "ffmpeg dung mot mp4 THAT (3s · 320x240 · h264+aac) roi nap qua cua media"
+    ket_qua: >
+      `ten_goc` tra ve `"Bai giang THAT.mp4"` — giu ca dau LAN chu hoa.
+      `content-disposition: inline` · `content-type: video/mp4` · `nosniff` con.
+  - lenh: "playwright: mo ban ghi do trong cua so doc"
+    ket_qua: >
+      `<video class="hv-p">` 679x382 · `controls` · `preload=metadata` ·
+      `readyState 4` · `duration 3` · `videoWidth 320` · **`play()` chay,
+      `currentTime 0.54`** · `v.error` = null. PHAT DUOC.
+  bay_toi_tu_dat_va_go_duoc: >
+    Lan nghiem thu dau dung mot mp4 GIA 96 byte (`ftyp` + zero). Trinh phat
+    dung dung nhung `DEMUXER_ERROR_COULD_NOT_OPEN` — loi cua FIXTURE, khong
+    cua ma. Neu bao "xong" o day thi do la mot loi khai; neu bao "van hong" thi
+    do la mot bao dong oan. Dung ffmpeg dung mot mp4 THAT moi tra loi duoc.
+
+đỏ_do: >
+  `page-weight` ve *"trang chu"* 63 200/61 440 — **WO-055 da co chu** (mo
+  2026-09-05, do 61 915 khi do, cung ve, `AC5` cua `T03-112`). Ba don vi nay
+  thuan logic + CSS, 0 byte HTML them.
+
+con_lai:
+  - "NGUOI: sua `M11_video/spec.md:11` theo `FR-075 §2` roi ky lai `FROZEN.lock` (hash hien `fe500d1b99b3c7a6`)"
+  - "o backlog: ve `media` cua `allOf[6]` la mot ve KHONG BAO GIO fire duoc (`url` bat buoc o goc chan truoc)"
+  - "kho co HAI ban ghi THU do toi tao luc nghiem thu (`thay-on-bai-thi-final` mp4 gia 96 byte · `bai-giang-that-nghiem-thu` mp4 that 43 KB) — cho chu du an quyet bo hay giu; toi khong tu xoa du lieu trong kho"

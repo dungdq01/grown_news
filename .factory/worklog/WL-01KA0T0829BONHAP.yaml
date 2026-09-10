@@ -1,0 +1,102 @@
+id: WL-01KA0T0829BONHAP
+khi: 2026-09-04T12:22:00+07:00
+loai: ban_giao
+tac_nhan: claude-code
+viec: FR-057 mở + T08-29 — cửa BỎ một bản nháp (`da_bo`)
+module: M08_api
+
+object:
+  - path: .factory/fr/FR-057-bo-mot-ban-nhap.md          # FR MỚI
+  - path: .factory/fr/FR-046-nhap-chung-cat-luu-db.md    # §1 sửa: +`da_bo`
+  - path: 07_plan/M08_api/tasks/T08-29-cua-bo-mot-ban-nhap.md
+  - path: web/api/loi.schema.sql                          # enum 5 giá trị
+  - path: web/api/dungchung.mjs                           # diTruLoi + loiLietKeNhap
+  - path: web/api/nhap-cua.mjs                            # cuaBoNhap + chặn sửa sau bỏ
+  - path: web/api/router.mjs                              # POST …/bo
+  - path: web/test/loi-cua.test.js                        # enum-5 + di trú
+  - path: web/test/loi-nhap-cua.test.js                   # §6c · §6d
+  - base_sha: 8535a26                                     # chưa commit
+
+fr_mo:
+  id: FR-057
+  vi_sao: |
+    `T03-94` đòi BỐN hành động (Duyệt · Sửa · Trả lại · Xoá); `FR-046 §1` khai
+    vòng đời không có giá trị nào nghĩa "đã bỏ", và `T08-27` vừa siết enum đó
+    thành `CHECK` ở DDL — đúng theo FR. Thêm một trạng thái là SỬA MỘT FR ĐÃ
+    CHỐT, không phải một chi tiết thi công.
+  nguoi_quyet: chủ dự án — "duyệt cả 2", lối (a), 2026-09-04
+  khong_ky_frozen: |
+    `loi.schema.sql` và `FR-046` đều KHÔNG trong `FROZEN.lock`. FR này tồn tại
+    vì `FR-046` đã CHỐT, không vì file bị khoá.
+
+r5_do_truoc:
+  # rule.md mục 8 — cặp dấu thời gian trong CÙNG entry.
+  - luc: 2026-09-04T12:13:25+07:00
+    trang_thai: DO
+    lenh: node web/test/loi-nhap-cua.test.js
+    ra: |
+      10 lỗi
+        FAIL thiếu `ly_do` ⇒ 422 — trả 404
+        FAIL `ly_do` quá ngắn ⇒ 422 — trả 404
+        FAIL có `ly_do` đủ dài ⇒ 200 — trả 404 {"loi":"Không có đường này."}
+        FAIL trạng thái sang `da_bo` — là nhap
+        FAIL `ly_do` đọc lại được
+        FAIL bỏ LẦN HAI ⇒ 409 — trả 404
+        FAIL SỬA một bản đã bỏ ⇒ 409 — trả 200
+        FAIL bỏ một bản `da_duyet` ⇒ 409 — trả 404
+        FAIL bản đã bỏ VẮNG ở danh sách mặc định
+        FAIL lọc tường minh `?trang_thai=da_bo` thì CÓ
+    ghi_chu: cổng viết XONG; `nhap-cua.mjs` · `router.mjs` · DDL chưa đụng dòng nào
+  - luc: 2026-09-04T12:11:00+07:00
+    trang_thai: DO
+    lenh: node web/test/loi-cua.test.js
+    ra: |
+      3 lỗi
+        SAI `trang_thai='da_bo'` được nhận — đúng năm giá trị FR-046+FR-057
+        SAI di trú thêm `da_bo` vào `CHECK`
+        SAI DB đã di trú nhận `da_bo`
+  - luc: 2026-09-04T12:20:00+07:00
+    trang_thai: XANH
+    lenh: node web/test/loi-cua.test.js && node web/test/loi-nhap-cua.test.js
+    ra: "cả hai pass"
+
+do_do:
+  - lenh: npm test        # trong web/
+    ket_qua: 2877 ok · 0 FAIL · exit 0     # 2858 → 2877, +19 vế mới
+  - lenh: npm run build
+    ket_qua: "build-fe: 5 file .inline.ts"
+  - lenh: kill 8787/8790 + npm run api + curl
+    ket_qua: |
+      GET / → 200 · GET /api/nhap-chung-cat → 200
+      POST /api/nhap-chung-cat/khong-co/bo → {"loi":"không có nháp khong-co"}
+      (route SỐNG THẬT, không chỉ xanh trong fixture)
+
+do_do_boi: chua-quy-duoc-chu
+
+quyet_dinh:
+  - |
+      BỎ ≠ XOÁ. Không cửa nào chạy `DELETE`. `ban_goc_ai` tốn token model để tạo
+      và là thứ duy nhất trả lời "người đã sửa những gì" (`FR-046 §1` gọi nó bất
+      biến); `rule.md` mục 4 cấm agent tự xoá; và một dòng `audit_loi` trỏ vào
+      hàng đã biến mất là một vết vô nghĩa.
+  - |
+      HAI ca 409, hai lý do KHÁC NHAU — `da_duyet` (file đã trong `kb/`, bỏ hàng
+      nháp không gỡ file ra ⇒ hai nguồn chân lý) và `da_bo` (một chiều). Trả cùng
+      một mã nhưng hai câu, vì người đọc cần biết vướng cái nào.
+  - |
+      `da_bo` MỘT CHIỀU cưỡng chế ở CỬA, không ở `CHECK`: `CHECK` nói về GIÁ TRỊ,
+      không nói về CHUYỂN TIẾP. Nên `cuaSuaNhap` cũng chặn — không thì "sửa" là
+      một nút hồi sinh.
+  - |
+      Danh sách mặc định lọc bỏ `da_bo`; `tong` đếm CÙNG tập với `dong`. Hai câu
+      lệnh đếm hai tập khác nhau là cách một badge nói dối ("5 việc", hiện 3).
+  - |
+      Di trú enum-4 → enum-5 đi qua `diTruLoi` đã có (`WO-044`), đo bằng SỰ VẮNG
+      MẶT của `da_bo` trong DDL thật — không bằng một cột cờ "đã di trú": cờ đó
+      là một lời khai. Cổng đo cả tính BẤT ĐỘNG lẫn việc trigger `ban_goc_ai`
+      được dựng lại (trigger gắn bảng CŨ và chết theo nó).
+
+keo_theo:
+  - |
+      FE chưa có nút Xoá ở `/chung-cat/nhap/` — cửa đã sống, màn chưa gọi.
+      Đã mở ô backlog M03; đơn vị M03 (chưa cấp ID, sẽ `ls` lúc tạo file).

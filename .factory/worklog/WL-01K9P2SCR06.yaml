@@ -1,0 +1,54 @@
+id: WL-01K9P2SCR06
+at: 2026-08-29
+by: claude
+buoc: quét dải grid đếm cứng (sạch) · SCR-06 hợp đồng ba màn nạp
+loai: bàn giao (nợ C9 — wireframe)
+
+object:
+  doc:
+    - 05_uiux/wireframes/SCR-06-ba-man-nap.md   # MỚI
+    - 05_uiux/README.md                          # trỏ con trỏ tới nó
+
+quet_dai_grid:
+  - >
+    Sau WO-024, quét toàn bộ `prototype.css` tìm luật cùng loại: 8 luật dùng
+    `repeat(...)`, **6 dùng `auto-fill`/`auto-fit`** (tự thích ứng), còn đúng
+    HAI luật đếm cứng — `.hs` và `.pt3`, cả hai `repeat(3, …)`
+  - >
+    Cả hai KHỚP markup, đã đếm: `.pt3` có đúng 3 `.pt3-o` trong `shell.html`;
+    `.hs` lấy từ `soLieu()` (`trang.mjs:392`) là một mảng 3 phần tử cố định.
+    **Không lỗi cùng loại nào nữa** — kết luận âm, và nó có giá trị đúng bằng
+    một kết luận dương
+
+scr06:
+  - >
+    Bản này KHÔNG vẽ trước — ba màn dựng xong (C6) rồi mới có nó. Nên nó không
+    phải bản thiết kế mà là **hợp đồng ghi lại**: cái gì phải giống nhau, cái gì
+    được khác, và vì sao
+  - >
+    Ghi ra vì thứ này đã trôi HAI lần và cả hai chỉ lộ khi người dùng nhìn thấy:
+    WO-021 (ba form lệch bộ trường) và WO-024 (WO-021 chữa cột form nhưng dải
+    tab nằm ngoài phạm vi đo, nên hai màn vẫn lệch trái)
+  - >
+    **Con số trong bản vẽ KHÔNG phải nguồn.** Bộ trường do `format-chung` §1 canh
+    bằng tập giao + tập hiệu; bố cục do §5–§6. Hợp đồng đổi thì chỗ đỏ là CỔNG,
+    bản vẽ chỉ nói VÌ SAO. Đây là bài học FR-036 đã trả giá: SCR-05 từng ghim con
+    số 9 ô và nó thành sai khi khung đổi
+  - >
+    Mọi tên cổng và luật CSS dẫn trong bản vẽ đều đã kiểm tồn tại trước khi ghi —
+    8 file test, `.np-p`/`.np-tw` `max-width:52rem`, `.np-p .f-row` `40rem`,
+    `one_liner` là trường duy nhất trong `required` của schema
+
+no_con_lai_C9:
+  - "spec ba module: XONG (M10/M11 có cổng từ WL-01K9P0ACM10M11)"
+  - "wireframe: SCR-06 xong — ba màn danh sách chưa có, và chúng ít trôi hơn"
+  - "`memory/decisions.md`: XONG (4 entry, WL trước)"
+  - "`FROZEN.lock` ký lại: CHỜ NGƯỜI"
+
+do_do:
+  - cong: he-kinh.test.js
+    do_do_boi: ảnh 708 KB người dùng thêm — `python core/tools/toi_uu_anh_nen.py`
+  - cong: check_frozen.py
+    do_do_boi: chờ NGƯỜI ký sau khi FR-039 duyệt
+  - cong: check_danh_muc.py · check_skill.py · check_running.py
+    do_do_boi: agent khác · và hệ quả của hai cổng trên

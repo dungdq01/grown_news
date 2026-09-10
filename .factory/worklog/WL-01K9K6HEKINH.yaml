@@ -1,0 +1,202 @@
+id: WL-01K9K6HEKINH
+at: 2026-08-24
+by: claude
+buoc: s8 (M03_web) + s5 (tokens, ui_frozen)
+loai: amend-frozen · ha tang he kinh + tra 3 no cu
+fr: FR-027-he-kinh-tren-anh.md
+
+viec: >
+  Nguoi dung: "giờ chúng ta sang big update UI — read only Big update UI in
+  ui_guide.md". Va chon: ha tang + Trang chu · giu WCAG AA (sua token cho du
+  sang) · anh lay tu public/, them gradient nhung PHAI MUOT.
+
+khong_phai_ke_hoach_moi: >
+  05_uiux/REDESIGN-PLAN.md da ton tai va ghi "cho ban tham khao cua nguoi dung.
+  Muc 3 va 4 se duoc viet lai khi co tham khao". ui_guide.md CHINH LA tham khao
+  do. Nen FR-027 la phan con thieu cua ke hoach da co, va ton trong luat §5:
+  "nhip C chi dung MOT man — v1 hong o cho toi dung ca 4 man roi moi dua xem".
+
+# ── Ba dieu khao sat DOI so voi gia dinh ban dau ─────────────────────────
+he_anh_nen_da_co: >
+  Tuong phai dung tu dau. Thuc te: web/plugins/backdrop/ da lam dung BA dieu
+  ui_guide §5 doi (dao opacity hai lop · dung khi visibilitychange · dung khi
+  mouseover), va prototype.css:65-74 da co .sky + .mist + .grain = ba tang dau
+  cua §1. Chi thieu tang canvas va loe sang.
+
+ba_trong_bon_thu_kinh_da_co: >
+  --edge (FR-014) · --e-top (FR-013) · --blur-lift (DESIGN.md §3). Thieu dung
+  thu THU TU: --gloss. Do la ly do panel truoc FR nay doc ra la "o mo", khong
+  phai mat kinh — mat nhan ra vat lieu qua PHAN CHIEU, khong qua do mo.
+
+phan_doan_trong_plan_SAI_va_phep_do_sua: >
+  Plan viet "--t4 truot o ca hai he, sua #7c7c86 -> #8c8c96". Do lai tren ANH
+  THAT: he nay chi co BA bac chu, khong bon — --t4 cua guide la bac thu tu
+  khong ton tai o day. KHONG sua gi ca.
+  Ca THAT SU truot nam o cho khac: ban SANG, va la NO CU (xem duoi).
+
+# ── Quyet dinh alpha: hai che do hai gia tri ─────────────────────────────
+alpha_theo_che_do:
+  do_duoc: |
+    ban SANG · light-4.jpg vung giua 109.2 · muted-foreground:
+      alpha .60 -> 3.52 TRUOT · .84 -> 4.45 · .88 -> 4.63 PASS
+    ban TOI · dark-5.jpg vung giua 151.7 · ink-3:
+      alpha .55 -> 4.90 · .62 -> 5.16 · .88 -> 6.43 (ban truoc)
+  quyet_dinh: "toi .88 -> .62 · sang GIU .9"
+  vi_sao_khong_lech_chuan: >
+    He qua VAT LY: anh sang lam nen nhat nen chu TOI can panel DAC moi doc duoc.
+    Khong phai thieu nhat quan.
+  vi_sao_62_khong_60: >
+    .55 cho ink-3 = 4.90, chi du 0.4 — them mot anh sang hon la lat sang truot.
+    .62 cho 5.16, du 0.66. Guide dung .6; .62 la cung cam giac, do duoc an toan hon.
+  tinh_co_may_man: >
+    motion-polish.test.js:62 khoa glass_alpha.light === 0.9 voi
+    --background:rgba(252,252,251,.9). Giu ban sang nguyen CUNG LA giu test do
+    xanh — khong phai trung hop: contract da validate dung con so nay.
+
+# ── Buoc 1 · anh nen cho muot ────────────────────────────────────────────
+anh_nen:
+  do_truoc: "public/ 11 file / 17.7 MB · lon nhat 8.4 MB (9783x5503, bi tran 4MB cua plugin BO QUA IM LANG)"
+  ba_cap_trung:
+    - "light-6 copy.jpg = light-6.jpg — BYTE-IDENTICAL (cung sha256)"
+    - "lio.jpg ~ ...38714444.jpg — lech 0.35/255"
+    - "...38543670 (1).jpg ~ ...38543670.jpg — lech 0.97/255"
+  nguong_so_da_kiem: "cap gan nhat tiep theo lech 25+ nen nguong 6.0 khong co nguy co xoa anh khac nhau"
+  ba_viec_moi_viec_mot_ly_do:
+    thu_nho: "<=2560px — anh bi blur(22px) + veil phu len nen chi tiet hon the la thua"
+    nen: "<=400 KB, KHONG xuong duoi q60 — duoi do thay banding tren vung troi phang"
+    bo_trung: "giu ban NHO"
+  ket_qua: "public/ 17.7MB -> 2.3MB · static/bg/ 9306 -> 2267 KB (-76%) · 10 -> 8 file · lon nhat 428 KB"
+  khong_dot_vao_pixel: >
+    Hai anh vung giua con sang (151.7 va 137.3). Script in `!!` goi ten chung,
+    xu ly bang veil trong CSS — de con doi y duoc.
+  cong_cu: core/tools/toi_uu_anh_nen.py (co --xem, khong ghi)
+
+hai_bug_trong_script_toi_tu_bat:
+  vong_lap_thieu_san: >
+    `range(82, 59, -4)` cho 82,78,...,62 roi DUNG — 60 khong bao gio duoc thu,
+    nen anh 3 MB thoat vong lap ma khong ghi gi (tra "?"). Dung danh sach tuong
+    minh + phu toi CL_MIN.
+  im_lang_vuot_tran: >
+    Cham san chat luong ma van >400 KB thi in `!!` kem con so. Im lang vuot tran
+    la cach lam tran mat nghia.
+
+# ── Buoc 2-3 · token + CSS ───────────────────────────────────────────────
+token:
+  - "toi: --background .88 -> .62 (ghi ca bang do vao comment)"
+  - "--gloss MOI, khai rieng hai che do: sang .10 · toi .14"
+vi_sao_gloss_toi_DAM_hon:
+  nguoc_voi_e_top_nhung_cung_ly_do: >
+    Mat doc DO TUONG PHAN voi nen, khong doc tri so alpha.
+    --e-top la mot VACH 1px: .55 tren nen tham thanh duong choi => ha xuong .07.
+    --gloss la VET LOANG trai 64% panel: .10 tren nen tham gan nhu tan => nang .14.
+
+css:
+  them: ".pn,.bk,.top{background-image:var(--gloss)} · .cd{background-image:var(--gloss)}"
+  chi_2_dong: "khong phai he CSS thu hai chong len"
+  vi_sao_khong_pseudo_element: >
+    .pn::after da mang vien sang FR-014. Them ::before la them mot lop hop thanh
+    nua tren nen dang co anh — dung thu §6a dem. background-image nam tren mat
+    nen san co, KHONG ton lop.
+
+# ── Ba no CU tra trong FR nay ────────────────────────────────────────────
+no_1_blur_go_tay:
+  cho: "prototype.css .dlg::backdrop{backdrop-filter:blur(2px)}"
+  vi_pham: "DESIGN.md §9 'Khong them blur khac --blur-lift'"
+  vi_sao_luat_ton_tai: "ban v15 dung ba muc blur => mat doc ra ba chat lieu tren cung man hinh"
+  sua: "dung var(--blur-lift)"
+
+no_2_muted_foreground_sang_TRUOT_AA:
+  hien_tuong: "#6B6B74 cho 4.34 / 4.39 tren anh THAT — truot AA suot tu dau"
+  vi_sao_khong_ai_thay: >
+    audit 2.0.0 VIET TAY va do tren nen GIA DINH #F0F5F7 (sang 243), ngoai khoang
+    anh that (109-137). Nen giả định de hon thuc te o ban sang.
+  sua: "#6B6B74 -> #65656C (4.76 tren nen te nhat, du 0.26; van 5.63 tren nen dac)"
+  vi_sao_khong_68686F: "4.55 sat mep — them mot anh sang hon la lat sang truot"
+  khong_do_FR_027: "ban sang khong doi alpha trong FR nay; day la no co san"
+
+no_3_audit_lech_thuc_te_va_KHONG_CO_script:
+  hien_tuong: >
+    Header file ghi "Sinh lai moi khi token mau doi — KHONG chinh tay" nhung
+    KHONG CO script nao de sinh. Nen no da duoc viet tay, va den FR-027 thi khai
+    glass_alpha.dark = 0.88 trong khi token da .62.
+  vi_sao_te: "audit lech thuc te te hon khong co audit — cho cam giac da kiem trong khi con so khong con dung"
+  sua: "core/tools/sinh_contrast_audit.py — doc hex + alpha TU tokens.css, tinh WCAG, ghi JSON"
+  ket_qua: "audit 3.0.0 · 62 cap · 0 truot tren ANH DANG DUNG"
+
+# ── Hai bug trong script audit toi tu bat ────────────────────────────────
+bug_bo_lop_veil:
+  hien_tuong: "7 cap 'truot'"
+  nguyen_nhan: >
+    Ban 2.0.0 (va ban dau script cua toi) do anh -> panel, BO lop veil. Nhung
+    .mist (z-index -2) LUON nam giua .sky (-3) va panel — bo no cho ty le THAP
+    hon thuc te.
+  sua: "them veil_nhat_nhat() — lay chang NHAT NHAT cua gradient (ca te nhat)"
+  ket_qua: "7 truot -> 5"
+bug_gop_hai_bo_anh:
+  hien_tuong: "ban SANG 'truot' 4.27 nhung do thu cong ra 5.05 PASS — chenh lech phoi ra loi"
+  nguyen_nhan: >
+    nen_that() gop ca hai bo anh vao mot dict phang, nen ban SANG bi do tren anh
+    TOI (#4D4D4D) — nen no khong bao gio dung.
+  sua: "tra {mode: {ten: hex}}; public/ -> dark, public/light/ -> light (khop backdrop-assets:38-39)"
+  ket_qua: "5 truot -> 2, va ca 2 la no cu that (muted_fg sang)"
+
+hai_nhom_nen_trong_audit_3:
+  tham_chieu: "4 nen GIA DINH tu ban 2.0.0 — GIU de so sanh duoc, nhung KHONG tinh vao failures"
+  that: "2 bien moi bo anh dang dung (do vung giua) — day moi la cai phai PASS"
+  vi_sao_tach: >
+    #F0F5F7 sang 243 va #0E1216 toi 18 nam NGOAI khoang anh that 77-152. Truot
+    o do la thong tin de theo doi, khong phai loi phai sua.
+
+# ── Buoc 4 · bit lo hong + rang ──────────────────────────────────────────
+lo_hong_gn_css:
+  hien_tuong: "gn.css 118 KB ma KHONG test nao chot tran"
+  bang_chung_lech_tai_lieu: "comment noi 86 KB · css-applied noi 46 KB · thuc te 118 KB (phinh 2.4x)"
+  vi_sao_thoat: "test canh 'CSS phai TACH ra file' — tach cuu phan LAP, khong cuu phan PHINH"
+  sua: "page-weight.test.js them tran gn.css <= 160 · gn.js <= 100"
+
+rang_moi:
+  file: web/test/he-kinh.test.js
+  so_phep_kiem: 19
+  phu:
+    - "bon thu cua §4 deu co token va deu toi duoc .pn; --gloss khai rieng hai che do"
+    - "§6a — dem lop backdrop-filter <= nguong khai (6/8); .cd KHONG blur"
+    - "§6b + DESIGN.md §9 — moi blur dung var(--blur-lift), khong saturate() go tay"
+    - "§6c — khong mix-blend-mode tren lop phu toan man"
+    - "§6d — canvas (neu co) phai co document.hidden + khoa 30fps + reduced-motion"
+    - "anh nen <=500 KB, khong cap nao trung dung luong"
+  chap_nhan_chua_co_canvas: "guide MO TA no, khong bat buoc — nen 'chua co' la trang thai hop le"
+  kiem_hai_chieu:
+    - "lui --gloss khoi .pn => do"
+    - "tra blur(2px) => do"
+    - "gieo 1 anh 3 MB => do kem dung lenh sua"
+
+# ── Con so lech trong tai lieu, sua luon ─────────────────────────────────
+sua_tai_lieu:
+  - "project_map.yaml: '113 token' -> 90 (dem that, bo comment truoc khi dem)"
+  - "project_map.yaml: contrast 50/50 -> 62 cap · 0 truot, kem giai thich hai nhom nen"
+  - "ui_frozen v1.10 -> v1.11"
+loi_YAML_toi_tu_gay:
+  hien_tuong: "check_ba do — ParserError"
+  nguyen_nhan: "chuoi nhieu dong khong dung block scalar, va dong co '#F0F5F7' bi YAML coi la comment"
+  sua: "dung `>` block scalar"
+
+evidence:
+  - "cd web && npm test => exit 0, 34/34 file, 0 FAIL"
+  - "npm run check => sach"
+  - "pytest core/tests -q => 30 passed"
+  - "13/13 cong check_* exit 0"
+  - "sinh_contrast_audit.py => 62 cap · 0 truot tren anh dang dung"
+  - "static/bg/: 9306 KB -> 2267 KB · 10 -> 8 file · lon nhat 428 KB"
+  - "gn.css 119 KB (nguong 160 moi) · mock/index.html 48 KB (khong doi)"
+  - "check_frozen: ky lai 27 file (contrast-audit.json doi 485 dong)"
+
+no_con_lai:
+  - >
+    TRANG CHU chua dung theo he kinh — chi ha tang. REDESIGN-PLAN.md §5 doi dung
+    MOT man roi dua xem. Chua lam: canvas hat 3D (§6d/§8), ba vong tu chuyen (§5
+    — va DESIGN.md §9 cam carousel nen phai la crossfade tai cho).
+  - "5 man con lai (v-all, v-queue, v-kho, v-concepts, v-nap) KHONG dung. v-nap la 249 dong / 36 control va ui_guide khong co cong thuc nao cho form — can ban rieng."
+  - "FR-025 (cong 9 khong bat khi url_normalized vang) — CHO NGUOI KY."
+  - "FR-026 ve B (rejected -> draft) va ve B2 (thu hoi approved) — CHO NGUOI KY."
+  - "Chua co cache-busting cho gn.js/gn.css — thuc ra CO ROI (index.ts:783-787 hash djb2 theo noi dung -> ?v=). No nay da tra tu truoc, ghi lai cho dung."
+  - "Mot luot test do khong tai hien duoc (luong-day-du, phep kiem long sau) — da them in nguyen van phan hoi."

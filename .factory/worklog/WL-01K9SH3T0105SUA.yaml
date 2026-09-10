@@ -1,0 +1,76 @@
+ulid: 01K9SH3T0105SUA
+khi: 2026-09-04T04:40+07:00
+tac_nhan: agent-thi-cong (Claude, phiên 6c7880c5)
+loai: ban-giao
+module: M03_web
+don_vi: T03-105 — ngữ cảnh SỬA sống qua điều hướng (WO-045)
+
+viec: |
+  Bấm **Sửa** một tài liệu từ `/tai-lieu/` trả về một form **Nạp mới trống**.
+  Nguyên nhân: `suaTaiLieu()` gọi `doiView("naptailieu")` RỒI MỚI điền form,
+  mà `doiView` ĐIỀU HƯỚNG khi view vắng khỏi DOM (`v-naptailieu` bị cắt khỏi
+  mọi trang không phải nap) — mọi dòng sau chạy trên trang đang unload.
+
+  Sửa: CẤT ngữ cảnh vào `sessionStorage` TRƯỚC khi gọi `doiView`; `noiLaiSua()`
+  đọc + XOÁ NGAY ở `khoiDong()`, cạnh khuôn `data-moBai` đã có sẵn cho cửa sổ
+  đọc. Phần điền form tách thành `dienFormSua()` để dùng lại — chép đôi mã thì
+  chỗ thứ hai sẽ lệch, và lệch ở đây là form nối lại thiếu một ô không ai thấy.
+
+  Ba quyết định, mỗi cái một lý do:
+  1 · `sessionStorage`, KHÔNG `localStorage` — ngữ cảnh sửa là việc của MỘT tab
+      đang làm dở; `localStorage` sống qua cả lần đóng trình duyệt và dùng
+      chung mọi tab ⇒ tab thứ hai thấy "đang sửa" một bài mình chưa bấm.
+  2 · XOÁ NGAY sau khi nối lại — để lại thì lần vào `/…/nap/` kế tiếp (bấm
+      "+ nạp tài liệu") mở ra form điền sẵn của bài cũ, và người ghi đè một bài
+      họ không định đụng.
+  3 · Sửa CẢ ca thứ hai (`suaTuCua`) — `doiView` có thể điều hướng, nên MỌI
+      người gọi điền DOM sau nó đều mang cùng lỗi. Sửa một chỗ là để lại lớp.
+
+object:
+  - .factory/wo/WO-045-sua-tai-lieu-mat-ngu-canh-khi-doi-view.md
+  - 07_plan/M03_web/tasks/T03-105-sua-noi-lai-sau-dieu-huong.md
+  - web/plugins/multiwindow/src/scripts/multiwindow.inline.ts
+  - web/test/sua-dung-man.test.js       # 7 ca mới
+  - web/test/o-media-sua.test.js        # phép đo về đúng tính chất
+  - 06_modules/M03_web/backlog.md       # tick WO-045 + 1 ô lớp lỗi
+
+bang_chung:
+  - "ĐỎ-TRƯỚC (rule.md mục 8), mốc 2026-09-04T04:2x: `node web/test/sua-dung-man.test.js`
+     → 6 lỗi (`suaTaiLieu CẤT ngữ cảnh` · `CẤT trước doiView sau` (cất -1,
+     doiView 33) · `có nhánh NỐI LẠI` · `nối lại XOÁ ngay` · `suaTuCua cũng đi
+     qua đường cất-rồi-nối-lại` (doiView 294 · G(f-bai) 346))"
+  - "SAU: cùng lệnh pass"
+  - "TRÌNH DUYỆT THẬT, chiều SỬA: /tai-lieu/ → Sửa → /tai-lieu/nap/ với
+     tv-1l='Đôi điều về XGBoost' · up-tv-kq='Đang SỬA xgboost-stap-by-step…' ·
+     tv-gui='Lưu thay đổi' · sessionStorage=null"
+  - "TRÌNH DUYỆT THẬT, chiều NẠP MỚI: vào /tai-lieu/nap/ đường thường ⇒ form
+     TRỐNG, nút 'Ghi vào kho' — ngữ cảnh không đi lang thang"
+  - "cd web && npm test → exit 0 · 2795 ok · 0 FAIL · gn.js 101743/102400"
+
+do_do: 8535a26 (2026-08-30) — KHÔNG phải phiên này
+do_do_chi_tiet: |
+  `git log -1` trên `multiwindow.inline.ts` → `8535a26 fix 123`, và
+  `git show HEAD:…` đã có `doiView("naptailieu")` ở dòng 1628. Bug lộ ra lúc đo
+  ranh giới cho `T03-104`, không phải do T03-104 gây.
+
+hoc_duoc: |
+  1 · Một phép đo có thể ĐỎ OAN theo hai kiểu, và tôi vấp cả hai trong một lượt:
+      · phép TÔI viết cấm `localStorage` TOÀN FILE — nhưng `gn-theme`/`gn-lang`
+        dùng nó hợp lệ. Thu về đúng khoá `gn-sua`.
+      · phép CÓ SẴN (`o-media-sua`) quét riêng thân `suaTaiLieu` — tách hàm làm
+        nó đỏ dù hành vi không đổi. Nó đo VỊ TRÍ HÀM, không đo tính chất.
+      ⇒ Một cổng neo vào TÊN HÀM phạt mọi lần refactor đúng, và người bị phạt
+        học cách KHÔNG refactor — đúng chiều ngược thứ cổng muốn.
+
+  2 · Cổng cấu trúc-mã XANH không có nghĩa luồng CHẠY đúng. Phải mở trình duyệt
+      và đo cả HAI chiều: chiều sửa (form điền) VÀ chiều nạp mới (form trống).
+      Chiều thứ hai mới bắt được lỗi "ngữ cảnh đi lang thang".
+
+keo_theo:
+  - "T03-104 nay tách được ranh giới sạch — `kqTV` còn một chỗ dùng ở
+     `dienFormSua`, và hàm đó thuộc vùng nap"
+  - "M03 backlog: cổng neo vào tên hàm — chưa đếm còn bao nhiêu cái"
+
+chua_xong: |
+  T03-104 · T03-95 · T03-94 · Xoá nháp · audit_loi vào backup — tất cả đã duyệt,
+  chưa làm. Gate G6C do NGƯỜI ký. Chưa commit.

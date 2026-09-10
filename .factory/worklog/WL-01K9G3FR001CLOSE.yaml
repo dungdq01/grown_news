@@ -1,0 +1,21 @@
+at: 2026-08-18T12:20Z
+agent: claude
+step: FR-001 / CLOSE
+did: >
+  FR-001 CLOSE — đã thêm 3 trường vào frontmatter.schema.json và cưỡng chế bằng
+  ràng buộc conditional: review_status approved ⇒ BẮT BUỘC khai cả ba.
+
+  Vì sao cần ràng buộc, không chỉ thêm trường: trường tồn tại mà không ai điền
+  thì M1 vẫn không đo được. Đây đúng lỗi mà README skill cảnh báo — "máy cưỡng
+  chế được thì đừng trông vào việc LLM nhớ".
+
+  insight_new     boolean  chỉ NGƯỜI đặt, không phải máy
+  skill_installed boolean  cả ba điều: sinh + cài + output agent đổi tốt hơn
+  review_minutes  integer  minimum 0, bấm giờ không ước
+
+  Kiểm bằng máy: 6/6 trường hợp đúng (approved thiếu ⇒ chặn · approved đủ ⇒
+  pass · draft không cần · rejected vẫn cần reject_reason · review_minutes âm
+  ⇒ chặn · insight_new sai kiểu ⇒ chặn).
+
+  Thêm 5 test cố định vào core/tests/test_gates.py. Bộ test 14 → 19, all pass.
+object: core/assets/frontmatter.schema.json · core/tests/test_gates.py

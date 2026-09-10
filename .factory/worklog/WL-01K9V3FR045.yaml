@@ -1,0 +1,95 @@
+id: WL-01K9V3FR045
+at: 2026-09-01
+by: claude
+buoc: "ap FR-044 + FR-045 (nguoi duyet) vao artifact — tru file bi deny chan"
+loai: doi hop dong tang tren; KHONG dong ma chuc nang
+fr: [FR-044-ho-so-tong-hop.md, FR-045-giai-doan-hai-nam-tai-khoan.md]
+
+object:
+  - 03_docs/brd.md                 # +B-D3b · B-B4 doi cho · B-E1 bac 3 MO · B-E5 kich hoat · bang truy +2 dong
+  - 03_docs/prd.md                 # bang "co y KHONG co": 2 dong doi chieu
+  - 04_system/security_baseline.md # +§1.1 authz viet lai · bang bon bac · bang ra
+  - 04_system/adr.md               # +hai bo tu vung · Z3 ngoai le · bang thu muc +cong/
+  - 02_proposal/proposal-2-ai-llm-kenh.md   # bang Q4 + cau "bac 3 khong chan gi"
+  - .factory/fr/FR-043-du-lieu-gui-ra-ngoai.md  # bien dau file + tieu de bac 3 + cong C4
+  - .factory/fr/FR-045-giai-doan-hai-nam-tai-khoan.md  # sua khang dinh SAI ve FROZEN
+  - core/assets/dich-vu.json       # v1 -> v2: +cong (M17) · +nghe_ngoai · sua 3 chu thich lac hau
+  - cong/README.md                 # MOI — scaffold khung rong
+  - project_map.yaml               # v18 -> v19: +M17_cong · +4 entity FR-045
+
+# ══ PHAN DANG GIA NHAT ═════════════════════════════════════════════════
+FR-045_cua_toi_khai_SAI_ve_FROZEN: >
+  FR-045 §0 khai `core/assets/kho.schema.sql` la FROZEN. Do lai: FROZEN.lock giu
+  DUNG MOT file trong core/ — frontmatter.schema.json. kho.schema.sql khong frozen.
+  Nen bon bang moi them duoc KHONG can ky. Da sua trong FR truoc khi lam theo no.
+  Bai hoc: toi viet "(FROZEN)" tu tri nho chu khong tu grep. Mot FR khai sai dieu
+  kien cua chinh no thi nguoi thi cong se hoac cho mot chu ky khong can, hoac di
+  vong mot deny khong ton tai.
+
+mot_quyet_dinh_doi_thi_phai_sua_BAY_CHO_khong_phai_mot: >
+  Mo bac 3 lam BAY cho khac noi nguoc: brd.md (bang + tieu de) · security_baseline
+  (bang + doan giai thich + bang ra) · proposal-2 (bang Q4 + mot cau) · prd.md
+  (hai dong) · FR-043 (tieu de + cong C4 + bang dau file).
+  Grep truoc khi sua, va grep LAI sau khi sua. Bo sot mot cho la de lai mot luat
+  noi nguoc, va nguoi doc sau khong biet tin cho nao — te hon la khong sua gi.
+
+khong_GHI_DE_artifact_de_ngay_ke_ca_FR: >
+  FR-043 (08-31) khai bac 3 dong. Khong sua tung dong trong no — dan mot BIEN o
+  dau file: "moi cau 'bac 3 dong' duoi day la HO SO cua quyet dinh 08-31, khong
+  phai luat dang hieu luc. Luat hien hanh: brd.md B-E1 + B-D3b."
+  Ly do: FR la ho so cua mot quyet dinh o mot thoi diem. Sua noi dung no thi mat
+  dau vet "da tung quyet khac", ma dau vet do la thu cho biet vi sao doi.
+
+B-D3b_la_SIET_khong_phai_NOI: >
+  Nguoi doc de tuong "5 nguoi doc duoc" la noi long B-D3. Nguoc lai:
+  "private" cu nghia la "khong ai biet URL" — mot tinh chat KHONG DO DUOC.
+  B-D3b nghia la "co mot bang ghi ro ai duoc" — dem duoc, thu hoi duoc, cong kiem
+  duoc. Ghi ro dieu nay trong brd.md de lan sau khong ai doc nham chieu.
+
+cong_BIEN_giu_M08-R1_NGUYEN_VAN: >
+  Dat be mat Internet vao web/ => phai viet lai M08-R1 ("localhost LA toan bo lop
+  bao ve") + sua api-guard.test.js. Dat vao cong/ (BIEN) => ca hai giu nguyen van,
+  vi BIEN von la vung duoc giao viec doi mat Internet.
+  Cai gia: Z3 phai co ngoai le. Nhung ngoai le KHAI TRONG BANG (nghe_ngoai: true)
+  thi cong con dem duoc; ngoai le trong dau nguoi thi lan thu hai khong ai biet la
+  lan thu hai.
+
+them_mot_dich_vu_lam_BA_chu_thich_noi_sai: >
+  Them cong/ vao dich-vu.json lam ba $comment lac hau ngay lap tuc:
+  "BIEN: KHONG nghe gi" · "BIEN luon null" · "Sau dich vu tren".
+  Chu thich giai thich mot BANG thi song cung bang do — them dong ma khong doc lai
+  chu thich la de lai mot loi giai thich noi nguoc voi du lieu ngay ben duoi no.
+
+evidence:
+  - "grep FROZEN.lock => chi frontmatter.schema.json trong core/"
+  - "grep -rn 'bậc 3' 03_docs 04_system 02_proposal .factory/fr | grep dong => chi con dong trong BIEN cua FR-043 (co y)"
+  - "yaml.safe_load(project_map) => v19 · modules 11 · du_kien 6"
+  - "assert moi duong be cua modules_du_kien ton tai => khong con duong tro hu khong"
+  - "json dich-vu.json => v2 · 7 dich vu · cong khong trung · nghe_ngoai = ['cong'] (DUNG MOT)"
+  - "22/26 cong Python xanh · pytest 42 passed · check_map xanh"
+
+do_do:
+  check_danh_muc + check_skill: "agent khac — hai ban schema core/skill-src lech core/assets"
+
+dinh_chinh_quy_chu_2026-09-01: >
+  Dong `do_do` tren khai SAI CHIEU. Da diff hai ban schema (khong doc tu tri nho):
+  lech DUY NHAT co nghia la `properties.media.properties.mime` — core/assets co
+  `pattern`, core/skill-src con `enum` 5 gia tri. Do CHINH LA thay doi FR-039, tuc
+  NGUYEN NHAN la viec CUA TOI. Hai lech con lai (`allOf[3].$comment` va
+  `category.$comment`/`description`) chi la chu thich, khong doi nghia.
+  Nen quy chu dung la: NGUYEN NHAN = FR-039 (toi) · CHO SUA = core/skill-src (agent
+  khac so huu, toi bi cam ghi). Khong phai "do cua agent khac".
+  Vi sao dang ghi: viet "agent khac" cho mot do do MINH gay ra la dung hinh dang
+  cua `#do-cua-nguoi-khac` — R6 canh chinh cai do. Khong sua dong cu, de lai de
+  thay tung khai the nao.
+  Loi phu do duoc: fix la mot patch HAI dong (bo `enum`, them `pattern` +
+  `description`), khong phai mot cuoc hop nhat hai file — agent kia khong can
+  doi chieu cac $comment.
+  check_frozen: "cho NGUOI ky — no FR-034 + FR-036 + FR-041 + FR-042"
+  check_running: "he qua cua hai muc tren"
+
+no_con_lai:
+  - "frontmatter.schema.json (FR-044: +ho_so tong-hop, +nguon) — BI DENY CHAN, agent khong ghi duoc. Can NGUOI ap hoac go deny."
+  - "kho.schema.sql (FR-045: 4 bang) — khong frozen nhung la ma/DDL => viec cua s8, khong phai s4"
+  - "s6-module-spec: 6 module du kien can module-pack roi tot nghiep sang `modules:`"
+  - "Hai o backlog M01 con lai: <worklog-check> chua cai · Z6 chua cai"

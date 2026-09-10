@@ -1,0 +1,301 @@
+{
+  "$comment": "Năng lực HIỆN CÓ của agent nội bộ — không phải danh sách tên file skill. M06_skillgen đọc file này để phân loại NEW/DEEPEN/OVERLAP/OUT_OF_SCOPE. Chấm depth trung thực: cao quá thì không bao giờ đề xuất gì, thấp quá thì cái gì cũng NEW.",
+  "$depth_scale": {
+    "1": "chỉ biết tên khái niệm",
+    "2": "biết khi nào dùng",
+    "3": "làm được trường hợp chuẩn",
+    "4": "xử lý được edge case, biết các đánh đổi",
+    "5": "thiết kế được cách tiếp cận mới"
+  },
+  "$note": "Bản TỐI THIỂU — lớn dần từ thực tế, không đoán trước 30 dòng. Cùng logic với concepts.yaml. Mỗi lần M06 cho ra một loạt NEW đáng ngờ ⇒ dấu hiệu manifest thiếu, bổ sung capability chứ đừng hạ ngưỡng.",
+  "version": 1,
+  "updated": "2026-08-18",
+  "agent": "smartlog-internal",
+  "domain": [
+    "ai-solutions",
+    "agent-engineering",
+    "backend-integration",
+    "ai-services",
+    "solution-consulting"
+  ],
+  "skills": [
+    {
+      "id": "agent-builder",
+      "$why": "Bạn đang dùng Claude Code, tự viết skill, và source-distiller có hẳn archetype 'Agent / AI system'. Đây là mảng làm nhiều nhất.",
+      "capabilities": [
+        {
+          "name": "skill-authoring",
+          "depth": 4,
+          "$why": "Đã viết 7 skill, biết description quyết định kích hoạt. Chưa cho 5 vì chưa thấy bằng chứng thiết kế một chuẩn skill mới.",
+          "aliases": [
+            "agent-skill-design",
+            "skill-packaging"
+          ]
+        },
+        {
+          "name": "prompt-architecture",
+          "depth": 3,
+          "$why": "Phần tĩnh + phần lắp động. Cho 3 vì làm được ca chuẩn; 4 cần bằng chứng xử lý edge case như prompt versioning, A/B.",
+          "aliases": [
+            "prompt-design",
+            "system-prompt-design",
+            "prompt-versioning"
+          ]
+        },
+        {
+          "name": "context-management",
+          "depth": 3,
+          "$why": "Có trong concepts.yaml. Cắt gì khi tràn là bài toán khó nhất của agent — cho 3, nâng khi có nguồn thật chứng minh sâu hơn.",
+          "aliases": [
+            "context-truncation-strategy",
+            "context-compaction",
+            "context-window-budget",
+            "truncation-strategy"
+          ]
+        },
+        {
+          "name": "tool-schema-design",
+          "depth": 3,
+          "$why": "Mô tả tool cho model, validate tham số, trả lỗi. Có trong concepts.yaml.",
+          "aliases": [
+            "function-calling",
+            "tool-definition",
+            "parameter-validation"
+          ]
+        },
+        {
+          "name": "eval-harness",
+          "depth": 2,
+          "$why": "Cho 2 (biết khi nào dùng) vì chưa thấy bộ eval hồi quy nào trong dự án. Nếu bạn đã dựng eval thật thì nâng lên 3-4.",
+          "aliases": [
+            "regression-eval",
+            "golden-set",
+            "llm-as-judge"
+          ]
+        },
+        {
+          "name": "multi-agent-orchestration",
+          "depth": 2,
+          "$why": "Chưa có bằng chứng. Đặt 2 để M06 đề xuất DEEPEN khi gặp nguồn về chủ đề này.",
+          "aliases": [
+            "agent-handoff",
+            "subagent-design"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "backend-integration",
+      "$why": "concepts.yaml có idempotency, staging-table-pattern, backpressure, circuit-breaker, schema-evolution — toàn khái niệm tích hợp hệ thống.",
+      "capabilities": [
+        {
+          "name": "idempotency-and-dedupe",
+          "depth": 3,
+          "$why": "Có trong concepts.yaml với đủ alias (exactly-once, dedupe, idempotency-key). Cho 3; 4 cần bằng chứng đã xử lý ca khó như dedupe cửa sổ trượt.",
+          "aliases": [
+            "idempotency-key-design",
+            "exactly-once",
+            "dedupe",
+            "staging-table-pattern"
+          ]
+        },
+        {
+          "name": "erp-integration",
+          "depth": 3,
+          "$why": "skill-gap.md lấy ví dụ ERP Bravo — có vẻ là việc thật. Sửa nếu không đúng.",
+          "aliases": [
+            "bravo-integration",
+            "erp-sync"
+          ]
+        },
+        {
+          "name": "async-job-processing",
+          "depth": 3,
+          "$why": "Hàng đợi, retry, backpressure. concepts.yaml có backpressure và circuit-breaker.",
+          "aliases": [
+            "queue-consumer",
+            "backpressure",
+            "circuit-breaker",
+            "retry-budget-design",
+            "retry-strategy"
+          ]
+        },
+        {
+          "name": "api-design",
+          "depth": 3,
+          "$why": "Mức làm được ca chuẩn. Nâng nếu bạn thiết kế API cho sản phẩm thật.",
+          "aliases": [
+            "rest-design",
+            "contract-versioning",
+            "schema-evolution"
+          ]
+        },
+        {
+          "name": "data-migration",
+          "depth": 2,
+          "$why": "local-cicd có nhắc 'chạy migration an toàn' nhưng chưa rõ độ sâu.",
+          "aliases": [
+            "etl",
+            "batch-ingest"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ai-services",
+      "$why": "Bạn nêu chatbot / OCR / recommendation. concepts.yaml có layout-aware-extraction và schema-from-data — đúng nhóm OCR/trích xuất tài liệu.",
+      "capabilities": [
+        {
+          "name": "document-extraction-ocr",
+          "depth": 3,
+          "$why": "concepts.yaml có layout-aware-extraction (table-detection, region-ocr) và schema-from-data. Có vẻ đã làm thật.",
+          "aliases": [
+            "layout-aware-extraction",
+            "table-detection",
+            "region-ocr",
+            "schema-from-data"
+          ]
+        },
+        {
+          "name": "rag-retrieval",
+          "depth": 3,
+          "$why": "concepts.yaml có retrieval-chunking với alias ast-chunking, semantic-chunking, chunk-overlap — chi tiết như người đã làm.",
+          "aliases": [
+            "retrieval-chunking",
+            "ast-chunking",
+            "semantic-chunking",
+            "chunk-overlap"
+          ]
+        },
+        {
+          "name": "structured-output-recovery",
+          "depth": 3,
+          "$why": "concepts.yaml có json-repair, constrained-decoding, retry-on-parse-error.",
+          "aliases": [
+            "json-repair",
+            "constrained-decoding",
+            "retry-on-parse-error"
+          ]
+        },
+        {
+          "name": "recommendation-system",
+          "depth": 2,
+          "$why": "Bạn nêu nhưng concepts.yaml không có khái niệm nào thuộc nhóm này. Đặt 2 — sửa nếu bạn làm sâu hơn.",
+          "aliases": [
+            "collaborative-filtering",
+            "ranking"
+          ]
+        },
+        {
+          "name": "conversational-ai",
+          "depth": 2,
+          "$why": "Chatbot bạn nêu. Đặt 2 vì chưa có bằng chứng trong repo.",
+          "aliases": [
+            "chatbot-design",
+            "dialog-management"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ml-engineer",
+      "$why": "concepts.yaml có nhóm 'dữ liệu và ML' đầy đủ: walk-forward-validation, data-leakage, intermittent-demand, feature-store, model-drift, hierarchical-forecast-reconciliation.",
+      "capabilities": [
+        {
+          "name": "demand-forecasting",
+          "depth": 3,
+          "$why": "concepts.yaml có intermittent-demand (croston, lumpy-demand) và hierarchical-forecast-reconciliation — mức chi tiết của người đã làm.",
+          "aliases": [
+            "intermittent-demand",
+            "croston",
+            "hierarchical-forecast-reconciliation"
+          ]
+        },
+        {
+          "name": "model-evaluation",
+          "depth": 3,
+          "$why": "Có model-drift trong concepts.yaml.",
+          "aliases": [
+            "model-drift",
+            "concept-drift",
+            "backtest-design"
+          ]
+        },
+        {
+          "name": "walk-forward-cv-design",
+          "depth": 2,
+          "$why": "CỐ Ý ĐẶT THẤP để kiểm M06: nguồn walk-forward trong data contract phải cho ra verdict DEEPEN chứ không OVERLAP. Nếu bạn đã vững chỗ này thì nâng lên 4 và verdict sẽ đổi thành OVERLAP — đó là hành vi đúng.",
+          "aliases": [
+            "walk-forward-validation",
+            "rolling-origin",
+            "time-series-cv",
+            "data-leakage"
+          ]
+        },
+        {
+          "name": "feature-engineering",
+          "depth": 3,
+          "$why": "feature-store có trong concepts.yaml (online-offline-parity).",
+          "aliases": [
+            "feature-store",
+            "online-offline-parity"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "solution-consulting",
+      "$why": "Bạn nêu 'tư vấn giải pháp'. Nhóm này khác ba nhóm trên: nó là năng lực CHỌN, không phải năng lực LÀM.",
+      "capabilities": [
+        {
+          "name": "requirement-analysis",
+          "depth": 3,
+          "$why": "writing-plans skill + cách bạn chạy s1-s5 cho thấy làm được ca chuẩn.",
+          "aliases": [
+            "spec-writing",
+            "user-story"
+          ]
+        },
+        {
+          "name": "tech-selection",
+          "depth": 3,
+          "$why": "ADR-01 chọn Quartz bằng bằng chứng thay vì cảm tính — dấu hiệu depth 3-4. Đặt 3, nâng nếu bạn thấy thấp.",
+          "aliases": [
+            "adr",
+            "trade-off-analysis"
+          ]
+        },
+        {
+          "name": "cost-estimation",
+          "depth": 2,
+          "$why": "Chưa thấy bằng chứng trong repo.",
+          "aliases": [
+            "effort-estimation"
+          ]
+        }
+      ]
+    }
+  ],
+  "$out_of_scope": {
+    "$comment": "Ghi rõ cái KHÔNG thuộc domain — để M06 gán OUT_OF_SCOPE thay vì cố nhét vào skill nào đó.",
+    "examples": [
+      "game development",
+      "embedded / firmware",
+      "blockchain / web3",
+      "mobile native (iOS/Android thuần)",
+      "computer graphics / 3D rendering"
+    ]
+  },
+  "$matching": {
+    "$comment": "THỨ TỰ CỔNG — chạy đúng thứ tự này, cổng trên thắng cổng dưới.",
+    "order": [
+      "1. CỔNG CỨNG: credibility claimed|conflicted VÀ independent_sources==1 ⇒ OUT_OF_SCOPE. Thắng mọi thứ. Schema cưỡng chế.",
+      "2. NGOÀI DOMAIN: chủ đề thuộc $out_of_scope ⇒ OUT_OF_SCOPE, giữ dạng knowledge.",
+      "3. ĐÃ PHỦ SÂU: khớp capability (kể cả aliases) và depth >= 4 ⇒ OVERLAP, ghi lý do.",
+      "4. ĐÃ PHỦ NÔNG: khớp capability và depth <= 3 ⇒ DEEPEN vào skill đó.",
+      "5. CHƯA PHỦ: không capability nào khớp, thuộc domain ⇒ NEW."
+    ],
+    "match_by": "tên capability HOẶC bất kỳ alias nào. So khớp không phân biệt hoa thường, bỏ dấu gạch.",
+    "$why_order": "Lượt kiểm đầu tôi chạy sai thứ tự — kiểm domain trước cổng cứng, cho ra NEW cho hai ứng viên mà schema đã cấm. Cổng cứng phải chạy trước."
+  }
+}

@@ -1,0 +1,130 @@
+entry: ban-giao
+ulid: 01M2TTDHBJB26KRGQNB8ZQTTZ0
+ngay: 2026-09-09
+module: [M12_chungcat, M03_web]
+don_vi: [T12-31, T03-131]
+wo: WO-074
+tieu_de: >-
+  TikTok + Douyin — bon loi rieng biet, ba sua duoc, mot khong phai cua ta
+
+object:
+  - .factory/wo/WO-074-tiktok-douyin-day-du.md
+  - 07_plan/M12_chungcat/tasks/T12-31-tiktok-curlcffi-douyin-khong-anh.md
+  - 07_plan/M03_web/tasks/T03-131-cua-so-xem-co-duong-lui.md
+  - chungcat/pyproject.toml
+  - chungcat/assets/nguon-transcript.json
+  - chungcat/src/worker.py
+  - chungcat/tests/check_sinh_thumbnail.py
+  - core/assets/media-mime.json
+  - web/api/tho-cua.mjs
+  - web/render/trang.mjs
+  - web/plugins/multiwindow/src/scripts/multiwindow.inline.ts
+  - web/test/xem-tiktok-douyin.test.js
+  - web/test/id-video-hoa-thuong.test.js
+  - web/test/media-cua-so.test.js
+  - web/package.json
+  - 06_modules/M12_chungcat/backlog.md
+  - 06_modules/M03_web/backlog.md
+commit: b7f6ba9
+
+viec: |
+  Chu du an nap hai ban ghi THAT roi bao "hai cai do khong xem duoc video", va
+  yeu cau test full cases. Do ra BON loi RIENG BIET:
+
+  1 TikTok, nen the: `curl_cffi` chua cai. TikTok chan client khong gia dang
+    TLS fingerprint. Cau loi yt-dlp KHONG noi thieu goi — no bao "hay bao issue
+    len GitHub", dan nguoi doc di sai duong. Manh moi that nam o dong bi cat
+    cut trong log job: "...rmation on installing the required dependencies".
+  2 Douyin, nen the: KHONG sua duoc. yt-dlp CO extractor [Douyin] nhung doi
+    cookie phien, ke ca voi URL dang chuan va da co curl_cffi.
+  3 Douyin, cua so: `id_tu` khai `/video/(...)`, URL that la
+    `/jingxuan/course?modal_id=...` => `idVideo` tra null => `return ""` =>
+    cua so TRANG TRON, khong nut khong link khong loi giai thich.
+  4 Douyin, nhung: `open.douyin.com/player` tra 403 o `aweme/detail` ke ca khi
+    id dung => sua (3) ma khong sua (4) thi nut hien ra de nhung mot khung
+    trong, TE HON hom nay. Nen `nhung: null` va phep sua (3) phai di cung nhau.
+
+khong_phai_loi_cua_ta: |
+  TikTok nhung: khung cua ta DUNG — trang nhung ve du tac gia, caption, 251
+  like. Nhung CDN `vx-bdp.tiktokv.com` tra 403. Do TACH BACH: mo THANG
+  `tiktok.com/embed/v2/<id>` o tab top-level, khong co app cua ta trong duong
+  di — van 403 y het. Ghi lai de lan sau khong ai di sua `referrerpolicy` hay
+  `allow=` cho mot thu khong nam o phia minh.
+
+nghiem_thu_that: |
+  - pip install curl_cffi => --list-impersonate-targets co Chrome-133
+  - job sinh-thumbnail chay lai tu rac => xong, image/jpeg 4 761 byte
+  - the /video/ hien anh THAT 540x960 (truoc: icon)
+  - cua so douyin: link https://douyin.com/jingxuan/course?modal_id=...,
+    chu "Mo o nguon", rel=noopener, KHONG co nut nhung
+  - cua so tiktok: van nut "Xem video" nhu cu
+
+cong:
+  moi: web/test/xem-tiktok-douyin.test.js — 7 ve DO truoc, 0 sau
+  M12: check_sinh_thumbnail.py — 7e tinh tu bang, 7g/7g2 khong go cung host,
+       7h/7h2 curl_cffi khai VA co that trong moi truong
+  do_duoc_chung_minh:
+    - 7e — gieo lai douyin.com vao HOST_TU_XEP => DO; go ra => xanh
+    - media-cua-so — gieo mot hang URL nhung vao ham dung => DO
+    - ve 5 — tra lai h.nhung.includes(...) => DO dung cau "of null"
+    - ve 6a — doi ban.url_normalized -> ban.url => DO
+    - id-video-hoa-thuong — gieo .toLowerCase() vao nhungVideo => DO
+
+bon_lan_cong_xanh_ma_man_hong: |
+  Don vi nay bi DUNG BAY bon lan, ca bon cung mot ho: cong doc CHU, man hong o
+  cho khac. Ghi het vi day la lop loi dat nhat cua du an.
+
+  1 `nhung: null` lam trang.mjs:197 chay `h.nhung.includes("youtube")` tren
+    null => HTTP 500 o MOI man, ke ca trang chu. Bon cong doc-nguon deu XANH.
+    Chi phat hien vi phai restart server. => Them ve 5: DUNG TRANG THAT bang
+    dung duong server.mjs di. Sua: so `h?.nhan === "youtube"`, khong do chuoi
+    trong mot cot khac.
+
+  2 Nhanh duong-lui doc `ban.url`, ma phong bi cua so (`mo()`) KHONG chep
+    truong do — chi co `url_normalized`. Cua so douyin VAN trang tron sau khi
+    da sua id_tu; moi ve doc-nguon xanh. => Them ve 6a: NOI hai dau — truong
+    nao nhanh doc thi phong bi phai mang.
+
+  3 Ve 5 ban dau dung fixture GO TAY, thieu truong nen ban ghi bi man loc ra
+    => ve 5 do mot trang KHONG CO douyin roi bao xanh. Chi ve 5a giu no khoi
+    xanh oan. Cuoi cung: NHAN BAN mot ban ghi mock co that roi doi URL.
+
+  4 Ve 3b-3d cat vung bang slice(i, i + 4200) — than ham dai ra la vung do hut,
+    ve DO vi mot ly do khong lien quan gi toi thu no canh. => Cat toi DAU HAM
+    KE TIEP, khong cat theo mot so doan truoc.
+
+hai_cong_keo_hai_huong: |
+  `media-cua-so` cam ham dung markup cham `.nhung` (mot chuoi host di qua do la
+  mot buoc gan hon toi cho no lot vao markup, va luc do MO TRANG da la mot loi
+  goi ra ngoai). `id-video-hoa-thuong` ve 4 lai DOI idVideo() tra ve `.nhung`.
+
+  Giai: idVideo tra CO `nhungDuoc: !!h.nhung` thay vi chuoi. Chuoi nhung chi
+  con song trong nhungVideo — ham chay SAU KHI nguoi bam. Tinh chat ve 4 canh
+  (src = tien to TU BANG + id GIU NGUYEN CHU HOA) KHONG doi, no chi doi CHO;
+  nen phep do di theo, khong noi ra. Chuoi `nhung` trong return cua idVideo von
+  da khong ai dung — nhungVideo tu tra lai dong host theo `nhan`.
+
+mot_cong_do_oan_da_va: |
+  `media-cua-so` chay `thanVe.includes(h.nhung)`. `nhung: null` bi ep thanh
+  chuoi "null", ma than ham co chua chu "null" => DO vi mot ly do khong lien
+  quan gi toi viec co hay khong mot URL nhung trong ham. Va bang
+  `typeof h.nhung === "string"`, roi CHUNG MINH no con rang bang cach gieo mot
+  hang URL nhung vao ham (DO dung).
+
+do_do: |
+  7 cong web con do sau don vi nay — DUNG BANG truoc no, WO-074 them 0.
+  Quy chu tung cai o WL-01M2W6RY8YVKXN40ESJ04BFWKK.
+  M12 51/51 xanh. core pytest 49 passed.
+
+byte: |
+  gn.js 103 243 -> 103 495 (tran 104 448).
+  mock/index.html cham tran o 272 391/272 384 — phai cat BA luot moi lot: bo
+  boc <p>, rut ten moc data-hv-ngoai -> data-ngoai, bo cau giai thich thua.
+  Trang do von da o 99,9 phan tram tran TRUOC don vi nay (con 248 byte). Da mo
+  o backlog M03 de lan sau khong ai tuong minh vua lam gi sai.
+
+keo_theo:
+  - M12 backlog: douyin khong co anh bia (can cookie — quyet dinh cua NGUOI)
+  - M12 backlog: HOST_TU_XEP van la ban thu hai cua chien_luoc_anh_bia
+  - M03 backlog: TikTok CDN 403 (khong phai loi phia ta)
+  - M03 backlog: mock/index.html o 99,9 phan tram tran

@@ -1,0 +1,48 @@
+id: WL-01KB41KEOTHEO
+luc: 2026-09-09 (phien PM M13)
+ai: claude-fable-5-1 (PM M13)
+viec: bon viec keo theo tu FR-072/ADR-08 — chu du an "chot ca 4" (a) M14 model_flow/diagram_flow theo FR-072 §1.1 (b) FR-078 M12 (c) FR-079 M12 (d) dinh chinh spec_overview
+gate: khong dong gate nao — (a) va (d) la artifact KHONG frozen (cho phep sua module chua trien khai); (b)(c) la FR MO, team M12 ap
+object:
+  - 06_modules/M14_chatbot/model_flow.md            # §2 dong M13: {cau_hoi,pham_vi,nguon,k} -> {ket_qua[...], so_ban_ghi_trong_pham_vi, tong}; khoa chieu + aud
+  - 06_modules/M14_chatbot/diagram_flow.md          # §1 mui ten M14->M13 them nguon + FR-072
+  - 06_modules/M14_chatbot/backlog.md               # o [ ] nguon_van_ban -> block (spec frozen => FR khi s7 M14); o [x] model_flow/diagram_flow
+  - .factory/fr/FR-078-m12-dai-han-bang-khai-va-ai-goi-vao-theo-adr08.md   # MO — dai Han doc dai-han.json (spec §4.2, dinh_tuyen._DAI_HAN, backlog:631) + AC-1.4/M12-R7 theo ADR-08 (goi_duoc)
+  - .factory/fr/FR-079-m12-text-pdf-theo-trang-thanh-hien-vat.md           # MO — text PDF theo trang thanh hien vat text/plain la_dan_xuat; _doc_nguon het neo p.1 gia; thi cong SAU M13 chay mot duong
+  - 03_docs/spec_overview.md                        # :452-459 dinh chinh "web la client DUY NHAT" -> "web la WRAPPER" theo ADR-08; tro Z8'/Z9
+noi_dung: |
+  Doc lai ma M12 truoc khi viet (khong suy tu spec): dinh_tuyen.py:25-30 _DAI_HAN
+  4 dai go cung · verify.py:55 chuan_hoa NFKC/ligature/casefold (khac ban M13) ·
+  api.py cong_tu_bang_khai doc dich-vu theo thu_muc + _tu_loi so mot khoa (khuon
+  cho _tu_ai) · worker.py:141 _doc_nguon tra than voi neo p.1 GIA cho moi tai
+  lieu · worker.py:1213 pdfplumber chi dung gian tiep (pypdfium2) sinh thumbnail
+  · worker.py:771/936 _nap_hien_vat(byte, mime, ten_goc) la duong transcript
+  text/vtt vao kho — FR-079 dung CUNG duong nay cho text/plain.
+  M14: spec.md (FROZEN) KHONG nhac doan[] — chi model_flow:41 va diagram_flow:14;
+  AC-8.2/8.4/8.5 khop FR-072 (M14 tu giai bot->doc_id roi truyen nguon[] xuong,
+  caller khong gui doc_id) => KHONG can FR cho M14 luot nay. Ve nguon_van_ban ->
+  block la de nghi, ghi o backlog M14, mo FR khi s7 M14.
+  03_docs/** chua co chu trong project_map (ghi chu v15) — sua mot doan, ghi o
+  day de co object; khong khai chu vi chua co don vi viec thu hai can.
+do_do:
+  - lenh: "check_frozen · check_mermaid · check_ba · check_g6a · check_map"
+    ket_qua: "5/5 exit 0 — khong artifact frozen nao bi cham; M14 6/6 artifact, mermaid 4 blok ok"
+đỏ_do: "khong co do trong luot nay — check_g6b 12 loi la task team khac (T12-33 moi them, con lai nhu WL-01KB40S7M13V2)"
+song_song_tren_cay_chung: |
+  (1) 12 file plan M13 cua WL-01KB40S7M13V2 (T13-0..7 · T01-51/52 · T04-9 ·
+      T08-35) DA VAO GIT qua commit 242431f "WO-076" cua dev team M12 (Dung Dang,
+      09:38) — bi gom vao commit cua ho, khong phai toi commit. Noi dung khong
+      doi; ghi de ai tra 'ai commit plan M13' co cau tra loi.
+  (2) PM-Space chay song song (WL-01KB40SPACE4Q · rule.md muc 13): ho lay dai
+      T##-90+ / FR-080+; toi giu dai hien hanh (FR-077/078/079 khong va). Hai
+      diem noi KHOA: `pham_vi.space` (T13-0 — da danh) va cot `space` cua
+      kho-delta (T08-35 — PM-Space them o header, toi noi vao AC1 cho cong do
+      duoc). Doi mot trong hai phai qua FR va bao PM kia.
+  (3) chungcat/src/api.py + worker.py dang sua chua commit = WO-077 cua team M12
+      (boi_canh) — khong lien quan FR-078/079; FR-078 vế `_tu_ai()` se cham
+      api.py, team M12 ap sau khi WO-077 dong de khong tranh file.
+khong_lam:
+  - "KHONG sua M14 spec.md/rules.md (FROZEN) — khong can cho luot nay; ve nguon_van_ban cho s7 M14."
+  - "KHONG sua M12 spec/rules/ma — FR-078/079 MO, team M12 ap (dang giu WO-074/075)."
+  - "KHONG them chatbot/truyhoi vao chungcat.goi_duoc — FR-078 §2.4 giu hien trang ['web']."
+  - "KHONG commit, KHONG push."

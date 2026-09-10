@@ -1,0 +1,66 @@
+id: WL-01KA0T0828AUDIT
+khi: 2026-09-04T11:52:00+07:00
+loai: ban_giao
+tac_nhan: claude-code
+viec: T08-28 — audit_loi vào đường backup (WO-046)
+module: M08_api
+
+object:
+  - path: web/api/dungchung.mjs        # XUAT_LOI + xuatLoi (coBang)
+  - path: web/test/loi-cua.test.js     # cổng bốn bảng + ca "dòng audit có thật"
+  - path: 04_system/adr.md             # ADR-06 (c): ba → bốn, giữ vế bí mật
+  - path: .factory/wo/WO-046-audit-loi-khong-co-duong-backup.md
+  - path: 07_plan/M08_api/tasks/T08-28-audit-vao-backup.md
+  - base_sha: 8535a26                  # chưa commit — diff nằm ở working tree
+
+r5_do_truoc:
+  # rule.md mục 8 — "đỏ trước" chứng minh bằng CẶP dấu thời gian trong CÙNG entry,
+  # không bằng trạng thái suite trên cây chung.
+  - luc: 2026-09-04T11:46:45+07:00
+    trang_thai: DO
+    lenh: node web/test/loi-cua.test.js
+    ra: |
+      4 lỗi
+        SAI  khai đúng 4 bảng phải-xuất  — khai 3
+        SAI  đúng 4 file, không hơn  — dinh-danh-kenh.yaml nguoi-dung.yaml nhap-chung-cat.yaml
+        SAI  có `audit-loi.yaml`  — dinh-danh-kenh.yaml nguoi-dung.yaml nhap-chung-cat.yaml
+        SAI  dòng audit vừa ghi CÓ trong bản lùi — không chỉ 'file có mặt'
+    ghi_chu: cổng viết XONG, code `dungchung.mjs` CHƯA đụng một dòng
+  - luc: 2026-09-04T11:48:10+07:00
+    trang_thai: XANH
+    lenh: node web/test/loi-cua.test.js
+    ra: "pass · BẢY cửa C1–C7 giữ đủ V1–V8 + xuất ADR-06 (c)"
+
+do_do:
+  - lenh: npm test        # trong web/
+    ket_qua: 2858 ok · 0 SAI · exit 0
+  - lenh: npm run build
+    ket_qua: "build-fe: 5 file .inline.ts"
+  - lenh: kill cổng 8787/8790 + npm run api + curl
+    ket_qua: "GET / → 200 · GET /api/nhap-chung-cat → 200"
+
+do_do_boi: chua-quy-duoc-chu   # không có ĐỎ nào của người khác trong lượt này
+
+quyet_dinh:
+  - |
+      Bảng thứ tư xuất file RỖNG khi `audit_loi` chưa tồn tại, KHÔNG bỏ qua bảng.
+      Bảng này được tạo lúc ghi audit đầu tiên (`loiGhiAudit`), không ở
+      `loi.schema.sql` — nên trên DB vừa init nó chưa có. "Chưa có dòng audit nào"
+      là một câu trả lời; thiếu hẳn file thì im lặng, và im lặng đọc giống hệt
+      "bản lùi này không có audit" — đúng thứ WO-046 đi dẹp.
+  - |
+      KHÔNG dời DDL `audit_loi` sang `loi.schema.sql`. Ba trigger append-only sống
+      cùng chỗ với CREATE trong `loiGhiAudit`; tách CREATE ra mà để trigger lại là
+      dựng hai nguồn chân lý cho một bảng. Ngoài phạm vi T08-28.
+  - |
+      `04_system/adr.md` KHÔNG nằm trong `FROZEN.lock` (`grep -c` = 0) ⇒ sửa
+      "ba bảng" → "bốn bảng" không cần FR. Vế chịu lực của ADR-06 (c) là
+      "hai bảng bí mật (`ma_moi`, `phien`) không xuất" — vế đó giữ nguyên; con số
+      "ba" là ngẫu nhiên.
+  - |
+      Cổng cũ đo `=== 3`, tức đo *"ba bảng ĐÃ KHAI"* — số lấy từ chính thứ bị đo
+      (`#tự-khai`), nên nó xanh mãi dù bảng thứ tư không ai cứu. Thêm một vế đo
+      HÀNH ĐỘNG THẬT: ghi một dòng audit rồi đòi thấy nó trong bản lùi. Một file
+      rỗng cũng "có mặt".
+
+keo_theo: []

@@ -1,0 +1,18 @@
+{
+  "extends": "./_quartz/tsconfig.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "allowImportingTsExtensions": true,
+    "allowJs": false
+  },
+  "include": [
+    "plugins/**/*.ts",
+    "plugins/**/*.tsx"
+  ],
+  "exclude": [
+    "**/*.inline.js",
+    "node_modules",
+    "_quartz",
+    "site"
+  ]
+}

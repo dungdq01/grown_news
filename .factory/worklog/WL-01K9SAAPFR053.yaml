@@ -1,0 +1,89 @@
+ulid: 01K9SAAPFR053
+khi: 2026-09-03T19:40+07:00
+tac_nhan: agent-thi-cong (Claude, phiên 6c7880c5)
+loai: ban-giao
+module: M12_chungcat · M03_web · M08_api
+don_vi: ba chỉ đạo duyệt 2026-09-03 — ẩn /dot-hai/ · tháo luật-chỏi-luật · áp FR-053
+
+viec: |
+  ① `/dot-hai/` thành trang OVERVIEW (T03-98) — `menu: false`, gỡ button rail +
+     luật icon mồ côi. Rule 5 cấm GOM module vào một URL, KHÔNG cấm một trang
+     toàn cảnh; đọc nó thành "phải tháo" là đọc thêm một câu không có.
+     Trả lại **215 byte** cho `gn.css`: 39 → 255 byte dư.
+
+  ② Luật chỏi luật (T03-100) — `nut-song.test.js §5` đổi CÂU HỎI từ *"có trong
+     npm test không?"* sang *"có CHỦ không?"*. Câu cũ trộn hai bệnh:
+       cổng MỒ CÔI = không đăng ký VÀ không task nào khai  ⇒ ĐỎ (bệnh thật)
+       cổng CHỜ MÃ = không đăng ký NHƯNG có task khai      ⇒ không đỏ, IN RA
+     R5 (cổng đỏ trước mã) và §5 cũ không có nước đi nào xanh. Sức bắt lỗi không
+     mất — file không ai khai vẫn đỏ; cái mất là phép phạt đánh vào R5 làm đúng.
+     Chủ lấy từ TASK FILE, không từ marker trong chính file test: marker sống
+     TRONG thứ bị đo ⇒ bên bị đánh giá tự khai mình có chủ (luật gốc).
+     Phát hiện kèm: `T08-17b` — đơn vị TEST mà `T08-17` đã KHAI TÊN — **chưa
+     từng được viết**. Câu cũ chỉ báo "KHÔNG được gọi: cai-dat.test.js": đúng
+     hiện tượng, sai bệnh. Bệnh là thiếu một ĐƠN VỊ VIỆC, không thiếu một dòng
+     package.json. Đã tạo `T08-17b-test-cai-dat.md`.
+
+  ③ Áp FR-053 vào spec/rules M12 (T12-0) + mặc định **gemini-2.5-flash**.
+
+object:
+  - core/assets/man-hinh.json · web/render/shell.html · web/plugins/home-pages/shell.html
+  - web/styles/prototype.css · web/render/trang.mjs
+  - web/plugins/multiwindow/src/scripts/multiwindow.inline.ts
+  - 05_uiux/screen_inventory.md · memory/decisions.md
+  - 07_plan/M03_web/tasks/T03-98-an-dot-hai-khoi-menu.md
+  - 07_plan/M03_web/tasks/T03-100-cong-do-truoc-co-chu.md
+  - 07_plan/M08_api/tasks/T08-17b-test-cai-dat.md
+  - web/test/nut-song.test.js                        # §5 đổi câu hỏi
+  - 06_modules/M12_chungcat/spec.md                  # FROZEN — 6 chỗ, CHỜ NGƯỜI KÝ
+  - 06_modules/M12_chungcat/rules.md                 # FROZEN — M12-R4/R5, CHỜ NGƯỜI KÝ
+  - chungcat/assets/model.json                       # v2 — ba nhà thật
+  - chungcat/src/adapter/google.py                   # đổi tên từ nha_a.py
+  - chungcat/src/api.py                              # WO-042
+  - chungcat/tests/check_du_phong_cung_khu_vuc.py · check_bang_khai_model.py
+  - chungcat/tests/check_e2e_chung_cat.py · check_mot_hop_dong.py
+  - .factory/wo/WO-042-cong-0-thanh-cong-that.md
+
+bang_chung:
+  - "cd web && npm test → exit 0 · 2662 ok · 0 FAIL (lần đầu XANH HẲN)"
+  - "18/18 cổng M12 xanh · check_e2e_chung_cat.py --mock xanh"
+  - "check_g6a.py → G6A: 6 điều kiện đạt trên cả 18 module (M12: 27 AC hard)"
+  - "check_g6b.py → 29 lỗi (không lỗi mới của lượt này)"
+  - "page-weight → gn.css 102145/102400 byte"
+  - "cmp hai shell → exit 0, byte-identical"
+  - "check_frozen.py → FAIL 2 file lệch baseline: ĐÚNG NHƯ MONG ĐỢI, chờ người ký"
+
+do_do: khong-co-do-moi
+
+phat_hien_nang: |
+  WO-042 · `api.chay(cong=0)` bind CỔNG THẬT 8790.
+  `cong or cong_tu_bang_khai()` — **`0` là falsy**, mà `0` là cách POSIX nói
+  "cho OS chọn cổng rảnh". Mọi cổng kiểm truyền `cong=0` đã dựng server trên
+  cổng sản xuất. Và nó IM LẶNG: `HTTPServer.allow_reuse_address = 1`, trên
+  Windows `SO_REUSEADDR` cho HAI socket bind cùng cổng thành công ⇒ không raise,
+  kết nối có thể vào listener CŨ, listener đó đọc khoá từ env của NÓ ⇒ 403.
+  ⇒ Kết quả cổng phụ thuộc "có ai đang giữ 8790 không" — nó KHÔNG đo thứ nó
+  khai đo. `#cổng-đỏ-oan` + `#cổng-không-đỏ-được` trong một dòng mã.
+  Sửa: `cong if cong is not None else …`.
+
+hoc_duoc: |
+  Bốn hướng chẩn đoán SAI trước khi đo đúng, và mỗi hướng bị loại bằng một phép
+  đo (ghi đủ trong WO-042). Phép đo cắt được nút: thay `_tu_loi` thành
+  `return True` vô điều kiện — ca "KHÔNG có khoá ⇒ 403" VẪN xanh, điều không
+  thể xảy ra nếu server đang chạy mã đó ⇒ cổng đang nói với MỘT SERVER KHÁC.
+  Bài học: khi một cổng đỏ mà mã không giải thích được, hỏi "nó đang nói với
+  ai?" trước khi hỏi "mã sai ở đâu?".
+
+  Ba lần tự gây đỏ vì escaping: chuỗi `\n` trong heredoc Python thành xuống-dòng
+  THẬT, làm hỏng một regex JS và cắt một khối `>` của Markdown (khiến check_g6a
+  báo AC-3.2 thiếu nhãn hard). Viết `\n` vào file thì dùng `chr(92) + "n"`.
+
+keo_theo:
+  - "NGƯỜI ký FROZEN.lock: python core/tests/check_frozen.py --ky (FR-053 §7 —
+     agent KHÔNG ký). Cùng lượt với nợ ký FR-034/036/041/042."
+  - "T12-5 chốt định danh model mà GATEWAY nhận — E2E --that chặn đúng ở đó"
+  - "T08-17b: đăng ký cai-dat.test.js vào npm test CÙNG LƯỢT với mã T08-17"
+
+chua_xong: |
+  `--that` chưa chạy: tên nhà/model nay là THẬT nhưng định danh gateway nhận
+  CHƯA xác minh (mỗi gateway đặt tên một kiểu). Gate G6C do NGƯỜI ký.

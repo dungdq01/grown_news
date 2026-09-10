@@ -1,0 +1,79 @@
+id: WL-01K9U3S4
+at: 2026-08-31
+by: claude
+buoc: "s4-system — thiet ke he thong cho pham vi dot hai"
+loai: artifact he thong + scaffold khung; KHONG dong ma chuc nang
+gate: >
+  project_map.yaml khai skipped_gates [G1, G2, G3]; G4 ky tren map +
+  security_baseline. Day la ghi chu theo giao thuc, chua ky.
+
+object:
+  - 04_system/security_baseline.md   # +§3.1 secret dau tien · +§4b bon bac gui RA · +8 muc bang ra
+  - 04_system/env_plan.md            # +dev dot hai: 6 tien trinh · .env theo VUNG · may tat thi sao
+  - 04_system/build_order.md         # +C1..C10 · duong re mermaid · 3 cau chua tra loi
+  - 04_system/diagrams/flow-dot-hai.md   # MOI — 3 hinh: ai goi ai · duong vao kho · viec dai
+  - 04_system/adr.md                 # ADR-05 (luot truoc) — khong cham o worklog nay
+  - core/assets/dich-vu.json         # MOI — bang khai 6 dich vu: thu muc · vung · cong · key
+  - project_map.yaml                 # v17 -> v18: +modules_du_kien (5) +2 entity tho
+  - chungcat/README.md · truyhoi/README.md · chatbot/README.md · artifact/README.md · kenh/README.md
+  - .factory/fr/FR-044-ho-so-tong-hop.md   # MOI — ho so thu ba, N nguon
+
+# ══ PHAN DANG GIA NHAT ═════════════════════════════════════════════════
+secret_DAU_TIEN_va_cach_giu_no_la_diem_dang_gia_nhat_cua_ba_vung: >
+  security_baseline §3 khai "khong API key, khong token, khong credential". FR-043
+  bac 4 lam cau do HET DUNG — du an sap co secret dau tien.
+  Cach giu: key CHI ton tai trong bien moi truong cua tien trinh THO. web/ va
+  kenh/ khoi dong KHONG co bien do.
+  => B-E2 ("chi THO duoc goi model") tu mot DIEU CAM thanh mot RANG BUOC VAT LY:
+  web/ khong the goi model du ai viet nham mot dong fetch, vi no khong co gi de
+  xac thuc. Cong Z2 van giu, nhung vai doi — no bat Y DINH luc review, som hon la
+  doi toi luc chay moi thay 401.
+
+khai_module_vao_dau_de_check_map_khong_do: >
+  Dua M12..M16 vao `modules:` se lam check_map DO: §1 doi 06_modules/<ten>/ ton
+  tai, §4 doi spec.md. Spec la artifact cua s6.
+  Cach chua duy nhat neu ep vao `modules:` la de nam spec RONG — tuc nam hop dong
+  khong noi gi. Nen: muc rieng `modules_du_kien:`. check_map khong doc no, nguoi
+  doc duoc, s6/s7 tieu thu duoc `be`.
+  KHONG phai cho giau — la cho ghi ro "da quyet bien, chua viet hop dong".
+  Tot nghiep sang `modules:` o s6 khi pack ton tai.
+
+boundary_tro_vao_hu_khong_toi_TU_viet_ra: >
+  Ban dau toi khai be: [chungcat/**, 06_modules/M12_chungcat/**]. Thu muc thu hai
+  KHONG TON TAI. Do dung thu check_map §2 goi ten: "boundary tro vao hu khong:
+  task khai pham_vi_ghi trong do van di qua check_g6b ma khong ai bao".
+  check_map khong bat vi no khong doc modules_du_kien — nen mot phep assert tay
+  moi bat duoc. Da bo 06_modules/** khoi ca nam, ghi ly do ngay tren.
+  Bai hoc: mot muc khong duoc cong doc thi phai TU kiem no truoc khi ghi.
+
+C9_khong_phai_don_vi_viec_binh_thuong: >
+  C9 (adapter Discord) la THI NGHIEM KIEM CHUNG KIEN TRUC, khong phai mot tinh
+  nang. Neu kenh thu hai ton >20% cong kenh dau (M8.2) thi luan diem "core xong
+  truoc thi kenh re" SAI, va cho sai gan nhu chac chan la chatbot da moc vao web/.
+  Phat hien do o kenh thu HAI re hon nhieu so voi o kenh thu tu.
+
+ba_cau_s4_CO_Y_khong_tra_loi: >
+  idempotency cua job · tho chet thi viec treo bao lau · gioi han thu lai.
+  Khong tra loi vi can biet hinh dang job, ma job do M12 dinh nghia o s6.
+  Cau ba KHONG thuan ky thuat: moi lan thu lai la mot lan tai lieu ROI KHOI MAY
+  (§4b bac 4), va moi lan deu phai co log. Retry vo han = gui vo han.
+
+evidence:
+  - "python -c json.load(dich-vu.json) => 6 dich vu, 5 cong khong trung"
+  - "check_map.py => xanh, 11 module · 11 thu muc (modules_du_kien khong pha)"
+  - "yaml.safe_load(project_map) => v18, modules 11, modules_du_kien 5"
+  - "assert moi duong be cua modules_du_kien ton tai => khong con duong tro hu khong"
+  - "ls -p | grep / => 5 thu muc dich vu moi co that"
+  - "22/26 cong Python xanh · pytest 42 passed"
+
+do_do:
+  check_danh_muc + check_skill: "agent khac — hai ban schema core/skill-src lech core/assets"
+  check_frozen: "cho NGUOI ky"
+  check_running: "he qua cua hai muc tren"
+
+no_con_lai:
+  - "s4 CHUA xong het: chua co README marker `factory:sinh`, chua co CI khung cho 5 service"
+  - "NGUOI KY G4: map + security_baseline"
+  - "FR-044 cho thi cong — khong di truoc C1 (cong T2 can tap dang dia chi B-A5)"
+  - "FROZEN.lock: FR-044 cham frontmatter.schema.json => NGUOI ky sau khi FR duyet"
+  - "Discord van chua khao bang nguon nao (R-g)"

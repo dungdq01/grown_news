@@ -1,0 +1,78 @@
+id: WL-01KA34SINHTS
+khi: 2026-09-04T18:10:00+07:00
+loai: ban_giao
+tac_nhan: claude-code
+viec: T12-16 phần còn lại — `sinh-transcript` vào worker.BANG_LOAI + lối `dich_vu`
+module: M12_chungcat
+
+object:
+  - path: chungcat/src/asr_cua.py                  # MỚI — lối dich_vu
+  - path: chungcat/src/worker.py                   # chay_sinh_transcript + _nap_hien_vat
+  - path: chungcat/tests/check_khong_tu_duyet.py   # phân biệt cửa bản ghi / cửa hiện vật
+  - base_sha: 8535a26
+
+do_do:
+  - lenh: 29 cổng chungcat/tests/*.py
+    ket_qua: 29/29 exit 0
+  - lenh: python -m pytest core/tests -q
+    ket_qua: 45 passed
+  - lenh: cd web && npm test
+    ket_qua: exit 0
+  - lenh: chạy tay — nạp một job `sinh-transcript` rồi `worker.mot_vong`
+    ket_qua: |
+      BANG_LOAI = [chung-cat-mot-nguon, sinh-transcript]
+      chọn lối `cua-asr` (uu_tien 1, đúng quyết "ưu tiên gọi dịch vụ")
+      dừng ở `dang-doc-nguon` kèm lý do đọc được; job Ở LẠI `cur/` (không vào
+      `done/`), giai đoạn = chỗ hỏng ⇒ `chay_lai` nhặt đúng chỗ.
+
+do_do_boi: chua-quy-duoc-chu
+
+quyet_dinh:
+  - |
+      `asr_cua.py` là FILE RIÊNG, không phải một nhánh trong `asr.py`. `M12-R8`
+      đòi đường ASR local có 0 lời gọi mạng và cổng quét bằng AST; lối `dich_vu`
+      thì audio RỜI MÁY. Gộp hai lối vào một file là làm cột `tieu_egress` của
+      `nguon-transcript.json` thành một lời khai — không phép đo nào phân biệt
+      được đường nào vừa chạy.
+  - |
+      `asr_cua` CHẶN khi model không khai `ho_tro_audio`. Guide §2.5:
+      "gửi media tới model không hỗ trợ ⇒ phần media bị bỏ qua ÂM THẦM" — tức
+      ta trả tiền cho một lời gọi trả về một bản phiên âm BỊA TỪ PROMPT. Chặn
+      trước khi gửi, không sau khi nhận.
+  - |
+      Dòng egress của lối này mang `tieu_egress: true` + `loi_dung: cua-asr`.
+      Không ghi thì con số egress trộn lối local với lối gửi-ra, đúng thứ
+      `AC-V3` đòi phân biệt.
+  - |
+      `_nap_hien_vat` dùng `POST /api/articles/media` — cửa HIỆN VẬT. Phân biệt
+      với `POST /api/articles` (cửa BẢN GHI, `taoBai` đặt `approved` vô điều
+      kiện) là cả luật, nên `check_khong_tu_duyet` sửa để chặn đúng cửa sau và
+      cho qua cửa trước — `FR-054` BUỘC M12 dùng cửa hiện vật.
+  - |
+      Và thêm vế NGƯỢC vào cùng cổng đó: 0 lời gọi `PUT`/`PATCH` vào bản ghi
+      kho. `AC-1.1` nói nháp đi qua BẢNG NHÁP; sửa thẳng một bản ghi đã duyệt là
+      đi vòng qua cả `FR-046` lẫn `M05-R1`, và trước đó KHÔNG cổng nào canh chỗ
+      đó — phép chặn cũ (`in "/api/articles"`) chặn mù nên nó che mất câu hỏi.
+  - |
+      Dọn xác do chính tôi để lại ở `check_khong_tu_duyet`: một khối `if False:`
+      và biến `cua_nguoi` luôn rỗng, còn từ lượt sửa trước. Một phép kiểm luôn
+      xanh vì biến luôn rỗng là một dòng nói dối trong bản báo cáo cổng.
+  - |
+      DỪNG ĐÚNG CHỖ, không đoán: `gan-hien-vat` mới làm nửa đầu (nạp `.vtt` qua
+      cửa hiện vật). Nửa sau — gắn sha vào `media[]` của bản ghi video + bump
+      `ban` — đòi một cửa GHI BẢN GHI, và đó là câu hỏi hợp đồng chưa ai trả
+      lời: `PUT /api/articles/<type>/<slug>` là cửa của NGƯỜI, còn `AC-1.1` nói
+      nháp của M12 đi qua bảng nháp. Tôi KHÔNG chọn hộ — trả về
+      `gan_vao_ban_ghi: "CHƯA"` và ghi ô backlog.
+
+keo_theo:
+  - |
+      HAI MẢNH CÒN THIẾU của đường video, cả hai đo được:
+      (a) KHÔNG AI chạy `tai_nguon.lenh_tai()` — nên `doc-byte` luôn dừng với
+          "chưa có audio". Lệnh đã dựng và có cổng (`check_tai_url_allowlist`),
+          thứ thiếu là người gọi nó qua `egress.gui()`.
+      (b) `gan-hien-vat` nửa sau — xem `quyet_dinh` cuối. Cần NGƯỜI/PM chọn cửa.
+  - |
+      `T03-108` (nút Sinh transcript + màn đọc .vtt) vẫn chặn cứng bởi ngân sách
+      byte: tải đầu `/chung-cat/nhap/` còn 11 byte. Cần đợt giảm béo `gn.css`
+      (107 selector khai trùng) trước.

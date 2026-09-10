@@ -1,0 +1,67 @@
+at: 2026-08-18T16:40Z
+agent: claude (vai PM)
+step: s7 — PM plan (G6B) cho 7 module
+did: >
+  Chạy trạm m-ba trước (bắt buộc), rồi chia 15 task cho 7 module.
+
+  m-ba bắt 2 rule MẤT RĂNG: M01-R3 và M04-R1 khai bề mặt S3 nhưng không
+  lệnh nào cưỡng chế. Theo factory-rules, rule không định tuyến được vào
+  S1-S4 là kỷ luật chứ không phải cơ chế. Viết check_rule_surfaces.py.
+
+  PHÁT HIỆN LỚN NHẤT — lỗ bảo mật, không phải lỗi plan:
+  Khi viết T04-3 (ghi .githooks/**) thì Bash bị deny chặn. Kiểm lịch sử:
+  21/21 file trong deny list ĐÃ BỊ GHI qua Bash heredoc, gồm
+  frontmatter.schema.json (2 commit) và kb/concepts.yaml.
+  Deny chặn TOOL Write; cat > file <<EOF đi đường khác.
+  Vá bằng check_frozen.py (S3): băm SHA-256 21 file, so FROZEN.lock.
+  Kiểm thật: sửa spec.md => exit 1; khôi phục => exit 0.
+  Ghi vào security_baseline §5.1.
+
+  check_g6b.py bắt 3 nhóm lỗi của chính PM:
+  1. T02-1, T02-2, T04-1 ghi NGOÀI boundary module. core/** thuộc M01,
+     không thuộc M02 hay M04. Đây là loại nghiêm trọng nhất: R1 mất địa
+     chỉ, và M04 (bên chấm) sửa được core/ (thứ nó chấm).
+     => chuyển sang M01_core, đổi id thành T01-1/T01-2/T01-3.
+  2. .githooks/** KHÔNG module nào sở hữu. Không nới boundary lén
+     => mở FR-003, T04-3 chờ duyệt.
+  3. AC-2.1.1 của M02 chạy từ root thì đỏ, chỉ chạy được từ core/src
+     => FR-004, sửa thành đường đầy đủ. Không sửa luật.
+
+  Ba lần script của tôi báo sai trên spec đúng, sửa script không sửa spec:
+  đọc rule S3 bỏ qua comment · coi sample là nguồn trường hợp lệ thay vì
+  schema · parse cột bảng markdown thay vì đọc project_map.
+
+verify:
+  hard:
+    - "python core/tests/check_ba.py       => 7/7 module sạch, không điểm treo"
+    - "python core/tests/check_g6a.py      => 6 điều kiện đạt trên 7 module"
+    - "python core/tests/check_frozen.py   => 21 file khớp baseline"
+    - "python core/tests/check_rule_surfaces.py => M01-R3, M04-R1 có cơ chế"
+    - "python -m pytest core/tests -q      => 19 passed"
+    - "python core/tests/check_mermaid.py  => 16 blok pass"
+  do_co_chu_y:
+    - "check_g6b.py  => 1 lỗi: T04-3 chờ FR-003. PM KHÔNG tự nới boundary."
+    - "check_version_pin.py       => nợ T01-3"
+    - "test_sample_coverage.py    => nợ T06-1"
+
+ra:
+  - 07_plan/README.md              # thứ tự 3 chặng, đồ thị, evidence plan
+  - 07_plan/M0{1,3,4,5,6,7}/tasks/ # 15 task file
+  - core/tests/check_g6b.py
+  - core/tests/check_ba.py
+  - core/tests/check_rule_surfaces.py
+  - core/tests/check_frozen.py + FROZEN.lock
+  - .factory/fr/FR-003-githooks-owner.md
+  - .factory/fr/FR-004-ac-m02-duong-day-du.md
+  - 04_system/security_baseline.md  # §5.1
+
+so_lieu:
+  task: 15
+  hard: 14
+  soft: 1        # T03-4 bốn màn — click không lệnh nào đo được
+  fr_mo: 2       # FR-003 chưa duyệt, FR-004 đã sửa chờ xác nhận
+
+no_go:
+  - "PLAN LÀ soft: 1 lượt, NGƯỜI DUYỆT bắt buộc, DRAFT trước duyệt. PM không tự bắn task."
+  - FR-003 chưa duyệt ⇒ T04-3 chưa chạy được ⇒ dự án CHƯA có bề mặt S4
+  - M02_kb không có task nào — nó là hợp đồng, không có code để viết

@@ -1,0 +1,121 @@
+{
+  "$comment": "v2 — ui_flow M16: nút CHỈ trên bài approved (§1); job mất PHÚT, job_id bền (§2a); đường TTS cloud/local nói TRƯỚC (§2b); giới hạn engine nói TRƯỚC (§2c: PPTX của Marp là ẢNH); thất bại 3 loại (§2d); quay-ngược = metadata + sidecar (§3).",
+  "version": 2,
+  "bai": [
+    {
+      "slug": "xgboost-taylor-bac-hai",
+      "trang_thai": "approved",
+      "co_nut_artifact": true
+    },
+    {
+      "slug": "arxiv-2410-99999",
+      "trang_thai": "draft",
+      "co_nut_artifact": false,
+      "$luat": "nút không hiện trên bài nháp — mời người dùng vào đường sẽ bị từ chối là lỗi"
+    }
+  ],
+  "canh_bao_truoc_khi_sinh": {
+    "slide": "PPTX của Marp là ẢNH — không sửa được chữ. Cần sửa chữ thì chọn đường PowerPoint thật (chậm hơn).",
+    "audio_cloud": "Giọng đám mây: TOÀN VĂN bài sẽ rời máy (có ghi vết sha256). Giọng tại chỗ: không byte nào rời máy, giọng máy hơn.",
+    "video": "Việc tính bằng PHÚT — đóng tab được, việc vẫn chạy, mở lại thấy tiến độ."
+  },
+  "that_bai_enum": {
+    "het-quota-cloud": "hết hạn mức giọng đám mây tháng này — đổi sang giọng tại chỗ hoặc chờ",
+    "engine-loi": "công cụ dựng lỗi — xem dòng lỗi nguyên văn, thường do dàn ý",
+    "bai-khong-du-dieu-kien": "bài thiếu phần cần thiết (ví dụ không có mục nào) — sửa bài trước"
+  },
+  "jobs": [
+    {
+      "job_id": "af-01",
+      "bai_slug": "xgboost-taylor-bac-hai",
+      "loai": "slide",
+      "giai_doan": "xong",
+      "thoi_gian_s": 41,
+      "engine": {
+        "outline": "claude-sonnet-5",
+        "render": "marp-cli",
+        "sha256": "f0a2c1…33b7"
+      },
+      "files": [
+        {
+          "ten": "xgboost-taylor.pdf",
+          "kb": 412,
+          "quay_nguoc": "bấm trong PDF nhảy đúng trang nguồn"
+        },
+        {
+          "ten": "xgboost-taylor.pptx",
+          "kb": 890,
+          "quay_nguoc": "mỗi trang một liên kết về bài trong kho"
+        }
+      ]
+    },
+    {
+      "job_id": "af-02",
+      "bai_slug": "xgboost-taylor-bac-hai",
+      "loai": "audio",
+      "giai_doan": "xong",
+      "thoi_gian_s": 220,
+      "tts": {
+        "duong": "local",
+        "provider": "piper vi_VN",
+        "ky_tu": 8940,
+        "sha256": null
+      },
+      "files": [
+        {
+          "ten": "xgboost-taylor.mp3",
+          "kb": 6200,
+          "quay_nguoc": "chương audio mang mốc + liên kết về bài"
+        }
+      ],
+      "sidecar": [
+        {
+          "t": "00:00",
+          "url": "/bai/xgboost-taylor-bac-hai"
+        },
+        {
+          "t": "01:12",
+          "url": "/bai/xgboost-taylor-bac-hai#vi-sao-bac-hai"
+        },
+        {
+          "t": "03:40",
+          "url": "/bai/xgboost-taylor-bac-hai#trong-so-la"
+        }
+      ]
+    },
+    {
+      "job_id": "af-03",
+      "bai_slug": "thien-duong-chuot-tuong-lai-nhan-loai-giai-ma-loi-tien-tri-d",
+      "loai": "video",
+      "giai_doan": "dang-ghep-hinh-tieng",
+      "thoi_gian_s": null,
+      "tts": {
+        "duong": "cloud",
+        "provider": "azure vi-VN-HoaiMy",
+        "ky_tu": 9350,
+        "sha256": "8c1d90…e4f7"
+      },
+      "files": [],
+      "$edge": "job PHÚT — hiện bước, không hiện %; job_id bền qua đóng/mở tab"
+    },
+    {
+      "job_id": "af-04",
+      "bai_slug": "quartz-plugin-api",
+      "loai": "slide",
+      "giai_doan": "dung",
+      "that_bai": "engine-loi",
+      "loi_nguyen_van": "marp exit 1 — heading cấp 4 vượt khung dàn ý",
+      "files": []
+    },
+    {
+      "job_id": "af-05",
+      "bai_slug": "xgboost-taylor-bac-hai",
+      "loai": "audio",
+      "giai_doan": "dung",
+      "that_bai": "het-quota-cloud",
+      "loi_nguyen_van": "quota giọng đám mây còn 0/500K ký tự tháng này",
+      "files": [],
+      "$edge": "3 loại thất bại = 3 hành động — không gộp thành 'có lỗi xảy ra'"
+    }
+  ]
+}

@@ -1,0 +1,81 @@
+id: WL-01K9V2WO039
+at: 2026-09-01
+by: claude
+buoc: "PATCH · WO-039 / T01-41 — check_running khong de vet, va co LUOI"
+loai: bug o mot cong; sua trong M01_core
+wo: .factory/wo/WO-039-check-running-ghi-vao-repo.md
+task: 07_plan/M01_core/tasks/T01-41-test-check-running-khong-de-vet.md
+
+object:
+  - core/tests/check_running.py    # +chup_cay()/so_cay() LUOI · +GHI_KHONG_CO · noi luoi vao vong chay
+  - 07_plan/M01_core/tasks/T01-41-test-check-running-khong-de-vet.md
+  - .factory/wo/WO-039-check-running-ghi-vao-repo.md
+  - 06_modules/M01_core/backlog.md  # tick o "check_running ghi vao repo", kem object
+
+# ══ PHAN DANG GIA NHAT ═════════════════════════════════════════════════
+loi_khong_phai_THIEU_MOT_DONG_ma_la_CACH_PHAT_HIEN: >
+  check_running DA CO nhanh cho lenh ghi, nhung no phat hien bang HAU TO CO:
+  CHI_CU_PHAP = ("--fix", "--ghi", "--ky"). `python 07_curate/curate.py week` GHI
+  ma khong co co nao => lot.
+  Neu chi them curate vao danh sach thi chua dung mot ca, va lenh ghi tiep theo
+  se lot y nhu vay. Nen sua HAI tang:
+    - bang GHI_KHONG_CO (re, chay truoc, khong sinh vet ngay tu dau)
+    - LUOI do THAT: chup working tree truoc/sau MOI lenh, lech thi DO va neu ten
+  Bang mot minh chi biet nhung gi da biet. Luoi bat ca lop.
+
+LUOI phai bam NOI DUNG chu khong chi git status: >
+  Mot lenh GHI DE mot file da dang ` M` thi porcelain KHONG doi — chi so sanh
+  porcelain la mot luoi co lo dung o cho de lot nhat (07_curate/reports/2026-08.md
+  la dung ca do). Nen chup ca sha256 cua moi file dang trong porcelain.
+
+khong_chung_minh_duoc_DO_tren_repo_that_va_vi_sao_do_KHONG_phai_lo: >
+  Chay lai tren repo that: luoi KHONG ban. Vi 2026-W36.md da ton tai tu 23:10 va
+  noi dung tuan nay khong doi => bam giong => that su khong doi gi.
+  Do la GIOI HAN DA KHAI trong docstring, khong phai luoi sai. Nhung mot cong
+  khong do duoc la cong chua dau, nen phai dung VAT THAY THE: git repo rieng o
+  thu muc tam, bon ca:
+    ca 1 file MOI              -> BAT duoc
+    ca 2 GHI DE file da ` M`   -> BAT duoc
+    ca 3 lenh CHI DOC          -> KHONG do oan
+    ca 4 ghi noi dung Y HET    -> khong thay (dung, vi khong doi gi)
+  Fixture NAP hai ham TU chinh cong (exec tren doan cat ra), khong chep lai —
+  chep la co ban thu hai de lech.
+
+ve_CHAY_THAT_cua_cac_lenh_KHAC_khong_mat: >
+  Bang chung sach nhat khong phai fixture ma la chinh lan chay that: cong dang
+  bao check_danh_muc + check_frozen FAIL. No chi bao duoc the neu no THUC SU
+  chay hai lenh do. Fixture toi dung cho AC3 bi nhieu (thieu file nen do vi nhieu
+  ly do) — bo, dung bang chung tren repo that.
+  Va ve "curate chay that" khong mat: 07_curate/test_curate.py van chay no that
+  (Makefile:56). Day la CHIA VIEC, khong phai bo viec.
+
+khong_sua_curate_py_va_vi_sao: >
+  curate.py co tham so `out` (dong 164) nhung main() KHONG lo no ra CLI (chi doc
+  argv[1]). Chuyen huong output => sua 07_curate/** = M07 = HAI module = BUILD.
+  Ngoai pham vi mot PATCH. Da ghi vao WO-039 §"Dieu WO nay KHONG lam".
+
+trung_ID_task_LAN_THU_BA_trong_phien: >
+  Dat T01-39, da co (WO-038). Roi T01-41 thieu chu "test" trong ten nen
+  check_g6b §5 do (R1: don vi cham file test phai la don vi test).
+  Ba lan cung mot lop loi trong mot phien. Cach chua da biet ma toi khong dung:
+  `ls tasks/ | sed 's/T01-\([0-9]*\).*/\1/' | sort -n | tail -1` TRUOC khi dat so,
+  va them "test" vao ten neu pham_vi_ghi co file test.
+
+evidence:
+  - "git status truoc/sau khi chay CA 26 cong => KHONG khac mot dong (AC2)"
+  - "fixture 4 ca => luoi DO duoc va KHONG do oan"
+  - "check_running: tu 3 do ve 2 do (ca hai la cua nguoi khac)"
+  - "curate.py week|month => '(chi kiem cu phap - lenh nay GHI)'"
+  - "test_curate.py => van chay that, ok"
+  - "check_g6b => 5 dieu kien tren 159 task"
+  - "22/26 cong Python xanh · pytest 42 passed"
+
+do_do:
+  check_danh_muc + check_skill: "agent khac — hai ban schema core/skill-src lech core/assets"
+  check_frozen: "cho NGUOI ky — no FR-034 + FR-036 + FR-041 + FR-042"
+  check_running: "he qua cua hai muc tren; ban than cong da sua xong"
+
+no_con_lai:
+  - "07_curate/reports/2026-W36.md van untracked — do cong sinh luc 23:10, KHONG xoa (nguoi dung da dan)"
+  - "Hai o backlog M01 con lai can WO rieng: <worklog-check> chua cai · Z6 chua cai"
+  - "FR-044 va FR-045 cho NGUOI duyet · G4 cho NGUOI ky"

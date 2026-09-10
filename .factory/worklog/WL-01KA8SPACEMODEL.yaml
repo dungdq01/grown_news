@@ -1,0 +1,40 @@
+id: WL-01KA8SPACEMODEL
+khi: 2026-09-09
+loai: ban_giao
+tac_nhan: claude-opus-5
+vai: s1 — danh gia kha thi Space Model tren he that + de bai research cho team
+gate: G1 bo sung — dau vao cho s2 (proposal) va ADR-09; chua quyet gi
+module: xuyen module — M01 M02 M03 M08 M13 M14 M18 (+ M19 giu cho)
+viec: >
+  Chu du an dua tai lieu "Space Model — da vu tru tri thuc" (ban 2) + chi dao "nghien cuu
+  truoc khi lam M13, khong danh so, goi la big update system". /factory:go cau 1 => BUILD.
+  Do 8 fact tren he that, so voi 4 gia dinh cua tai lieu khong ap thang duoc, viet de bai
+  R1-R6 va 4 cau cho chu du an.
+do_duoc:
+  - "kb/** 14 ban ghi that => migration re HOM NAY"
+  - "PK (source_type, slug) ca ba bang; dia-chi.json dung slug tran => R1 la quyet dinh goc"
+  - "ontology global: kb/categories.yaml · concepts.yaml · loai-nguon.yaml; frontmatter.schema FROZEN"
+  - "gn.js 82482/102400 · gn.css 91380/102400 => ~20 KB cho tab bar, View Transitions native 0 byte"
+  - "chi tiet mo trong cua so .bk, khong co route /video/{id} => rui ro dung slug thap hon tai lieu lo"
+  - "BA co che khoanh pham vi da co: pham_vi (M13 FR-072) · bot->doc_id (M14 AC-8.4) · M19 BaiHoc giu cho;
+     M14 spec:219 'bai hoc KHONG thay pham_vi' => Space se la truc thu tu neu khong THAY M19"
+  - "FR-045 mot chu + 5 doc; space_member owner/editor/viewer la mo hinh quyen moi => FR sua FR"
+ket_luan: "kha thi; khong dung M13; R1 chan hinh dang doc_id; Space nen thay M19"
+object:
+  - path: 01_research/space-model-danh-gia-va-de-bai.md
+    ghi_chu: "MOI — §0 ket luan · §1 8 fact · §2 va cham · §3 4 cho khong ap thang · §4 R1-R6 · §5 cach noi voi team · §6 M13 · §7 chu du an quyet"
+  - path: 01_research/original_request.md
+    ghi_chu: "+muc 2026-09-09 nguyen van"
+  - path: 01_research/research_summary.md
+    ghi_chu: "+§16 con tro"
+khong_lam:
+  - "KHONG mo proposal-4 / khong sua proposal-3 — chu du an chon nha."
+  - "KHONG viet ADR-09 — s4 sau s2."
+  - "KHONG sua FR-072 (them khoa space) — de nghi o §6, PM ap."
+  - "KHONG cham M13 plan (7 task cua PM)."
+  - "KHONG commit, KHONG push."
+cho_NGUOI_quyet:
+  - "Space THAY M19_baihoc?"
+  - "Bot M14 pham vi = mot space (± nguon[])?"
+  - "proposal-3 bo sung hay mo proposal-4?"
+  - "Ai lam spike R1-R6, time-box?"

@@ -1,0 +1,49 @@
+entry: ky-gate
+ulid: 01M2TKDMNVJV2GW8NB7AEKPG8P
+ngay: 2026-09-09
+module: M11_video
+fr: FR-075
+tieu_de: >-
+  Ky lai FROZEN.lock sau khi sua M11 spec theo FR-075 §2 — NGUOI uy quyen
+
+object:
+  - 06_modules/M11_video/spec.md
+  - FROZEN.lock
+  - .factory/fr/FR-075-video-co-the-chi-co-byte.md
+  - 06_modules/M03_web/backlog.md
+
+uy_quyen: |
+  `CLAUDE.md` chot *"Gate do NGUOI ky. Agent chuan bi evidence, khong ky"*.
+  Chu du an 2026-09-09 uy quyen tuong minh: *"bạn sửa rồi ký giúp tôi luôn"*.
+  Ghi ra day de trace khong nhap nhem: NGUOI quyet, agent thi cong phep may.
+
+trinh_tu: |
+  1 Sua `spec.md:11` theo dung cau FR-075 §2 (qua Edit, KHONG di vong Bash).
+  2 Chay `check_frozen.py` TRUOC khi ky => "FAIL · 1 file frozen lech baseline".
+  3 `check_frozen.py --ky` => ky 56 file.
+  4 `diff` FROZEN.lock cu/moi => DUNG MOT dong doi.
+  5 Chay lai `check_frozen.py` => pass.
+
+hash:
+  truoc: fe500d1b99b3c7a6
+  sau: 3b97fd60e18a4fb4
+
+canh_bao_ghi_lai: |
+  `--ky` ky lai TOAN BO 56 file frozen, khong chi file trong FR. Lan nay an toan
+  vi cong xac nhan truoc do CHI MOT file lech. Ai ky khi co hai file lech thi
+  dang dong dau cho ca file khong co FR nao — kiem cong TRUOC khi ky la buoc
+  BAT BUOC, khong phai buoc lich su. Da ghi canh bao nay vao cuoi FR-075.
+
+nut_tai_xuong: |
+  Chu du an bao 5 file tai ve mang ten UUID, roi xac nhan "gio ko bi nua".
+  KHONG tai hien duoc: moi route xuat tra 200 + Content-Disposition dung ten,
+  bam that ra `cai-dat-va-thiet-lap-hermes-tren-vps.txt`; FE khong co cho nao
+  `createObjectURL` de tai. DE MO o backlog M03, khong dong — mot loi tu het la
+  mot loi chua hieu.
+
+  Nhung tim duoc MOT loi that o cung be mat: `?dang=goc` 302 sang route media,
+  va route do dat `inline; filename="<12 hex>.pdf"` — Content-Disposition thang
+  thuoc tinh `download`, nen `ten_goc` FE truyen vao bi vut. Da mo o backlog.
+
+do_do: |
+  check_frozen: DO truoc khi ky (dung y do), pass sau khi ky.

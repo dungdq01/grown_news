@@ -1,0 +1,48 @@
+id: WL-01K9W2S5MOCK
+at: 2026-09-01
+by: claude
+buoc: "s5-prototype dot hai — mock M12-M16 tren khung UI co san"
+loai: artifact UI mock + data contract; KHONG dong ma san pham
+gate: "G5 dot hai — cho NGUOI duyet de frozen v1 (dot hai)"
+
+object:
+  - 05_uiux/contracts/chungcat.sample.v1.json    # MOI — job Maildir, sha256/attempt, retry cap 2, ca tong-hop FR-044
+  - 05_uiux/contracts/truyhoi.sample.v1.json     # MOI — chunk file#anchor+dong, 4 truy van mau
+  - 05_uiux/contracts/chatbot.sample.v1.json     # MOI — blocks[]{text,citations[]} + tu_choi enum 3 + ca gate-gan-co
+  - 05_uiux/contracts/kenh.sample.v1.json        # MOI — adapter goi RA, dinh_danh_kenh, audit bac 3
+  - 05_uiux/contracts/artifact.sample.v1.json    # MOI — bo 3 file + sidecar, TTS hai nhan egress
+  - 05_uiux/wireframes/SCR-07-chung-cat.md
+  - 05_uiux/wireframes/SCR-08-tra-cuu-kho.md
+  - 05_uiux/wireframes/SCR-09-hoi-kho.md
+  - 05_uiux/wireframes/SCR-10-kenh.md
+  - 05_uiux/wireframes/SCR-11-artifact.md
+  - 05_uiux/screen_inventory.md                  # +muc dot hai (append, khong sua phan cu)
+  - 05_uiux/prototype/sinh_v21.py                # MOI — generator, inline contracts luc sinh
+  - 05_uiux/prototype/app-v21.html               # MOI — SINH RA, 46KB; app-v20 FROZEN khong dung
+
+vi_sao_sinh_chu_khong_viet_tay: >
+  Du lieu mock phai la CHINH contracts/*.v1.json (data contract co version).
+  Chep tay JSON vao HTML la hai nguon su that — lech im lang. sinh_v21.py
+  inline contracts luc sinh; doi contract thi chay lai mot lenh.
+
+dieu_mock_phai_noi_duoc:
+  - "M12: sha256 TUNG attempt + failed 2/2 het luot — FR-043 bac 4 + retry cap nhin thay duoc"
+  - "M13: pham vi la control HIEN THI; empty CO pham vi goi y noi; ca khong-dau chung minh chuan_hoa mot ham; bm25 am that"
+  - "M14: 3 kieu tu choi enum; co-nhung-mau-thuan keo >=2 dia chi thuoc 2 ban ghi (decisions 09-01); block citations rong render kieu GAN CO; [xem JSON] chung minh hop dong service"
+  - "M15: gui-than-bai LUON kem khoi audit ai-nhan/bai-nao (cong U5); tu-choi-dinh-danh vs loi-dinh-dang tach bach (M8.3/M8.4)"
+  - "M16: file mang duong ve nguon o tang METADATA + sidecar t->url bam duoc; TTS local '0 byte roi may' vs cloud sha256"
+
+evidence:
+  - "Playwright tren http 8799: m12_jobs 6 (bam Chung cat ra job moi) · m13_kq 2 + 3 mark · cua so doc mo dung anchor (h3.diem true) · m14: 4 msg, 4 chip citation, 1 tu-choi, mark cited_text 1 · m15: 5 su kien + 1 khoi audit · m16: 4 card + 3 sidecar link"
+  - "console: chi 404 favicon — 0 loi script"
+  - "screenshot man Hoi kho da xem: dung luat chu, nen be, chip citation + hop mau thuan render dung"
+  - "app-v21.html 46445 bytes — khong nhung font (v20 3.3MB vi font); token an qua ../tokens.css that"
+
+gioi_han_khai_thang:
+  - "G5 doi ui_kit.md TON TAI — chua co tu dot mot (DESIGN.md + TYPOGRAPHY.md dang ganh vai do). Ve hard cua gate se do; hop nhat thanh ui_kit.md la no dot mot, khong lam chui o day."
+  - "05_uiux/backlog.md chua ton tai — ve gate 2 khong co gi de quet"
+  - "BAI trong cua so doc la noi dung gia lap — mock khong doc kb/ that"
+
+no_con_lai:
+  - "NGUOI duyet app-v21 -> frozen v1 dot hai; sau do s6 M12-M16 ke thua, m-uiux khong ve lai"
+  - "screenshot tam v21-m14.png o goc repo + server tam 8799 — don o buoc sau (lenh bi chan quyen)"

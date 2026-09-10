@@ -1,0 +1,31 @@
+{
+  "name": "multiwindow",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "index.ts",
+  "quartz": {
+    "name": "multiwindow",
+    "displayName": "Cua so doc nhieu bai",
+    "description": "Port 363 dong JS tu prototype G5 — mo nhieu bai cung luc, keo tha, keo gian 8 huong",
+    "category": "component",
+    "version": "1.0.0",
+    "quartzVersion": ">=5.0.0",
+    "defaultEnabled": true,
+    "components": {
+      "MultiWindow": {
+        "displayName": "Cua so doc",
+        "defaultPosition": "afterBody",
+        "defaultPriority": 90
+      }
+    }
+  },
+  "exports": {
+    ".": {
+      "import": "./index.ts"
+    },
+    "./components": {
+      "import": "./components.ts"
+    },
+    "./package.json": "./package.json"
+  }
+}

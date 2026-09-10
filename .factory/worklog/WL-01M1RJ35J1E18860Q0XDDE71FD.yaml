@@ -1,0 +1,118 @@
+ulid: 01M1RJ35J1E18860Q0XDDE71FD
+thoi_diem: 2026-09-05T17:30+07:00
+tac_nhan: claude-opus-5
+loai: ban_giao
+module: M12_chungcat + M03_web
+don_vi: T03-113 · T12-19 · T03-108 (phần "sinh tới đâu hiện tới đó")
+viec: >
+  Ba đơn vị theo thứ tự chủ dự án giao. T03-113 sửa bug cửa sổ nháp đi đường
+  bài-kho. T12-19 lộ tiến độ transcript từng phần qua API. T03-108 nối phần đó
+  vào cửa sổ việc để "sinh chữ tới đâu show tới đó".
+
+r5_do_truoc:
+  - don_vi: T03-113
+    lenh: node web/test/chung-cat-nhap.test.js
+    ket_qua: >
+      Bug đo trên MÀN THẬT (ảnh chủ dự án): mở nháp ⇒
+      `GET /api/articles/article/phan-tich-…` 404, thân trống, bốn nút chân
+      cửa sổ là bộ nút BÀI KHO và tất cả chết cùng lỗi.
+    đỏ_do: claude-opus-5 (bug do chính T03-112 của tôi đẻ ra)
+  - don_vi: T12-19
+    lenh: python chungcat/tests/check_tien_do_transcript.py
+    ket_qua: "ĐỎ — `HangDoi.ghi_tien_do` chưa tồn tại"
+    đỏ_do: claude-opus-5
+  - don_vi: T03-108
+    lenh: node web/test/sinh-transcript-ui.test.js
+    ket_qua: "ĐỎ 3 vế — chưa có `veTienDo`"
+    đỏ_do: claude-opus-5
+
+do_sau:
+  - lenh: node web/test/chung-cat-nhap.test.js
+    ket_qua: pass — 11 vế T03-113
+  - lenh: python chungcat/tests/check_tien_do_transcript.py
+    ket_qua: pass
+  - lenh: node web/test/sinh-transcript-ui.test.js
+    ket_qua: pass
+  - lenh: 'for f in chungcat/tests/check_*.py; do python "$f"; done'
+    ket_qua: 33/33 XANH
+  - lenh: python -m pytest core/tests -q
+    ket_qua: 49 passed
+
+t03_113:
+  goc: >
+    Bản nháp KHÔNG tồn tại trong kho — nó sống ở DB nháp, khoá `job_ulid`.
+    `T03-112` của tôi mở nó bằng cửa sổ bài-kho generic, và cửa sổ đó chạy
+    `tai()` ⇒ fetch `/api/articles/<loai>/<slug>` ⇒ 404 + bộ nút của bài đã
+    lên site. SAI CỬA, không sai API.
+  sua:
+    - "`mo(bai, {kieu:'nhap'})` BỎ QUA `tai()` — 0 request tới `/api/articles/*`"
+    - "cửa sổ nháp đọc `GET /api/nhap-chung-cat/<id>` (một lời gọi, cả hai bản)"
+    - >
+      bốn nút ĐÚNG VAI: Duyệt vào kho · Trả lại (bắt lý do) · Sửa ở hàng nháp ·
+      Bỏ nháp. Bỏ *Đưa lên site* / *Bỏ khỏi kho* — đời sống của bài ĐÃ duyệt.
+    - "nháp `da_duyet` ⇒ dẫn sang bài kho thật (lúc đó `/api/articles` mới đúng)"
+    - "lý do trả lại hỏi bằng `<dialog>`, không `prompt()` (`FR-022`); rỗng thì không gửi"
+  vet_luon: >
+    Cửa sổ VIỆC của `T03-112` có cùng lỗi tiềm ẩn (cũng chạy `tai()`) — nay
+    dùng chung `kieu: "nhap"`.
+
+t12_19:
+  hinh_dang: >
+    `HangDoi.ghi_tien_do` / `doc_tien_do` / `duong_tien_do` + `api.py` gắn
+    `tien_do: {cue_xong, giay_xong, vtt_tung_phan}` vào `GET /viec/<id>`, CHỈ
+    cho `loai: sinh-transcript`.
+  ba_quyet_dinh:
+    - >
+      GHI NGUYÊN TỬ (`os.replace`). Lý do rất cụ thể: người đang NHÌN màn hình
+      trong lúc file được ghi lại mỗi block. Ghi thẳng vào đích thì có một
+      khoảnh khắc file chỉ có nửa nội dung, và FE đọc đúng lúc đó render nửa
+      câu rồi ném.
+    - >
+      GHI ĐÈ, không nối đuôi: `phien_am` trả TOÀN BỘ cue từ đầu tới block vừa
+      xong (nó bỏ block cũ bằng `moc_bat_dau`), nên nối đuôi là nhân đôi cue
+      sau mỗi lần resume.
+    - >
+      `vtt_tung_phan` cắt trần 64 KB CUỐI — đủ để hiện, không phình phản hồi
+      lên vài MB cho một video dài.
+  loi_khong_giet_viec: >
+    `ghi_tien_do` nuốt lỗi. Làm chết một job đã tiêu tiền vì không ghi được một
+    file HIỂN THỊ là đánh đổi sai chiều.
+
+t03_108:
+  lam: >
+    Cửa sổ việc hiện khối "Đang phiên âm": số câu + mốc giây + 12 cue CUỐI, đổ
+    bằng `textContent`, câu mới trượt vào (chỉ transform/opacity, trong khối
+    `prefers-reduced-motion`).
+  khong_tu_suy: >
+    FE ĐỌC `tien_do` do THỢ tính, không suy tiến độ từ `giai_doan`. Giai đoạn
+    là enum bốn nấc; suy ra một con số câu từ nó là bịa một tiến độ.
+  chua_chay_that: >
+    Đường ASR vẫn chưa chạy được đầu-cuối: lối cửa bị chặn vì thân request
+    (~17 MB base64 > trần cửa), lối local cần `pip install "./chungcat[asr]"`.
+    Nên phần "hiện tới đâu" mới xanh ở mức NGUỒN + cổng, chưa có ảnh chụp một
+    lần phiên âm thật.
+
+chan_lai:
+  ly_do: >
+    `trang chủ 61915/61440`. Quy chủ: `git diff --numstat
+    web/plugins/home-pages/shell.html` = +37 dòng, 0 xoá, mtime 11:14 — một
+    phiên KHÁC thêm khối `<div class="cds" id="dhthe">`. Shell đi theo cả tám
+    màn.
+  cua_toi_thi_khong: >
+    Chip `md`/`txt` lọc đúng (đo: 16 chip, không có md/txt), và mọi thứ
+    T03-112/113/108 thêm đều nằm trong CHUNK.
+  da_ghi: 06_modules/M03_web/backlog.md — lần thứ HAI trần này vỡ vì cộng dồn
+    giữa hai đơn vị chạy song song trên cùng working tree.
+
+object:
+  - chungcat/src/vong.py
+  - chungcat/src/api.py
+  - chungcat/src/worker.py
+  - chungcat/tests/check_tien_do_transcript.py
+  - web/plugins/cctab/src/cctab.inline.ts
+  - web/plugins/chungcat/src/chungcat.inline.ts
+  - web/plugins/multiwindow/src/scripts/multiwindow.inline.ts
+  - web/build-fe.mjs
+  - web/test/chung-cat-nhap.test.js
+  - web/test/sinh-transcript-ui.test.js
+  - 06_modules/M03_web/backlog.md

@@ -1,0 +1,107 @@
+ulid: 01M1TC8N5R2J7W4K9XVPQDMHB6
+thoi_diem: 2026-09-06T18:30+07:00
+tac_nhan: claude-opus-5
+loai: ban_giao
+module: M03_web + M08_api
+don_vi: T03-117 BƯỚC 2 · menu "Tải xuống ▾" + trang in
+
+r5_thu_tu: >
+  Giấy → DUYỆT → cổng ĐỎ → code. Wireframe `SCR-19` viết trước, chủ dự án duyệt
+  và trả lời ba câu (mốc `WL-01M1T7X3B6N4K8P2VQDWHM5FGJ`), rồi mới viết cổng,
+  rồi mới code. Không dòng mã bước 2 nào tồn tại trước mốc duyệt.
+
+r5_do_truoc:
+  - don_vi: T03-117
+    lenh: node web/test/nut-tai-xuong.test.js
+    ket_qua: "ĐỎ 4 vế — chưa có menu, chưa đọc bảng khai, chưa có trang in"
+    đỏ_do: claude-opus-5
+
+quyet_dinh_2_lam_lo_mot_khac_biet_that: >
+  Chủ dự án chọn "bài viết NÊN có File gốc". Lúc hỏi tôi cho đây là *hai tên
+  cho một thứ* — SAI, và câu trả lời làm lộ khác biệt thật:
+    `dang=md`  → THÂN BÀI, không frontmatter
+    `dang=goc` → NGUYÊN FILE `.md` như trên đĩa, CÓ frontmatter
+  Ai cần ĐỌC thì lấy `md`; ai cần NẠP LẠI ở kho khác thì cần frontmatter —
+  thiếu nó thì bản ghi mất `id`, `nguon`, `category`, `concepts`. Đã cài `goc`
+  cho cả bài viết lẫn nháp, dựng từ `fm` + `than` chứ KHÔNG đọc file trên đĩa
+  (`FR-034`: DB là nguồn, file là export).
+
+noi_pham_vi_khai_thang: >
+  Bản khai định đặt nhánh `?in=1` ở `trang.mjs`. Đo ra KHÔNG đặt được: site chỉ
+  có route theo MÀN (`VIEW_SSR[duong]`), không có route theo từng bài — đặt ở
+  đó phải thêm một đường định tuyến mới ở `server.mjs`, hai file cho một trang.
+  Đặt vào `xuat-cua.mjs`: cửa đã phân giải được bản ghi, và `xuat-dang.json` đã
+  liệt `in` là MỘT DẠNG cạnh md/txt/docx — nhà sẵn có, 0 route mới.
+  Đánh đổi nói ra, không giấu: một cửa `/api/` trả HTML, hơi lệch vai API/SSR.
+
+hai_cong_neo_sai_cho:
+  - markup_matches_css: >
+      Chỉ soi `prototype.css`, nên tố oan mọi class có luật trong khối CSS TIÊM
+      TỪ MÃ — chính cách `cctab`/`multiwindow` tránh trần `gn.css` (`FR-062`).
+      Tính chất nó giữ là *không class nào thiếu luật*, không phải *mọi luật
+      phải nằm trong prototype.css*.
+      Sửa xong nó BẮT NGAY hai luật typography trong chunk chưa từng ai kiểm:
+      `#cc-hv .hv-h b` và `#cc-hv dt` thiếu `--f-ui` (nhãn HOA phải dùng font
+      giao diện — `TYPOGRAPHY.md` luật 3 / `FR-018`). Đã sửa.
+  - ve_trang_in: >
+      Vế "trang in nằm ở `trang.mjs`" hỏi NÓ Ở FILE NÀO, không hỏi nó có tồn tại
+      và có sạch không. Chỗ đặt là quyết định thi công; tính chất mới là thứ
+      cần giữ. Đổi sang đo: có nhánh `in` · tự gọi `window.print()` · 0 rail/menu
+      · có `@media print`.
+
+tran_byte: >
+  Đặt CSS menu vào `prototype.css` đẩy `gn.css` lên 103140/102400 — VỠ 740 byte.
+  KHÔNG nới trần (`FR-061`). Chuyển sang khối `TX_CSS` tiêm lúc dựng menu lần
+  đầu: luật này chỉ dùng ở thanh chân CỬA SỔ ĐỌC, người chỉ lướt danh sách
+  không bao giờ thấy nó. Sau khi chuyển: `gn.css` về đúng 102378.
+
+vet_nho: >
+  Bảng khai `xuat-dang.json` nhúng vào bundle ban đầu mang cả `$comment` —
+  cổng `cat-binh-luan-js` bắt đúng. Đã áp `lotComment` như mọi bảng khác.
+  Và tên dạng ban đầu là "Word (.docx)" trong khi menu đã hiện đuôi riêng ⇒
+  "Word (.docx).docx". Bỏ đuôi khỏi TÊN.
+
+do_sau:
+  - lenh: node web/test/nut-tai-xuong.test.js
+    ket_qua: "XANH 11/11 vế"
+  - lenh: node web/test/xuat-van-ban.test.js
+    ket_qua: "XANH 24/24 vế"
+  - lenh: cd web && npm test
+    ket_qua: "3094 vế ok · 0 FAIL"
+  - lenh: cd web && node test/page-weight.test.js
+    ket_qua: "gn.css 102378/102400 · gn.js 87072/102400 · trang chủ 60399/61440 — KHÔNG nới trần nào"
+  - lenh: python -m pytest core/tests -q
+    ket_qua: 49 passed
+  - lenh: 'for f in chungcat/tests/check_*.py; do python "$f"; done'
+    ket_qua: 37/37 XANH
+  - lenh: python core/tests/check_ky_tu_vo_hinh.py
+    ket_qua: "pass · 0 ký tự vô hình"
+
+chay_that:
+  - "`/api/xuat/article/<slug>?dang=` md 7867 · txt 7650 · docx 11611 · goc 8604 · in 8559 byte, đủ 200"
+  - "trang in: 0 rail/menu/nút, tự gọi `window.print()`"
+  - "`dang=in` cho `video` ⇒ 422 — ĐÚNG bảng khai (video chỉ có `goc`)"
+  - "menu trên trình duyệt: 5 mục, tất cả `<a href>` thẳng cửa; `download` ở file, `target=_blank` ở trang in"
+
+ghi_nhan_khong_phai_toi: >
+  `kb/docs/xgboost-taylor-bac-hai.md` vào thùng rác lúc 10:57 hôm nay
+  (`_recycle/_meta.jsonl`) — trong lúc chủ dự án test, khôi phục được qua
+  `POST .../restore`. Chỉ sửa tham chiếu trong `test/WORKLOG.md`, KHÔNG tự khôi
+  phục: xoá hay giữ là quyết định của chủ dự án.
+
+đỏ_do: claude-opus-5
+
+object:
+  - web/api/xuat-cua.mjs
+  - core/assets/xuat-dang.json
+  - web/build-fe.mjs
+  - web/plugins/multiwindow/src/scripts/multiwindow.inline.ts
+  - web/plugins/chungcat/src/chungcat.inline.ts
+  - web/test/nut-tai-xuong.test.js
+  - web/test/xuat-van-ban.test.js
+  - web/test/markup-matches-css.test.js
+  - web/package.json
+  - 07_plan/M03_web/tasks/T03-117-nut-tai-xuong-va-print-view.md
+  - 07_plan/M03_web/tasks/T03-110b-test-tab-theo-doi.md
+  - web/WORKLOG.md
+  - web/test/WORKLOG.md

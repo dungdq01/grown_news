@@ -1,0 +1,92 @@
+id: WL-01K9P9WO028
+at: 2026-08-29
+by: claude
+buoc: WO-028 — nạp video và nạp tài liệu CHẾT HẲN vì đọc một ô đã gỡ
+loai: bàn giao WO-028
+wo: WO-028-hai-duong-nap-chet-vi-doc-o-da-go.md
+
+object:
+  wo:
+    - .factory/wo/WO-028-hai-duong-nap-chet-vi-doc-o-da-go.md
+  task:
+    - 07_plan/M03_web/tasks/T03-64-test-moc-fe-con-that.md   # test
+    - 07_plan/M03_web/tasks/T03-65-slug-tu-suy.md            # code
+  code:
+    - web/plugins/multiwindow/src/scripts/multiwindow.inline.ts
+  test:
+    - web/test/moc-fe-con-that.test.js   # MỚI
+    - web/package.json
+
+may_xanh:
+  - "ĐỎ TRƯỚC (R5): 5 mốc treo, `ghiVideo`/`ghiBanGhiThuVien` đọc ô đã gỡ"
+  - "sau khi vá: `node test/moc-fe-con-that.test.js` -> pass"
+  - >
+    Đo trên byte đã build với CHÍNH hai chuỗi người dùng gõ:
+    `slugGoiY("Thiên Đường Chuột & …")` -> `thien-duong-chuot-…` và
+    `slugGoiY("dự báo tương lai của elon")` -> `du-bao-tuong-lai-cua-elon`,
+    cả hai khớp `^[a-z0-9]+(-[a-z0-9]+)*$`
+  - "quét web 75/76 (chỉ `he-kinh`) · 22/26 cổng Python · pytest 42"
+
+bug:
+  - >
+    WO-021 gỡ ô *"Địa chỉ trong kho"* đúng theo yêu cầu, nhưng HAI hàm gửi vẫn
+    đọc nó. `G("vd-slug")` trả `null`, `slug` thành `""`, và phép kiểm ngay dưới
+    từ chối chuỗi rỗng ⇒ **luôn đỏ**. Người dùng không có cách nào qua vì KHÔNG
+    CÒN Ô NÀO để sửa cái địa chỉ đó
+  - >
+    `?.value ?? ""` TRÔNG như đã phòng thủ, nhưng cái nó phòng thủ lại rơi thẳng
+    vào một phép kiểm từ chối chuỗi rỗng. Guard không cứu được gì — đây là hình
+    dạng đáng nhớ: một `?.` làm lỗi IM LẶNG ở chỗ nó xảy ra, rồi nổ ở chỗ khác
+  - "Bài viết sống sót vì nó TỰ SUY. Hai đường kia chết hẳn kể từ WO-021"
+
+vi_sao_75_cong_khong_bat:
+  - >
+    `format-chung` §2 hỏi *"ô đã gỡ chưa"* và *"`guiFormThat` có tự điền không"*
+    — nhưng `guiFormThat` là hàm của BÀI VIẾT, đúng cái duy nhất không hỏng
+  - >
+    `ba-duong-nap-that` (tôi viết sáng nay) POST THẲNG API nên bỏ qua cái nút.
+    Nó chứng minh SERVER chạy, không chứng minh NÚT chạy
+  - >
+    `man-video`/`man-tai-lieu` đo MARKUP có ô nhãn hay không
+  - >
+    Cả ba đo thứ Ở CẠNH chỗ hỏng. Không cổng nào hỏi *"bấm nút thì có ghi được
+    không"*. Đây là bài học nặng nhất của lần này: tôi vừa viết hai cổng tích hợp
+    sáng nay mà vẫn để lọt một đường nạp CHẾT HẲN
+
+cong_moi_do_theo_cau_truc:
+  - >
+    §1 bắt cả LỚP: mọi `G("id")` phải trỏ tới mốc có trong `shell.html` hoặc do
+    chính FE dựng. Tìm ra 5 mốc treo, không phải 2
+  - >
+    Ngoại lệ `kp-rac` ghi thành BẢNG CÓ TÊN + lý do, và cổng đòi ngoại lệ đó VẪN
+    ĐÚNG THỰC TẾ. Một danh sách bỏ qua không ai kiểm sẽ che mất mốc khác
+  - >
+    Bỏ bình luận TRƯỚC khi quét — lượt đầu tôi đếm cả một `G("x")` nằm trong khối
+    `/* … */`
+
+don_kem:
+  - >
+    `f-slug` còn đọc ở hai chỗ, và `veDuongGhi()` vẽ đường dẫn vào `f-duong-v` —
+    cả thẻ lẫn ô đều đã gỡ, nên hàm thoát ngay dòng đầu. Ba đoạn là mồ côi của
+    CHÍNH lần gỡ WO-021 nên dọn theo
+  - >
+    `kp-rac` KHÔNG đụng: mồ côi của lần gỡ KHÁC (thiết kế lại KPI) ⇒ KPI thùng
+    rác không bao giờ cập nhật. `CLAUDE.md` §3: nêu ra, đừng xoá. Ô backlog đã mở
+
+de_ban_va_toi_trinh_duyet:
+  - >
+    `assets.mjs` ghép `gn.js` từ `multiwindow.inline.js` LÚC SERVER KHỞI ĐỘNG, và
+    `build-fe.mjs` đã dịch lại file đó. Nên chỉ cần **khởi động lại server 8787**
+  - >
+    `web/site/gn.js` là bản CŨ còn sót (không chứa `slugGoiY`) — server chỉ dùng
+    nó khi `GN_SSR=0`
+
+đỏ_do: chưa quy được chủ  # lỗ mở ra ở WO-021, không truy được lượt ghi cụ thể
+
+do_do:
+  - cong: he-kinh.test.js
+    do_do_boi: ảnh 724662 byte người dùng thêm — `python core/tools/toi_uu_anh_nen.py`
+  - cong: check_frozen.py
+    do_do_boi: chờ NGƯỜI ký sau khi FR-039 duyệt
+  - cong: check_danh_muc.py · check_skill.py · check_running.py
+    do_do_boi: agent khác · và hệ quả của hai cổng trên

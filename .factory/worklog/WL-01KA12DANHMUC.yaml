@@ -1,0 +1,120 @@
+id: WL-01KA12DANHMUC
+khi: 2026-09-04T14:30:00+07:00
+loai: ban_giao
+tac_nhan: claude-code
+viec: >
+  Lượt HAI của T12-11 (đồng bộ 238 model từ danh mục gateway) + T03-107 lượt hai
+  (phiếu chưng cất thành HỘP THOẠI riêng)
+module: M12_chungcat · M03_web
+
+nguoi_quyet: |
+  Chủ dự án 2026-09-04, sau khi xem lượt một:
+    1a "chưa đủ, cần liệt kê đầy đủ ra … có thể tham khảo trên mạng với
+        9router / openrouter"
+    1b "nên tạo popup (tab on) riêng, tránh ghi đè lên cửa sổ window của bài
+        viết hay video"
+    2  "tôi đang bảo PM lên plan để implement cho phần transcript luôn, wait.
+        Làm với file người tải trước nhưng nâng cấp dần lên để E2E auto."
+
+object:
+  - path: chungcat/tools/dong_bo_model.py     # MỚI — đồng bộ bảng khai
+  - path: chungcat/assets/model.json          # 8 → 238 dòng, 15 nhà
+  - path: chungcat/src/api.py                 # /model trả thêm la_mac_dinh
+  - path: web/api/tho-cua.mjs                 # CHO_RA + la_mac_dinh
+  - path: web/plugins/multiwindow/src/scripts/multiwindow.inline.ts
+  - path: web/styles/prototype.css
+  - path: web/test/chung-cat-ui.test.js       # mẫu cc-gui đỏ oan
+  - path: 07_plan/M12_chungcat/tasks/T12-11-mo-rong-bang-model.md
+  - path: 07_plan/M03_web/tasks/T03-107-test-bo-cuc-phieu-chung-cat.md
+  - base_sha: 8535a26                         # chưa commit
+
+do_do:
+  - lenh: python chungcat/tools/dong_bo_model.py --tu <danh-muc.json>
+    ket_qua: |
+      238 dòng dùng được · +232 mới · đã ghi chungcat/assets/model.json
+      Lượt chạy ĐẦU TIÊN báo BẤT BIẾN VỠ và KHÔNG ghi — đúng thiết kế.
+  - lenh: 21 cổng chungcat/tests/*.py
+    ket_qua: 21/21 exit 0
+  - lenh: cd web && npm test
+    ket_qua: 2877 ok · exit 0
+  - lenh: node web/test/page-weight.test.js
+    ket_qua: "tải đầu /chung-cat/nhap/ 280571/280576 — còn 5 byte · gn.css còn 258"
+  - lenh: chạy thật — kill 8787/8790, build, bật cả hai, Playwright
+    ket_qua: |
+      GET /api/model → 238 dòng, 15 nhà, la_mac_dinh = [gemini-2.5-flash, deepseek-chat].
+      Bấm Chưng cất ⇒ <dialog id="dlg-cc"> mở MODAL, cửa sổ đọc nằm sau backdrop
+      KHÔNG bị đẩy đi. Bộ chọn mở sẵn google/gemini-2.5-flash (đúng mặc định).
+      Đổi nhà sang anthropic ⇒ ô Model đổi thành các model Claude.
+      Nút mang lớp .bt / .bt.pri — có tạo hình, không phải nút xám của trình duyệt.
+
+do_do_boi: chua-quy-duoc-chu
+
+quyet_dinh:
+  - |
+      KHÔNG gõ tay 238 dòng. Danh mục gateway có 427 model và đổi mỗi tuần: gõ
+      tay là 427 chỗ sai chính tả HÔM NAY, và một bảng nói dối THÁNG SAU. Nên
+      bảng khai VẪN là nguồn chân lý (`M12-R4` + `AC-4.6` nguyên vẹn), chỉ khác:
+      **máy ghi phần DANH MỤC, người giữ phần CHÍNH SÁCH.** Kết quả commit vào
+      repo ⇒ runtime KHÔNG BAO GIỜ đọc mạng, và allowlist vẫn cố định.
+  - |
+      BẰNG CHỨNG ngay lượt chạy đầu: ba trong tám dòng gõ tay ở lượt một KHÔNG
+      TỒN TẠI ở gateway — `claude-opus-4-1` (gateway dùng dấu CHẤM:
+      `claude-opus-4.1`) · `claude-haiku-4-5` · `deepseek-reasoner` (gateway gọi
+      `deepseek-r1`). Cả ba sẽ 404 GIỮA JOB. Không cổng nào cũ bắt được: cổng đo
+      bảng TỰ NHẤT QUÁN, không đo bảng KHỚP THỰC TẾ.
+  - |
+      `kieu_structured` DẪN XUẤT từ `supported_parameters`, không đoán:
+      `structured_outputs`→json_schema · `tools`→tool_use ·
+      `response_format`→json_mode · không cơ chế nào ⇒ **BỎ DÒNG** (hợp đồng M12
+      LÀ structured output — bày một model không làm được chỉ để job chết giữa
+      đường). `nguong_lech_schema` tra từ `$bang_lech_schema` — không gõ số lần
+      thứ hai.
+  - |
+      Đồng bộ KHÔNG ghi lên cột chính sách (`khu_vuc` · `du_phong` ·
+      `la_mac_dinh` · `ngon_ngu` · `can_key` · `dich`). Một lệnh đồng bộ xoá
+      được quyết định của người là một lệnh không ai dám chạy lần hai.
+  - |
+      `--kiem` KHÔNG tự sửa, chỉ trả 1 khi lệch. Một lệnh tự sửa rồi báo xanh
+      là một lệnh không đo gì.
+  - |
+      HỘP THOẠI thay vì chèn vào cửa sổ đọc. Bản trước chèn `.bk-phieu` vào giữa
+      thân và chân cửa sổ ⇒ ĐẨY nội dung đang đọc đi; với PDF nhúng thì khung
+      xem co lại. `<dialog>` native cho focus-trap · ESC · backdrop · inert —
+      trình duyệt làm sẵn và đúng hơn mọi bản tự viết. Dùng lại `.dlg` của
+      `FR-022` + `.bt`/`.bt.pri` ⇒ 0 byte CSS mới cho khung.
+  - |
+      `la_mac_dinh` PHẢI đi qua hai cửa. Nó đang bị lọc ở cả `:8790 /model` lẫn
+      `CHO_RA` của `web /api/model`, nên FE mở dòng ĐẦU của 238 dòng —
+      `gemini-3.8-flash`, một model không ai chọn cho người dùng. Không phải bí
+      mật: một quyết định đã khai, và `FR-053 §1.1` cho người THẮNG gợi ý —
+      muốn thắng thì phải thấy gợi ý là gì.
+  - |
+      HOÀN LẠI một phép gộp CSS: gộp `.dlg .f-act …` vào sáu rule của
+      `.bk-phieu` tốn 225 byte để dựng lại đúng thứ hệ đã có. Thay bằng `.bt` /
+      `.bt.pri` — 0 byte, và đã audit tương phản.
+  - |
+      `chung-cat-ui.test.js` sửa CÙNG LƯỢT: mẫu `[^;]{0,120}` ĐỎ OAN khi nhánh
+      có `e.preventDefault();` ở giữa. Hành vi không đổi. Mẫu mới đo mệnh đề
+      thật: giữa `cc-gui` và `guiChungCat` KHÔNG có `fetch(` nào — tức nhánh đó
+      gửi QUA `guiChungCat`, không tự dựng request.
+  - |
+      DỪNG ở ngân sách byte thay vì cắt thêm nội dung. Tải đầu
+      `/chung-cat/nhap/` còn **5 byte**; ngay cả 24 byte trả lại khoảng cách cho
+      `.cc-o` cũng không vừa. Đếm được **107 selector khai trùng** trong
+      `gn.css` — đó là một đợt giảm béo riêng, không phải việc làm chen giữa.
+
+keo_theo:
+  - |
+      15 nhà trong bảng mà chỉ `google` có adapter ⇒ model của 14 nhà kia bị
+      phép chặn (b) §4.0b từ chối TRƯỚC khi tiêu token. Cần chủ dự án xác nhận
+      gateway nói MỘT hợp đồng chung (kiểu OpenRouter): nếu có thì một adapter
+      dùng cho cả 15 nhà, không phải 15 file. Đã mở ô backlog M12.
+  - |
+      NGÂN SÁCH BYTE — ô backlog M03 đã mở ở lượt trước, nay còn gắt hơn: 5 byte.
+  - |
+      `chungcat/src/chungcat.inline.ts:478` dùng `prompt()` của trình duyệt cho
+      lý do TRẢ LẠI — đi ngược `FR-022` ("bỏ confirm()/prompt() của trình
+      duyệt"). Phát hiện lúc soát chunk tìm byte. Ô backlog M03.
+  - |
+      Transcript (`FR-054`): CHỜ plan của PM. Chủ dự án chốt hướng — làm lối
+      `file-nguoi-tai` TRƯỚC, rồi nâng dần tới E2E tự động. Chưa nhận việc.

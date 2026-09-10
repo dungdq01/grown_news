@@ -1,0 +1,92 @@
+entry: ban-giao
+ulid: 01KB46G6BCRASH
+ngay: 2026-09-09
+module: M01_core (chu core/tests/**) · anh huong MOI module co plan
+don_vi: [T01-53, T01-54]
+wo: WO-084
+tieu_de: >-
+  check_g6b CRASH thay vi DO khi mot task thieu `verifiability:` — mot task sai cua
+  mot nguoi lam CA HAI NHANH mat cong plan. Mo WO-084 + hai don vi, khong tu sua ma.
+
+object:
+  - .factory/wo/WO-084-check-g6b-crash-thay-vi-do.md              # MOI
+  - 07_plan/M01_core/tasks/T01-54-test-g6b-thieu-verifiability.md # MOI — test di dau
+  - 07_plan/M01_core/tasks/T01-53-g6b-do-duoc-khong-crash.md      # MOI — sua cong
+  - .factory/worklog/WL-01KB46G6BCRASH.yaml
+
+repro: |
+  export PYTHONIOENCODING=utf-8 && python core/tests/check_g6b.py
+  → in duoc toi "FAIL T03-135 ... 4 AC nhung 3 cmd" roi:
+    File "core/tests/check_g6b.py", line 81, in <module>
+      print(f"  {'ok  ' if not l else 'FAIL'} {tid:<7} {v['mod']:<13} {v['verif']:<5} "
+    TypeError: unsupported format string passed to NoneType.__format__
+  Chay qua pipe (`| tail`) thi exit code la 0 — mot vo boc chi doc exit code cua tail
+  se tuong cong XANH.
+
+hai_ve_hai_chu: |
+  VE A — hai task khai sai khoa. CHU: nhanh M03.
+    T03-136-tran-hien-thi-danh-sach.md  (14:50)  `- **Loại**: PATCH · hard`
+    T03-137-cat-thut-dau-dong.md        (15:27)  `- **Loại**: PATCH · hard · M03_web`
+    `check_g6b:36` doc `re.search(r"verifiability:\s*(\w+)")` ⇒ khong khop ⇒ verif=None.
+    Muc pho bien: 295/297 task dung `verifiability:`; dung 2 file dung khuon kia, ca hai
+    `??` chua commit ⇒ khuon SAI CUA MOT LUOT, khong phai khuon moi cua du an.
+    ⇒ Viec cua CHU HAI TASK do: doi mot dong thanh `verifiability: hard`. Toi KHONG sua
+      (checklist song song §4: khong cham plan cua nhanh kia; va chung dang `??`).
+  VE B — cong CRASH thay vi DO. CHU: M01. DAY LA BUG, va la ve nang hon.
+    Doc `:74-81`: cong DA CO KET LUAN DUNG — dong `:76` da ghi
+    `verifiability=None` vao list `l`. No chet o dong IN (`:81`) vi `f"{None:<5}"`.
+    Tuc cong BIET task nao sai va KHONG NOI RA DUOC. Nang hon: no chet o task dau tien
+    gap None nen 297 task con lai khong duoc kiem — mot task sai cua mot nguoi lam CA
+    HAI NHANH mat cong plan.
+    Cung lop loi da tra gia 2026-09-05 o check_frozen.py (ket luan xong roi chet o dong
+    in, vo nhan exit 1) — xem docstring check_frozen.py:26-32, `#cong-do-oan`.
+
+quy_chu: |
+  `git status --short 07_plan/M03_web/tasks/` ⇒ ca hai file la `??` (chua commit).
+  `ls -l --time-style=+%H:%M` ⇒ 14:50 va 15:27, sau moc ghi cuoi cua toi (c98255a).
+  Ba commit gan nhat khong phai cua toi: d48c13f (T03-135) · va hai file nay chua vao git.
+  ⇒ QUY DUOC CHU: nhanh M03. Khong phai `chua-quy-duoc-chu`.
+
+khong_noi_regex: |
+  De nghi de-nghi-nghe-hop-ly ma TU CHOI: "cho regex nhan ca khuon `- **Loại**:`".
+  Hai khuon cho mot truong la hai cho se lech (`#cong-xanh-vi-neo-sai`). Neu du an MUON
+  doi khuon thi do la mot quyet dinh rieng va phai doi CA 297 task cung luot. Ghi o
+  WO-084 §5 va o dau T01-53 de lan sau khong ban lai.
+
+do_do:
+  - lenh: "for f in 07_plan/*/tasks/*.md; grep -q '^verifiability:' || in ten"
+    ket_qua: "dung 2 file: T03-136 · T03-137. Tong task 297, co verifiability 295"
+  - lenh: "ls -l --time-style=+%H:%M 07_plan/M03_web/tasks/T03-13[4-9]*"
+    ket_qua: "T03-135 14:27 (da commit d48c13f) · T03-136 14:50 · T03-137 15:27"
+  - lenh: "sed -n 72,81p core/tests/check_g6b.py"
+    ket_qua: "xac nhan :76 da append loi vao `l`, :81 la dong chet — cong biet ma khong noi ra duoc"
+  - lenh: "python -c '<doc T01-53/54 bang DUNG regex cua check_g6b>'"
+    ket_qua: "T01-53 verif=hard · scope 1 · AC 4 · cmd 4 || T01-54 verif=hard · scope 2 · AC 3 · cmd 3 — hai task moi cua toi khai DUNG khuon"
+  - lenh: python core/tests/check_g6b.py
+    ket_qua: "VAN CRASH — dung the: T01-53 chua thi cong. Day la trang thai DO TRUOC cua WO-084"
+đỏ_do: >
+  nhanh M03 (hai task chua commit, 14:50 va 15:27) cho VE A; M01 cho VE B (cong khong
+  chiu duoc gia tri vang). Ca hai deu KHONG phai `chua-quy-duoc-chu`.
+
+he_qua_cho_M13: |
+  `T13-0` DA KY FROZEN.lock 2026-09-09 va khai `AC7` voi
+  `cmd: python core/tests/check_g6b.py` ⇒ AC do HIEN KHONG DO DUOC. Khong mo o backlog
+  M13 cho viec nay: nguyen nhan nam ngoai M13 (mot cong cua M01 + hai task cua M03), va
+  mot o trong backlog M13 se chan G6A cua M13 vi no cua module khac — dung ly le da
+  dung cho o C3. Ghi o day + WO-084 §4.
+
+thu_tu_de_nghi: |
+  T01-54 (test, DO truoc) -> T01-53 (sua cong) -> roi moi T01-52 -> T01-51 -> T13-1.
+  T01-53 CHEN LEN TRUOC T01-52 vi no la cong ma moi don vi khac dung de tu kiem, va
+  hai nhanh dang mat no.
+
+cho_NGUOI_quyet:
+  - "Bao chu hai task T03-136/T03-137 doi `- **Loại**: PATCH · hard` -> `verifiability: hard` (mot dong moi file). Toi khong sua plan cua nhanh kia."
+  - "Duyet T01-54 -> T01-53 chen len truoc T01-52 (cong chan ca hai nhanh)."
+
+khong_lam:
+  - "KHONG sua core/tests/check_g6b.py — dat M01, va chu du an giao dev M13 thi cong."
+  - "KHONG sua T03-136/T03-137 — plan cua nhanh khac, dang `??` chua commit."
+  - "KHONG sua T03-135 (FAIL '4 AC nhung 3 cmd') — do la mot FAIL THAT va DUNG."
+  - "KHONG noi regex de nhan khuon thu hai."
+  - "KHONG bump project_map — PM-Space giu but."

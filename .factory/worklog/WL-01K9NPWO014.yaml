@@ -1,0 +1,88 @@
+id: WL-01K9NPWO014
+at: 2026-08-28
+by: claude
+buoc: WO-014 (hai chiều facet) + WO-013/2 (ô hiện vật trong form sửa)
+loai: bàn giao WO-014 + WO-013/2
+wo: WO-014-hai-chieu-phan-loai-va-loai-nguon.md · WO-013-sua-dung-man-va-crud-tai-cho.md
+
+object:
+  wo:
+    - .factory/wo/WO-014-hai-chieu-phan-loai-va-loai-nguon.md
+  task:
+    - 07_plan/M03_web/tasks/T03-38-hai-chieu-facet.md        # code
+    - 07_plan/M03_web/tasks/T03-39-test-hai-chieu-facet.md   # test
+    - 07_plan/M03_web/tasks/T03-40-o-media-trong-form-sua.md # code
+    - 07_plan/M03_web/tasks/T03-41-test-o-media-sua.md       # test
+  code:
+    - web/render/trang.mjs        # nguonCua() · phanLoaiCua() · bangLoc(…, module)
+    - web/render/shell.html · web/plugins/home-pages/shell.html   # khối hiện vật
+    - web/styles/prototype.css    # .tv-hv-cu
+    - web/plugins/multiwindow/src/scripts/multiwindow.inline.ts   # suaTaiLieu · TANG
+  test:
+    - web/test/hai-chieu-facet.test.js   # MỚI — 5 mục
+    - web/test/o-media-sua.test.js       # MỚI — 5 mục
+    - web/test/filter-counts.test.js     # tầng facet đổi tên
+    - web/test/WORKLOG.md · web/WORKLOG.md · web/styles/WORKLOG.md
+    - web/plugins/WORKLOG.md · web/package.json
+
+may_xanh:
+  - "cd web && node test/hai-chieu-facet.test.js  ->  pass (5 mục)"
+  - "cd web && node test/o-media-sua.test.js  ->  pass (5 mục)"
+  - "cd web && npm test  ->  exit 0 (62 file)"
+  - "PYTHONIOENCODING=utf-8 pytest core/tests -q  ->  42 passed"
+  - "gn.js 101106 / 102400 byte — dư 1294"
+
+wo014_ket_qua:
+  - "/bai-viet/ ⇒ article · paper · repo · announcement · docs"
+  - "/tai-lieu/ ⇒ pdf (định dạng, suy từ `media.mime`)"
+  - "/video/   ⇒ youtube (nơi phát, suy từ `url_normalized`)"
+  - "Tổng hợp  ⇒ PHÂN LOẠI: bài viết · tài liệu · video"
+  - >
+    KHÔNG đổi schema: cả ba đã nằm sẵn trong `source_type` / `media.mime` /
+    `url_normalized`. MỘT phép suy `nguonCua()`, dùng cho mọi màn
+  - >
+    `data-loai` GIỮ nghĩa `source_type`; hai chiều mới vào `data-pl` +
+    `data-nguon`. Đổi nghĩa `data-loai` là phá ba cổng vì lý do không liên quan
+
+wo013_2_ket_qua:
+  - "màn sửa tài liệu hiện tên gốc · định dạng · kích cỡ, và có nút Thay file"
+  - "`suaTaiLieu` là đường RIÊNG — không dùng lại form viết bài"
+  - "đang sửa ⇒ PUT (giữ If-Match); tạo mới ⇒ POST"
+
+kiem_hai_chieu:
+  - "R5 ĐỎ TRƯỚC có thật: hai-chieu-facet 7 lỗi · o-media-sua 5 lỗi"
+  - >
+    cho `nguonCua` trả `source_type` cho mọi module ⇒ đỏ "một dòng tai-lieu
+    trong sidebar tai-lieu là vô nghĩa" — đúng câu người dùng chỉ vào
+  - "đổi `hienVatCho = m` thành `= null` ⇒ §5 đỏ; cả hai hoàn tác khớp sha256"
+
+tu_bat_duoc:
+  - >
+    LỖ `npm test` KHÔNG THẤY: tôi phá `hienVatCho = m ?? null` thành `= null`
+    (tức bấm "Lưu thay đổi" là `media` biến mất) và **npm test vẫn exit 0** —
+    mọi phép kiểm HTTP tự dựng payload nên không đi qua đường FE. Đã thêm §5 đọc
+    BUNDLE; phá lại thì nó đỏ đúng câu đó
+  - >
+    Lát cắt thân hàm bằng "xuống dòng + ngoặc nhọn" trúng ngay CHỮ KÝ của
+    `suaTaiLieu` (chữ ký trải hai dòng) ⇒ đỏ oan. Phải cắt bằng ngoặc khớp
+  - >
+    Một lát cắt khác NUỐT cả phần đầu `apSap` (TIM · boDau · SAP) khi tôi thay
+    khối `LOC`. Khôi phục từ bản build `.js` — lần thứ hai bản build cứu một lát
+    cắt hỏng
+  - >
+    Escaping #24-25: `String.raw` cho regex trong `filter-counts` (template
+    literal thường nuốt dấu gạch chéo của `\s`/`\d` ⇒ regex thành `s*`/`d+`,
+    khớp 0 nút mà không lời nào) · một `\n}` trong chú thích thành xuống dòng
+    THẬT, làm cả file test lỗi cú pháp
+
+do_do:
+  - cong: check_skill.py
+    do_do_boi: agent khác
+  - cong: check_danh_muc · check_frozen · check_running
+    do_do_boi: chính tôi, từ FR-039 — hai ô backlog M01 chờ người dùng
+
+con_lai:
+  - "WO-013/3 · CRUD trên màn danh sách, bắt TRƯỚC dòng `.bk` guard của `bam()`"
+  - "C8 · BUG-1 `[hidden]` thua `.api-only` · BUG-2 `#acount` đếm cả trang"
+  - "C9 · spec ba module · wireframe · ký lại FROZEN.lock"
+  - "CÒN MỞ (WO-014 §cuối): 'video upload hệ thống' — bucket `tai-len` hợp lệ nhưng RỖNG vì FR-037 chốt video không có byte. Cần người dùng quyết có mở đường tải video lên không"

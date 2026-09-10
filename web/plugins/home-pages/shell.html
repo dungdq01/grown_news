@@ -1,0 +1,1094 @@
+<div class="sky" id="sky1"></div><div class="sky" id="sky2"></div>
+<div class="mist"></div><div class="grain"></div>
+<!-- FR-027d · tang 3 cua ui_guide §1: loe sang + vignette, "gom mat ve giua".
+     Ca hai TINH (khong animation, khong blend) va o DUOI panel (z-index 3 vs
+     5+) nen chung khong dung vao tuong phan cua chu. -->
+<div class="flare"></div><div class="vign"></div>
+
+<a class="skip" href="#main" data-i18n="skip">Bỏ qua điều hướng</a>
+
+<button class="bt ghost icon" id="rc" aria-expanded="true"
+  aria-label="đóng thanh bên">◧</button>
+<header class="top">
+  <h1 class="lg"><a href="/">Grown<i>_</i>news</a></h1>
+
+  <nav class="tabs" aria-label="Điều hướng chính">
+    <!-- FR-038/C5 · HAI NHOM. Nguoi dung chot: "thanh menu can phan biet ro:
+         1 tong hop, 2 bai viet, 3 tai lieu, 4 video (cung voi do man dashboard,
+         kho, tong hop bai hay danh muc cung can giu lai)".
+
+         NHOM khai bang `data-nhom` tren THE BAO, khong tren tung nut. Ly do la
+         hai regex cung o `rail-trai.test.js` kep chat the nut tu hai phia:
+           :167  class="tb[^"]*" data-nav="[a-z]+"        -> data-nav phai LIEN
+                                                             ngay sau class
+           :137  data-nav="[a-z]+" data-i18n="nav\.[a-z]+">  -> data-i18n phai
+                                                             lien ngay sau, roi ">"
+         Nhet mot thuoc tinh thu ba vao nut lam DUT mot trong hai, va cai dut do
+         IM LANG: nhan roi khoi phep do do dai, `soTab` tut xuong duoi 4 roi DO
+         vi mot ly do khong lien quan gi toi thu vua sua. -->
+    <div class="tbg" data-nhom="noidung" role="group" aria-label="Nội dung">
+      <button class="tb" data-nav="all" data-i18n="nav.all">Tổng hợp</button>
+      <button class="tb" data-nav="baiviet" data-i18n="nav.baiviet">Bài viết</button>
+      <button class="tb" data-nav="tailieu" data-i18n="nav.tailieu">Tài liệu</button>
+      <button class="tb" data-nav="video" data-i18n="nav.video">Video</button>
+    </div>
+    <div class="tbg" data-nhom="hethong" role="group" aria-label="Hệ thống">
+      <button class="tb on" data-nav="home" data-i18n="nav.home">Dashboard</button>
+      <!-- FR-027g · tab "Duyet" DA BO — man Cho duyet gop vao Kho.
+           Doi lai: tab Kho mang mot BADGE SO. Mat mot duong mot-bam toi viec
+           hang ngay la cai gia that, nen tin hieu phai o lai o dau — badge noi
+           "con bao nhieu bai dang doi ban" ma khong ton mot tab.
+           `data-mount` + luat `[data-mount]:empty{display:none}` (prototype.css)
+           => 0 bai thi badge tu bien mat, khong can mot nhanh dieu kien nao. -->
+      <button class="tb" data-nav="kho" data-i18n="nav.kho">Kho</button>
+      <!-- Chưng cất thuộc nhóm `hethong`, KHÔNG phải `noidung`. Nhóm nội
+           dung là hợp đồng ba-module: Tổng hợp + ĐÚNG ba loại (bài viết · tài
+           liệu · video). Mục thứ năm ở đó làm người đọc menu tưởng có loại nội
+           dung thứ tư, và làm vỡ phép đếm `check_khai_mot_noi` dựng lên để giữ
+           đúng hình dạng ấy. Đây là nơi người LÀM VIỆC với kho, cạnh Kho và
+           Danh mục — không phải nơi người ĐỌC kho. -->
+      <button class="tb" data-nav="chungcat" data-i18n="nav.chungcat">Chưng cất</button>
+      <!-- `data-nav`/view id giu "concepts": doi slug URL ton 4 test do va pha
+           URL da co (index.ts:733 — cho man nay URL rieng la mot sua loi co chu
+           dich). Nguoi dung chi thay CHU tren tab. -->
+      <button class="tb" data-nav="concepts" data-i18n="nav.concepts">Danh mục</button>
+      <!-- T03-90 · man TOAN CANH dot hai. Nhom `hethong` chu khong phai nhom
+           noi dung: no khong liet ban ghi nao, no liet DICH VU. `cat_khi_khac`
+           = true trong bang khai nen view nay chi di theo trang /dot-hai/ —
+           page-weight cua cac trang khac khong phinh. -->
+    </div>
+  </nav>
+
+</header>
+
+<!-- Dai canh bao khi xem du lieu mau. Emitter chi chen o ban /mock/. -->
+<div id="mockbar" data-mount></div>
+
+<!-- FR-027e · HAI LOP, dung ui_guide §9:
+       ngoai `.wrap`  padding-left:78px         (bu rail, KHONG max-width)
+       trong `.mid`   max-width:1280px + auto   (can giua trong phan con lai)
+     Gop hai viec vao MOT phan tu la thu guide canh bao: "Ca rail lan khung giua
+     phai giu dung de khong lech". -->
+<main class="wrap" id="main" tabindex="-1">
+<div class="mid">
+
+<!-- FR-027c · HEADER TRANG — search + trang thai, TRONG vung noi dung.
+     Rail 78px khong chua noi o nhap. Va ve nghia chung thuoc TRANG dang xem,
+     khong thuoc dieu huong toan app. -->
+<div class="ph">
+  <div class="tsearch">
+    <svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="7" cy="7" r="5"/><path d="M11 11l4 4"/></svg>
+    <input type="search" id="q" placeholder="Tìm bài, khái niệm, nguồn…"
+      aria-label="Tìm trong kho" autocomplete="off" spellcheck="false">
+  </div>
+  <div class="top-r">
+    <span class="tcount" id="tcount"></span>
+    <span id="nutnap" data-mount></span>
+  </div>
+  <!-- FR-076 · DAO FR-027f: nam dieu khien TOAN APP len day, khong con o day
+       rail. FR-027f lap luan `.ph` la "header cua TRANG" nen de chung o day la
+       sai vai — lap luan do van dung, nhung chu du an 2026-09-09 doi VAI cua
+       `.ph`: no thanh THANH TREN CUNG cua APP. No von da lai vai san (o tim la
+       tim TOAN KHO, khong phai tim trong trang).
+       Duoc kem theo: mobile <=720px an ca `.top .rail-d`, nghia la dien thoai
+       KHONG doi duoc ngon ngu/tone/nguon. O `.ph` thi chung song moi be rong.
+       MOCK/REAL van la LINK chuyen trang, khong phai toggle JS (du lieu chon
+       luc BUILD nen mot nut khong doi duoc nguon cua trang da tai). -->
+  <div class="ph-d">
+    <span class="dmode" id="dmode" data-mount></span>
+    <button class="bt ghost icon" id="lang" aria-label="đổi ngôn ngữ"
+      title="tiếng Việt / English">VI</button>
+    <button class="bt ghost icon" id="tb" aria-label="đổi tone">☾</button>
+    <button class="bt ghost icon" id="bgb" aria-label="đổi ảnh nền" title="đổi ảnh nền ngay">◑</button>
+    <button class="bt ghost icon" id="bgp" aria-label="tạm dừng đổi ảnh" title="tạm dừng">❙❙</button>
+  </div>
+</div>
+
+<!-- ═══ TRANG CHỦ — nhiều vùng ═══ -->
+<div class="view on" id="v-home">
+
+  <!-- VÙNG 1 · NỔI BẬT — FR-027e: KHONG panel boc.
+       Ban truoc boc ca vung trong mot `.pn`, nen ba the ben trong la panel-trong
+       -panel: hai lop kinh chong nhau doc ra mot khoi duc. Ban tham khao de tieu
+       de TRAN roi cho chinh cac the lam panel — do la thu tu lop dung.
+       `.brk-h` la tieu de tran; `.brk-g` la luoi 2 cot mang perspective. -->
+  <div class="brk-h rise">
+    <h2 data-i18n="pn.breaking">Nổi bật</h2><span class="ln"></span>
+    <span class="c">ưu tiên cao nhất</span>
+    <button class="more" data-nav="all" data-i18n="more.all">xem tất cả</button>
+  </div>
+  <div class="brk-g" id="brk" data-mount></div>
+
+  <!-- VÙNG 2 · MỚI + KHO — hai cột, hai layout family khác nhau -->
+  <div class="two">
+    <section class="pn rise" style="margin:0">
+      <div class="pn-h"><h2 data-i18n="pn.latest">Mới phân tích</h2><span class="ln"></span>
+        <button class="more" data-nav="all" data-i18n="more.all">xem tất cả</button></div>
+      <div class="nw" id="nw" data-mount></div>
+    </section>
+
+    <section class="pn rise" style="margin:0">
+      <div class="pn-h"><h2 data-i18n="pn.store">Kho</h2><span class="ln"></span>
+        <button class="more" data-nav="kho">xem dashboard</button></div>
+      <div class="kpi" id="kpi" data-mount></div>
+      <div class="bars" id="bars" data-mount></div>
+    </section>
+  </div>
+
+  <!-- VÙNG 3 · GẦN ĐÂY — lưới thẻ -->
+  <section class="pn rise">
+    <div class="pn-h"><h2 data-i18n="pn.recent">Trong kho</h2><span class="ln"></span>
+      <button class="more" data-nav="all" data-i18n="more.all">xem tất cả</button></div>
+    <div class="grid" id="grid" data-mount></div>
+  </section>
+
+</div>
+
+<div class="view" id="v-all">
+  <section class="pn">
+    <div class="pn-h"><h2 data-i18n="pn.allposts">Tất cả bài</h2><span class="ln"></span>
+      <!-- Sap xep o TRINH DUYET, khong doi thu tu build: M03-R5 quy dinh site
+           sinh ra theo `priority`, va expected-render.test.js canh dieu do.
+           Nut nay chi doi thu tu cac the DANG hien tren trang. -->
+      <span class="sortb" role="group" aria-label="Sắp xếp">
+        <button type="button" data-sap="pri" aria-pressed="true">ưu tiên</button>
+        <button type="button" data-sap="moi" aria-pressed="false">mới nhất</button>
+        <button type="button" data-sap="cu" aria-pressed="false">cũ nhất</button>
+      </span>
+      <span class="c" id="acount" data-mount></span></div>
+    <!-- FR-027f · DAI "MAY DA LAM GI" + khoi 3D phan bo uu tien.
+         `priority` cua MOI ban do may tinh (cong thuc o M06), va no LA thu tu
+         mac dinh cua man nay — nhung truoc day man khong noi dieu do o dau ca,
+         nen con so trong o `.pr` doc ra nhu mot nhan tuy y.
+         Khoi 3D o day la CHU THICH cho luoi ben duoi nen dung `.sm` (thap hon
+         ban Trang chu): no khong duoc to hon thu no giai thich. -->
+    <div class="mb" id="mball" data-mount></div>
+
+    <!-- HAI cot: sidebar loc + luoi the. Ba <select> cu o day khong co ma xu ly
+         nao — chung hua mot viec trang khong lam duoc. Sidebar thay dung vai. -->
+    <div class="fw">
+      <aside class="fl" id="filter" data-mount aria-label="Lọc bài"></aside>
+      <div class="grid" id="grid2" data-dem="acount" data-mount></div>
+    </div>
+  </section>
+</div>
+
+<!-- ═══ BA MÀN LOẠI (FR-038/C5) ═══
+     Nguoi dung chot: module bai viet TACH BIET voi tai lieu / video, va CHI Kho
+     + Tong hop de chung danh sach. Ba khoi duoi day cung mot khuon; khac nhau o
+     dung mot thu — mount nao duoc do ban cua loai nao. `trang.mjs` dan xuat ca
+     ba tu `core/assets/man-hinh.json` + `loai-nguon.json`, khong go tay.
+
+     VI TRI: SAU `v-all`, TRUOC `v-nap` — con dung MOT khe.
+       `trang-chu-layout.test.js:200` cat slice(v-home .. v-all) => khong duoc
+       chen giua home va all.
+       `catNap()` (trang.mjs:247) cat tu moc mo cua man Nap toi cuoi main
+       => khong duoc dat sau nap, khong thi man moi bi cat IM LANG khoi bon
+       trang kia.
+
+       BINH LUAN NAY CO Y KHONG VIET LITERAL cua hai moc do. Ba cho cat vung
+       bang `indexOf` tren chinh chuoi ay (cac-man-con-lai:117 · catNap() ·
+       page-weight:demThe), nen mot binh luan NHAC den moc lam lat cat bat dau o
+       sai cho — vua do duoc: no keo `#mbnap` ra ngoai man cua no va cong do
+       dung. -->
+
+<div class="view" id="v-baiviet">
+  <section class="pn">
+    <div class="pn-h"><h2 data-i18n="pn.baiviet">Bài viết</h2><span class="ln"></span>
+      <!-- WO-012 · BA NUT SAP y khuon man Tong hop. Sap o TRINH DUYET, khong doi
+           thu tu build (M03-R5) — nut nay chi doi thu tu cac the DANG hien. -->
+      <span class="sortb" role="group" aria-label="Sắp xếp">
+        <button type="button" data-sap="pri" aria-pressed="true">ưu tiên</button>
+        <button type="button" data-sap="moi" aria-pressed="false">mới nhất</button>
+        <button type="button" data-sap="cu" aria-pressed="false">cũ nhất</button>
+      </span>
+      <span class="c" id="c-baiviet" data-mount></span></div>
+
+    <!-- WO-012 · DAI so dem CUA LOAI NAY, khong phai cua ca kho. Ba man loai
+         cung mot khuon nhung ba tap so khac nhau — `ui-ba-man.test.js` §2 doi
+         chung KHAC nhau, vi ba dai cung mot con so nghia la chung in so ca kho. -->
+    <div class="mb" id="mb-baiviet" data-mount></div>
+
+    <!-- HAI cot y man Tong hop: sidebar loc + luoi the. Dung LAI `.fw`/`.fl` —
+         gn.css dang 92/100 KB, dat class moi cho viec da co class la cach het
+         8 KB con lai trong mot luot. -->
+    <div class="fw">
+      <aside class="fl" id="fl-baiviet" data-mount aria-label="Lọc bài viết"></aside>
+      <div class="grid" id="g-baiviet" data-dem="c-baiviet" data-mount></div>
+    </div>
+
+    <!-- Trang thai rong o NGOAI luoi: nam trong `.grid` thi no an mot cot 240px
+         va cau xuong dong giua — WO-012 muc 3. -->
+    <p class="empty" id="rong-baiviet" data-mount></p>
+  </section>
+</div>
+
+<div class="view" id="v-tailieu">
+  <section class="pn">
+    <div class="pn-h"><h2 data-i18n="pn.tailieu">Tài liệu</h2><span class="ln"></span>
+      <!-- WO-012 · BA NUT SAP y khuon man Tong hop. Sap o TRINH DUYET, khong doi
+           thu tu build (M03-R5) — nut nay chi doi thu tu cac the DANG hien. -->
+      <span class="sortb" role="group" aria-label="Sắp xếp">
+        <button type="button" data-sap="pri" aria-pressed="true">ưu tiên</button>
+        <button type="button" data-sap="moi" aria-pressed="false">mới nhất</button>
+        <button type="button" data-sap="cu" aria-pressed="false">cũ nhất</button>
+      </span>
+      <span class="c" id="c-tailieu" data-mount></span></div>
+
+    <!-- WO-012 · DAI so dem CUA LOAI NAY, khong phai cua ca kho. Ba man loai
+         cung mot khuon nhung ba tap so khac nhau — `ui-ba-man.test.js` §2 doi
+         chung KHAC nhau, vi ba dai cung mot con so nghia la chung in so ca kho. -->
+    <div class="mb" id="mb-tailieu" data-mount></div>
+
+    <!-- HAI cot y man Tong hop: sidebar loc + luoi the. Dung LAI `.fw`/`.fl` —
+         gn.css dang 92/100 KB, dat class moi cho viec da co class la cach het
+         8 KB con lai trong mot luot. -->
+    <div class="fw">
+      <aside class="fl" id="fl-tailieu" data-mount aria-label="Lọc tài liệu"></aside>
+      <div class="grid" id="g-tailieu" data-dem="c-tailieu" data-mount></div>
+    </div>
+
+    <!-- Trang thai rong o NGOAI luoi: nam trong `.grid` thi no an mot cot 240px
+         va cau xuong dong giua — WO-012 muc 3. -->
+    <p class="empty" id="rong-tailieu" data-mount></p>
+  </section>
+</div>
+
+<div class="view" id="v-video">
+  <section class="pn">
+    <div class="pn-h"><h2 data-i18n="pn.video">Video</h2><span class="ln"></span>
+      <!-- WO-012 · BA NUT SAP y khuon man Tong hop. Sap o TRINH DUYET, khong doi
+           thu tu build (M03-R5) — nut nay chi doi thu tu cac the DANG hien. -->
+      <span class="sortb" role="group" aria-label="Sắp xếp">
+        <button type="button" data-sap="pri" aria-pressed="true">ưu tiên</button>
+        <button type="button" data-sap="moi" aria-pressed="false">mới nhất</button>
+        <button type="button" data-sap="cu" aria-pressed="false">cũ nhất</button>
+      </span>
+      <span class="c" id="c-video" data-mount></span></div>
+
+    <!-- WO-012 · DAI so dem CUA LOAI NAY, khong phai cua ca kho. Ba man loai
+         cung mot khuon nhung ba tap so khac nhau — `ui-ba-man.test.js` §2 doi
+         chung KHAC nhau, vi ba dai cung mot con so nghia la chung in so ca kho. -->
+    <div class="mb" id="mb-video" data-mount></div>
+
+    <!-- HAI cot y man Tong hop: sidebar loc + luoi the. Dung LAI `.fw`/`.fl` —
+         gn.css dang 92/100 KB, dat class moi cho viec da co class la cach het
+         8 KB con lai trong mot luot. -->
+    <div class="fw">
+      <aside class="fl" id="fl-video" data-mount aria-label="Lọc video"></aside>
+      <div class="grid" id="g-video" data-dem="c-video" data-mount></div>
+    </div>
+
+    <!-- Trang thai rong o NGOAI luoi: nam trong `.grid` thi no an mot cot 240px
+         va cau xuong dong giua — WO-012 muc 3. -->
+    <p class="empty" id="rong-video" data-mount></p>
+  </section>
+</div>
+
+<!-- ═══ KHÁI NIỆM ═══ -->
+<!-- ═══ KHO — dashboard + CHO DUYET (FR-027g) ═══
+     Man Cho duyet DA GOP vao day. Hai man cu cung MOT VAI: noi nguoi dung
+     THAO TAC tren kho, khong phai noi DOC no. Kho da chua thung rac (danh sach
+     khoi phuc); dat danh sach cho duyet canh no thi "vao Kho la lam duoc moi
+     viec quan ly", va so o KPI "cho duyet" nam CUNG MAN voi danh sach ma no
+     dem — truoc day no tro sang mot man khac. -->
+<div class="view" id="v-kho">
+  <section class="pn rise">
+    <div class="pn-h"><i class="dot"></i><h2 data-i18n="kho.title">Kho</h2><span class="ln"></span>
+      <span class="c">toàn cảnh</span></div>
+    <!-- Dai canh bao file khong doc duoc. Emitter chi chen khi CO file hong;
+         rong thi CSS `[data-mount]:empty{display:none}` an han. -->
+    <p class="khocanh" id="khocanh" data-mount></p>
+
+    <!-- FR-027f · DAI cua man Kho noi mot su that KHAC voi cac man kia: ca
+         dashboard nay duoc DUNG LAI tu file .md moi lan build, va so file may
+         KHONG doc duoc duoc noi ra thay vi bo qua im lang.
+         Khoi 3D o day la BA LOAI NGUON (paper/video/repo) — dung ba cot, va la
+         phan bo chua duoc ve 3D o man nao khac. -->
+    <div class="mb" id="mbkho" data-mount></div>
+
+    <div class="kpi" id="kpi2" data-mount></div>
+  </section>
+
+  <!-- ═══ MUC "CHO DUYET" DA BO HAN (FR-033) ═══
+       Nguoi dung: "bo logic duyet bai moi... user tao la len chinh thuc luon",
+       "bo tat ca thu goi la cho duyet".
+
+       Bai tao tren web gio vao kho voi trang thai `approved` ngay (taoBai), va
+       sua bai KHONG con ha xuong `edited`. Nen khong con hang doi de hien.
+
+       Ba moc di theo: `#queue` (danh sach), `#qcount` (dem), `#mbq` (dai noi
+       ranh gioi B-B1). Emitter thoi chen ca ba.
+
+       Bai `draft` VAN CO THE ton tai — `gate.py:123` (M05-R1) giu nguyen cho
+       hang NHAP TU NGOAI qua `_inbox/`. Chung hien o man Tat ca nhu moi bai
+       khac, va mo ra co nut "Dua len site". Khong co hang doi rieng cho chung:
+       mot danh sach rieng chinh la hang doi. -->
+
+  <!-- ═══ PHÂN TÍCH — ba biểu đồ, MỘT panel (FR-027k) ═══
+       Truoc day ba nhom nay o HAI panel: `.two` (loai nguon | do tin cay) va
+       mot panel rieng (trang thai). Nguoi dung: *"phan kho bao lam dashboard
+       summary ma chua lam a?"* — va do la mot phan cua ly do: ba bieu do cung
+       tra loi mot cau hoi ("kho co gi") ma nam o ba khung roi rac.
+
+       BA LOAI CHART cho BA HINH DANG DU LIEU. `upgrade.md`: *"Dashboard can da
+       dang loai chart"* — nhung da dang phai theo hinh dang du lieu, khong phai
+       theo so luong loai:
+
+         loai nguon    danh muc RIENG BIET, khong thu tu  -> bar ngang
+         do tin cay    danh muc CO THU TU (verified > plausible > claimed >
+                       conflicted) va cai dang can la TI LE  -> thanh chia doan
+         trang thai    bon gia tri roi rac, can so chinh xac -> bar ngang
+
+       CO SO DEM khai o nhan tung muc, khong khai mot lan cho ca panel: hai muc
+       dau dem `appr` (bai DA LEN SITE), muc cuoi dem `tatCa`. Ba bieu do canh
+       nhau ma khac mau so la loi im lang neu khong noi ra. -->
+  <section class="pn rise">
+    <div class="pn-h"><h2 data-i18n="kho.phantich">Phân tích kho</h2><span class="ln"></span>
+      <span class="c">ba góc nhìn</span></div>
+
+    <div class="pt3">
+      <div class="pt3-o">
+        <div class="pt3-h" data-i18n="kho.bytype">Theo loại nguồn</div>
+        <div class="pt3-c">bài đã duyệt</div>
+        <div class="bars" id="bars2" data-mount></div>
+      </div>
+
+      <!-- FR-041 luot 2 · pane tin cay DA BO theo chi dao — bon tong hop:
+           thoi gian · phan loai · loai nguon · trang thai. Pane nay la so 2:
+           ba mang noi dung (bai viet / tai lieu / video), doc tu loai-nguon.json. -->
+      <div class="pt3-o">
+        <div class="pt3-h" data-i18n="kho.bynhom">Theo phân loại</div>
+        <div class="pt3-c">cả kho · ba mảng nội dung</div>
+        <div class="bars" id="kf-nhom" data-mount></div>
+      </div>
+
+      <div class="pt3-o">
+        <div class="pt3-h" data-i18n="kho.bystatus">Trạng thái duyệt</div>
+        <!-- TACH `draft` va `edited`: thanh thanh phan o dau man gop chung
+             thanh "cho duyet" (dung cho cau "kho dang o dau"), con o day tach
+             ra vi hai tinh huong khac nhau — `draft` la chua ai doc, `edited`
+             la da duyet roi bi sua nen RO KHOI SITE. -->
+        <div class="pt3-c">cả kho · <code>edited</code> đã rời site</div>
+        <div class="bars" id="bars4" data-mount></div>
+      </div>
+    </div>
+    <p class="note" id="m1note"></p>
+  </section>
+
+  <!-- ═══ FR-031 · DONG CHAY KHO — ba goc nhin nua, TU CHUYEN ═══════════════
+       Nguoi dung: "Tao nhieu dashboard cho muc thong ke nay hon -> da dang
+       auto scroll."
+
+       FR-041 luot 2 · con HAI goc nhin — ca hai la TONG HOP THOI GIAN so 1
+       cua nguoi dung, hai thang hai hinh:
+         theo ngay     `analyzed_at`     so TUNG NGAY le  -> cot doc
+         theo thang    `analyzed_at`     xu huong dai     -> duong vung
+       (pane `origin` va `uu tien` DA BO theo chi dao; uu tien van con o mball)
+
+       VI SAO KHONG gop vao panel `.pt3` ben tren: panel do tra loi "kho dang o
+       dau" (trang thai, loai, tin cay). Khoi nay tra loi "kho den tu dau va
+       tu bao gio". Hai cau hoi, hai khoi.
+
+       `data-kpane`/`data-ktab` — KHONG dung lai `data-pane`/`data-tab`:
+       shell la CHUNG cho moi trang, nen markup vong xoay cua Trang chu CO MAT
+       tren `/kho/` (do trong site/kho/index.html: 3 `data-pane`). Dung cung
+       ten la hai vong tron vao mot tap, va bam tab o Kho se doi pane o Trang
+       chu. Da do truoc khi dat ten. -->
+  <section class="pn rise" id="v-kho-flow">
+    <div class="pn-h"><h2 data-i18n="kho.dongchay">Dòng chảy kho</h2><span class="ln"></span>
+      <span class="c" data-krotlabel></span></div>
+
+    <div class="kf-t" role="group" aria-label="Chọn góc nhìn">
+      <button type="button" class="kf-b" data-ktab="0" aria-pressed="true">theo ngày</button>
+      <button type="button" class="kf-b" data-ktab="1" aria-pressed="false">theo tháng</button>
+    </div>
+
+    <!-- `opacity:0` INLINE cho pane 1-2, pane 0 KHONG khai gi — dung khuon vong
+         xoay cua Trang chu (`index.ts:696`). Hai ly do, ca hai deu that:
+
+         1. KHONG JS thi pane 0 van doc duoc. Neu day `opacity:0` vao CSS cho ca
+            ba thi ba pane chong nhau va deu vo hinh — khoi nay bien mat hoan
+            toan khi script khong chay.
+         2. `opacity-khong-pha-contrast` quet LUAT CSS. Mot luat `opacity:0` cho
+            phan tu co chu la 1.00:1, va cong bat dung. Trang thai ban dau cua
+            mot vong xoay thuoc ve MARKUP, khong thuoc ve bang mau. -->
+    <div class="kf-w">
+      <div class="kf-p" data-kpane="0"><div id="kf-ngay" data-mount></div></div>
+      <div class="kf-p" data-kpane="1" style="opacity:0"><div id="kf-thang" data-mount></div></div>
+    </div>
+  </section>
+
+  <!-- FR-011 · thung rac — CHI hien khi API local chay (body.api-co).
+       DELETE tren web khong xoa that (M08-R4): file nam o _recycle/, khoi phuc
+       duoc tu day. Site tinh thuan khong co API thi khu nay khong ton tai. -->
+  <section class="pn rise api-only">
+    <div class="pn-h"><h2 data-i18n="kho.rac">Thùng rác</h2><span class="ln"></span>
+      <span class="c" id="rcount"></span></div>
+    <div class="rc" id="rac"></div>
+  </section>
+</div>
+
+<!-- ═══ DANH MỤC — quản lý nhãn ═══
+     BA TAB, khong phai ba panel xep doc: ba danh sach dai (22 + 6 + 5 muc) canh
+     nhau thi ca ba deu chat, va nguoi dung moi luc chi quan MOT danh muc.
+     Cung khuon `.np-tabs` cua man Nap nguon — khong phat minh co che thu hai.
+
+     Mau: MOI mau lay tu contrast-audit.json (50/50 pass WCAG AA). Khai niem
+     dung --brand, chu de dung --success, cho duyet dung --warn — ba vai khac
+     nhau nen ba mau khac nhau, khong phai trang tri. -->
+<div class="view" id="v-concepts">
+  <section class="pn rise">
+    <div class="pn-h"><i class="dot"></i><h2 data-i18n="pn.catalog">Danh mục</h2><span class="ln"></span>
+      <span class="c">nhãn gán cho bài</span></div>
+
+    <!-- FR-027f · DAI cua man Danh muc noi ve DUONG ONG TU DONG that su co:
+         may DE XUAT khai niem tu bai (`concepts_proposed`), dat nguong
+         `concept_merge_min` thi co nut Ket nap. Do la mot quy trinh tu dong
+         co that trong repo, khong phai mot cau quang cao.
+         Khoi 3D: ba khai niem duoc dung NHIEU NHAT — phan bo, dung ba cot. -->
+    <div class="mb" id="mbdm" data-mount></div>
+
+    <div class="kpi" id="dmkpi" data-mount></div>
+  </section>
+
+  <section class="pn rise">
+    <div class="dm-tabs" role="tablist" aria-label="Hai danh mục và hàng chờ">
+      <!-- CHI ten + so. Dong giai thich cu ("ky thuat bai day · kb/concepts.yaml
+           LA chan ly") day tab cao gan gap doi va lap lai thu da noi o panel dau
+           man. Chuyen vao `title=` — tra duoc khi can, khong chiem cho. -->
+      <button type="button" class="dm-tab t-cpt" data-dmtab="cpt" role="tab"
+        aria-selected="true" title="Khái niệm kỹ thuật rút ra từ bài">
+        <b data-i18n="pn.registry">Khái niệm</b>
+        <i class="dm-n" id="dmn-cpt" data-mount></i></button>
+      <button type="button" class="dm-tab t-cat" data-dmtab="cat" role="tab"
+        aria-selected="false" title="Mảng của bài · bản đọc-được của enum trong schema">
+        <b data-i18n="pn.topics">Chủ đề</b>
+        <i class="dm-n" id="dmn-cat" data-mount></i></button>
+      <button type="button" class="dm-tab t-cho" data-dmtab="cho" role="tab"
+        aria-selected="false" title="Đề xuất từ bài · đủ ngưỡng thì kết nạp">
+        <!-- FR-033 · doi ten: tab nay liet ke khai niem do BAI DE XUAT
+             (`concepts_proposed`), khong phai mot buoc duyet cho thu nguoi dung
+             tao. Nguoi dung tao nhan la vao danh muc ngay. -->
+        <b data-i18n="pn.pending">Đề xuất từ bài</b>
+        <i class="dm-n" id="dmn-cho" data-mount></i></button>
+      <!-- WO-016 · tab thu tu, CHI DOC. Loai nguon sinh ra chinh cac rang buoc
+           `CHECK` cua DDL, nen o day khong co nut them/sua/xoa: mot nut nhu vay
+           la loi hua ma `INSERT` se tu choi bang mot cau khong ai doc duoc. -->
+      <button type="button" class="dm-tab t-nguon" data-dmtab="nguon" role="tab"
+        aria-selected="false" title="Loại nguồn, nhóm theo phân loại của nó">
+        <b data-i18n="pn.sources">Loại nguồn</b>
+        <i class="dm-n" id="dmn-nguon" data-mount></i></button>
+    </div>
+
+    <!-- ── TAB 1 · KHÁI NIỆM ─────────────────────────────────────────── -->
+    <div class="dm-p" data-dmview="cpt">
+      <div class="dm-top">
+        <span class="c" id="ccount" data-mount></span>
+        <button type="button" class="bt pri sm api-only" data-mopopup="cpt">+ khái niệm mới</button>
+      </div>
+      <!-- Bar CHI cho muc dang duoc dung: 22 bar trong do 12 bang 0 la nhieu,
+           khong phai thong tin. Muc chua dung xuong danh sach ben duoi. -->
+      <div class="bars" id="cb" data-mount></div>
+      <div class="rc" id="cchua" data-mount></div>
+      <nav class="pgn dm-pgn" id="pg-cpt" aria-label="Phân trang khái niệm" hidden></nav>
+    </div>
+
+    <!-- ── TAB 2 · CHỦ ĐỀ ────────────────────────────────────────────── -->
+    <div class="dm-p" data-dmview="cat" hidden>
+      <div class="dm-top">
+        <span class="c" id="catcount" data-mount></span>
+        <button type="button" class="bt pri sm api-only" data-mopopup="cat">+ chủ đề mới</button>
+      </div>
+      <div class="rc" id="catlist" data-mount></div>
+      <nav class="pgn dm-pgn" id="pg-cat" aria-label="Phân trang chủ đề" hidden></nav>
+    </div>
+
+    <!-- ── TAB 3 · CHỜ VÀO DANH MỤC ──────────────────────────────────── -->
+    <div class="dm-p" data-dmview="cho" hidden>
+      <div class="dm-top"><span class="c" id="pcount" data-mount></span></div>
+      <div class="nw" id="cprop" data-mount></div>
+      <nav class="pgn dm-pgn" id="pg-cho" aria-label="Phân trang đề xuất" hidden></nav>
+      <!-- Moc `pnguong` GIU LAI: `index.ts:895` in so vao day. Chi cat van xuoi
+           quanh no — bo ca the thi emitter chen vao mot cho khong ton tai. -->
+      <p class="note">Từ <b id="pnguong" data-mount></b> bài nhắc tới thì nên kết nạp.</p>
+    </div>
+
+    <!-- ── TAB 4 · LOẠI NGUỒN (WO-016) ────────────────────────────────── -->
+    <div class="dm-p" data-dmview="nguon" hidden>
+      <div class="dm-top"><span class="c" id="nguoncount" data-mount></span></div>
+      <div class="rc" id="nguonlist" data-mount></div>
+    </div>
+  </section>
+
+  <p class="foot api-thieu">Chưa nối được máy chủ — chạy <code>npm run api</code> để thao tác trên web.</p>
+</div>
+
+<!-- ═══ POPUP TẠO NHÃN — <dialog> native ═══
+     Vi sao <dialog> chu khong tu dung: focus-trap, ESC dong, backdrop, va
+     `inert` cho phan con lai cua trang — trinh duyet lam san, dung hon moi ban
+     tu viet. Bay: `showModal()` chi hoat dong khi the o trong DOM va KHONG bi
+     `display:none` boi CSS khac.
+
+     MOT dialog cho CA HAI loai: hai form giong nhau 3/4, va hai dialog thi phai
+     dong bo hai lan moi khi doi. O `gom` an khi tao khai niem. -->
+<dialog class="dlg" id="dlg-nhan" aria-labelledby="dlg-tieu">
+  <form class="api-only" id="f-nhan-moi">
+    <div class="dlg-h"><h3 id="dlg-tieu">Khái niệm mới</h3>
+      <button type="button" class="bt ghost icon sm" data-dlgdong aria-label="đóng">✕</button></div>
+
+    <!-- FR-031 · BON CAU <em> DA BO. Rang buoc khong mat cho nao:
+           dinh dang  -> `pattern` chan, `placeholder` lam mau
+           he qua     -> `title` (tra khi can, khong choan man)
+         Bon dong van xuoi canh bon o nhap la giao dien tu day cho nguoi doc; o
+         nhap co MAU san thi khong ai can doc ta bang loi. -->
+    <label class="f-row"><span>Mã nhãn</span>
+      <input id="dlg-id" type="text" required pattern="[a-z0-9]+(-[a-z0-9]+)*"
+        title="khoá của nhãn — không đổi được sau khi đã có bài dùng"
+        placeholder="vd: semantic-caching"></label>
+    <label class="f-row"><span>Tên hiển thị</span>
+      <input id="dlg-nhan-o" type="text" required placeholder="vd: Cache theo ngữ nghĩa"></label>
+    <label class="f-row" id="dlg-r-gom"><span>Gồm những gì</span>
+      <input id="dlg-gom" type="text" placeholder="vd: xác thực, phân quyền, bí mật"></label>
+    <label class="f-row" id="dlg-r-alias"><span>Tên gọi khác</span>
+      <input id="dlg-alias" type="text" title="chỉ dùng khi tìm kiếm"
+        placeholder="vd: prompt-cache, kv-cache"></label>
+
+    <p class="dlg-canh" id="dlg-canh"></p>
+    <div class="f-act">
+      <button class="bt pri sm" type="submit" id="dlg-gui">Thêm</button>
+      <button class="bt ghost sm" type="button" data-dlgdong>Huỷ</button>
+    </div>
+  </form>
+</dialog>
+
+<!-- ═══ HỘP THOẠI HỎI — FR-022 ═══
+     Thay `confirm()` va `prompt()` cua trinh duyet. Vi sao phai thay:
+       · no mang tieu de "127.0.0.1:8787 says", font va nut cua he dieu hanh —
+         khong theo token nao, khong theo quy uoc dat ten nut (FR-016)
+       · tu lan thu hai Chrome hien o "Khong cho trang nay tao hop thoai nua".
+         Bam nham mot lan thi MOI `confirm` sau do tra `false` IM LANG — nut Xoa
+         thanh nut chet, khong bao gi, khong ai doan ra vi sao.
+
+     Dung <dialog> native nhu hai popup tren: focus-trap, ESC, backdrop, `inert`
+     — trinh duyet lam san. Va quan trong hon: showModal() vao TOP LAYER, luon
+     noi tren cua so doc (z-index cua chung tang khong tran, `++Z`).
+
+     KHONG dung <form>: four-screens.test.js bat moi <form> trong bundle tinh
+     phai `api-only`, ma hop thoai nay con hoi ca viec khong can API ("Dong
+     form? Thay doi chua luu se mat"). Enter-de-gui xu ly tay. -->
+<dialog class="dlg" id="dlg-hoi" aria-labelledby="hoi-tieu">
+  <div class="dlg-than">
+    <div class="dlg-h"><h3 id="hoi-tieu"></h3>
+      <button type="button" class="bt ghost icon sm" data-dlgdong aria-label="đóng">✕</button></div>
+    <p class="hoi-chu" id="hoi-chu"></p>
+    <label class="f-row" id="hoi-o" hidden><span id="hoi-nhan"></span>
+      <input id="hoi-nhap" type="text" autocomplete="off"></label>
+    <p class="dlg-canh" id="hoi-canh"></p>
+    <div class="f-act">
+      <button class="bt pri sm" type="button" id="hoi-ok"></button>
+      <button class="bt ghost sm" type="button" data-dlgdong id="hoi-thoi">Đóng</button>
+    </div>
+  </div>
+</dialog>
+
+<!-- Sua nhan: hai o, khong doi `id` (server tra 400 — id la thu bai viet tro vao). -->
+<dialog class="dlg" id="dlg-sua" aria-labelledby="dlg-sua-tieu">
+  <form class="api-only" id="f-nhan-sua">
+    <div class="dlg-h"><h3 id="dlg-sua-tieu">Sửa nhãn</h3>
+      <button type="button" class="bt ghost icon sm" data-dlgdong aria-label="đóng">✕</button></div>
+    <p class="dlg-id"><code id="dlg-sua-id"></code> <em>id không đổi được</em></p>
+    <label class="f-row"><span>Nhãn tiếng Việt</span>
+      <input id="dlg-sua-nhan" type="text" required></label>
+    <label class="f-row" id="dlg-sua-r-gom"><span>Gồm</span>
+      <input id="dlg-sua-gom" type="text"></label>
+    <div class="f-act">
+      <button class="bt pri sm" type="submit">Lưu</button>
+      <button class="bt ghost sm" type="button" data-dlgdong>Huỷ</button>
+    </div>
+  </form>
+</dialog>
+<!-- FR-027h · XOA o day: mot ban SAO Y dong .foot api-thieu (ban that o dong
+     317, BEN TRONG v-concepts) va mot `</div>` LAC.
+
+     `</div>` lac do dong `.mid` SOM — nen rieng man Nap nguon nam NGOAI khung
+     giua, trai gan het be ngang trong khi `.ph` bi bo 1440px. Do dung la loi
+     nguoi dung chi vao trong anh /nap/.
+     Do duoc: v-home/v-all/v-kho/v-concepts mo o do sau 2, v-nap mo o do sau 1.
+
+     `<dialog>` GIU o ngoai v-concepts co ly do: no la top-layer, va neu nam
+     trong mot `.view` dang `display:none` thi `showModal()` khong ve duoc gi. -->
+
+<!-- ═══ NẠP NGUỒN ═══
+     FR-011: "cua nap + ban viet". BA LOI NGANG HANG — khong phai ba buoc
+     tuan tu (ban cu danh so 01→03 lam nguoi doc tuong phai lam het ca ba).
+     Moi loi mot loai hang, MOI loi ket thuc o draft (B-B1):
+       A  dan link cho distiller (CLI — luon song, khong can API)
+       B  nop file agent sinh   (keo-tha → /api/inbox → gate, FR-010)
+       C  TU VIET bai tren web  (form → POST /api/articles, origin manual)
+     Loi B/C can API local (npm run api) — khong co thi mo di + hien lenh. -->
+<!-- T03-102 · CHI mot moc rong. Khung + bon nut loc + panel chi tiet do
+     `plugins/chungcat` dung, va chunk do CHI tai tren man nay. Shell la
+     MOT file di theo MOI trang, nen moi the dat o day la byte tren duong
+     tai dau cua ca bay man khac — ban dau day cua man nay day trang chu
+     len 62545/61440. -->
+<div class="view" id="v-chungcat" data-mount></div>
+
+<!-- T03-94 · CHI mot moc rong. Khung do chunk `chungcat` dung, va chunk do
+     CHI tai tren /chung-cat/ + /chung-cat/nhap/. Shell di theo ca chin man,
+     nen moi the dat o day nhan voi chin — trang chu du 10 byte. -->
+<div class="view" id="v-chungcatnhap"></div>
+
+<div class="view" id="v-dothai">
+  <section class="pn rise">
+    <div class="pn-h"><i class="dot"></i><h2 data-i18n="dothai.title">Đợt hai</h2><span class="ln"></span>
+      <span class="c">năm dịch vụ</span></div>
+    <!-- Dai NOI THAT: day la MOCK doc tu contracts, khong phai so lieu chay
+         that. Mot man overview khong noi ra dieu do se duoc doc nhu mot
+         dashboard, va nguoi doc se tin mot con so chua ton tai. -->
+    <p class="al" data-i18n="dothai.canh">Số liệu dưới đây đọc từ hợp đồng mẫu — chưa phải hệ đang chạy.</p>
+    <div class="kpi" id="dhkpi" data-mount></div>
+  </section>
+
+  <!-- Nam the, mot the mot dich vu. Moi the noi DUNG BA thu: vung tin cay
+       (LOI/THO/BIEN — quyet ai duoc goi ra Internet), trang thai that, va MOT
+       so do lay tu contracts. Khong the nao mang mot con so khong co nguon. -->
+  <section class="pn">
+    <div class="pn-h"><i class="dot"></i><h2 data-i18n="dothai.dv">Dịch vụ</h2><span class="ln"></span></div>
+    <div class="cds" id="dhthe" data-mount></div>
+  </section>
+</div>
+
+<div class="view" id="v-napbaiviet">
+  <section class="pn rise">
+    <div class="pn-h"><i class="dot"></i><h2 data-i18n="pn.ingest">Nạp bài viết</h2><span class="ln"></span>
+      <span class="c">ba lối vào · mọi lối kết thúc ở draft</span></div>
+
+    <!-- Doan gioi thieu da BO: ba tab ben duoi da noi ro moi loi lam gi, va
+         cau "moi loi ket thuc o draft" van con o nhan ben phai header + o dong
+         .note cuoi man. Nhac ba lan mot y la chiem cho, khong phai nhan manh.
+         Rieng cau LENH bat API thi giu — do la thu nguoi doc CAN khi loi B/C mo. -->
+    <p class="foot api-thieu">Chưa nối được máy chủ — chạy <code>npm run api</code> để thao tác trên web.</p>
+
+    <!-- FR-027f · DAI cua man Nap nguon. Su that rieng o day: ba loi khong
+         ngang nhau ve MUC TU DONG HOA — loi A may lam gan het (6 pass), loi B
+         may kiem (4 cong 05_intake), loi C ban tu viet. Man cu trinh bay ba loi
+         nhu ba the giong nhau, nen nguoi moi khong biet nen vao loi nao.
+         Ba con so deu co nguon: 6 pass (02_proposal §S1) · 4 cong (gac() cua
+         05_intake/gate.py) · 9 cong (danh so trong validate.py). -->
+    <div class="mb" id="mbnap" data-mount></div>
+
+    <!-- Ba TAB, khong phai ba cot: form viet bai dai gan man hinh, de canh hai
+         the kia thi ca ba deu chat. Tab cung noi ro "moi luc chi lam MOT viec".
+
+         FR-027f · them CHIEU SAU: day la mot LUA CHON, khong phai phan bo, nen
+         dung `perspective` chu khong dung khoi 3D. Tab dang chon tien ve phia
+         truoc — no tra loi cau "toi dang o loi nao" bang vi tri, khong bat mat
+         phai doc lai chu. Va them VACH MUC TU DONG (3/2/1) tren moi tab. -->
+    <!-- FR-038/C6a · CON BA TAB, khong bon. Tab thu tu (thu vien) da sang man
+         `/tai-lieu/nap/` cung noi dung cua no.
+
+         GIU dai tab nay: ba loi la ba duong vao CUNG MOT module, va loi `file`
+         + `viet` mang `hidden` — bo tab la khong con gi bat chung hien, tuc hai
+         trong ba loi bien mat. Luat "khong gop chung" noi ve MODULE, khong noi
+         ve hai lua chon ben trong mot module.
+
+         Vach muc tu dong (3/2/1) tren moi tab: ba loi khong ngang nhau ve muc
+         may lam ho, va truoc do man khong noi dieu do o dau ca. -->
+    <div class="np-tw">
+    <div class="np-tabs" role="tablist">
+      <button type="button" class="np-tab t-link" data-naptab="link"
+        role="tab" aria-selected="true">
+        <b data-i18n="np.h1">Dán link</b>
+        <span>bài báo, tài liệu từ bên ngoài</span>
+        <span class="np-au" title="hệ thống làm gần hết"><i></i><i></i><i></i>
+          <em>tự động cao</em></span></button>
+      <button type="button" class="np-tab t-file" data-naptab="file"
+        role="tab" aria-selected="false">
+        <b data-i18n-html="np.h2">Nộp file .md</b>
+        <span>tệp đã soạn sẵn từ nơi khác</span>
+        <span class="np-au" title="hệ thống kiểm trước khi nhận"><i></i><i></i><i class="o"></i>
+          <em>máy kiểm</em></span></button>
+      <button type="button" class="np-tab t-viet" data-naptab="viet"
+        role="tab" aria-selected="false">
+        <b data-i18n="np.h3">Tự viết bài</b>
+        <span>ghi chép của bạn — điền form, ghi thẳng vào kho</span>
+        <span class="np-au" title="bạn viết, hệ thống chỉ soát lại"><i></i><i class="o"></i><i class="o"></i>
+          <em>bạn viết</em></span></button>
+    </div>
+    </div>
+    <!-- ── LỐI 1 · dán link ───────────────────────────────────────────── -->
+    <div class="np-p t-link" data-napview="link">
+      <p class="np-h">1 · dán câu này vào trợ lý, thay bằng link của bạn</p>
+      <div class="np-cmd"><code data-cmd>phân tích https://arxiv.org/abs/2411.00002</code>
+        <button class="bt ghost sm" data-copy data-i18n="np.copy">chép</button></div>
+      <p class="np-h">2 · kiểm lại kho sau khi skill ghi xong</p>
+      <div class="np-cmd"><code data-cmd>python core/src/source_distiller/validate.py kb/ --strict</code>
+        <button class="bt ghost sm" data-copy data-i18n="np.copy">chép</button></div>
+      <p class="np-h">3 · dựng lại trang tĩnh để thấy bài trên site</p>
+      <div class="np-cmd"><code data-cmd>cd web &amp;&amp; npm run build</code>
+        <button class="bt ghost sm" data-copy data-i18n="np.copy">chép</button></div>
+      </div>
+
+    <!-- ── LỐI 2 · nộp file (FR-010) ──────────────────────────────────── -->
+    <div class="np-p t-file" data-napview="file" hidden>
+      <p class="np-t"><a class="bt sm" href="/mau-nap-nguon.md"
+        download="mau-nap-nguon.md" type="text/markdown"
+        data-i18n="np.dl">⬇ tải template .md</a>
+        <span class="np-h">điền theo khung này rồi nộp</span></p>
+      <div class="up api-only" id="up">
+        <input type="file" id="upf" accept=".md,text/markdown" hidden>
+        <button type="button" class="up-z" id="upz">
+          <b>Chọn file .md</b>
+          <span>hoặc kéo thả vào đây · tối đa 1 MB</span>
+        </button>
+        <p class="up-kq" id="upkq" hidden></p>
+      </div>
+      <!-- WO-020 · BA O BO SUNG cho loi `file`.
+
+           Template `mau-nap-nguon.md` DA khai `one_liner` · `concepts` ·
+           `category`, nen ba o nay KHONG phai nguon thu hai: chung chi dien
+           khoa mà file THIEU. Khong co luat do thi hai noi khai mot su that,
+           va cai lech im lang. Luat duoc noi ra tren man ngay duoi day. -->
+      <p class="np-h">Ba ô dưới chỉ dùng khi file thiếu.</p>
+      <label class="f-row f-mo"><span>Mô tả
+        <i class="f-opt">tối đa <b id="up-tran" data-mount></b> từ</i></span>
+        <textarea id="up-mo" rows="3" placeholder="dùng khi file không có thân bài"></textarea></label>
+      <div class="f-row"><span>Chủ đề <i class="f-opt">nếu file thiếu</i></span>
+        <span class="f-chon" id="up-cat" data-dm="cat"><i class="f-tai">đang tải…</i></span>
+      </div>
+      <div class="f-row"><span>Khái niệm <i class="f-opt">nếu file thiếu</i></span>
+        <span class="f-chon" id="up-cpt" data-dm="cpt"><i class="f-tai">đang tải…</i></span>
+      </div>
+      <p class="foot api-thieu">Chưa nối được máy chủ — chạy <code>npm run api</code> để thao tác trên web.</p>
+      <p class="np-h">Hoặc làm bằng dòng lệnh — kết quả y hệt</p>
+      <div class="np-cmd"><code data-cmd>python 05_intake/gate.py</code>
+        <button class="bt ghost sm" data-copy data-i18n="np.copy">chép</button></div>
+
+    </div>
+    <!-- ── LỐI 3 · tự viết (FR-011) ───────────────────────────────────── -->
+    <div class="np-p t-viet" data-napview="viet" hidden>
+      <p class="foot api-thieu">Chưa nối được máy chủ — chạy <code>npm run api</code> để thao tác trên web.</p>
+      <button type="button" class="bt sm api-only" id="f-mo">✎ Mở form viết bài</button>
+
+      <!-- Form dung chung cho TAO (POST) va SUA (PUT — nut ✎ o cua so doc).
+           Khong prefill truong QUYET DINH nao: id/credibility/conformance la
+           nguoi dat (M05-R2). Slug co GOI Y tu tieu de nhung sua duoc. -->
+      <!-- Form chia BON nhom, moi nhom tra loi MOT cau hoi. Thu tu theo thu
+           nguoi viet biet truoc: bai gi (1) → cat o dau trong kho (2) → ban
+           danh gia the nao (3) → noi dung (4). Cot phai cua nhom 1-3 la o
+           "se ghi vao dau" + bang theo doi cac muc — chung PHAN CHIEU dung cong
+           validate.py, de nguoi sua TRUOC khi gui chu khong doi 422 tra ve. -->
+      <form class="np-form api-only" id="f-bai" hidden>
+        <header class="f-top">
+          <div class="f-h" id="f-che">Viết bài mới · bài vào kho ở trạng thái draft, chờ người duyệt</div>
+          <!-- Hoc bang VI DU: do ca form bang mot bai that, hop le, qua duoc
+               cong. Nguoi dung xoa dan va thay bang bai cua minh. Khac han
+               viec lang le doan ho mot truong bo trong (M05-R2 cam dieu do) —
+               day la mot nut co nhan noi ro no lam gi. -->
+          <button type="button" class="bt ghost sm" id="f-mau">điền một bài mẫu</button>
+        </header>
+
+        <div class="f-cot">
+          <fieldset class="f-nhom">
+            <legend><b>1</b> Bài này là gì</legend>
+
+            <label class="f-row"><span>Tiêu đề <i class="f-req">bắt buộc</i></span>
+              <input id="f-title" type="text" required></label>
+
+            <label class="f-row"><span>Một câu tóm tắt <i class="f-req">bắt buộc</i>
+              <b id="f-dem">0/160</b></span>
+              <input id="f-1l" type="text" maxlength="160" required></label>
+
+            <label class="f-row"><span>URL nguồn <i class="f-req">bắt buộc</i></span>
+              <input id="f-url" type="url" placeholder="https://..." required></label>
+
+            <div class="f-doi">
+              <label class="f-row"><span>Loại nguồn <i class="f-req">bắt buộc</i></span>
+                <select id="f-type" required>
+                  <option value="article">article — bài viết, blog</option>
+                  <option value="paper">paper — bài báo khoa học</option>
+                  <option value="repo">repo — mã nguồn</option>
+                  <option value="video">video — hội thảo, bài giảng</option>
+                  <option value="docs">docs — tài liệu chính thức</option>
+                  <option value="announcement">announcement — thông báo phát hành</option>
+                  <option value="tai-lieu">tai-lieu — tài liệu tải lên (pdf/ppt/word)</option>
+                </select></label>
+
+              <label class="f-row"><span>Ngày phân tích <i class="f-req">bắt buộc</i></span>
+                <input id="f-ngay" type="date" required></label>
+            </div>
+          </fieldset>
+
+
+          <fieldset class="f-nhom">
+            <legend><b>2</b> Nhãn cho bài</legend>
+
+            <div class="f-row"><span>Chủ đề <i class="f-opt">để trống cũng được</i></span>
+              <span class="f-chon" id="f-cat" data-dm="cat"><i class="f-tai">đang tải danh mục…</i></span>
+              <!-- Tao nhanh chu de: category KHONG co duong de xuat
+                   (`category_proposed` khong ton tai) nen day la POST that. -->
+              <div class="f-them api-only">
+                <button type="button" class="bt ghost sm" id="f-catmoi-mo">+ chủ đề mới</button>
+                <span class="f-them-o" id="f-catmoi-o" hidden>
+                  <input id="f-catmoi-id" type="text" placeholder="id: security">
+                  <input id="f-catmoi-nhan" type="text" placeholder="Nhãn: An ninh">
+                  <input id="f-catmoi-gom" type="text" placeholder="Gồm: xác thực, bí mật">
+                  <button type="button" class="bt pri sm" id="f-catmoi-gui">thêm</button>
+                </span>
+              </div></div>
+
+            <div class="f-row"><span>Khái niệm <i class="f-opt">chọn trong danh mục</i></span>
+              <span class="f-chon" id="f-cpt" data-dm="cpt"><i class="f-tai">đang tải danh mục…</i></span></div>
+
+            <label class="f-row"><span>Đề xuất khái niệm mới</span>
+              <input id="f-cptmoi" type="text" placeholder="vd: rag-eval, tool-sandbox"></label>
+          </fieldset>
+
+          <!-- MOT O MOI MUC LA, khong mot o (SCR-05 §1). Cong doi du muc; mot textarea
+               bat nguoi viet tu nho ten muc va tu go `## n.`, va chi biet minh
+               thieu sau khi cong tra 422. Mot o moi muc thi moi rang buoc cua cong co
+               dung mot cho de go, va goi y nam ngay trong o do.
+               Che do THO luon con: bai do skill 6-pass sinh co the mang cau
+               truc khac, nuot mat noi dung cua no la hong nang hon nhieu. -->
+          <fieldset class="f-nhom f-nhom-than">
+            <legend><b>3</b> Nội dung
+              <button type="button" class="bt ghost sm" id="f-khung">nạp khung 5 mục</button>
+            </legend>
+
+            <div class="f-o-muc" id="f-o-muc"></div>
+
+            <!-- Cau "giao thuc doi du muc; ty le muc 5+6" da bo: cot
+                 `.f-doi-chieu` ben canh phan chieu DUNG rang buoc do va cap
+                 nhat NGAY khi go. Mot cau tinh noi lai dieu mot cot dong dang
+                 noi la hai lan noi, va cai tinh se lac hau truoc. -->
+          </fieldset>
+        </div>
+
+        <!-- Cot theo doi — PHAN CHIEU cong validate.py, cap nhat khi go.
+             Muc dich: thay thieu gi TRUOC khi gui, thay vi doi 422 tra ve. -->
+        <aside class="f-doi-chieu">
+          <h4>Còn thiếu gì</h4>
+          <ul class="f-muc" id="f-muc"></ul>
+          <p class="f-tu" id="f-tu">chưa có chữ nào</p>
+          <!-- Cau nay TRUOC DAY vo nghia: "Loi cuoi van la Bai duoc kiem tu
+               dong ngay khi ban bam ghi." — mot lan sua truoc cat mat chu ngu
+               va de lai hai nua cau dinh nhau. Loi HIEN THI, khong ai bao. -->
+          <p class="np-h">Ước tính tại chỗ — bài được kiểm lại khi bạn bấm ghi.</p>
+        </aside>
+
+        <div class="f-act">
+          <button type="submit" class="bt pri" id="f-gui">Ghi vào kho</button>
+          <button type="button" class="bt ghost" id="f-huy"
+            title="bỏ thay đổi chưa lưu — không xoá gì trong kho">Đóng</button>
+          <span class="np-h"><kbd>Ctrl</kbd>+<kbd>Enter</kbd> để ghi</span>
+        </div>
+        <pre class="f-kq" id="f-kq" role="status" aria-live="polite" hidden></pre>
+      </div>
+      </form>
+
+    <!-- GIU, va giu NGAN. Day khong phai chu thich — day la mot BAO DAM: khong
+         loi nao trong ba loi tu duyet bai. Neu bo, khong cho nao tren man noi
+         dieu do, va nguoi dung phai tu suy ra tu viec khong thay bai len site. -->
+    <p class="note">Cả ba lối đều dừng ở bản nháp — duyệt là việc của bạn.</p>
+  </section>
+</div>
+
+<div class="view" id="v-naptailieu">
+  <section class="pn rise">
+    <div class="pn-h"><i class="dot"></i><h2 data-i18n="pn.ingesttl">Nạp tài liệu</h2><span class="ln"></span>
+      <span class="c">một lối · giữ nguyên file trong kho</span></div>
+
+    <p class="foot api-thieu">Chưa nối được máy chủ — chạy <code>npm run api</code> để thao tác trên web.</p>
+
+    <div class="mb" id="mbnaptl" data-mount></div>
+
+    <!-- Ba TAB, khong phai ba cot: form viet bai dai gan man hinh, de canh hai
+         the kia thi ca ba deu chat. Tab cung noi ro "moi luc chi lam MOT viec".
+
+         FR-027f · them CHIEU SAU: day la mot LUA CHON, khong phai phan bo, nen
+         dung `perspective` chu khong dung khoi 3D. Tab dang chon tien ve phia
+         truoc — no tra loi cau "toi dang o loi nao" bang vi tri, khong bat mat
+         phai doc lai chu. Va them VACH MUC TU DONG (3/2/1) tren moi tab. -->
+    <!-- ── LOI 4 · thu vien (FR-036/B7b) ─────────────────────────────── -->
+    <!-- WO-017 · DAI LOI cua tai lieu — MOT duong, va noi ra la mot.
+         Cong `tai-lieu` doi `media`, nen khong co duong "dan link tai lieu".
+         Ve ba tab cho mot duong la hua hai duong khong ton tai. -->
+    <div class="np-tw">
+    <div class="np-tabs" role="tablist">
+      <button type="button" class="np-tab t-tep" data-naptab="tep"
+        role="tab" aria-selected="true">
+        <b>Chọn tệp</b>
+        <span id="tv-dd" data-mount></span>
+        <span class="np-au" title="máy đọc tệp rồi kiểm trước khi nhận"><i></i><i></i><i class="o"></i>
+          <em>máy kiểm</em></span></button>
+    </div>
+    </div>
+    <div class="np-p t-tv" data-napview="tep">
+      <p class="foot api-thieu">Chưa nối được máy chủ — chạy <code>npm run api</code> để thao tác trên web.</p>
+
+      <!-- Byte di TRUOC, ban ghi di SAU — vi `source_type: tai-lieu` doi
+           `media`, nen ban ghi khong the ton tai hop phap truoc blob cua no
+           (M09 §2.3). Hai buoc, mot lan bam: nguoi dung khong can biet. -->
+      <div class="up api-only" id="up-tv">
+        <input type="file" id="up-tv-f" hidden>
+        <button type="button" class="up-z" id="up-tv-z">
+          <b>Chọn tài liệu</b>
+          <span id="up-tv-goi">hoặc kéo thả vào đây</span>
+        </button>
+        <p class="up-kq" id="up-tv-kq" hidden></p>
+      </div>
+
+      <div class="tv-meta api-only" id="tv-meta" hidden>
+        <label class="f-row"><span>Một câu tóm tắt <i class="f-req">bắt buộc</i></span>
+          <input id="tv-1l" type="text" maxlength="160" required></label>
+        <p class="tv-hv" id="tv-hv"></p>
+
+        <!-- WO-013/2 · HIỆN VẬT ĐANG GẮN. Chỉ hiện khi SỬA một bản đã có; lúc
+             nạp mới thì khối này ẩn vì chưa có gì để hiện.
+
+             `media` KHÔNG mất khi sửa (đo ở WL-01K9NNWO013), nên đây là THIẾU
+             TÍNH NĂNG chứ không phải mất dữ liệu: người dùng sửa một tài liệu mà
+             không thấy file của nó, và không thay được. -->
+        <div class="tv-hv-cu" id="tv-hv-cu" hidden>
+          <span id="tv-hv-ten"></span>
+          <span class="c" id="tv-hv-cd"></span>
+          <button type="button" class="bt ghost sm" id="tv-hv-thay">Thay file…</button>
+        </div>
+
+      </div>
+      <!-- WO-018 · MÔ TẢ + hai ô nhãn, đặt NGOÀI khối ẩn.
+
+           Ba thứ này BẮT BUỘC (cổng module chặn thiếu chủ đề/khái niệm), nên
+           người mở màn phải thấy chúng ngay. Trước đó chúng nằm trong khối
+           `hidden` chỉ hiện sau khi chọn file / dán link — có trong DOM mà
+           người dùng không thấy, đúng câu "cần thêm 1 số fields".
+
+           Mô tả đi vào THÂN BÀI. Trước đó hai đường này gửi thân bài bằng
+           chính câu tóm tắt, tức bản ghi tự nói hai lần. -->
+      <label class="f-row"><span>Tiêu đề
+        <i class="f-opt">nên có</i></span>
+        <input id="tv-title" type="text" placeholder="tên tài liệu này"></label>
+      <label class="f-row f-mo"><span>Mô tả
+        <i class="f-opt">tối đa <b id="tv-tran" data-mount></b> từ</i></span>
+        <textarea id="tv-mo" rows="4" placeholder="vài dòng về nội dung tài liệu này"></textarea></label>
+      <div class="f-row"><span>Chủ đề <i class="f-opt">nên có</i></span>
+        <span class="f-chon" id="tv-cat" data-dm="cat"><i class="f-tai">đang tải…</i></span>
+      </div>
+      <div class="f-row"><span>Khái niệm <i class="f-opt">nên có</i></span>
+        <span class="f-chon" id="tv-cpt" data-dm="cpt"><i class="f-tai">đang tải…</i></span>
+      </div>
+
+      <!-- WO-035 · NÚT Ở CUỐI. Trước đó nó nằm trong `#tv-meta` — khối đứng
+           TRƯỚC Tiêu đề · Mô tả · Chủ đề · Khái niệm, nên "Ghi vào kho" hiện ra
+           GIỮA form. Bọc bằng `.f-act` như màn bài viết: một hình dạng cho
+           cùng một việc, và thanh hành động dính đáy khung nhìn. -->
+      <div class="f-act">
+        <button type="button" class="bt pri sm" id="tv-gui">Ghi vào kho</button>
+      </div>
+
+      </div>
+      <p class="np-h">Ba việc máy làm sau khi bạn chọn file</p>
+      <ul class="f-muc">
+        <li>băm nội dung (sha256) — cùng file nạp hai lần chỉ tốn chỗ một lần</li>
+        <li>soi byte mở đầu để chắc file đúng loại nó tự khai</li>
+        <li>giữ thêm một bản sao ngoài cơ sở dữ liệu, để bản lưu trữ của bạn có luôn file gốc</li>
+      </ul>
+
+    <!-- GIU, va giu NGAN. Day khong phai chu thich — day la mot BAO DAM: khong
+         loi nao trong ba loi tu duyet bai. Neu bo, khong cho nao tren man noi
+         dieu do, va nguoi dung phai tu suy ra tu viec khong thay bai len site. -->
+    <p class="note">Tài liệu nạp xong dừng ở bản nháp — duyệt là việc của bạn.</p>
+  </section>
+</div>
+
+<!-- ═══ NẠP VIDEO (C6b) ═══
+     ĐƯỜNG NÀY TRƯỚC ĐÓ KHÔNG TỒN TẠI. Phần video đã có chỉ là XEM
+     (`idVideo()` · `nhungVideo()`); đăng ký một video phải đi qua form viết bài
+     chung — tức đúng "gộp chung" người dùng cấm.
+
+     Ba màn nạp, ba hình dạng đầu vào: bài viết nhận một BẢN PHÂN TÍCH · tài liệu
+     nhận một HIỆN VẬT · màn này nhận một URL. Không byte nào vào kho: một video
+     vượt trần 25 MB theo định nghĩa. -->
+<div class="view" id="v-napvideo">
+  <section class="pn rise">
+    <div class="pn-h"><i class="dot"></i><h2 data-i18n="pn.ingestvd">Đăng ký video</h2><span class="ln"></span>
+      <span class="c">một lối · chỉ địa chỉ, không tải file</span></div>
+
+    <p class="foot api-thieu">Chưa nối được máy chủ — chạy <code>npm run api</code> để thao tác trên web.</p>
+
+    <div class="mb" id="mbnapvd" data-mount></div>
+
+    <!-- WO-017 · DAI LOI cua video — MOT duong. FR-037: video khong mang
+         byte, nen khong co duong "tai len". -->
+    <div class="np-tw">
+    <div class="np-tabs" role="tablist">
+      <button type="button" class="np-tab t-url" data-naptab="url"
+        role="tab" aria-selected="true">
+        <b>Dán URL</b>
+        <span id="vd-nph" data-mount></span>
+        <span class="np-au" title="máy nhận diện nơi phát và mã video"><i></i><i></i><i></i>
+          <em>tự động cao</em></span></button>
+    </div>
+    </div>
+    <div class="np-p" data-napview="url">
+      <!-- Host kiểm NGAY LÚC DÁN (M11-R3). Chờ 422 nghĩa là người dùng dán
+           xong, điền xong, bấm ghi rồi mới biết sai host. Nhưng đó là tiện lợi
+           cho NGƯỜI — cổng cho MÁY là `/api/video` (FR-040), và cả hai đều có. -->
+      <div class="up api-only" id="up-vd">
+        <label class="f-row"><span>Địa chỉ video <i class="f-req">bắt buộc</i></span>
+          <input id="vd-url" type="url" inputmode="url" autocomplete="off"
+            spellcheck="false" placeholder="dán link vào đây"></label>
+        <p class="up-kq" id="up-vd-kq" hidden></p>
+      </div>
+
+      <div class="tv-meta api-only" id="vd-meta" hidden>
+        <label class="f-row"><span>Một câu tóm tắt <i class="f-req">bắt buộc</i></span>
+          <input id="vd-1l" type="text" maxlength="160" required></label>
+        <p class="tv-hv" id="vd-hv"></p>
+      </div>
+      <!-- WO-018 · MÔ TẢ + hai ô nhãn, đặt NGOÀI khối ẩn.
+
+           Ba thứ này BẮT BUỘC (cổng module chặn thiếu chủ đề/khái niệm), nên
+           người mở màn phải thấy chúng ngay. Trước đó chúng nằm trong khối
+           `hidden` chỉ hiện sau khi chọn file / dán link — có trong DOM mà
+           người dùng không thấy, đúng câu "cần thêm 1 số fields".
+
+           Mô tả đi vào THÂN BÀI. Trước đó hai đường này gửi thân bài bằng
+           chính câu tóm tắt, tức bản ghi tự nói hai lần. -->
+      <label class="f-row"><span>Tiêu đề
+        <i class="f-opt">nên có</i></span>
+        <input id="vd-title" type="text" placeholder="tên video này"></label>
+      <label class="f-row f-mo"><span>Mô tả
+        <i class="f-opt">tối đa <b id="vd-tran" data-mount></b> từ</i></span>
+        <textarea id="vd-mo" rows="4" placeholder="vài dòng về nội dung video này"></textarea></label>
+      <div class="f-row"><span>Chủ đề <i class="f-opt">nên có</i></span>
+        <span class="f-chon" id="vd-cat" data-dm="cat"><i class="f-tai">đang tải…</i></span>
+      </div>
+      <div class="f-row"><span>Khái niệm <i class="f-opt">nên có</i></span>
+        <span class="f-chon" id="vd-cpt" data-dm="cpt"><i class="f-tai">đang tải…</i></span>
+      </div>
+
+      <!-- WO-035 · NÚT Ở CUỐI. Trước đó nó nằm trong `#vd-meta` — khối đứng
+           TRƯỚC Tiêu đề · Mô tả · Chủ đề · Khái niệm, nên "Ghi vào kho" hiện ra
+           GIỮA form. Bọc bằng `.f-act` như màn bài viết: một hình dạng cho
+           cùng một việc, và thanh hành động dính đáy khung nhìn. -->
+      <div class="f-act">
+        <button type="button" class="bt pri sm" id="vd-gui">Ghi vào kho</button>
+      </div>
+
+      </div>
+      <p class="np-h">Hai việc máy làm sau khi bạn dán link</p>
+      <ul class="f-muc">
+        <li>đọc mã video từ địa chỉ, và từ chối nếu nơi phát không nằm trong danh sách nhận</li>
+        <li>rút địa chỉ về dạng gọn để hai lần dán cùng một video không thành hai bản ghi</li>
+      </ul>
+
+    <p class="note">Video đăng ký xong dừng ở bản nháp — duyệt là việc của bạn.</p>
+  </section>
+</div>
+
+</div>
+</main>
+
+<div class="dock" id="dock"></div>

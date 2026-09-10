@@ -1,0 +1,37 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:04.140
+Clod vừa ra mắt bộ Agent bán hàng, chạy ngay trong app của bạn.
+
+00:00:04.540 --> 00:00:14.340
+Clod for Commerce là bộ khung mở để bạn tự dựng Agent của mình, Agent cho khách và Agent cho người bán. Bốn ngành làm sẵn, bán lẻ, du lịch, viễn thông, giải trí.
+
+00:00:15.200 --> 00:00:18.040
+Trước đây khách hỏi xong là nhảy sang một trợ lý bên thứ ba.
+
+00:00:18.340 --> 00:00:21.000
+Đơn vẫn về nhưng quan hệ với khách thì mất.
+
+00:00:21.480 --> 00:00:24.320
+Bây giờ Agent chạy ngay trong app giữ lại được cả hai.
+
+00:00:25.180 --> 00:00:27.280
+Đây là Agent cho người mua hàng.
+
+00:00:27.680 --> 00:00:31.420
+Nó so sánh từng hạng vé rồi thêm thẳng vào giỏ cho khách.
+
+00:00:31.780 --> 00:00:33.600
+Và nó nhớ sở thích của khách cho lần mua sau.
+
+00:00:34.340 --> 00:00:36.300
+Còn đây là Agent cho người bán.
+
+00:00:36.780 --> 00:00:40.540
+Mỗi sáng nó báo món sắp hết và món cần giảm giá, nhưng mọi thay đổi đều nằm chờ bạn duyệt.
+
+00:00:41.340 --> 00:00:50.180
+Bắt đầu thì đơn giản, đây là mã nguồn mở nên bạn fork về là tự làm chủ, Clod Repo, cài plug in cho Clod Code rồi tả Agent bạn muốn.
+
+00:00:50.820 --> 00:00:55.440
+Tám demo chạy thật đang chờ bạn, link mình để ở phần bình luận, theo dõi Ken kiến thức.

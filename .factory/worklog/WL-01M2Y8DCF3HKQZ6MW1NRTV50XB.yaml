@@ -1,0 +1,101 @@
+entry: ban-giao
+ulid: 01M2Y8DCF3HKQZ6MW1NRTV50XB
+ngay: 2026-09-10
+module: M03_web
+don_vi: T03-143
+wo: WO-090
+scr: SCR-26
+tieu_de: >-
+  Tab Ket qua: chip "tat ca" noi doi (3 trong khi co 8), va ve lai theo SCR-26
+
+object:
+  - web/api/dungchung.mjs
+  - web/api/nhap-cua.mjs
+  - web/plugins/chungcat/src/chungcat.inline.ts
+  - web/test/tab-ket-qua-day-du.test.js
+  - web/package.json
+  - web/WORKLOG.md
+  - web/test/WORKLOG.md
+  - 07_plan/M03_web/tasks/T03-143-tab-ket-qua.md
+  - .factory/wo/WO-090-tab-ket-qua.md
+
+trieu_chung: |
+  Chu du an 2026-09-10: *"Tab ket qua cung design lai, tab nay moi la noi hien
+  thi tat ca ban va trang thai nhe. (hien tai muc Ket qua do dang loi.)"*
+
+  Anh chup: chip `tat ca` hien 3, chip `da bo` hien 0. DB that co 8
+  (`da_bo 5 · nhap 2 · da_duyet 1`).
+
+chan_doan_TOI_da_noi_SAI_mot_lan: |
+  Luot truoc toi bao chu du an *"cua mac dinh luoc `da_bo`, nen `tat ca` ra 3 —
+  loi o NGHIA cua 'tat ca'"*. Dung mot nua, va nua sai la chỗ quan trong:
+
+  Doc ky `dungchung.mjs:1607` thi mac dinh `WHERE trang_thai <> 'da_bo'` la CO
+  Y va co ly le viet san (`T08-29`/`FR-057`): danh sach ay la HANG DOI VIEC cua
+  `T03-94`, va mot ban da bo khong con la viec.
+
+  => **Cua khong sai.** Sai nam TRON VEN o FE: `ccNapNhap` (`:673`) goi cua
+  TRAN roi loc CLIENT tren tap da bi SERVER loc:
+
+      const r = await fetch("/api/nhap-chung-cat?n=50");   // khong co `da_bo`
+      const hien = NH_LOC ? CC_NHAP.filter(v => v.trang_thai === NH_LOC) : CC_NHAP;
+
+  Nen chip `da bo` khong bao gio co gi de loc, va nhan `tat ca` noi doi.
+
+  Ghi ra vi neu tin ban chan doan dau thi toi da doi MAC DINH cua cua — tuc
+  chua mot man bang cach pha mot man khac.
+
+sua: |
+  1 Cua nhan CO TUONG MINH `gom_da_bo`; mac dinh y nguyen.
+    KHONG nhoi vao `trang_thai=tat-ca`: `trang_thai` la mot ENUM TRANG THAI, va
+    nhet mot gia tri-khong-phai-trang-thai vao do la cho ca thu ba lech.
+  2 `nhap-cua.mjs` chuyen `?gom_da_bo=1` xuong.
+  3 `ccNapNhap` goi `?n=200&gom_da_bo=1` — tab lich su phai thay het, khong cat
+    o 50.
+  4 Ve lai theo `SCR-26`: `ccNhom` + `ccTheoNgay` + `.cc-song` + `nhanNguon`,
+    thay cho mot `<ul class="nh-l">` phang. Hai tab cua cung mot man noi hai
+    ngon ngu hinh la hai thu nguoi phai hoc cho mot viec.
+
+khac_Hang_viec_DUNG_MOT_dieu: |
+  KHONG goi `ccBanCuoi`. Tab nay la LICH SU nen moi ban deu hien, ke ca ban da
+  bi thay the — gop ve ban cuoi o day la giau dung thu tab nay sinh ra de hien.
+  Ve 3b khoa lai dieu do.
+
+cong:
+  them: web/test/tab-ket-qua-day-du.test.js — 11 ve
+  cach_do: |
+    CHAY THAT cau lenh SQL: dung `LOI_DB` tro vao mot DB o THU MUC TAM, gieo
+    dung phan bo do duoc tren DB that (5 bo · 2 nhap · 1 duyet), roi goi
+    `loiLietKeNhap` that. Khong gia lap, va khong dung `_loi.sqlite` that.
+  do_duoc: chay truoc khi sua => 7 ve DO
+  ve_chong_sua_qua_tay: |
+    Ve 1b nang ngang ve 1a: cach sua DE la doi mac dinh cua cua. Lam the thi
+    hang doi viec bong cong ban da bo — chua mot man bang cach pha mot man
+    khac, va cai pha ay khong ai thay ngay. Ve 1b doi: KHONG co => y nhu cu.
+    Ve 1d: duong loc tuong minh `?trang_thai=da_bo` van ra 5.
+    Ve 1c: `tong` khop `dong` o CA HAI che do — `dungchung.mjs` da tu ghi
+    *"Hai cau lenh dem hai tap khac nhau la cach mot badge noi doi"*.
+    Ve 2b: khoa lai dieu DANG DUNG — bon o so van dem tren `CC_NHAP` day du.
+
+hai_neo_cong_qua_rong_da_thu_hep: |
+  Ve 2a ban dau cam chuoi `?n=50` o MOI NOI trong chunk. Nhung `nhapNap` (danh
+  sach nhap trong CUA SO) cung goi cung duong va no la mot MAT KHAC — cam o moi
+  noi la bat mot ham khong lien quan doi theo. Da thu hep: chi do trong THAN
+  `ccNapNhap`.
+
+  Ve 2b/3 ban dau neo vao `nhapKpi` / `veDsNhap` — hai ten toi TUONG TUONG ra.
+  Ten that la `ccNapNhap`. Neo vao mot ten khong ton tai thi ve do vi khong tim
+  thay ham, khong vi hanh vi sai.
+
+do_do: |
+  Cua that, sau restart:
+    (khong co)        tong 3  — hang doi viec, y nhu cu
+    ?gom_da_bo=1      tong 8  — tab Ket qua
+    ?trang_thai=da_bo tong 5  — duong loc cu con nguyen
+  Web: 7 do nen, KHONG mot do moi.
+  `check_worklog` xanh (test 135).
+
+chua_nghiem_thu_duoc: |
+  Chua bam thu tren trinh duyet. Cong chay that cau SQL va do markup + noi day,
+  nhung "tab Ket qua trong the nao" thi phai mat nguoi. Mo `/chung-cat/` >
+  `Ket qua` la thay.

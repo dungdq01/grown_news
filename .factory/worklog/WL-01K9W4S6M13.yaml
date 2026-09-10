@@ -1,0 +1,74 @@
+id: WL-01K9W4S6M13
+at: 2026-09-01
+by: claude
+buoc: "s6-module-spec · M13_truyhoi — pack 6 artifact + tot nghiep sang modules:"
+loai: s6; G6A cho MOT module
+gate: G6A (M13; con M14 M15 M16 M17)
+
+object:
+  - 06_modules/M13_truyhoi/spec.md          # 17 AC, 8 muc
+  - 06_modules/M13_truyhoi/rules.md         # 5 rule S3, moi rule du 3 ve
+  - 06_modules/M13_truyhoi/diagram_flow.md  # 2 duong doc lap + chieu CAM + diem re hybrid
+  - 06_modules/M13_truyhoi/data_flow.md     # hinh dang chunk + dan xuat vs so DO
+  - 06_modules/M13_truyhoi/model_flow.md    # M14 la khach hang DUY NHAT + 2 hop dong phai khop
+  - 06_modules/M13_truyhoi/ui_flow.md       # KHONG giao dien; nhung pham vi la control HIEN THI
+  - project_map.yaml                        # v20 -> v21: M13 sang modules
+
+evidence:
+  - "check_g6a => xanh (13 module, 13 thu muc, khop)"
+  - "check_map · check_ba · check_rule_surfaces · check_mermaid => xanh"
+  - "pytest core/tests -q => 42 passed"
+  - "29 cong Python => 22 xanh; 7 do: 4 do CU + 3 cua agent khac (y nhu luot M12)"
+
+# ══ PHAN DANG GIA NHAT ═════════════════════════════════════════════════
+ba_bai_hoc_M12_ap_duoc_ngay_—_nam_cong_xanh_LAN_DAU: >
+  M12 phai sua hai vong moi qua. M13 qua ngay lan dau vi ap truoc ba thu:
+    1) rule S3 khai du `lenh` + `do_khi` + `xanh_khi` ngay tu dau
+    2) KHONG mo dong bang bang mot ten lowercase trong backtick — check_ba doc no
+       nhu mot truong frontmatter; da ghi quy uoc do thanh mot dong canh bao NGAY
+       TRONG data_flow.md de nguoi sau khong vap lai
+    3) `grep -n '^[a-z_]*:'` TRUOC khi chen vao project_map — M12 neo sai 2 lan vi
+       tuong `modules:` dung truoc `modules_du_kien:`
+  Do la gia tri that cua worklog: khong phai de bao cao, ma de luot sau re hon.
+
+lo_lon_nhat_cua_M13_khong_phai_ky_thuat_truy_hoi: >
+  Ma la `chuan_hoa()` chi co ban JavaScript. Do 2026-09-01:
+    grep -rn "NFD|unicodedata|combining" --include=*.py core 05_intake  =>  0
+  Luat ASCII-fold sinh anchor chi ton tai o multiwindow.inline.ts:1015-1021. Ban
+  Python cua M13 se la ban THU HAI cua mot luat — dung lop loi dang lam
+  check_danh_muc DO ngay luc nay (hai ban frontmatter.schema.json lech o media.mime).
+  Nen M13-R2 (anchor khop M03) khong phai mot AC cho dep: no la cong DUY NHAT chan
+  hai ban troi khoi nhau. Va no phai so HAI BAN THAT, khong so ban Python voi mot
+  bang gia tri mong doi viet tay — so voi bang viet tay thi ca hai ban cung troi
+  ma cong van xanh.
+
+mot_luat_HAI_cho_dung_—_dem_duoc_hai_cai: >
+  M13 co dung hai hop dong "mot luat, hai cho cai":
+    a) luat sinh anchor       — voi M03_web (renderer)
+    b) dai ky tu Han          — voi M12_chungcat (dem ti le dinh tuyen model)
+  Ca hai deu hong IM LANG: (a) chatbot tro vao anchor trang khong co => link chet;
+  (b) mot tai lieu duoc index kieu nay, dinh tuyen kieu khac.
+  Ghi thanh mot muc rieng trong model_flow §4 vi day la thu s7 phai chia task cho
+  DUNG mot don vi, khong phai hai don vi moi ben mot nua.
+
+diem_re_hybrid_—_dieu_kien_tien_quyet_DA_DAT_va_do_doi_ket_luan: >
+  research §11 M13-5 viet "Kiem NGAY: SQLite trong Python-Windows cua du an >= 3.39?"
+  Da do: 3.50.4, va FULL OUTER JOIN CHAY THAT (khong suy tu so phien ban).
+  Nen hop dong RRF cam duoc bat cu luc nao — diem re khong con la mot rui ro ky
+  thuat, no thuan la mot quyet dinh van hanh. Doi cach viet §7 tu "phai kiem" sang
+  "da dat, cho tin hieu".
+
+do_do:
+  check_danh_muc + check_skill: "nguyen nhan FR-039 cua toi; cho sua o core/skill-src (agent khac so huu)"
+  check_frozen: "cho NGUOI ky"
+  check_running: "he qua hai muc tren"
+  check_g6b: "AGENT KHAC — T03-90 dong pham_vi_ghi co chu thich CUNG DONG"
+  check_khai_mot_noi: "AGENT KHAC — 8 man / khai 7 (UI frame dot hai)"
+  check_worklog: "AGENT KHAC — so dong prototype.css va ky tu shell.html khong khop tai lieu"
+
+no_con_lai:
+  - "BON module con lai: M14_chatbot M15_kenh M16_artifact M17_cong."
+  - "`chuan_hoa()` ban Python chua co; dai ky tu Han chua thanh bang khai (hien chi la regex toi da do)."
+  - "`w_title` chua co so — phai DO, va can HAI so (vi/en va zh) vi token mot-chu cho diem khac han."
+  - "Phon the != gian the: `資料` khong khop `资料`. Chi dao noi phon the; nguon lan gian the thi can fold OpenCC — chua lam."
+  - "Nam lenh trong truyhoi/tests/ chua ton tai => nam rule S3 hien la ky luat."

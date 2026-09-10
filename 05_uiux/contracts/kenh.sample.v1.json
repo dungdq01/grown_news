@@ -1,0 +1,92 @@
+{
+  "$comment": "Data contract v1 — màn Kênh (M15). Adapter chỉ GỌI RA (long-poll/gateway), không mở cổng. dinh_danh_kenh thay allowlist phẳng (FR-045). Telegram giữ update 24h khi bot offline.",
+  "version": 1,
+  "adapters": [
+    {
+      "kenh": "telegram",
+      "trang_thai": "dang-poll",
+      "offset": 88231407,
+      "update_cuoi": "2026-09-01T09:41:22+07:00",
+      "ghi_chu": "getUpdates long-poll · update giữ 24h khi offline · gửi file <=50MB"
+    },
+    {
+      "kenh": "discord",
+      "trang_thai": "tat",
+      "offset": null,
+      "update_cuoi": null,
+      "ghi_chu": "gateway WebSocket GỌI RA · MESSAGE_CONTENT toggle (<10k user) · file <=10MiB — C9 chưa bật"
+    }
+  ],
+  "dinh_danh_kenh": [
+    {
+      "kenh": "telegram",
+      "chat_id": "1290077431",
+      "nguoi_dung": "dung.dang",
+      "buoc_luc": "2026-08-31T20:00:00+07:00"
+    },
+    {
+      "kenh": "telegram",
+      "chat_id": "8823140055",
+      "nguoi_dung": "dong.nghiep-a",
+      "buoc_luc": "2026-09-01T08:00:00+07:00"
+    }
+  ],
+  "su_kien": [
+    {
+      "luc": "2026-09-01T09:30:01+07:00",
+      "kenh": "telegram",
+      "chat_id": "1290077431",
+      "loai": "link",
+      "noi_dung": "https://arxiv.org/abs/2410.99999",
+      "ket_qua": "draft",
+      "slug": "arxiv-2410-99999",
+      "audit": "nạp qua POST /api/nhap — dừng ở draft (M05-R1)"
+    },
+    {
+      "luc": "2026-09-01T09:32:44+07:00",
+      "kenh": "telegram",
+      "chat_id": "5550001234",
+      "loai": "link",
+      "noi_dung": "https://spam.example/x",
+      "ket_qua": "tu-choi-dinh-danh",
+      "audit": "chat_id không thuộc nguoi_dung nào — 0 bản ghi được tạo (M8.3)"
+    },
+    {
+      "luc": "2026-09-01T09:35:10+07:00",
+      "kenh": "telegram",
+      "chat_id": "8823140055",
+      "loai": "hoi",
+      "noi_dung": "walk-forward là gì?",
+      "ket_qua": "tra-loi",
+      "phien": "ph-02",
+      "audit": "câu hỏi -> M14 với phien của đúng account"
+    },
+    {
+      "luc": "2026-09-01T09:38:00+07:00",
+      "kenh": "telegram",
+      "chat_id": "1290077431",
+      "loai": "file",
+      "noi_dung": "bao-cao-noi-bo.pdf (3.1MB)",
+      "ket_qua": "loi-dinh-dang",
+      "thieu": [
+        "title",
+        "source_type"
+      ],
+      "audit": "phản hồi nêu ĐÚNG trường thiếu (M8.4) — không nạp mù"
+    },
+    {
+      "luc": "2026-09-01T09:40:12+07:00",
+      "kenh": "telegram",
+      "chat_id": "8823140055",
+      "loai": "hoi",
+      "noi_dung": "gửi tôi thân bài XGBoost",
+      "ket_qua": "gui-than-bai",
+      "audit_log": {
+        "ai_nhan": "dong.nghiep-a",
+        "bai": "xgboost-taylor-bac-hai",
+        "luc": "2026-09-01T09:40:13+07:00"
+      },
+      "$edge": "bậc 3 MỞ theo FR-045 — nhưng MỖI lần bắn phải có dòng audit ai nhận · bài nào (cổng U5)"
+    }
+  ]
+}

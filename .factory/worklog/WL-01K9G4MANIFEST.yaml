@@ -1,0 +1,31 @@
+at: 2026-08-18T12:45Z
+agent: human+claude
+step: F5 / skill-manifest.json
+did: >
+  Chốt lối C — manifest tối thiểu, lớn dần. Cùng logic với concepts.yaml:
+  "lớn lên từ thực tế, đừng đoán trước 30 dòng".
+
+  Người dùng nêu lĩnh vực: xây agent / backend-tích hợp / công nghệ mới /
+  tư vấn giải pháp / AI services (chatbot, OCR, recommendation).
+  KHÔNG phải logistics thuần như skill-gap.md lấy ví dụ.
+
+  Viết 5 skill, 23 capability. Mỗi dòng có $why giải thích vì sao chấm depth
+  đó — người dùng sửa số nào sai thay vì viết lại từ đầu. Bằng chứng chấm lấy
+  từ concepts.yaml (22 khái niệm cho thấy mảng nào làm sâu) và 7 skill hiện có.
+
+  Thử trên skill_candidates của data contract v2: lượt đầu 2/5 khớp.
+  Ba lệch đều là LỖI THUẬT TOÁN của tôi, không phải lỗi manifest:
+    1. So khớp bằng tên chính xác ⇒ không nhận 'context-truncation-strategy'
+       là đồng nghĩa của 'context-management'. Sửa: thêm aliases cho cả 23
+       capability, giống concepts.yaml.
+    2. Kiểm domain TRƯỚC cổng cứng ⇒ cho ra NEW cho hai ứng viên mà schema
+       đã cấm. Sửa: khai $matching.order — cổng cứng chạy trước, thắng mọi
+       phân loại khác.
+
+  Sau khi sửa: 4/5 khớp. Chỗ còn lại là CONTRACT SAI chứ không phải manifest:
+  idempotency-key-design khai NEW vì lúc viết contract chưa có manifest.
+  Đã sửa thành DEEPEN → backend-integration. Giờ 5/5.
+
+  Cố ý đặt walk-forward-cv-design depth 2 để kiểm M06 cho ra DEEPEN. Nếu người
+  dùng nâng lên 4 thì verdict đổi thành OVERLAP — đó là hành vi đúng.
+object: skill-manifest.json · 05_uiux/contracts/analyses.sample.v2.json

@@ -1,0 +1,19 @@
+{
+  "name": "backdrop-assets",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "index.ts",
+  "exports": {
+    ".": {
+      "import": "./index.ts"
+    },
+    "./package.json": "./package.json"
+  },
+  "quartz": {
+    "name": "backdrop-assets",
+    "displayName": "Chep anh nen",
+    "description": "public/ -> output/static/bg/ + index.json",
+    "category": "emitter",
+    "defaultEnabled": true
+  }
+}

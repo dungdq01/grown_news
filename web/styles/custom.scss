@@ -1,0 +1,142 @@
+@use "./variables.scss" as *;
+// tokens.css nạp bằng @use, KHÔNG bằng @import: @import sinh ra một @import CSS
+// thật trong bundle, và nó nằm sau các rule khác ⇒ trình duyệt bỏ qua, Quartz
+// báo "@import rules must precede all rules". @use nội tuyến lúc biên dịch.
+@use "./tokens.css" as *;
+// prototype.css KHONG nap o day: Sass dien giai CSS thuan la sai kieu —
+// calc(100% - 14px) hop le trong CSS nhung Sass coi la phep tru khac don vi.
+// No nap qua component backdrop (QuartzComponent.css nhan CHUOI, khong qua Sass).
+/* ═══════════════════════════════════════════════════════════════════════════
+   M03_web · nối tokens.css của s5 vào Quartz
+   ───────────────────────────────────────────────────────────────────────────
+   `tokens.css` là NGUỒN DUY NHẤT (05_uiux/README.md). File này KHÔNG định nghĩa
+   giá trị mới — nó chỉ:
+     1 · nhập 113 token
+     2 · ánh xạ chúng lên biến Quartz (--light, --secondary, …)
+     3 · áp ba luật chữ của s5
+
+   Cấu hình màu trong quartz.config.yaml chỉ nhận 10 tên. Đó là ánh xạ nghèo của
+   một hệ 113 token — nó không biết --fs-body, không biết --blur-lift, không biết
+   ba luật chữ. Nên phần nhìn thật sống ở đây.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+
+
+/* ── 1 · biến Quartz đọc từ token, không gõ lại giá trị (M03-R4) ────────── */
+:root {
+  --light: var(--background);
+  --lightgray: var(--line);
+  --gray: var(--ink-3);
+  --darkgray: var(--ink-2);
+  --dark: var(--ink);
+  --secondary: var(--brand);
+  --tertiary: var(--warning);
+  --highlight: var(--brand-bg);
+  --textHighlight: var(--warning-bg);
+
+  --bodyFont: var(--f-ui);
+  --headerFont: var(--f-ui);
+  --codeFont: var(--f-mn);
+}
+
+/* ── 2 · thang chữ — 10 bậc, KHÔNG px tự do ─────────────────────────────── */
+body {
+  font-family: var(--f-ui);
+  font-size: var(--fs-body);
+  line-height: var(--lh-read);
+  font-weight: var(--w-body);
+  color: var(--ink);
+  background: var(--background);
+}
+
+article {
+  font-size: var(--fs-read);
+  line-height: var(--lh-read);
+}
+
+/* Luật 2 của s5: header và nội dung CÙNG CỠ, khác nhau ở WEIGHT.
+   Đây là điểm đặc trưng của sản phẩm — phân cấp bằng weight, chữ gọn. */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--f-ui);
+  font-weight: var(--w-head);
+  color: var(--ink);
+}
+h1 { font-size: var(--fs-h1);   line-height: var(--lh-h1) }
+h2 { font-size: var(--fs-h2);   line-height: var(--lh-h2) }
+h3 { font-size: var(--fs-h3);   line-height: var(--lh-h3) }
+h4 { font-size: var(--fs-lead); line-height: var(--lh-lead) }
+h5, h6 { font-size: var(--fs-body); line-height: var(--lh-ui) }
+
+/* Luật 1: menu ĐẬM + THẲNG */
+.page-title, nav a, .toc a, .explorer-list a {
+  font-weight: var(--w-head);
+  font-style: normal;
+}
+
+/* Luật 3: ghi chú / cảnh báo / lỗi NGHIÊNG */
+blockquote, .callout-content, figcaption, .meta {
+  font-style: var(--i-note);
+}
+
+/* FR-018 — MỘT họ chữ cho giao diện. Mono chỉ còn ở MÃ THẬT: ở đó bề rộng ký
+   tự cố định là chức năng (cột thẳng hàng, phân biệt 0/O và 1/l). */
+code, pre, kbd {
+  font-family: var(--f-mn);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Locator, mốc thời gian, cột số: vẫn cần chữ số thẳng cột — nhưng
+   `tabular-nums` lo việc đó rồi, không cần đổi cả họ chữ. */
+.locator, time, .tabular {
+  font-family: var(--f-ui);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── 3 · liên kết: đỏ thương hiệu, KHÔNG tím mặc định ───────────────────── */
+a {
+  color: var(--brand);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: border-color var(--tr-lb, 160ms) ease;
+}
+a:hover { border-bottom-color: var(--brand) }
+a:visited { color: var(--brand) }   /* tím mặc định của trình duyệt: bỏ */
+a:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+  border-radius: var(--r-sm);
+}
+
+/* ── 4 · nhịp dọc theo thang 4px ────────────────────────────────────────── */
+article > * + * { margin-top: var(--s-md) }
+article h2 { margin-top: var(--s-xl) }
+article h3 { margin-top: var(--s-lg) }
+
+.page > #quartz-body {
+  gap: var(--s-lg);
+}
+
+/* ── 5 · chất liệu: MỘT blur duy nhất cho mọi bề mặt nổi ────────────────── */
+.popover, .search-container, .callout {
+  background: var(--glass);
+  backdrop-filter: var(--blur-lift);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius);
+}
+
+/* ── 6 · nhãn theo loại nguồn — 4 màu riêng trong token ─────────────────── */
+.tag-link[href*="repo"]    { color: var(--c-repo) }
+.tag-link[href*="paper"]   { color: var(--c-paper) }
+.tag-link[href*="video"]   { color: var(--c-video) }
+.tag-link[href*="article"] { color: var(--c-article) }
+
+/* ── 7 · bảng và code cuộn trong ô của chúng (DESIGN.md §9) ─────────────── */
+article table, article pre {
+  display: block;
+  overflow-x: auto;
+  max-width: 100%;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition: none !important; animation: none !important }
+}

@@ -1,0 +1,75 @@
+id: WL-01K9W5S6M14
+at: 2026-09-01
+by: claude
+buoc: "s6-module-spec · M14_chatbot — pack 6 artifact + tot nghiep sang modules:"
+loai: s6; G6A cho MOT module
+gate: G6A (M14; con M15 M16 M17)
+
+object:
+  - 06_modules/M14_chatbot/spec.md          # 19 AC, 8 muc
+  - 06_modules/M14_chatbot/rules.md         # 6 rule S3, moi rule du 3 ve
+  - 06_modules/M14_chatbot/diagram_flow.md  # mot luot hoi + tu choi HAI TANG + chieu CAM
+  - 06_modules/M14_chatbot/data_flow.md     # MAY tinh vs MODEL khai + khong giu trang thai
+  - 06_modules/M14_chatbot/model_flow.md    # service khong phai lop trong web + gioi han verify
+  - 06_modules/M14_chatbot/ui_flow.md       # co chua-xac-minh: cho ca module thanh trang tri hoac khong
+  - project_map.yaml                        # v21 -> v22: M14 sang modules
+
+evidence:
+  - "check_g6a => xanh (14 module, 14 thu muc)"
+  - "check_map · check_ba · check_rule_surfaces · check_mermaid => xanh (lan dau)"
+
+# ══ PHAN DANG GIA NHAT ═════════════════════════════════════════════════
+M14-R3_la_rule_KHONG_cuong_che_duoc_dieu_no_muon: >
+  Chu du an chot `co-nhung-mau-thuan` do MODEL tu khai. No chỏi luat goc: model
+  vua sinh cau tra loi vua tu phan "nguon mau thuan nen toi khong tra loi", tuc
+  so huu thuoc do cua chinh no, va mot lan tu choi SAI trong y het mot lan DUNG.
+  Khong dao quyet dinh; thu hep cho no tu do: model duoc KHAI, nhung phai kem
+  >=2 dia chi, va CODE kiem dieu kien can — ca hai phan giai duoc, va thuoc HAI
+  ban ghi khac nhau.
+  Ghi RO gioi han trong rules.md: rule nay KHONG cuong che duoc "dung tu choi
+  sai", chi cuong che duoc "tu choi phai tro vao hai cho co that". Viet gioi han
+  ra la de khong ai doc bang rule roi tuong nhanh nay da duoc canh dung nghia.
+  Va vi nhanh nay KHONG co tien le ma nguon mo nao, AC-4.3 (log MOI lan ban) la
+  thu duy nhat cho biet sau ba thang no co bi lam dung khong.
+
+mot_quyet_dinh_UI_quyet_dinh_luon_gia_tri_CA_module: >
+  Chu du an chon "gan co TUNG khang dinh" thay vi bo im lang / tu choi ca cau.
+  Lua chon do CHI co nghia neu co duoc NHIN THAY. Mot block chua-xac-minh render
+  GIONG block da xac minh thi he da bo im lang — chi la bo trong mat nguoi doc
+  thay vi bo trong du lieu.
+  Nhung do la AC cua M03, KHONG phai M14. Neu khong ai viet AC ben M03 thi lua
+  chon cua chu du an mat hieu luc MA KHONG CONG NAO DO. Da ghi thanh muc rieng o
+  ui_flow §2 de s7 chia task cho M03, khong de no roi vao khe giua hai module.
+
+viet_ra_cai_verify_KHONG_bao_dam_—_de_khong_khai_qua_vach: >
+  M14 la cho de khai qua vach nhat. Mot cau tra loi co MOI citation xac minh VAN
+  CO THE SAI. Co `da-xac-minh` nghia la "quote nay co that o do", khong nghia
+  "cau nay dung". Da lap bang bon dong kiem-duoc / KHONG-kiem-duoc o model_flow
+  §5, dan thang B-A6: "may kiem duoc dia chi co that + van tai do chua tu khoa,
+  KHONG kiem duoc van do co ung ho khang dinh. Dung khai qua vach."
+
+thu_tu_citation-first_la_HOP_DONG_khong_phai_toi_uu_prompt: >
+  57% citation kieu generate-then-cite la post-rationalization (research §11).
+  Nen "doan truoc, viet sau" khong phai mot cach viet prompt cho gon — no la hop
+  dong. Va AC-5.2 (KHONG goi M13 lan hai sau khi model da viet) la cach duy nhat
+  cuong che tu ngoai: mot loi goi M13 sau khi model da viet CHINH LA cai dat cua
+  57% do.
+
+M15_dung_DUNG_endpoint_cua_M03: >
+  Khong co endpoint rieng cho kenh. Mot endpoint rieng cho Telegram la buoc dau
+  cua viec chatbot moc hai ban, va M8.2 (kenh thu hai <=20% cong kenh thu nhat)
+  la phep do bat dung chuyen do. Ghi vao model_flow §2 vi day la thu s7 de chia
+  sai nhat — "lam mot route rieng cho gon" nghe vo hai.
+
+do_do:
+  check_danh_muc + check_skill: "FR-039 cua toi; cho sua o core/skill-src (agent khac)"
+  check_frozen: "cho NGUOI ky"
+  check_running: "he qua hai muc tren"
+  check_g6b + check_khai_mot_noi + check_worklog: "AGENT KHAC — UI frame dot hai (T03-90, 8 man/khai 7, so dong prototype.css)"
+
+no_con_lai:
+  - "BA module con lai: M15_kenh M16_artifact M17_cong."
+  - "Hinh dang JSON cua `ngu_canh` chua chot — FR-045 khai COT nhung khong khai hinh dang. Phai chot truoc khi M14 nhan."
+  - "Bang khai model dung chung voi M12 hay rieng: s7 quyet."
+  - "Co `chua-xac-minh` hien the nao: AC cua M03, phai co task rieng."
+  - "Sau lenh trong chatbot/tests/ chua ton tai => sau rule S3 hien la ky luat."

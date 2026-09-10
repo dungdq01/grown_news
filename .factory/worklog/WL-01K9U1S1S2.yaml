@@ -1,0 +1,97 @@
+id: WL-01K9U1S1S2
+at: 2026-08-31
+by: claude
+buoc: "s1-research (chuot lai) + s2-proposal — pham vi doi hai: AI/LLM + chatbot + kenh"
+loai: artifact khao sat + de xuat; KHONG dong ma san pham
+gate: >
+  project_map.yaml:29 khai skipped_gates [G1, G2, G3] => ghi chu theo giao thuc,
+  khong phai artifact ky gate
+object:
+  - 01_research/original_request.md      # +15 luot NGUYEN VAN (L1) · +canh bao troi pham vi
+  - 01_research/solutions_scan.md        # +dot khao thu hai: E NotebookLM · F kenh chat · G Hermes
+  - 01_research/gap_analysis.md          # +G-6..G-12 · danh dau 3 dong "KHONG dang lam" da dao chieu
+  - 01_research/research_summary.md      # VIET LAI — 218 dong chung tu 1538 dong raw
+  - 02_proposal/proposal-2-ai-llm-kenh.md  # MOI — proposal thu hai, khong ghi de ban 08-18
+  - .factory/fr/FR-043-du-lieu-gui-ra-ngoai.md  # MOI — dong Q4, mo khoa S11
+
+# ══ PHAN DANG GIA NHAT ═════════════════════════════════════════════════
+s1_TU_BAT_DUOC_troi_pham_vi: >
+  `original_request.md` ban 08-18 tu khai BA dieu "khong co trong yeu cau goc":
+  chia se cho nguoi khac doc · tu dong hoa viec TIM nguon · kiem tien hay quy mo.
+  Tinh toi 08-31 CA BA deu da vao pham vi (luot 8,9,10,11).
+  Luot 1-4 mo ta mot cong cu doc cho MOT nguoi. Luot 5-15 mo ta mot he thong day
+  NHIEU nguoi co mo hinh doanh thu. Khac nhau o AI CHIU HAU QUA khi he noi sai.
+  Ghi lai chu khong xoa — day la thu L1 sinh ra de bat.
+
+mau_thuan_NOI_TAI_trong_ban_toi_vua_viet: >
+  §4 cua research_summary viet: "Truoc khi va G-6/G-7, moi tinh nang LLM nhan RUI
+  RO len... day la ly do thu tu o §6 khong dao duoc." Roi §6 dat M12 (chung cat —
+  mot tinh nang LLM) TRUOC G-6/G-7. Hai muc cung mot file noi nguoc nhau.
+  Sua: G-6/G-7 len truoc. Ly do dung: chung cat sinh bai co trich dan; duong ray
+  tu khai thi do la TU DONG HOA VIEC BIA.
+  Bat duoc o vong review, khong phai o luc viet.
+
+ba_con_so_toi_CHEP_SAI_va_da_sua:
+  - "18/22 cong Python xanh -> THAT la 22/26. So cu, khong dem lai. Toi da chep no
+     qua hai artifact."
+  - "validate.py:243 (nhanh ho_so) -> THAT la 255-257. Dong 243 la mot dong binh luan."
+  - "di tru 3 bai phan-tich -> THAT la 1. Kho co 3 ban ghi nhung 2 la thu-vien,
+     ma thu-vien MIEN cong locator. S8 re hon toi viet."
+  - "Ca ba deu la lop loi #tu-khai ma chinh tai lieu nay di to. Do lai moi thay."
+
+khong_ghi_de_artifact_DE_NGAY: >
+  proposal.md (08-18) va §1-§7 cua llm-features-scan (08-29) giu nguyen. Pham vi
+  moi di vao MOT proposal thu hai + mot phu luc co ngay. Ly do: mot artifact de
+  ngay ma chua phat hien cua hom sau la mot bien ghi noi doi. Va bang "Scope OUT"
+  cu la CAM KET DA GHI — dao no phai noi ra, khong lang le phinh o s3.
+
+metric_khong_can_con_so_tuy_tien: >
+  "Core xong" khong dinh nghia bang so ban ghi (N tuy tien) ma bang HANH VI:
+  10 cau hoi -> >=8 dung · 100% khang dinh co dia chi BAM DUOC · 5 cau ngoai kho
+  -> 0 lan bia · goi duoc bang curl khong qua web.
+  Neu kho qua nho thi M7.1 tu truot => khong can nguong corpus rieng.
+  M8.2 ("kenh thu hai ton <=20% cong kenh thu nhat") la metric KIEN TRUC: no
+  chung minh hoac bac bo luan diem "core xong truoc thi kenh re".
+
+evidence:
+  - "wc -l research_summary.md => 218; raw 7 file => 1538. s1 doi 'ngan hon raw'"
+  - "sqlite3 'select count(*) from ban_ghi' => 3; trong do 1 phan-tich, 2 thu-vien"
+  - "ls core/tests/check_*.py | wc -l => 26; chay tung cai => 22 xanh"
+  - "ls web/test/*.test.js | wc -l => 80"
+  - "pytest core/tests => 42 passed"
+  - "moi muc Scope IN (S7..S16) co cot 'Truy ve' tro ve P1..P6 / G-6..G-12"
+  - "moi metric M5..M9 co Nguong + Cach do bang so"
+
+do_do:
+  check_danh_muc + check_skill: "agent khac — hai ban schema core/skill-src lech core/assets"
+  check_frozen: "cho NGUOI ky"
+  check_running: "he qua cua hai muc tren"
+
+ba_cau_chan_DA_DUYET_2026-08-31:
+  Q4_gui_RA: >
+    Nguoi quyet: "input tich hop de nhan/gui request thi open het" => bac 1 va 2
+    MO. Hai bac kia KHONG nam trong cau do, nen toi de xuat mac dinh va duoc gat:
+    bac 4 (tai lieu nguon -> model dam may) MO cho giai doan 1, KEM rang buoc
+    ghi log sha256 cua payload; bac 3 (than bai -> NGUOI KHAC) DONG, vi do la
+    B-D3 — mot quyet dinh da dong dau o brd.md:214, doi no can FR rieng nham vao
+    brd.md. Bac 3 dong khong chan gi bay gio: no chi can tu S14.
+    => FR-043, bon cong canh C1-C4.
+  Q5_cu_phap_dia_chi: >
+    Nguoi quyet: "linh dong di". KHONG cai dat thang duoc — linh dong va
+    phan-giai-duoc keo nguoc nhau. Dien giai thanh TAP DANG chu khong phai MOT
+    cu phap: nhan §II.4 · file.md:12-31 · p.7 · t=03:15 · slug; moi thu khac
+    (cong thuc, mang so) BO QUA chu khong tu choi.
+    Luat: moi muc can locator phai co >=1 dia chi may phan giai duoc.
+    LOI PHU dang gia nhat: dap R-a (do oan) tu CAO xuong THAP. Cong chi do khi
+    mot muc KHONG co dia chi nao hieu duoc — khong bao gio do vi mot cong thuc.
+    Tap dang phai o MOT bang khai (nhu khung-than-bai.json), khong go tay trong
+    validate.py — khong thi moi tang doc mot ban.
+  Q6_core_xong: >
+    Nguoi quyet: "chat va phan tich duoc tren web hien tai" — gon hon M7.1-M7.4
+    cua toi va thay the no o muc phat bieu. Giu M7 lam CACH DO, khong them nguong
+    corpus nao. Thu tu kenh chot: Telegram -> Discord -> Zalo -> FB.
+
+no_con_lai:
+  - "s2 XONG — ba cau chan da duyet. Tiep: s3-docs / s4-system"
+  - "Discord CHUA khao bang nguon nao — moi phat bieu ve no dang la gia dinh (R-g)"
+  - "Zalo ca nhan: menh de 'khong co API chinh thuc' moi o muc gia dinh"

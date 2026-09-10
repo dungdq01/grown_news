@@ -1,0 +1,87 @@
+id: WL-01K9NHFR040
+at: 2026-08-28
+by: claude
+buoc: s8 — FR-040 tách đường API theo module, mỗi đường mang cổng riêng
+loai: bàn giao FR-040
+fr: FR-040-tach-route-theo-module.md
+
+object:
+  task:
+    - 07_plan/M08_api/tasks/T08-14-tach-route-theo-module.md      # code
+    - 07_plan/M03_web/tasks/T03-29-test-route-theo-module.md      # test
+  code:
+    - web/api/cong-module.mjs      # MỚI — bảng cổng theo module + whitelist host
+    - web/api/router.mjs           # ba đường + bí danh + cổng phân loại type↔nhóm
+    - web/api/articles.mjs         # taoBai(req,res,nhom) gọi congNhom
+  test:
+    - web/test/route-theo-module.test.js   # MỚI — 5 mục
+    - web/test/WORKLOG.md · web/WORKLOG.md · web/package.json
+  no:
+    - 06_modules/M01_core/backlog.md       # ô `url_normalized` do client khai
+
+may_xanh:
+  - "cd web && node test/route-theo-module.test.js  ->  pass (5 mục)"
+  - "cd web && npm test  ->  exit 0 (56 file)"
+  - "18/22 cổng check_*.py xanh — bốn đỏ y hệt WL-01K9NGFR039, không thêm đỏ mới"
+
+quyet_dinh_thiet_ke:
+  - >
+    `/api/articles**` GIỮ làm bí danh, KHÔNG xoá. FE dựng URL thẳng ở bốn chỗ sửa
+    đổi (`multiwindow.inline.ts:1196·1289·1323·2249`) và FR-024 đã một lần làm vỡ
+    đúng đó. Tách đường + xoá đường cũ trong một lượt là hai rủi ro chồng nhau
+  - >
+    Cổng đặt trong `taoBai` chứ không trong `router.mjs`: router chưa đọc body, và
+    đọc body hai lần là hai cơ hội để hai bên nhìn thấy hai thứ khác nhau
+  - >
+    `cong-module.mjs` NÉM lúc nạp nếu một module khai trong `loai-nguon.json` mà
+    không có cổng — biến "quên viết cổng cho module thứ tư" thành lỗi lúc khởi
+    động thay vì một module lặng lẽ không ai chấm
+  - >
+    Host so bằng HẬU TỐ có dấu chấm, không `includes`: `includes("youtube.com")`
+    khớp cả `youtube.com.ke-xau.example`. Đây là cách whitelist thành vô nghĩa mà
+    khó thấy nhất, và có phép kiểm riêng cho nó
+  - >
+    `api-guard` răng 1+2 KHÔNG nới: `cong-module.mjs` không có fs ghi và không có
+    SQL. Tách route ≠ mỗi file tự viết SQL — mỗi route mang CỔNG, rồi cùng gọi
+    một đường ghi
+
+kiem_hai_chieu:
+  - "R5 ĐỎ TRƯỚC có thật: 22 lỗi trên code chưa có ba đường"
+  - >
+    tắt `congNhom` ⇒ 4 đỏ, và ca host lạ chuyển sang **201** (bản ghi được LƯU
+    với URL bất kỳ) — đúng lỗ FR-040 đóng
+  - "đổi so-hậu-tố thành `includes` ⇒ `youtube.com.ke-xau.example` lọt (201)"
+  - "cả hai lượt phá hoàn tác khớp sha256"
+
+tu_bat_duoc:
+  - >
+    CỔNG CỦA TÔI VÔ CĂN CỨ ở lượt đầu. §2 chỉ đòi `ma === 422`, và nó XANH cả khi
+    cổng module tắt hoàn toàn — `validate.py` cũng từ chối đúng ba ca đó, nên phép
+    kiểm đang đo cái hàm DÙNG CHUNG, tức chính thứ FR-040 nói là vấn đề. Sửa bằng
+    cách phân biệt AI từ chối: cổng module trả `{loi}`, validate trả `{loi_validate}`
+  - >
+    Ca "host ngoài whitelist" ĐỎ VÌ SAI LÝ DO: tôi bỏ trống `url_normalized` nên
+    nó rơi vào luật khác. Đo trực tiếp mới biết một bản video host lạ KÈM
+    `url_normalized` đi qua `validate.py --strict` SẠCH — nên khẳng định ban đầu
+    ("server không kiểm host") đúng, nhưng phép kiểm của tôi chưa chứng minh được
+  - >
+    Ba lỗi mầm gieo, mỗi lỗi làm một mục đo nhầm: `id` thiếu độ dài nên cả ba mầm
+    422 và §1 đo BA BẢN CỦA FIXTURE · thân ngắn làm bản `paper` trượt cổng khung ·
+    video thiếu `url_normalized`
+
+do_do:
+  - cong: core/tests/check_skill.py
+    do_do_boi: agent khác
+    quy_chu: không nằm trong tập file tôi đổi
+  - cong: core/tests/check_danh_muc.py · core/tests/check_frozen.py · core/tests/check_running.py
+    do_do_boi: chính tôi, từ FR-039 — chưa đóng được
+    quy_chu: >
+      Y HỆT WL-01K9NGFR039, không phải đỏ mới. Hai ô đang mở ở
+      `06_modules/M01_core/backlog.md`: bản schema thứ hai thuộc agent khác, và
+      `FROZEN.lock` chờ NGƯỜI ký
+
+con_lai:
+  - "C6 · ba màn nạp riêng; TẠO đường video (chưa có). FE giờ có ba endpoint để gọi"
+  - "C7 · CRUD tại chỗ; form Tài liệu phải có ô `media`"
+  - "C8 · BUG-1 `[hidden]` thua `.api-only` · BUG-2 `#acount` đếm cả trang"
+  - "M11 · `/api/video` tự tính `url_normalized` bằng cách gọi lại `chuan_hoa_url()` của Python — đơn vị riêng, đã ghi backlog"

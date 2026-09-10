@@ -1,0 +1,61 @@
+id: WL-01K9P7BADUONG
+at: 2026-08-29
+by: claude
+buoc: soi vòng export/import (sạch) · cài cổng chạy THẬT ba đường nạp trong một kho
+loai: bàn giao (cổng tích hợp)
+
+object:
+  task:
+    - 07_plan/M03_web/tasks/T03-62-test-ba-duong-nap-that.md
+  test:
+    - web/test/ba-duong-nap-that.test.js   # MỚI — 6 mục, 17 phép
+    - web/package.json
+
+may_xanh:
+  - "cd web && node test/ba-duong-nap-that.test.js -> pass (17 phép)"
+  - "quét web 73/74 (chỉ `he-kinh`) · 22/26 cổng Python · pytest 42"
+
+vong_export_import_da_duoc_canh_dung:
+  - >
+    Rủi ro #1 của plan (S12) — vòng reap của exporter xoá mọi `.md` không có
+    trong `can_co`, và `can_co` dựng từ view `ban_ghi`; view thiếu một nhánh ⇒
+    XOÁ SẠCH loại đó — **đã có răng**: `check_ba_bang.py` chèn một hàng cho MỖI
+    loại rồi đòi nó xuất hiện trong `ban_ghi`
+  - >
+    Và nó lặp qua chính `loai-nguon.json` chứ không gõ tay ba loại, nên thêm một
+    module thứ tư sau này vẫn được đo. S11 (gieo chỉ `repo`+`article`) cũng đã
+    vá — nay gieo đủ ba bảng, bản `tai-lieu` mang `media` thật + byte
+  - "Kết luận âm, và nó có giá trị đúng bằng một kết luận dương"
+
+cong_moi_do_gi_ma_cong_cu_khong:
+  - >
+    Mỗi cổng module gieo CHỈ loại của nó, nên câu *"màn A không lẫn loại khác"* ở
+    đó xanh một cách RỖNG — không có gì để lẫn. Chỉ khi cả ba cùng nằm trong một
+    kho thì phép lọc mới bị thử thật
+  - >
+    Đây là chỗ canh LUẬT THƯỜNG TRỰC của người dùng (*"ba module tách biệt ở mọi
+    tầng; chỉ Kho và Tổng hợp được gộp"*) ở tầng DỮ LIỆU THẬT, không ở markup
+  - >
+    §6 xác nhận bản vá WO-022 sống sót end-to-end: `url_normalized` trả về
+    `youtube.com/watch?v=dQw4w9WgXcQ` — **chữ hoa còn nguyên** sau khi
+    `normalize_url()` của Python chạm vào
+
+tu_bat_duoc:
+  - >
+    Lượt đầu cả BA đường trả 422 và tôi suýt báo "ba đường nạp hỏng". Đọc hết
+    thông báo: `id: 'src_khoi1' does not match '^src_[a-z0-9]{6,}$'` — **fixture
+    của tôi sai**, 5 ký tự thay vì 6. Thông báo lỗi nói đúng chỗ ngay từ đầu; cái
+    thiếu là tôi chưa đọc hết nó. Đã ghi lý do vào chính file cổng
+  - >
+    Hai lần escape hỏng qua `python -c` trong bash (dấu huyền, `\\n`). Cách chạy
+    được vẫn là: ghi script ra file bằng Write, hoặc viết thẳng file đích
+
+đỏ_do: chưa quy được chủ  # không lỗi mới nào; cổng cài thêm để phủ chỗ trống
+
+do_do:
+  - cong: he-kinh.test.js
+    do_do_boi: ảnh 724662 byte người dùng thêm — `python core/tools/toi_uu_anh_nen.py`
+  - cong: check_frozen.py
+    do_do_boi: chờ NGƯỜI ký sau khi FR-039 duyệt
+  - cong: check_danh_muc.py · check_skill.py · check_running.py
+    do_do_boi: agent khác · và hệ quả của hai cổng trên

@@ -1,0 +1,111 @@
+id: WL-01K9PGWO035
+at: 2026-08-29
+by: claude
+buoc: WO-035 — nút "Ghi vào kho" nằm giữa form · ô tích Chủ đề/Khái niệm dàn hai mép
+loai: bàn giao (PATCH, hai bug người dùng chỉ vào, một màn)
+
+object:
+  wo:
+    - .factory/wo/WO-035-nut-giua-form-va-o-tich-dan-hai-mep.md
+  task:
+    - 07_plan/M03_web/tasks/T03-78-test-nut-cuoi-form-va-o-tich.md
+    - 07_plan/M03_web/tasks/T03-79-nut-cuoi-form-va-luat-nhan-khong-giam.md
+  test:
+    - web/test/mo-ta-va-nut-nap.test.js   # +§8 thứ tự DOM · +§9 luật nhãn không giẫm
+  code:
+    - web/render/shell.html
+    - web/plugins/home-pages/shell.html
+    - web/styles/prototype.css
+  doc:
+    - web/plugins/WORKLOG.md   # số ký tự shell.html 55871 → 56559
+
+may_do_truoc_khi_sua:
+  - >
+    `node web/test/mo-ta-va-nut-nap.test.js` → **9 lỗi**, đúng lời: 6 lỗi thứ tự
+    (nút ở 1621 · ô ở 1739/2102/2264 ở tài liệu; 1326 · 1444/1801/1963 ở video),
+    2 lỗi "nút không nằm trong `.f-act`", 1 lỗi luật CSS giẫm. Màn `nap-bai-viet`
+    **xanh cùng lượt** — bản đúng phải xanh, nếu nó cũng đỏ thì phép đo hỏng
+  - >
+    `getComputedStyle(#tv-cat)` trên Chromium (Playwright, trang render thật):
+    `justify-content: space-between` · nhãn `aitalkshow` 646..736 · nhãn `ml`
+    1237..1276 — **cách nhau 501px**, đúng ảnh người dùng gửi
+
+may_xanh:
+  - "`node web/test/mo-ta-va-nut-nap.test.js` → pass (§8 24 ok · §9 6 ok)"
+  - >
+    77/77 file test chạy hết: **76 xanh**, một đỏ là `he-kinh.test.js` — ảnh nền
+    708 KB người dùng thêm, không phải hệ quả của lượt này (xem `do_do`)
+  - "`cmp web/render/shell.html web/plugins/home-pages/shell.html` → im lặng"
+  - "`node web/test/page-weight.test.js` → pass · trang chủ 59 KB · lớn nhất 68 KB"
+  - "byte: gn.js 100615/102400 (dư 1785) · gn.css 98714/102400 (dư 3686)"
+  - "`python core/tests/check_khung.py` → pass · `check_g6b.py` → 146 task, 5 điều kiện"
+  - >
+    `python core/tests/check_worklog.py` → pass. Cổng này **đã đỏ TRƯỚC lượt
+    này**: file thật 55875 ký tự, tài liệu chép 55871 — lệch 4, không phải của
+    lượt này. Sửa số lên 56559 vá luôn cả 4 ký tự đó; nói ra để không ai đọc con
+    số mới như bằng chứng rằng cổng vốn xanh
+  - >
+    đo lại sau khi sửa, cùng phép đo trình duyệt: `justify-content: normal` ·
+    `gap: 4px 24px` · nhãn 160..248 và 272..311 — liền nhau, cách đúng `--s-md`
+
+nguyen_nhan_that:
+  - >
+    **§2 không phải `flex-wrap`.** Mốc `.f-chon` là một **`<span>` con trực tiếp
+    của `.f-row`**, nên luật dành cho NHÃN của hàng —
+    `.f-row > span{…justify-content:space-between}`, độ cụ thể `0-1-1` — **đè**
+    luật của chính mốc (`.f-chon`, `0-1-0`). `flex-wrap` sống sót; `gap` bị thay;
+    `justify-content` được THÊM vào. `flex-wrap` một mình không dàn hai mép
+  - >
+    Ba luật giẫm, không một: `prototype.css:1096` (`justify-content`·`display`·
+    `gap`) · `:1465` (`display`·`gap`) · `:1524` `.f-nhom .f-row > span`
+    (`display:block` ở ≥1200px). Dòng 1524 là lý do màn **bài viết** ở màn rộng
+    không lộ lỗi — mốc bị ép `block` nên `justify-content` vô nghĩa, đổi lại mất
+    luôn `gap` của chính nó. Dưới 1200px màn bài viết dàn hai mép y hệt
+
+quyet_dinh_trung_tam:
+  - >
+    **Không sửa `.f-chon`, không bỏ `justify-content` khỏi luật nhãn.** Luật nhãn
+    CẦN `space-between` để đẩy `<i class="f-opt">` sang mép phải hàng — bỏ nó là
+    chữa triệu chứng bằng cách phá một thứ đang đúng. Sai ở chỗ luật nhãn **rơi
+    trúng một phần tử không phải nhãn**, nên chữa bằng `:not(.f-chon)`: luật nhãn
+    nói rõ nó nói về nhãn. 3 bộ chọn × 13 byte = 39 byte
+  - >
+    **Nút ra khỏi khối `hidden` là ĐƯỢC.** `#tv-meta`/`#vd-meta` chỉ hiện sau khi
+    chọn file / dán link, nhưng hai hàm gửi đã có chốt riêng (`"Chưa nạp tài liệu
+    nào."` · `LOI_HOST`) — nút bấm sớm trả lời được. Cùng lối WO-018 đã đưa mô tả
+    và hai ô nhãn ra ngoài khối ẩn vì cùng một lý do
+  - >
+    **Cổng đo THỨ TỰ TRONG DOM, không đo có-mặt.** Phép kiểm "có nút `#tv-gui`"
+    xanh y nguyên khi nút nằm giữa form — nó không thể đỏ vì lỗi này. Và bộ thuộc
+    tính cấm ở §9 **suy từ luật `.f-chon`** chứ không gõ tay: thêm một khai báo
+    vào `.f-chon` mà cổng không biết là một lỗ mở lại
+  - >
+    **§9 đo CẢ HAI VẾ.** Vế CSS một mình không nói được gì: luật nhãn chỉ giẫm khi
+    mốc ĐÚNG LÀ `<span>` con trực tiếp của `.f-row`. Đổi mốc sang `<div>` cũng là
+    một cách chữa hợp lệ, và lúc đó luật kia không còn là điều phải cấm
+
+tu_bat_duoc:
+  - >
+    **Phép dò `document.styleSheets` đầu tiên trả 0 luật khớp** trong khi mốc rõ
+    ràng đang bị đè. Lý do: Chrome cho CSSStyleRule một `cssRules` RỖNG (nested
+    CSS), mà nó **truthy**, nên nhánh "đây là at-rule, đệ quy vào" nuốt mọi luật
+    thường. Một phép đo trả rỗng mà không ai báo — đúng lớp "xanh vì mù"
+  - >
+    Cắt luật CSS trong cổng dùng **quét ngoặc theo độ sâu**, KHÔNG dùng neo
+    `(?:^|[};])` như sáu chỗ khác trong `web/test/`: neo đó nuốt dấu `}` của luật
+    liền trước nên chỉ thấy CÁCH MỘT luật (WO-027 đã trúng). Ở đây nó sẽ bỏ sót
+    đúng một trong ba luật giẫm
+
+đỏ_do: chưa quy được chủ   # he-kinh.test.js — ảnh nền người dùng thêm, có trước lượt này
+
+do_do:
+  - cong: web/test/he-kinh.test.js
+    do_do_boi: >
+      ảnh nền 708 KB người dùng thêm (`alexander-slattery-…jpg`), ngưỡng 500 KB —
+      đỏ từ trước lượt này, sửa bằng `python core/tools/toi_uu_anh_nen.py`
+
+quan_sat_ngoai_pham_vi:   # KHÔNG phải `kéo theo`: lỗ này có TRƯỚC lượt này
+  - >
+    Sáu chỗ trong `web/test/` còn cắt luật CSS bằng neo `(?:^|[};])`
+    (`rail-trai` ×4 · `ui-ba-man` ×2 · `cac-man-con-lai` ×1). Cùng lỗ WO-027, và
+    lượt này có sẵn một bản cắt đúng để chép sang — CHƯA làm, ngoài phạm vi ghi

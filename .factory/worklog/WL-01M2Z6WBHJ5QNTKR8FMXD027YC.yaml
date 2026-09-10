@@ -1,0 +1,107 @@
+entry: ban-giao
+ulid: 01M2Z6WBHJ5QNTKR8FMXD027YC
+ngay: 2026-09-10
+module: M03_web
+don_vi: T03-147
+wo: WO-096
+tieu_de: >-
+  Xuat PDF THAT bang Typst — chu New Computer Modern, dong gap [G] cua s1
+
+object:
+  - web/api/xuat-cua.mjs
+  - core/assets/xuat-dang.json
+  - web/test/xuat-pdf-typst.test.js
+  - web/package.json
+  - web/WORKLOG.md
+  - web/test/WORKLOG.md
+  - 01_research/m12-chat-luong-transcript-chung-cat.md
+  - 07_plan/M03_web/tasks/T03-147-xuat-pdf-typst.md
+  - .factory/wo/WO-096-xuat-pdf-bang-typst.md
+
+chi_dao: |
+  *"co gang su dung latex ma lam. Trong tai lieu toi chup gui ban la font latex
+  xuat ra pdf do, thu nghien cuu them?"* — va lam ro giua chung:
+  *"latex apply cho tai pdf thoi nhe"* => duong `?dang=in` (WO-095) GIU NGUYEN,
+  chi them `?dang=pdf`.
+
+khong_phai_nghien_cuu_lai_tu_dau: |
+  `s1` (`01_research/m12-chat-luong-transcript-chung-cat.md:121`) DA chon Typst:
+  mot binary vai chuc MB · 27x nhanh hon xelatex (356ms vs 9.65s) · font **New
+  Computer Modern**, *"cung ho voi font cua mau ChatGPT"* — tuc dung thu chu du
+  an chi vao.
+
+  Con treo dung MOT gap: `[G] NCM phu dau tieng Viet — chua do`.
+
+GAP_G_DA_DONG_hom_nay: |
+  Cai `typst 0.15.1` (winget), bien dich mot file thu 74 ky tu dau tieng Viet:
+
+    bien dich: 0 canh bao
+    SVG: khong co `.notdef` (khong o tofu)
+    trich chu khoi PDF bang `pypdf`, chuan hoa NFC, doi chieu:
+      65 thuong + 9 HOA (Ầ Ắ Ẵ Ệ Ộ Ợ Ữ Ỹ Đ) => THIEU 0 KY TU
+
+  Da sua `[G]` thanh `[F]` trong file nghien cuu, kem so do.
+
+vi_sao_Typst_chu_khong_TeX_day_du: |
+  TeX Live la vai GB va mot lan cai khong tai lap duoc. Typst la mot `.exe`
+  ~30MB, cai bang mot dong `winget`, va cho ra CUNG HO CHU. Thu chu du an that
+  su chi vao la CAI NHIN cua ban PDF, khong phai cai ten `\documentclass`.
+
+vi_sao_LOI_duoc_phep_spawn: |
+  `dungchung.mjs:469` DA `spawn` Python de chay validate. Nen `spawnSync("typst")`
+  di cung khuon da co, khong mo mot hang moi cho tang nay. (Nghien cuu [S] de
+  xuat goi tu THO; do lai thi LOI da co khuon, va cua xuat song o LOI — di qua
+  THO la them mot chang khong mua duoc gi.)
+
+  Chu thich dau file noi *"khong render PDF o may chu vi tieng Viet co dau la
+  cho chung vo truoc tien"*. Lo ay DUNG voi cac thu vien PDF thoi do, va da
+  duoc DO LAI hom nay. Da ghi ly le ay ngay tai nhanh moi, khong xoa chu thich
+  cu — no van dung cho `in`.
+
+sua: |
+  · `timTypst()` — env `TYPST_BIN` -> duong winget -> `PATH`. Khong thay => null.
+  · `mdSangTypst()` THUAN — tieu de · doan · danh sach · BANG (`#table`) ·
+    trich dan (`#quote`) · khoi ma · dam/nghieng/ma · lien ket (`#link`).
+  · Nhanh `dang === "pdf"`: dung preamble (NCM 11pt, A4, le 20/22mm, canh deu,
+    danh so trang), `spawnSync(typst, ["compile","--format","pdf","-","-"])`
+    voi `input`, tran 30s, `killSignal: SIGKILL`.
+  · Thieu binary => **503 noi thang** kem lenh cai, khong file 0 byte.
+  · `xuat-dang.json` khai `pdf` + `$vi_sao_pdf`; them vao `theo_loai` cua
+    article/paper/docs/repo/nhap.
+
+ve_nang_nhat_va_vi_sao: |
+  **Typst la mot NGON NGU**, khong phai mot bo danh chu cam: `#import`, `#eval`,
+  `#read` la ma CHAY DUOC trong bo dung. Than bai do MODEL sinh, nen dan thang
+  la mo mot duong thuc thi — te hon han mot the HTML lot luoi o `WO-095`.
+
+  Nen `E()` thoat DICH DANH `\ # $ @ * _ ` < > [ ]` TRUOC, roi `D()` moi mo lai
+  dung nhung cau truc Markdown ta muon — va `D()` khop DAU THOAT (`\*`, `` \` ``),
+  khong khop ky tu tran. Mot `*` do model viet van nam im.
+
+  Ve 2/2a/2b gieo `#import "evil.typ"`, `#eval("1+1")`, `$x^2$` va doi ca ba
+  KHONG con la lenh. Ve 2c doi markup do CHINH TA sinh van song — chong sua qua
+  tay thanh "thoat het, ke ca cau truc".
+
+cong:
+  them: web/test/xuat-pdf-typst.test.js — 20 ve
+  do_duoc: 7 ve DO truoc khi sua
+  ve_3_CHAY_THAT: |
+    Goi `typst` that, doc PDF ra, kiem `%PDF-` va do dai. May chua cai binary
+    thi cong IN RA "BO QUA · ve 3 KHONG do duoc" kem lenh cai — noi ro gioi han
+    thay vi gia vo xanh.
+  nghiem_thu_tren_cua_that: |
+    `GET /api/xuat/article/<slug>?dang=pdf` sau restart:
+      HTTP 200 · content-type: application/pdf
+      content-disposition: attachment; filename="phan-tich-...-vps.pdf"
+      62299 byte · 3 trang · 6104 ky tu · dau tieng Viet hien du
+
+do_do: |
+  Web  : 7 do nen, KHONG mot do moi
+  M12  : 59/59 xanh
+  core : 7 do nen
+  Chua rebuild FE vi WO nay khong cham `plugins/**` — chi cua API va bang khai.
+
+phu_thuoc_moi_can_ghi_o_README_trien_khai: |
+  `typst` la MOT BINARY NGOAI, cai bang `winget install Typst.Typst` (hoac dat
+  `TYPST_BIN`). Vang no thi `?dang=pdf` tra 503 va `?dang=in` van chay — nen no
+  la phu thuoc MEM, khong chan khoi dong.

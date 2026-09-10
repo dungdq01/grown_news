@@ -1,0 +1,87 @@
+id: WL-01K9JKFR024
+at: 2026-08-24
+by: claude
+buoc: s8 (M08_api + M03_web)
+loai: fix — bỏ vòng `run build` sau mỗi thay đổi kho
+fr: KHÔNG cần — chỉ thêm một endpoint GET, không đụng file frozen nào
+
+viec: >
+  Phase 3 của upgrade.md nêu hai mục tiêu: thêm database, và "không để sau mỗi
+  lần phải run build và api nữa". GĐ 1 giải mục tiêu THỨ HAI — và đo được là nó
+  KHÔNG cần database.
+
+do_duoc_truoc_khi_lam:
+  - "26 mốc điền lúc build (`chen(shell, ...)` trong home-pages/index.ts)"
+  - "11 lời gọi API động ĐÃ chạy trong multiwindow.inline.ts"
+  - "`BAI` (mảng cửa sổ đọc) ĐÃ nạp động — từ `static/open-index.json`"
+  - "kho 3 bài, build 669ms — ADR-04 mở cửa DB khi 'vượt vài trăm file mà build chậm', chưa thoả"
+  ket_luan: >
+    Thứ buộc build không phải định dạng lưu trữ, mà là `open-index.json` +
+    thẻ bài chỉ sinh lúc build. Sửa hai chỗ đó là hết phải build.
+
+lam_gi:
+  1_endpoint_moi: >
+    `GET /api/index` (articles.mjs `chiMucMo`) trả ĐÚNG hình dạng
+    `open-index.json` nhưng đọc lúc request. Gộp theo `url_normalized` cùng luật
+    M03-R5 mà emitter dùng, sắp theo priority. Gồm mọi review_status + thân bài.
+  2_nap_uu_tien_API: >
+    `nap()` thử `/api/index` trước, rơi xuống file tĩnh khi không có API. CHỈ thử
+    ở bản THẬT (`goc() === "/"`) — API đọc kb/ thật, ở `/mock/` nó trả kho khác
+    nên chỉ số trỏ sai bài (cùng lý do `doTimApi` tắt API_CO khi không ở gốc).
+  3_dongBoThe: >
+    Bù thẻ THIẾU ở màn Tất cả và sửa lại `data-open` của thẻ cũ. Không vẽ lại
+    toàn bộ: markup thẻ do emitter sinh, vẽ lại ở FE là bản thứ hai và hai bản
+    sẽ lệch — đúng lớp lỗi đã gặp ba lần (parser YAML, word_count, tiêu đề đôi).
+  4_data_slug: >
+    Thêm vào 4 chỗ emitter sinh (`the`, `dong`, `dongDuyet`). `data-open` là CHỈ
+    SỐ vào chỉ mục, và chỉ mục runtime có thể khác chỉ mục lúc build. FE cần một
+    khoá BỀN để sửa lại chỉ số — slug duy nhất trong kho, url_normalized thì không.
+
+rang_M03_R1_van_nguyen:
+  van_de: >
+    `approved-only` là filter Quartz chạy lúc BUILD, và nó là bề_mặt S3 của
+    M03-R1 — thứ chống bài draft (kể cả bài sinh do prompt injection) lọt lên web.
+    `GET /api/articles` trả MỌI trạng thái nên đọc động không tự có răng đó.
+  ke_hop_phap: >
+    Hệ thống ĐÃ tách hai loại màn (index.ts:359 — "Màn Tất cả là màn QUẢN LÝ: nó
+    hiện mọi trạng thái"). Nên: màn quản lý đọc động thấy mọi trạng thái (đúng
+    vai), còn TRANG BÀI vẫn qua build + ApprovedOnly.
+  kiem_chung: "web/site/docs/ và web/site/article/ RỖNG — 3 bài draft không lọt trang nào"
+
+test_bat_duoc_loi_THAT_ngay_luot_dau:
+  what: "`theFE()` thiếu `data-slug` — emitter có, FE không"
+  hau_qua_neu_lot: >
+    Thẻ FE vẽ ra không sửa được `data-open` ở lần đồng bộ sau ⇒ đứng yên với chỉ
+    số cũ ⇒ bấm mở SAI BÀI. Lỗi im lặng, không ai thấy tới khi bấm.
+  vi_sao_test_bat_duoc: >
+    Khối 4 so TỪNG data-* giữa hai khối code. Bản song sinh nào cũng phải có
+    cổng — đó là bài học từ ba lần trước.
+
+verify:
+  loai: hard
+  ket_qua:
+    npm_run_check: sạch
+    web_test: "29/29 file, exit 0 (thêm api-index-khong-can-build — 29 phép kiểm)"
+    cong_may: "3/4 (frozen · danh_muc · rule_surfaces xanh; check_running đỏ vì lý do CŨ)"
+    build: exit 0
+  kiem_tay_tren_server_that:
+    - "GET /api/index → 3 nhóm, có thân bài, sắp theo priority (60, 0, 0)"
+    - "thêm file thứ 4 vào kb/ → API thấy NGAY (4 bản / 3 nhóm — gộp đúng M03-R5)"
+    - "xoá file → API về 3 bản ngay. KHÔNG build lần nào"
+  cong_khong_do:
+    - "no-write-path: GET /api/index không phải đường ghi nên whitelist không đụng"
+    - "markup-matches-css: data-slug là attribute, không phải class"
+    - "only-approved: soi trang bài, không soi màn quản lý"
+
+no:
+  - "`check_running` VẪN đỏ vì `--strict` coi cảnh báo `concepts_proposed` là lỗi
+     — nguyên nhân CŨ, đã báo ở WL-01K9JJCANHBAOCHAN, chờ người dùng quyết."
+  - "`dongBoThe` chỉ bù thẻ ở màn Tất cả (`#grid2`). Màn Chờ duyệt (`#queue`)
+     chưa bù — hàng ở đó có nút `data-duyet` cần chỉ số, phức tạp hơn. Bài mới
+     vẫn phải build để hiện ở Chờ duyệt."
+  - "So thẻ trùng bằng TIÊU ĐỀ (`h4.textContent`), không bằng slug — vì thẻ cũ
+     trước lần build này chưa có `data-slug`. Sau một lần build nữa thì đổi sang
+     slug được, chính xác hơn."
+  - "Không cache-busting cho gn.js/gn.css — sửa FE xong vẫn phải hard-refresh.
+     Nợ riêng, chưa xử lý."
+  - "GĐ 2 (SQLite index) và GĐ 3 (API đọc DB) CHƯA làm. GĐ 2 cần FR-023."

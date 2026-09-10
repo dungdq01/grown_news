@@ -1,0 +1,82 @@
+ulid: 01M1XB6R2N9K4T7V5ZQHWMDPF3
+thoi_diem: 2026-09-07T10:20+07:00
+tac_nhan: claude-opus-5
+loai: ban_giao
+module: M12_chungcat
+don_vi: XOÁ việc chưng cất cũ khỏi hàng đợi (thay cho ẩn)
+
+viec: >
+  Chủ dự án bác lối ẩn: *"sao không xóa bản cũ đấy đi mà lại ẩn — ẩn cũng giải
+  quyết được vấn đề đó trong tương lai đâu?"*. Đúng: ẩn giữ nguyên đà phình của
+  hàng đợi, chỉ dời nó khỏi tầm mắt.
+
+quyet_dinh_cua_nguoi:
+  hoi: "ba thứ đang tồn tại song song — xoá thứ nào?"
+  chon: >
+    XOÁ **dòng việc cũ** khỏi hàng đợi. Bài chưng cất cũ VẪN qua thùng rác
+    (khôi phục được) — không xoá thẳng.
+  vi_sao_hoi: >
+    Ba thứ khác nhau (bài trong kho · bản nháp · dòng việc) và một trong ba
+    không lấy lại được. Đoán rồi xoá nhầm là hỏng thứ không sửa được bằng một
+    commit.
+
+vi_sao_xoa_duoc_ma_khong_mat_so_chi_phi:
+  do: >
+    Vết tiền nằm ở `egress.<pid>.jsonl` — bốn file, sống ĐỘC LẬP với
+    `done/*.json`. Đo sau khi dọn: cả bốn còn nguyên.
+  nghia: "câu *đã tiêu bao nhiêu* vẫn trả lời được sau khi file việc đi"
+
+hinh_dang:
+  ham: "`worker.don_viec_cu(goc, loai, slug, ulid_giu)` → danh sách ULID đã xoá"
+  goi_tu: "`chay_chung_cat`, NGAY sau khi ghi kết quả"
+  vi_sao_ngay_do: >
+    Dọn bằng một lệnh chạy tay thì hàng đợi chỉ sạch khi ai đó NHỚ chạy — tức
+    không bao giờ sạch.
+  ba_phep_chan:
+    - "cùng LOẠI — `sinh-transcript` cùng slug KHÔNG phải bản chưng cất; xoá nó là xoá transcript của người ta"
+    - "đã XONG — việc đang gọi model mà mất file thì worker mất chỗ ghi kết quả"
+    - "không phải MÌNH — bản vừa xong là bản phải giữ"
+  file_phu: "`.phan-hoi.json` · `.tien-do.*` đi theo — file mồ côi là rác không ai biết của ai"
+
+cong_lan_nay_CHAY_HAM_THAT:
+  vi_sao: >
+    Chủ dự án nói thẳng *"test kỹ, tôi không muốn lỗi này lặp lại"*. Lỗi ấy là
+    `donBanCu` XANH CỔNG suốt hai vòng trong khi nó không dọn gì (đọc nhầm
+    `b.source_type` thay vì `b.type`). Một cổng đọc NGUỒN không bao giờ bắt
+    được loại lỗi đó.
+  cach: >
+    `check_don_viec_cu.py` dựng một hàng đợi TẠM với sáu file việc — hai cũ,
+    một mới, một khác loại, một khác slug, một chưa xong — rồi GỌI HÀM và đo
+    file nào còn file nào mất.
+  ket_qua: "10/10 vế, gồm cả ba ca nhiễu và ca file phụ"
+
+do_sau:
+  - lenh: python chungcat/tests/check_don_viec_cu.py
+    ket_qua: pass — 10/10 vế
+  - lenh: 'for f in chungcat/tests/check_*.py; do python "$f"; done'
+    ket_qua: 41/41 XANH
+  - lenh: cd web && npm test
+    ket_qua: exit 0 · 0 FAIL
+  - lenh: python -m pytest core/tests -q
+    ket_qua: 49 passed
+
+chay_that_tren_hang_doi_that:
+  cach: >
+    Gọi thẳng `don_viec_cu` với hàng đợi THẬT — KHÔNG POST một việc mới. POST
+    một việc hợp lệ là khởi động một lần gọi model, và tôi đã trả giá cho bài
+    học ấy sáng nay.
+  truoc: "3 việc — sinh-transcript · chung-cat CŨ · chung-cat MỚI"
+  sau: "2 việc — sinh-transcript · chung-cat MỚI"
+  da_xoa: "75b5157bf6304f3fbe28f005079bf86e"
+  khong_dung_toi: "`sinh-transcript` cùng slug · bốn file `egress*.jsonl`"
+  tren_man: "màn `/chung-cat/` còn 2 thẻ, không thẻ nào `cct-cu`"
+
+giu_lai_gi:
+  - >
+    Gạch đỏ + công tắc ẩn VẪN giữ. Chúng nay phủ ca mà `don_viec_cu` không
+    chạm: việc `sinh-transcript`/`tai-video` trùng nguồn, và việc cũ sinh ra
+    TRƯỚC đợt này ở những máy chưa chạy lại worker.
+
+object:
+  - chungcat/src/worker.py
+  - chungcat/tests/check_don_viec_cu.py

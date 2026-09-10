@@ -1,0 +1,139 @@
+id: WL-01K9XEBONLOI
+at: 2026-09-03
+by: claude
+buoc: "Bon loi trong ma cua chinh toi (agent deep-research tim, toi tu do lai) + cam ca 4 cua theo chi dao"
+loai: sua loi an ninh + dinh chinh mot FR da dong sai
+gate: G6A xanh 18 module; M18 23 hard/0 soft
+
+object:
+  - core/assets/kho.schema.sql             # +audit_khong_ghi_de (lo CO SAN)
+  - web/api/dungchung.mjs                  # 3 trigger audit_loi · cot `boi` · chan admin cuoi · epQuyen · tai khoan dau = chu
+  - web/test/phan-quyen.test.js            # +Y8 Y9 Y10 Y11 Y12; 19 loi goi +boi
+  - web/test/loi-cua.test.js               # 17 loi goi +boi
+  - web/test/rate-limit.test.js            # 4 loi goi +boi
+  - 06_modules/M18_nguoidung/spec.md       # +§6.5 +AC-6.5 +AC-6.6  (FROZEN — CHO NGUOI KY)
+  - .factory/fr/FR-051-vai-nao-lam-duoc-gi.md   # +§9 DINH CHINH
+
+evidence:
+  - "npm test => exit 0 · pytest 45 passed · check_g6a 18 module"
+  - "M18: 23 hard / 0 soft (truoc: 21)"
+  - "chay that: tai khoan dau vai=chu · thu hai=dong_nghiep · khong danh tinh => NEM · dong_nghiep khong moi duoc"
+  - "5 thao tac goi epQuyen (do bang may, khong dem tay)"
+  - "4 do con lai: check_danh_muc + check_skill (agent khac) · check_g6b (T03-90) · check_frozen (cho NGUOI ky)"
+
+# ══ TOI DONG FR-051 BANG MOT PHEP DO SAI VE ════════════════════════
+loi_nang_nhat: >
+  §8 cua FR-051 viet "Y1-Y7 chay duoc" — DUNG TUNG CHU nhung SAI dieu no goi ra.
+  Y3 dem SO CHO DOC `.vai` = 1. Do la phep do SU TON TAI cua chokepoint, KHONG
+  phai phep do CO AI DI QUA NO.
+  Do lai: 0 route goi duocLam. Ma tran quyen la mot ham dung, co cong canh xanh,
+  va KHONG CUONG CHE GI tren bat ky request that nao.
+  => CONG XANH RONG — dung thu M17 AC-3.4 danh ca mot doan de canh bao
+  ("mot cong xanh rong te hon khong co cong: no lam nguoi ta tin"). Toi viet
+  doan do, roi tu mac.
+  Cai sai KHONG nam o Y3 — Y3 do dung thu no khai. Cai sai la toi DONG FR dua
+  tren mot tap cong KHONG PHU HET dieu FR hua, va khong ai bat duoc vi moi cong
+  rieng le deu xanh THAT.
+
+lop_loi_nay_la_lan_thu_BA_nhung_nang_hon_hai_lan_truoc: >
+  V3b (vi tri ky tu) · Y3 (danh sach toan tu) · ve1 (pham vi file / binh luan)
+  — tat ca la do HINH DANG thay vi do LUAT.
+  Hai lan truoc la DO OAN: thay ngay, sua ngay.
+  Lan nay la XANH OAN: khong thay gi, va toi da DONG mot FR tren no.
+  LUAT cho lan sau: truoc khi dong mot FR, hoi TUNG VE no hua —
+  "cong nao DO neu ve nay KHONG dung?". Neu cau tra loi la mot cong do SU TON
+  TAI CUA MOT CO CHE thay vi HIEU LUC cua no, thi ve do CHUA CO CONG.
+
+# ══ BON LOI — AGENT TIM, TOI TU DO LAI TRUOC KHI NHAN ══════════════
+quy_trinh: >
+  Agent deep-research (cho module "Quan ly va cai dat he thong") doc ma va bao
+  bon loi. Toi KHONG nhan theo loi agent — tu do lai ca bon bang grep/sed tren
+  ma nguon that. CA BON DEU THAT.
+  Va toi do them mot lo thu nam agent khong bao.
+
+loi_1_LOI_KHAI: >
+  audit_loi KHONG CO TRIGGER nao, trong khi audit_log cua kho co HAI
+  (kho.schema.sql:261,263).
+  Nang hon: binh luan :1052 cua toi viet "audit_loi khong co duong sua". Do la
+  LOI KHAI, khong phai su that — bang do la bang thuong, UPDATE/DELETE chay duoc.
+  CLAUDE.md cam dung dieu do ("tu khai").
+  Va khuon nam CACH MOT FILE: toi khang dinh mot tinh chat AN NINH ma khong chep
+  muoi dong dang co san.
+  => 3 trigger: UPDATE · DELETE · INSERT OR REPLACE.
+
+loi_2_ai_BI_doi_thay_vi_ai_DA_doi: >
+  loiDatVai ghi `nguoi_dung_id: id` — nguoi BI doi vai. Ba thang sau cau "ai
+  nang tai khoan nay len chu?" khong co cau tra loi.
+  => them cot `boi`. Cong Y9 doi HAI TRUONG PHAI KHAC NHAU o ca thu — neu chung
+  bang nhau thi cot moi dang chep lai cot cu, tuc khong tra loi cau hoi nao moi.
+
+loi_3_duocLam_khong_ai_goi: >
+  Xem muc "loi nang nhat" tren.
+
+loi_4_admin_cuoi: >
+  loiDatVai/loiThuHoi de lai 0 vai `chu` hoat dong duoc. Va vi duocLam DENY mac
+  dinh, trang thai do KHONG TU KHOI PHUC DUOC: khong ai moi duoc ai, khong ai
+  doi duoc vai. Duong ra duy nhat la SQL tho vao file .db.
+  Cong Y1-Y7 khong hoi cau nay — chung do "ai lam duoc gi", khong do "con ai
+  lam duoc khong".
+  => chan o CA HAI ham. Y10 do ca chieu am (co chu THU HAI thi ha duoc).
+
+lo_thu_NAM_toi_tu_do: >
+  INSERT OR REPLACE DI VONG CA HAI trigger cua audit_log — bang audit cua KHO,
+  co tu truoc toi. Do truc tiep: hang bi ghi de, changes() khong tang, khong
+  trigger nao ban.
+  KHONG dung PRAGMA recursive_triggers: do duoc no KHONG LUU TRONG FILE, mat khi
+  mo lai. Mot bien phap phai nho dat moi lan ket noi thi co ngay khong duoc dat.
+  => chan trong SCHEMA: BEFORE INSERT ... WHEN EXISTS. Bon cua ghi deu chan,
+     append van qua.
+
+# ══ CAM 4 CUA — chu du an chot "cam ca 4 cua nha" ══════════════════
+cam_o_tang_THAO_TAC_khong_tang_route: >
+  Do truoc khi cam: 3 TRONG 4 `viec` CHUA CO ROUTE NAO (moi-nguoi-moi, thu-hoi,
+  xem-audit — deu thuoc man admin, chua dung; M18 screens: []).
+  Cam o route nghia la de BA LO HO toi ngay dung man, va ngay do ai dung route
+  se phai NHO cam. Mot phep kiem phai-nho-cam la mot phep kiem se co ngay khong
+  duoc cam.
+  => Cam trong HAM (epQuyen), goi tu NAM thao tac. Route moi khong di vong duoc.
+
+cua_bootstrap_TU_DONG: >
+  epQuyen fail-CLOSED: thieu danh tinh => NEM. Dung MOT ngoai le: bang
+  nguoi_dung con RONG.
+  Ngoai le do can thiet vi tai khoan DAU TIEN khong the do ai tao. Va no TU
+  DONG: sau hang dau tien count(*) > 0 vinh vien, nen KHONG CO CO NAO PHAI NHO
+  TAT. Bai hoc S18 ap cho mot cua thoat an ninh.
+
+DEADLOCK_trong_ban_sua_cua_toi: >
+  Ban dau phan cam cua luon tao `dong_nghiep` (theo DEFAULT cua DDL). He qua:
+  tai khoan dau tien TAO DUOC qua cua bootstrap nhung KHONG BAO GIO NANG LEN
+  `chu` DUOC — loiDatVai doi quyen moi-nguoi-moi, quyen do doi vai `chu`, khong
+  ai co vai `chu`.
+  MOT HE THONG KHONG AI QUAN DUOC, TU DONG DAU TIEN.
+  Va KHONG TEST NAO DANG CO BAT DUOC — no chi lo ra o lan cai dat THAT dau tien.
+  Toi bat duoc no bang cach chay THAT (node -e tren DB tam), khong bang doc ma.
+  => Cua bootstrap khong chi phai cho TAO, no phai cho tao MOT NGUOI QUAN DUOC
+     HE. Nay tai khoan dau sinh ra voi vai `chu` (AC-6.6, cong Y12).
+
+hai_loi_ban_sua_tu_gay_va_ca_hai_cong_deu_DUNG: >
+  1. loiThuHoi doc `la.vai` trong JS => Y3 bao 2 cho thay vi 1. Cong DUNG: noi
+     bat bien ra 2 de vua mot ca la dung thu drift ma cong ay ton tai de chan.
+     => doi CACH DEM: `vai` chi con trong literal SQL.
+  2. Y1 do vi chan-admin-cuoi ban. Cong MOI dung, ca CU thieu tien de.
+     => them mot `chu` thu hai.
+
+ve_CON_HO_va_da_khoa: >
+  `sua-bai-nguoi-khac` CHUA CAM. PUT /api/articles/... la cua cua NGUOI tren
+  127.0.0.1 va KHONG MANG DANH TINH — chua co phien nao o duong do. Cam no doi
+  cua-cua-nguoi CO PHIEN truoc, tuc viec cua man admin + C6.
+  Cong Y11 canh cau «CHUA CAM» trong spec: cam roi thi cau do BUOC PHAI GO,
+  khong thi do. Trang thai nay khong lang le doc thanh "da cuong che" duoc.
+
+do_do:
+  khong_co_do_moi: "4 do con lai: 2 cua agent khac (core/skill-src) · g6b T03-90 · check_frozen cho NGUOI ky"
+
+no_con_lai:
+  - "check_frozen DO: M18/spec.md (+§6.5 +AC-6.5 +AC-6.6) — NGUOI ky, toi khong ky"
+  - "`sua-bai-nguoi-khac` chua cam — doi cua cua NGUOI co phien (man admin + C6)"
+  - "01_research/quan-ly-va-cai-dat-he-thong.md DA CO (1501 dong, 57 CVE verify) — chua ai doc de mo FR"
+  - "49 o backlog mo o M01(31) M03(14) M04(2) M08(2)"
+  - "Chuyen 22 rule GRANDFATHER sang bo ba lenh/do_khi/xanh_khi"

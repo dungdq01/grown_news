@@ -1,0 +1,109 @@
+id: WL-01K9JFHANGDANHMUC
+at: 2026-08-20
+by: claude
+buoc: s8 (M03_web)
+loai: fix — cỡ chữ theo màn tham chiếu, nút ngang hàng, màu chữ header
+fr: FR-021 (đã duyệt) — chỉ CSS + markup hàng, không sửa file frozen
+
+viec: >
+  Bốn yêu cầu trên bản chạy: (1) header tab chỉ ghi tên, (2) chữ danh sách to
+  hơn — "học hỏi /tat-ca/ hoặc /cho-duyet/", (3) hai nút ngang hàng, to hơn,
+  Sửa xanh Xoá đỏ, (4) header pha màu chữ cho sinh động.
+
+nguoi_dung_chi_MAN_THAM_CHIEU_nen_do_o_do:
+  what: "'học hỏi trang /tat-ca/ hoặc /cho-duyet/'"
+  do_duoc: >
+    `.nw h4` (danh sách màn Chờ duyệt) = --fs-small 14px + --w-head, padding hàng
+    --s-xs 12px, và hover đổi màu nhãn sang --brand.
+    Hàng của tôi đang --fs-meta 13px + weight 400.
+  lam_gi: >
+    Lấy ĐÚNG công thức đó: fs-small + w-head cho nhãn, hover → --brand. Không
+    đoán "to hơn xíu" là bao nhiêu.
+  ghi_chu_ve_luot_truoc: >
+    Lượt trước tôi hạ weight về 400 vì "trong bảng, đậm hết thì không nhấn gì".
+    Đúng nguyên tắc, nhưng màn tham chiếu của chính dự án dùng w-head cho nhãn —
+    và nhãn là thứ ĐỌC, mọi thứ khác trong hàng vẫn 400. Nguyên tắc giữ, con số
+    lấy từ màn đã chạy tốt.
+
+hai_nut_ngang_hang_phai_sua_MARKUP_khong_phai_CSS:
+  goc: >
+    Hai nút cùng khai `grid-column:4` nên chúng TRANH cùng một ô grid và tự rơi
+    xuống hai dòng. Không CSS nào sửa được điều đó.
+  sua: "bọc lại ở markup: `<span class=\"rc-act\">` là ô thứ tư, flex bên trong"
+  kem: "`<em>` (đang dùng) vào chung ô — trước đây nó ở cột 3 (cột id)"
+
+mau_nut_sua_xanh_xoa_do_CO_DO:
+  xanh: "--ok #15803D = 4.89:1 (contrast-audit, 'trạng thái ok')"
+  do: "--destructive #C81E1E = 5.59:1"
+  hai_nut_CUNG_hinh_dang: >
+    Chỉ khác màu, không khác độ nổi. Một nút đổ nền còn một nút không là nói SAI
+    rằng chúng khác cấp — sửa và xoá là hai việc ngang cấp trên cùng một hàng.
+
+lop_loi_MOI_tim_ra_color_mix_sinh_mau_chua_ai_do:
+  what: >
+    `color-mix(in srgb, var(--ok) 72%, var(--ink-2))` tạo màu KHÔNG có trong
+    contrast-audit.json. Audit đo màu GỐC; màu pha là màu khác.
+  toi_mac_ngay: >
+    Nền hover nút Sửa pha `--ok 10%` → chữ xanh tụt xuống 4.29:1 (dưới 4.5).
+    Đo từng mức: 10% → 4.29 trượt · 8% → 4.40 trượt · 6% → 4.53 pass.
+    Xanh trượt TRƯỚC đỏ vì nó chỉ có 4.89:1 khi đặc (đỏ có 5.59).
+  vi_sao_de_tuong_khong_sao: "nhạt 6% mà đã ăn 0.36 điểm tương phản"
+  cong_opacity_KHONG_bat_duoc: "đây không phải opacity — cùng hậu quả, khác cơ chế"
+  mo_rong_cong:
+    - "khối 4: mọi `color:color-mix(...)` sinh màu chữ — 6 màu, tất cả pass"
+    - "khối 5: chữ trên NỀN pha của nút hover — hai màu, cả hai pass ở 6%"
+
+BA_luat_trung_lap_tu_bat:
+  what: >
+    Khối FR-021c và FR-021d cùng khai `.rc-r .bt`, `.rc-r .bt.dstr`,
+    `.rc-r .bt.dstr:hover`. Bản CŨ thắng ở hai chỗ:
+      · `.dstr:hover{background:var(--destructive)}` — hover vẫn ra KHỐI ĐỎ ĐẶC,
+        đúng thứ vừa bỏ
+      · `.bt{height:1.5rem}` — nút vẫn thấp, không phải 1.75rem như yêu cầu
+  ai_bat: >
+    Cổng contrast mở rộng: nó KHÔNG đọc được nền hover 6% vì luật thắng là luật
+    khác. Nếu chỉ nhìn CSS mới thì mọi thứ trông đúng.
+  sua: "XOÁ khối cũ, không ghi đè. Để lại comment cảnh báo tại chỗ."
+  lan_thu_hai_trong_hai_luot: >
+    Lượt trước cũng đúng lỗi này (`.rc-r.r-cpt{border-left}` specificity cao hơn
+    `.rc-r{border:0}`). File 1600 dòng với nhiều khối FR chồng nhau thì "thêm
+    khối mới ở cuối" KHÔNG đủ — phải xoá cái nó thay.
+
+header_va_KPI_pha_mau_chu:
+  tab: "ba màu đã audit (brand/success/warning), mix 72% với --ink-2 khi chưa chọn"
+  KPI: "NHÃN mang màu (mix 76%), SỐ giữ --ink — số là dữ liệu, phải đọc trước"
+  do_lai_moi_mau_pha: "6 màu: 6.02 → 7.66:1, tất cả pass"
+  vi_sao_chi_ba_mau_do: >
+    FR-017 đã quyết: brand/success/warning là ba màu DUY NHẤT được audit làm màu
+    chữ. Không sinh hue mới.
+
+header_tab_bo_dong_giai_thich:
+  truoc: "tên + 'kỹ thuật bài dạy · kb/concepts.yaml LÀ chân lý' + số"
+  sau: "tên + số; câu giải thích vào `title=`"
+  vi_sao: "dòng đó đẩy tab cao gần gấp đôi và lặp lại thứ đã nói ở panel đầu màn"
+
+verify:
+  loai: hard
+  ket_qua:
+    npm_run_check: sạch
+    web_test: 26/26 file, exit 0
+    cong_may: 3/3 (frozen · danh_muc · running)
+    build: exit 0
+  bay_diem_kiem_tren_trang_da_xay:
+    - "header: 'Khái niệm 22 mục | Chủ đề 6 mảng | Chờ duyệt 5 chờ'"
+    - "chữ nhãn fs-small 14px = đúng /cho-duyet/"
+    - "hai nút trong .rc-act, một ô grid, flex"
+    - "nút cao 1.75rem"
+    - "Sửa --ok, Xoá --destructive"
+    - "hover không còn đổ đỏ đặc"
+    - "tab và KPI đều mang màu chữ"
+  frozen: "check_frozen exit 0"
+
+no:
+  - "Chưa xem trên màn thật sau lượt này."
+  - "Cổng color-mix chỉ đọc dạng `color-mix(in srgb,var(--a) N%,var(--b))`.
+     Dạng khác (3 màu, đơn vị khác, hoặc oklch) sẽ lọt."
+  - "Chỉ đo tone LIGHT. Dark có bảng token riêng và cổng chưa đọc khối đó —
+     contrast-audit CÓ đo dark nhưng cổng chưa dùng."
+  - "`.rc-r` giờ có 3 khối khai trong file (1036, 1490, 1570). Cả ba cùng chiều
+     nhưng đọc phải lần theo cascade. Gộp lại là việc dọn dẹp riêng."

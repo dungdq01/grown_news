@@ -1,0 +1,19 @@
+{
+  "name": "home-pages",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "index.ts",
+  "exports": {
+    ".": {
+      "import": "./index.ts"
+    },
+    "./package.json": "./package.json"
+  },
+  "quartz": {
+    "name": "home-pages",
+    "displayName": "Trang chu + man Tat ca + Cho duyet",
+    "description": "SCR-02/SCR-00 tu wireframe G5 — 4 vung, 4 layout family",
+    "category": "emitter",
+    "defaultEnabled": true
+  }
+}

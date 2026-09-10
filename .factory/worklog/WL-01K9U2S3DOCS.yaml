@@ -1,0 +1,85 @@
+id: WL-01K9U2S3DOCS
+at: 2026-08-31
+by: claude
+buoc: "s3-docs — BRD + PRD + spec_overview cho pham vi dot hai"
+loai: artifact tai lieu; KHONG dong ma san pham
+gate: >
+  project_map.yaml:29 khai skipped_gates [G1, G2, G3] => ghi chu theo giao thuc,
+  khong phai artifact ky gate
+
+object:
+  - 03_docs/brd.md            # +B-A5 B-A6 B-B4 + nhom E (B-E1..E5) · bang truy noi 8 dong
+  - 03_docs/prd.md            # +U8..U12 · bang truy noi 5 dong
+  - 03_docs/spec_overview.md  # +ba vung LOI/THO/BIEN · +M12..M16 · 2 bang truy · build order
+  - 06_modules/M01_core/backlog.md  # +o <worklog-check>
+
+# ══ PHAN DANG GIA NHAT ═════════════════════════════════════════════════
+nhom_E_la_mot_TRUC_MOI_chu_khong_phai_them_dong: >
+  Bon nhom cu phu: tri thuc dung (A) · ai duoc quyet (B) · kho toan ven (C) ·
+  phap ly noi dung (D). KHONG nhom nao noi ve du lieu DI RA.
+  B-D3 cam CONG BO, security_baseline §4 cam NGHE VAO — o giua la mot lo, va
+  pham vi dot hai mo no thanh bon bac cung luc.
+  Nen B-E1..E5 la nhom rieng, khong nhet vao nhom D. Nhet vao D se lam nguoi doc
+  tuong day la chuyen ban quyen, trong khi no la chuyen bien gioi may.
+
+B-A5_lam_B-A1_CO_NGHIA_chu_khong_them_rang_buoc: >
+  B-A1 doi moi khang dinh co dia chi. Do 08-30: LOCATOR_RE khop MOI cap ngoac
+  vuong, nen B-A1 duoc thoa bang cach go hai dau ngoac.
+  B-A5 khong phai mot rang buoc THEM cho dep — no la dieu kien de B-A1 co nghia.
+  Ghi ro trong BRD de s4-s9 khong coi no la tuy chon.
+
+hai_dong_trong_bang_KHONG_AP_DUNG_sap_sai: >
+  brd.md co bang "Rang buoc KHONG ap dung" — hai dong sap het dung:
+    - "GDPR / du lieu ca nhan: khong xu ly du lieu nguoi khac" => het dung o giai
+      doan 2 (B-E5).
+    - "Auth / phan quyen: mot nguoi dung, chay local" => allowlist kenh (B-B4) LA
+      auth toi thieu va BAT BUOC.
+  Danh dau tai cho thay vi xoa: mot bang "khong ap dung" ma im lang doi thanh
+  "ap dung" la cho de bo sot nhat.
+
+quyet_dinh_kien_truc_QUAN_TRONG_NHAT_cua_dot_hai: >
+  M14_chatbot la SERVICE CO API. Web la client thu nhat, KHONG phai chu so huu.
+  Chatbot moc trong web/ => moi kenh them vao la viet lai no.
+  Hai metric bat duoc neu lam sai: M7.4 (curl vao API tra JSON, khong qua web)
+  va M8.2 (kenh thu hai ton <=20% cong kenh thu nhat).
+  Ghi vao spec_overview chu khong de o s6 — vi neu de toi s6 thi luc do da co
+  nguoi viet chatbot vao web roi.
+
+ba_vung_cat_theo_RANH_GIOI_TIN_CAY: >
+  Khong cat "moi tinh nang mot service" — do la cach hong pho bien voi mot nguoi
+  van hanh. Cat theo: ai duoc GHI vao kho, va ai duoc NOI CHUYEN voi ben ngoai.
+  LOI (127.0.0.1, mot cua ghi, khong fetch ra) · THO (khong cong vao, DUY NHAT
+  duoc goi ra Internet, ghi qua _inbox/) · BIEN (goi RA lay tin, goi VAO
+  127.0.0.1, khong cham kb/).
+  Diem dang gia: hang doi giua cac vung DA CO SAN — _inbox/ + gate.py la message
+  queue co cong kiem, ep draft vo dieu kien. Khong can Redis/Kafka.
+
+quyet_dinh_nguoi_dung_ve_worklog_check: >
+  Do duoc: 121 file .factory/worklog/*.yaml — 7 khong parse, 48 thieu `object`
+  => 55 file khong lam duoc viec ma worklog sinh ra de lam.
+  `<worklog-check>` khai trong CLAUDE.md nhung CHUA BAO GIO duoc cai.
+  core/tests/check_worklog.py KHONG phai cong do — no kiem web/**/WORKLOG.md.
+  Trung ten, khac viec.
+  NGUOI QUYET: ap dung TU NAY VE SAU, khong sua nguoc 55 file cu.
+  Da ghi o backlog M01 kem cach cai: danh sach mien tru TUONG MINH (55 file),
+  cong do voi moi file NGOAI danh sach. Ba tinh chat: file moi bat buoc sach ·
+  danh sach chi co lai · no cu nhin thay duoc.
+  KHONG dung moc theo `at:` — file khong parse thi doc `at:` cung khong xong.
+
+evidence:
+  - "grep -c '^### B-' 03_docs/brd.md => 21 rang buoc (13 cu + 8 moi)"
+  - "wc -l 03_docs => brd 362 · prd 320 · spec_overview 601"
+  - "moi module M12..M16 co dong '-> PRD Uxx' — dieu kien dong G3"
+  - "moi scope-in S7..S16 co module ganh trong bang truy nguoc"
+  - "pytest core/tests => 42 passed · 22/26 cong Python xanh"
+
+do_do:
+  check_danh_muc + check_skill: "agent khac — hai ban schema core/skill-src lech core/assets"
+  check_frozen: "cho NGUOI ky"
+  check_running: "he qua cua hai muc tren"
+
+no_con_lai:
+  - "s3 XONG. Tiep: s4-system (kien truc, moi truong, security_baseline §4b tu FR-043)"
+  - "B-E5 chua co cho tieu thu — no da biet, ghi trong bang truy brd.md"
+  - "Discord CHUA khao bang nguon nao — R-g"
+  - "<worklog-check> chua cai — o backlog M01, ap dung tu nay ve sau"

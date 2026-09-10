@@ -1,0 +1,78 @@
+entry: ban-giao
+ulid: 01KB45BANGIAODEV
+ngay: 2026-09-09
+module: M13_truyhoi (chinh) · M01_core (T01-51/52)
+don_vi: [T01-52, T01-51, T13-1]
+fr: FR-077
+tieu_de: >-
+  FR-077 DA DUYET + ban giao dev M13 ba don vi ke tiep, kem mot file ngu canh/harness
+  (BAN-GIAO-DEV.md) va con tro tu ba task file
+
+object:
+  - .factory/fr/FR-077-dai-han-bang-khai.md                    # CHO DUYET -> DA DUYET
+  - 07_plan/M13_truyhoi/BAN-GIAO-DEV.md                        # MOI — 6 muc
+  - 07_plan/M01_core/tasks/T01-52-test-dia-chi-anchor.md       # +con tro BAN-GIAO-DEV
+  - 07_plan/M01_core/tasks/T01-51-bang-khai-cho-m13.md         # +con tro BAN-GIAO-DEV
+  - 07_plan/M13_truyhoi/tasks/T13-1-test-unit.md               # +con tro BAN-GIAO-DEV
+  - .factory/worklog/WL-01KB45BANGIAODEV.yaml
+
+quyet_dinh_chu_du_an_nguyen_van: |
+  2026-09-09: "1. Duyet giup toi" (FR-077) va "2. Dev M13 se thi cong . Ban can viet
+  them prompt kem de dev dam bao du context va herness".
+
+vi_sao_mot_FILE_chu_khong_phai_mot_PROMPT: |
+  Chu du an noi "viet them prompt kem". Toi ghi no thanh MOT FILE trong repo
+  (`07_plan/M13_truyhoi/BAN-GIAO-DEV.md`) chu khong phai mot doan chat, vi ba ly do
+  do duoc:
+   1 Mot prompt trong chat chet khi phien dong. Ba don vi nay chay it nhat ba luot,
+     va bay đã bắt được o day (vd "tao file dau tien trong truyhoi/tests/ lat 5 rule
+     sang DO") se phai noi lai moi luot.
+   2 File nay KHONG phai task file: `check_g6b` glob `07_plan/*/tasks/*.md`, nen no
+     khong bi doc nhu mot don vi viec — da do lai sau khi tao, T01-51/52/T13-1 van
+     "ok", 0 loi mang ma M13/T13/T01-5x.
+   3 Ba task file nay tro TOI no bang mot dong o dau file, nen dev mo task nao cung
+     thay duong den ngu canh. Con tro, khong chep noi dung (luat "tro con tro, dung chep").
+
+noi_dung_ban_giao_6_muc: |
+  §0 doc gi truoc — BAY file theo thu tu, moi file mot cot "lay gi o do"; va KHONG
+     doc gi de "hieu them" (01_research 386 dong da chung vao FR).
+  §1 harness — PYTHONIOENCODING (chi check_frozen tu reconfigure; cong khac chet o
+     dong print tren cp1252) · TAM lenh cong kem SO BASELINE · lenh dem loi g6b cua
+     rieng minh · worktree ../gn-m13 + ly do that (hai lan bi gom commit) · dai ID
+     T01-5x/T13-x va hai diem noi KHOA voi nhanh Space · kho tam KB_DIR + cong
+     8895-8899 · sua qua Edit khong di vong heredoc.
+  §2 ba don vi, thu tu BAT DI: T01-52 (test do truoc) -> T01-51 (bang khai) -> T13-1
+     (19 cong MOT luot). Moi don vi neu ro "nguon viet san" de dev khong thiet ke lai,
+     va ve KHONG thuoc no (A3 cua FR-073 · dinh_tuyen cua M12).
+  §3 NAM bay da do: (1) file dau tien trong truyhoi/tests/ lat 5 rule sang DO
+     (check_rule_surfaces :139-142) · (2) dong bang mo dau bang backtick lowercase
+     lam check_ba TREO (:43-46, M12 da vap o WL-01K9W3S6M12) · (3)
+     check_ky_tu_vo_hinh.py DANG CHET vi web/_quartz, dung dung lam cmd · (4)
+     trang.mjs:1722 hard-code sample.v1 + khoa `chunks`, thieu file thi NEM · (5)
+     `--ky` ghi de toan bo lock va khong kiem gi.
+  §4 ban giao — object · do_do co output that · R5 do-truoc-xanh-sau CUNG entry ·
+     `đỏ_do` + cach quy chu · keo_theo mo NGAY.
+  §5 MUOI HAI dieu khong duoc lam, moi dong mot ly do do duoc (bang).
+  §6 SAU ca DUNG va hoi PM.
+
+do_do:
+  - lenh: "python -c 'kiem 5 duong T01-51/52 cham co trong FROZEN.lock'"
+    ket_qua: "ca 5 deu False (dai-han · dia-chi · dich-vu · validate.py · check_dia_chi.py); lock 57 file ⇒ menh de §3.5 'ba don vi nay khong cham file frozen nao' DUNG"
+  - lenh: "grep -c file-anchor core/assets/dia-chi.json"
+    ket_qua: "0 — menh de §2.1 'T01-52 do vi bang khai chua co dang do' DUNG"
+  - lenh: "ls chungcat/tests/_nap.py · grep -n tu-kiem core/tests/check_rule_surfaces.py"
+    ket_qua: "_nap.py CO · --tu-kiem CO (:167, :217) — hai khuon toi chi dev dung deu ton tai that"
+  - lenh: python core/tests/check_g6b.py
+    ket_qua: "T01-51 (4 AC/4 cmd) · T01-52 (3/3) · T13-1 ok sau khi chen con tro; 0 dong loi mang ma M13/T13/T01-5x"
+đỏ_do: "khong co do trong luot nay"
+
+cho_NGUOI_quyet:
+  - "Khong con gi chan T01-52/T01-51: FR-073 va FR-077 deu DA DUYET."
+  - "Dev nen lam trong ../gn-m13 (worktree da dung) — main dang bi ca hai ben go, da gom commit 2 lan."
+
+khong_lam:
+  - "KHONG viet ma cho T01-52/T01-51/T13-1 — chu du an giao dev M13."
+  - "KHONG tao core/assets/dai-han.json — T01-51."
+  - "KHONG cham truyhoi/tests/** — T13-1, va file dau tien lat 5 rule sang DO."
+  - "KHONG sua spec/rules M13 (vua ky 2026-09-09)."
+  - "KHONG bump project_map — PM-Space giu but."

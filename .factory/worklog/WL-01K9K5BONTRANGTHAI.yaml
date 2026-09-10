@@ -1,0 +1,147 @@
+id: WL-01K9K5BONTRANGTHAI
+at: 2026-08-24
+by: claude
+buoc: s8 (M03_web)
+loai: fix (dieu huong + dem + mau + nhan) + amend ui_frozen
+fr: FR-026-bon-trang-thai-du-bon.md   (ve A da lam · ve B cho nguoi ky)
+
+viec: >
+  Nguoi dung gui 2 anh (hang nut o chan cua so doc bai, va hop thoai Duyet):
+  "kiem tra tat ca cac trang thai va button in cho duyet nha".
+
+# ── DO TRUOC, KHONG SUY DIEN ──────────────────────────────────────────────
+ma_tran_16_cap_do_bang_may: |
+  tu \ den   draft  edited  approved  rejected
+  draft       409    409      200       200
+  edited      409    409      200       409
+  approved    409    409      409       409
+  rejected    409    409      409       409
+  (+ approved -> edited: he qua cua PUT, khong phai mot lenh)
+
+khop_hoan_hao_khong_sua_gi:
+  - "nut Duyet chi hien voi draft/edited, nut Loai chi voi draft — KHOP chinh xac BANG_CHUYEN. KHONG nut chet nao."
+  - "11/11 data-act deu co handler (dispatcher multiwindow.inline.ts:489-501)."
+  - >
+    Hop thoai Duyet khop server hoan toan. Do 6 ca: 2 tick + 0 phut (dung nhu
+    anh nguoi dung gui) => 200; thieu / rong / am / thap phan => 422 kem DUNG ten
+    truong. FE khong dien ho truong nao (M08-R3).
+  - "Lam tron giay->phut nhat quan: o nhap luon khop chu 'do duoc' (do 10 moc)."
+  - "Dau `…` trong nhan la ky tu THAT (nghia 'con buoc nua'), khong phai bi cat — khong co text-overflow nao tren .bt-bt."
+
+# ── VE A: ba cho bo sot `edited` — DA SUA ────────────────────────────────
+bug_edited_khong_len_man_cho_duyet:
+  muc_do: NANG — bai cho duyet ma khong man nao, khong o nao co no
+  hien_tuong: >
+    Man Cho duyet loc `=== "draft"` nen ban `edited` khong hien, du
+    `BANG_CHUYEN` CHO PHEP `edited -> approved` va cua so doc bai CO ve nut Duyet
+    cho no. Duong cut o tang dieu huong: API cho, nut co, khong man nao dan toi.
+  do_tren_kho_that: >
+    2 draft + 1 edited. O KPI "cho duyet" hien 2, "tong ban ghi" hien 3 — ban
+    edited khong nam trong BAT KY o nao trong 4 o. Sau khi sua: "cho duyet" = 3.
+  bai_den_do_bang_duong_binh_thuong: >
+    Sua mot bai approved lam no tut xuong `edited` => ROI KHOI SITE (M03-R1 chi
+    publish approved) => roi bien mat khoi moi con so va moi hang cho. Khong tin
+    hieu nao cho nguoi duyet biet co viec phai lam.
+  duong_duy_nhat_truoc_khi_sua: >
+    Vao man Tat ca, TU MAT QUET tim chu `· edited` o dong meta — sidebar chi co
+    3 facet cat/loai/cpt, KHONG co facet trang thai.
+  sua: "tap `choDuyet` = draft + edited, dung o 6 cho (queue, qcount, 2 o KPI, dai rong, so trang)"
+  cho_chua_hon_ca: >
+    home-pages/index.ts:435-439 DA CO comment dai giai thich dung loi nay ("liet
+    ke trang thai bang tay la dem thu cong mot enum se dai ra") — tac gia sua cho
+    CHI MUC cua so, nhung khong ap cho queue/qcount/kpi2 ngay ben duoi. Bai hoc
+    viet ra roi ma khong ap het. Day la lan THU BA cung mot loi, moi lan mot cho.
+
+bug_st_edited_khong_co_luat_css:
+  hien_tuong: "st-draft co opacity .72, st-rejected co .5 + gach ngang, st-edited KHONG GI CA => trong y het approved"
+  sua: "`.cd.st-edited{border-left:3px solid var(--warn)}` + `.st-edited td:first-child{box-shadow:inset 3px 0}`"
+  vi_sao_khong_dung_opacity: >
+    CO Y. draft/rejected mo vi chung "chua toi" hoac "da bo"; `edited` thi CAN
+    HANH DONG — lam mo la nguoc nghia. Va opacity tren chu la thu hop dong tuong
+    phan phai canh; vien khong sinh mau chu moi nao nen contrast-audit KHONG doi.
+
+bug_nut_sua_im_lang:
+  hien_tuong: "`✎ Sửa` la nut DUY NHAT khong co `title`, va khong co `…`"
+  he_qua_that: "doi noi dung bai approved => tut `edited` => ROI KHOI SITE => phai xin duyet lai"
+  canh_bao_co_nhung_muon: "multiwindow.inline.ts:1349 chi hien SAU KHI da bam, o man nap"
+  sua: "`✎ Sửa…` + `title` theo trang thai (approved noi ro edited+roi site; rejected noi ro van rejected)"
+  cung_lop_loi_da_tung_phong: >
+    :1153-1160 viet ca mot doan de phong dung loi nay ("title noi he qua, vi nhan
+    ngan khong noi het duoc") — ap cho `Loai` va `Bo khoi kho`, BO SOT dung `Sửa`.
+
+# ── VE B: KHONG SUA, viet FR — day la quyet dinh vong doi ────────────────
+rejected_la_ho_den:
+  do_moi_endpoint:
+    - "PATCH /status ca 4 dich: 409, `duoc_phep: []` (BANG_CHUYEN khong co khoa `rejected`)"
+    - "PUT sua noi dung: 200 NHUNG VAN `rejected` (articles.mjs lot review_status roi gan lai gia tri cu)"
+    - "DELETE + restore: giu NGUYEN BYTE => giu `rejected`"
+    - "POST /api/articles: ve draft duoc, nhung la bai MOI (id/slug moi)"
+  ket_luan: >
+    Loai nham mot bai thi KHONG CO DUONG NAO dua no lai qua web. Chi con sua file
+    .md bang editor tay — tuc roi ra ngoai ban bien tap, dung thu FR-011 ton tai
+    de tranh.
+  khong_phai_bug: >
+    Spec va code KHOP nhau: M02_kb/spec.md §2.2 ve `└──> rejected` cung la mui
+    ten mot chieu. Nen day la quyet dinh can xem lai, khong sua lang => FR-026 ve B
+    de xuat `rejected -> draft` ("mo lai"), di ve draft de no qua DUNG cong nguoi
+    mot lan nua (B-B1 nguyen ven).
+  ve_B2_nhe_hon: "approved khong thu hoi duoc — muon ha phai PUT sua noi dung cho no tut edited, tuc dung TAC DUNG PHU lam chuc nang. De sau."
+
+hai_dieu_khai_thang_khong_sua:
+  review_minutes_0: >
+    `Number.isInteger(0) && 0>=0` PASS, schema `minimum: 0`. Mo cua so 2 giay roi
+    duyet van hop le. Nguong M1 "trung binh <20 phut" khong cong nao canh — nhung
+    do la nguong TREN TAP, khong tren tung bai, nen canh o day co the sai cho.
+    Can do M1 that truoc khi quyet.
+  phieu_422_loi_validate: >
+    Phieu Duyet co the 422 vi mot truong schema khac (vd `conformance`) ma hop
+    thoai khong hoi va khong sua duoc. FE hien nguyen van nhung do la chuoi
+    validate tho, khong phai khuon THIEU/SAI/SUA. Chua gap that.
+
+# ── RANG MOI ─────────────────────────────────────────────────────────────
+rang_moi:
+  file: web/test/bon-trang-thai.test.js
+  so_phep_kiem: 19
+  nguyen_tac: >
+    KHONG kiem "da sua cho do chua" ma kiem TINH CHAT. Doc `BANG_CHUYEN` TU
+    status.mjs chu khong go lai — doi bang thi test theo, nen no khong the thanh
+    loi khai thu hai.
+  phu:
+    - "trang thai nao duyet duoc (doc tu BANG_CHUYEN)"
+    - "FE ve nut Duyet cho DUNG tap do (bat ca nut chet lan duong cut)"
+    - "4 nut hanh dong deu co `title`; title cua Sua phai noi `edited` + `site`"
+    - "4 moc (queue/qcount/oKpi/oNho) khong duoc dung rieng `draft`"
+    - "3 trang thai non-approved deu co luat CSS; st-edited khong co opacity"
+    - "tren TRANG DA BUILD: moi bai st-draft/st-edited o man Tat ca phai co o man Cho duyet; qcount khop so hang"
+  kiem_hai_chieu: "lui ca 3 sua => 5 phep kiem do, goi ten dung tung nguyen nhan"
+
+phep_kiem_toi_viet_sai_va_tu_bat:
+  dem_data_slug: >
+    Dem `data-slug` de so voi qcount cho so GAP DOI — moi hang mang HAI data-slug
+    (the <a> mo bai + nut "doc & duyet"). Doi sang dem `<div class="qr">`.
+    Loi cua phep dem, khong cua trang.
+  thong_bao_toi_nghia: "'dung `draft`, khong phai `draft`' — sua thanh in ro gia tri dang dung"
+  thieu_in_ma_HTTP: >
+    Phep kiem "doi gia tri LONG SAU" chi in `review_status` nen khi PUT khong
+    thanh cong no bao `undefined` — khong phan biet duoc "so sanh sai" voi "PUT
+    that bai". Da them in ma + nguyen van phan hoi.
+
+evidence:
+  - "cd web && npm test => exit 0, 33/33 file, 0 FAIL (chay 4 luot; 1 luot dau do o luong-day-du)"
+  - "npm run check => sach"
+  - "pytest core/tests -q => 30 passed"
+  - "13/13 cong check_* exit 0"
+  - "build lai: o 'cho duyet' 02 -> 03; man Cho duyet gio co ca 3 bai (2 draft + 1 edited)"
+  - "check_frozen: dung 1 file doi (M03_web/spec.md), ky lai 27 file"
+
+no_con_lai:
+  - >
+    MOT LUOT do khong tai hien duoc: luong-day-du "doi gia tri LONG SAU" do trong
+    bo day du, xanh khi chay rieng. Chay lai 4 luot tron bo + 4 ban song song =>
+    deu xanh, khong tai hien. Da them in nguyen van phan hoi de lan sau no tu noi
+    nguyen nhan. KHONG coi la da tri — chi la chua bat lai duoc.
+  - "FR-026 ve B (`rejected -> draft`) va ve B2 (thu hoi approved) — CHO NGUOI KY."
+  - "FR-025 (cong 9 khong bat khi url_normalized vang) — CHO NGUOI KY."
+  - "Khong co facet loc theo TRANG THAI o sidebar — bai edited/rejected chi tim duoc bang mat."
+  - "dongBoThe() chi dong bo #grid2; man Cho duyet chua duoc dong bo => duyet xong bai van nam do toi khi build (FE co nhac chay build)."
+  - "Chua co cache-busting cho gn.js/gn.css — nen lam TRUOC buoc doi UI lon."

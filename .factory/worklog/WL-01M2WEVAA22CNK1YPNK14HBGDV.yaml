@@ -1,0 +1,51 @@
+entry: ban-giao
+ulid: 01M2WEVAA22CNK1YPNK14HBGDV
+ngay: 2026-09-09
+module: M03_web
+don_vi: T03-135
+wo: WO-081
+tieu_de: >-
+  Panel transcript ket o "Dang doc transcript..." — loi bi mot try cua nguoi khac nuot
+
+object:
+  - web/plugins/cctab/src/cctab.inline.ts
+  - chungcat/tests/check_tu_noi_tiep.py
+
+trieu_chung: |
+  Chu du an chup lai: panel "Sinh transcript" hien dai xanh la DUNG, roi dung
+  vinh vien o *"Dang doc transcript..."*. Nut footer khong hien. Console SACH.
+  Trong khi cua so ban ghi ben canh hien du 454 cue — transcript CO THAT.
+
+goc_re: |
+  Toi dat `veNutChungCatTuTranscript(doc, sl)` NGOAI khoi `try`, PHIA TREN phan
+  doc transcript. No nem => phan doc khong bao gio chay.
+
+  Va vi sao khong mot dong console: `await veKetQua(doc, v, ulid)` (dong ~712)
+  nam trong mot `try` bat dau o dong 660, ma `catch` cua no viet cho ca *"mat
+  lien lac voi dich vu"*. Moi loi trong panel roi vao do va bi NUOT CAM — DOM
+  dung nguyen o dong cuoi da ghi.
+
+  Day la lop loi dat: mot `catch` viet cho MOT ca cu the, dat du rong de nuot
+  moi ca khac. Panel khong duoc phep dua vao viec loi se noi len o dau do.
+
+sua: |
+  Transcript dung TRUOC va tu bao ve bang `try` rieng; nut la phan THEM, dung
+  SAU, `try` rieng, hong thi chi mat nut. Nguyen tac: thu NGUOI DANG CHO phai
+  duoc dung truoc va khong bao gio bi keo theo boi mot phan phu.
+
+cong:
+  them: ve 7 / 7a / 7b trong check_tu_noi_tiep.py
+  do_duoc: gieo lai thu tu cu (nut truoc transcript) => 7a DO dung
+  ve_7b: |
+    Khoa lai CHINH tien de: loi goi `veKetQua` nam trong mot `try` cua nguoi
+    khac. Ngay nao dieu do het dung, 7b do va nguoi sua doc lai truoc khi dong.
+
+chua_nghiem_thu_duoc: |
+  Khong dung duoc panel nay trong moi truong tu dong: `.bk` khong bao gio xuat
+  hien du URL da mang `?job=<ulid>`. Da thu 6 duong khac nhau (deep link, bam
+  the, bat dung luc dang chay). Nen day la SUA THEO CAU TRUC + cong khoa thu tu,
+  KHONG phai nghiem thu tren man that. Ghi ra thay vi noi da chay.
+
+do_do: |
+  M12 56/56. chunk-tu-chua / token-only / markup-matches-css / nut-song /
+  cua-so-transcript deu xanh.

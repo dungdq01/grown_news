@@ -1,0 +1,69 @@
+entry: ban-giao
+ulid: 01KB4AC3FE
+ngay: 2026-09-10
+module: M03_web (task FE) · M13_truyhoi (nguoi tieu thu)
+don_vi: [T03-148, T03-149, T03-125]
+tieu_de: >-
+  Plan M13 co MOT task FE (T03-125) va no co mot AC treo — mo C3 (T03-148 test ->
+  T03-149 code) de heading render co `id`, dia chi file#anchor BAM DUOC
+
+object:
+  - 07_plan/M03_web/tasks/T03-148-test-heading-id-anchor.md    # MOI — 4 ca, ca D = cong BA ban (FR-073 A3)
+  - 07_plan/M03_web/tasks/T03-149-heading-id-slug-goi-y.md     # MOI — md() sinh id, <=8 dong theo rule 15
+  - 07_plan/M03_web/tasks/T03-125-ui-tim-toan-van.md           # +phu_thuoc T03-149 cho AC2
+  - 06_modules/M03_web/backlog.md                              # o C3 (mo 09-02) nay tro task
+  - 06_modules/M13_truyhoi/backlog.md                          # o keo theo: AC-2.2 frozen se loi thoi sau C3
+  - .factory/worklog/WL-01KB4AC3FE.yaml
+
+cau_hoi_chu_du_an: "Plan ban viet co cac task FE chua?"
+
+tra_loi_do_duoc: |
+  CO MOT: T03-125 (UI tim toan van, wireframe SCR-22 -> code web/plugins/timkiem/).
+  Ma tran man (05_uiux/ma-tran-module-man.md) khai M13 gop vao BA cho: o tim (T03-125
+  phu) · facet Kho = pham vi (da co) · Ctrl+F "tim-hoac-hoi" (T03-125 chua nhac —
+  de sau, gop vao buoc 2 khi co wireframe).
+  NHUNG T03-125 AC2 "bam ket qua => cuon dung anchor (do DOM)" KHONG CO DUONG XANH:
+    multiwindow.inline.ts:313  md() render `<h${c}>` + inline + `</h${c}>` — KHONG id
+    multiwindow.inline.ts:626  nhay(id,j) chi scroll toi G(id+"s"+j) — muc KHUNG 5 MUC
+  ⇒ cuon toi anchor heading la cuon toi mot id khong ton tai. Day la C3, o backlog
+  M03:7 mo tu 2026-09-02, CHUA CO TASK. Mot AC da khai ma khong co duong xanh la AC
+  treo, va T03-125 se do loi cho M13 trong khi M13 sinh anchor dung.
+
+mo_hai_don_vi: |
+  T03-148 (test di dau): 4 ca — A id==slugGoiY (ca đ) · B dedup -1/-2 on dinh ·
+    C reset theo BAI · D cong BA BAN (id HTML == slugGoiY == anchor_py) tren 50
+    heading kho that — do la A3 cua FR-073, "cong dat nhat, khong thuoc rieng M01",
+    song o M03 vi ban thu ba la thu nguoi dung BAM VAO.
+  T03-149 (code): md() them id = slugGoiY(text) + dedup state theo bai. DUNG LAI
+    slugGoiY (:1335), khong viet ham thu hai (M13-R2). Rule 15 ap the nao: md() la
+    renderer DUNG CHUNG, khong co web/plugins/<module>/ de doi toi ⇒ doi <=8 dong trong
+    multiwindow; dedup >3 dong thi ra file moi anchor.ts. Diff >8 dong ⇒ reviewer FAIL.
+  ID: max dai hien hanh cua M03 = 147 (190+ la PM-Space) ⇒ 148, 149.
+
+noi_day: |
+  T03-125 phu_thuoc += T03-149. Truoc do T03-125 chi cho T08-35 + T13-4.
+  O backlog M03:7 (C3) tro hai task. O backlog M13 MOI: AC-2.2 (FROZEN) dang noi
+  "chua co gi de so" — sau T03-149 cau do loi thoi ⇒ FR, gop vao FR ke tiep cua M13.
+
+hai_cho_FE_con_CHUA_task_va_vi_sao_de_sau: |
+  1 Ctrl+F "tim-hoac-hoi" (ma tran :21) — gop vao T03-125 buoc 2 khi wireframe SCR-22
+    duoc duyet; mo task rieng bay gio la ve hai lan mot man.
+  2 Dashboard dem truy van 0-ket-qua (AC-7.1 hien thi) — chua co so de ve; T13-6 ghi
+    so truoc, man ve sau. Mo task khi so ton tai.
+  Va mot no cu da co o backlog M13: trang.mjs:1707 trang_thai M13 "chua dung" +
+  soDotHai doc sample.v1 — tro PM M03, khong phai task cua plan nay.
+
+do_do:
+  - lenh: "grep -n '<h\\${c}\\|function nhay' web/plugins/multiwindow/src/scripts/multiwindow.inline.ts"
+    ket_qua: ":313 <h${c}> KHONG id · :626 nhay(id,j) -> G(id+'s'+j)"
+  - lenh: "ls 07_plan/M03_web/tasks | sed | awk '$1<190' | tail -1"
+    ket_qua: "147 ⇒ lay 148, 149"
+  - lenh: python core/tests/check_g6b.py
+    ket_qua: "T03-148 hard 3 AC/3 cmd ok · T03-149 hard 4 AC/4 cmd ok · T03-125 ok 5/5 · khong VONG · 0 loi mang ma M13/T01-5[1-9]/T03-14[89]/T03-125"
+đỏ_do: "khong co do moi; 21 loi g6b van la task module khac"
+
+khong_lam:
+  - "KHONG sua md() — do la T03-149, dev lam."
+  - "KHONG sua spec M13 AC-2.2 (FROZEN) — o backlog M13, gop FR ke tiep."
+  - "KHONG mo task Ctrl+F va dashboard — ly do o tren."
+  - "KHONG bump project_map — PM-Space giu but."

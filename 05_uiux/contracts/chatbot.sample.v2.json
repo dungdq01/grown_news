@@ -1,0 +1,133 @@
+{
+  "$comment": "v2 — khớp spec M14 §2 nguyên văn: blocks[]{text, citations[]{doc_id, anchor, cited_text, start, end}, trang_thai: da-xac-minh|chua-xac-minh} + tu_choi{ly_do enum 3, dia_chi[slug#anchor]}. AC-3.1/3.2: không block nào bị bỏ im lặng — verify trượt thì gắn cờ, vẫn hiện. Kèm pham_vi.so_ban_ghi trả cùng.",
+  "version": 2,
+  "phien": [
+    {
+      "id": "ph-01",
+      "nguoi_dung": "dung.dang",
+      "kenh": "web"
+    },
+    {
+      "id": "ph-02",
+      "nguoi_dung": "dong.nghiep-a",
+      "kenh": "telegram"
+    }
+  ],
+  "lich_su_phien": [
+    {
+      "id": "ph-01",
+      "nguoi_dung": "dung.dang",
+      "kenh": "web",
+      "so_luot": 4,
+      "cap_nhat": "2026-09-02T09:10:00+07:00"
+    },
+    {
+      "id": "ph-02",
+      "nguoi_dung": "dong.nghiep-a",
+      "kenh": "telegram",
+      "so_luot": 2,
+      "cap_nhat": "2026-09-01T09:40:00+07:00"
+    },
+    {
+      "id": "ph-00",
+      "nguoi_dung": "dung.dang",
+      "kenh": "web",
+      "so_luot": 9,
+      "cap_nhat": "2026-08-31T21:00:00+07:00"
+    }
+  ],
+  "hoi_dap": [
+    {
+      "phien": "ph-01",
+      "cau_hoi": "Vì sao XGBoost dùng khai triển Taylor bậc hai?",
+      "pham_vi": {
+        "facet": {
+          "phan_loai": "tai-lieu"
+        },
+        "so_ban_ghi": 2
+      },
+      "blocks": [
+        {
+          "text": "XGBoost xấp xỉ hàm mất mát quanh dự đoán hiện tại bằng khai triển bậc hai để giữ thông tin độ cong.",
+          "citations": [
+            {
+              "doc_id": "xgboost-taylor-bac-hai",
+              "anchor": "vi-sao-bac-hai",
+              "cited_text": "khai triển bậc hai giữ được thông tin độ cong",
+              "start": 2101,
+              "end": 2148
+            }
+          ],
+          "trang_thai": "da-xac-minh"
+        },
+        {
+          "text": "Nhờ đó mỗi vòng boosting giải được nghiệm đóng cho trọng số lá.",
+          "citations": [
+            {
+              "doc_id": "xgboost-taylor-bac-hai",
+              "anchor": "trong-so-la",
+              "cited_text": "nghiệm đóng w* = -G/(H+lambda)",
+              "start": 3300,
+              "end": 3327
+            }
+          ],
+          "trang_thai": "da-xac-minh"
+        },
+        {
+          "text": "Cách này luôn nhanh hơn gradient bậc nhất ít nhất hai lần.",
+          "citations": [],
+          "trang_thai": "chua-xac-minh",
+          "$edge": "AC-3.1: quote không tìm thấy trong nguồn — GẮN CỜ, vẫn hiện, KHÔNG bỏ im lặng; markup phải KHÁC block đã xác minh"
+        }
+      ],
+      "tu_choi": null
+    },
+    {
+      "phien": "ph-01",
+      "cau_hoi": "Giá Bitcoin hôm nay bao nhiêu?",
+      "pham_vi": {
+        "facet": {},
+        "so_ban_ghi": 3
+      },
+      "blocks": [],
+      "tu_choi": {
+        "ly_do": "khong-co-trong-kho",
+        "dia_chi": []
+      },
+      "$hanh_dong": "nạp nguồn về chủ đề đó"
+    },
+    {
+      "phien": "ph-01",
+      "cau_hoi": "Walk-forward hay k-fold tốt hơn cho chuỗi thời gian?",
+      "pham_vi": {
+        "facet": {},
+        "so_ban_ghi": 3
+      },
+      "blocks": [],
+      "tu_choi": {
+        "ly_do": "co-nhung-mau-thuan",
+        "dia_chi": [
+          "walk-forward-validation-k-fold#ket-luan",
+          "storm-multi-perspective#danh-gia"
+        ]
+      },
+      "$hanh_dong": "đọc HAI địa chỉ được trỏ, tự quyết"
+    },
+    {
+      "phien": "ph-02",
+      "cau_hoi": "Cách nấu phở ngon?",
+      "pham_vi": {
+        "facet": {
+          "phan_loai": "video"
+        },
+        "so_ban_ghi": 1
+      },
+      "blocks": [],
+      "tu_choi": {
+        "ly_do": "ngoai-pham-vi",
+        "dia_chi": []
+      },
+      "$hanh_dong": "mở rộng facet đang chọn"
+    }
+  ]
+}

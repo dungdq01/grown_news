@@ -1,0 +1,55 @@
+entry: ban-giao
+ulid: 01KB4BNHANH
+ngay: 2026-09-10
+module: xuyen module — quy trinh nhanh/worktree
+tieu_de: >-
+  rule.md muc 17 — moi module mot nhanh m<NN> + worktree, main chi nhan merge; giu
+  nhanh m13 dang co (khong tao M13-gn); repo CHUA co remote nen push cho chu du an
+
+object:
+  - .claude/rule.md                        # +muc 17
+  - memory/decisions.md                    # +entry 2026-09-10 (nhanh)
+  - 07_plan/M13_truyhoi/BAN-GIAO-DEV.md    # §1.3 +rule 17, canh bao remote rong
+  - .factory/worklog/WL-01KB4BNHANH.yaml
+
+chi_dao_nguyen_van: |
+  2026-09-10: "the tao branch M13-gn roi xong push / working qua branch nay nha, moi
+  module 1 branch. thay hop ly thi note lai giup toi"
+
+do_truoc_khi_ghi: |
+  git worktree list  ⇒ 3 cay: Grown_news [main] · ../gn-m13 [m13] · ../gn-space [space]
+  gn-m13/.git        ⇒ FILE tro Grown_news/.git/worktrees/gn-m13 — worktree THAT, khong
+                        phai copy (cau hoi truoc cua chu du an)
+  git branch -vv     ⇒ m13 = e932753 (T01-51 vua xong) · main..m13 = 2 commit ·
+                        m13..main = 0 ⇒ nhanh m13 bao tron main, khong lech
+  git remote -v      ⇒ RONG — chua co remote, "push" chua di dau duoc
+  git branch -r      ⇒ rong
+
+mot_chu_khac_chi_dao_va_vi_sao: |
+  Chu du an noi "tao branch M13-gn". Toi de nghi GIU `m13` dang co, khong tao them:
+   - `m13` da co 2 commit dung cach (T01-52 do truoc, T01-51 xanh sau, R5 cung entry
+     WL-01M24GPRW2 cua dev), worktree da dung, dev dang lam o do.
+   - Hai nhanh cho mot module la hai cho se lech — dung lop loi "hai ban mot luat".
+   - Chuan ten `m<NN>` de nhanh cua module nao doc ra ngay; `space` la ngoai le vi
+     khong danh so.
+  Ghi thanh luat (rule 17) + decisions + memory. Neu chu du an van muon ten `M13-gn`
+  thi la mot lenh `git branch -m m13 M13-gn` — doi TEN, khong tao nhanh thu hai.
+
+remote: |
+  Repo chua co remote ⇒ ve "push" trong chi dao chua thuc hien duoc. Toi KHONG tu
+  `git remote add`: khong co URL, va do la ha tang cua chu du an. Ghi ro o rule 17 va
+  BAN-GIAO-DEV de dev khong tuong "da push". Cho toi khi co remote, nhanh chi song
+  local — mat may la mat nhanh.
+
+anh_huong_nhanh_khac: |
+  Team M12 va M03 dang commit thang `main` (09-09/09-10: 242431f · f611550 · a38310a ·
+  T12-33/34/35 · T03-135…). Theo rule 17 ho phai chuyen sang `m12`/`m03` + worktree.
+  Do la viec cua PM/dev cac module do — toi khong tao nhanh ho ho.
+
+đỏ_do: "khong chay cong; khong co do"
+
+khong_lam:
+  - "KHONG tao nhanh M13-gn — giu m13, ly do o tren."
+  - "KHONG git remote add — khong co URL, ha tang cua chu du an."
+  - "KHONG tao nhanh m12/m03 cho team khac."
+  - "KHONG merge m13 vao main — merge la sau CI xanh + reviewer vai khac, chua toi luc."

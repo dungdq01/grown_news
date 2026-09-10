@@ -1,0 +1,79 @@
+id: WL-01K9P6MAPCHECK
+at: 2026-08-29
+by: claude
+buoc: quét tám lệnh kiểm CLAUDE.md khai · cài `<map-check>` · hai cái còn lại KHÔNG tự cài
+loai: bàn giao (cổng khung Factory)
+
+object:
+  task:
+    - 07_plan/M01_core/tasks/T01-36-test-cong-map.md
+  test:
+    - core/tests/check_map.py   # MỚI — 5 mục, hai chiều
+  backlog:
+    - 06_modules/M01_core/backlog.md   # 3 ô
+
+may_xanh:
+  - "PYTHONIOENCODING=utf-8 python core/tests/check_map.py -> pass (11 module · 11 thư mục)"
+  - >
+    KIỂM HAI CHIỀU cho **cả bốn** răng, đo chứ không suy: module ma · boundary
+    trỏ hư không · spec vắng mặt · thư mục không ai khai — cả bốn ĐỎ đúng lời.
+    Phục hồi ⇒ `project_map.yaml` sha256 `c807f60d40931230` y hệt, cổng xanh lại
+  - "21/25 cổng Python (+1 cổng mới) · pytest 42 · quét web 72/73"
+
+quet_tam_lenh:
+  - >
+    ĐÃ CÓ: `<freeze-check>`=`check_frozen` · `<rule-surface-check>`=
+    `check_rule_surfaces` · `<pin-check>`=`check_version_pin` ·
+    `<worklog-check>`=`check_worklog`
+  - >
+    KHÔNG ÁP DỤNG: `<docs-sync>` — chuỗi `factory:sinh` KHÔNG xuất hiện ở đâu
+    trong repo này, kể cả README. Không có khối nào để đối chiếu; ghi ra để lần
+    sau không ai đi tìm
+  - "CÀI HÔM NAY: `<map-check>` = `check_map.py`"
+
+vi_sao_map_check_dang_cai_nhat:
+  - >
+    `project_map` là thứ `check_g6b` dùng để phán một `phạm_vi_ghi` có nằm trong
+    boundary hay không. Map lệch thư mục thật ⇒ MỌI phán quyết R1 đứng trên nền
+    sai, và sai IM LẶNG: một module khai `be: 06_skillgen/**` cho thư mục không
+    tồn tại vẫn cho mọi task của nó đi qua
+  - >
+    HAI CHIỀU vì một chiều không đủ: map→đĩa bắt boundary trỏ hư không; đĩa→map
+    bắt thư mục module không ai khai — đúng lỗ `kb-mock/**` từng có
+  - >
+    Và nó là cái DUY NHẤT trong ba cái thiếu mà cài vào XANH NGAY: không phá gì,
+    không bắt ai quyết gì
+
+hai_cai_khong_tu_cai:
+  - >
+    `<scope-check>` chưa cài được vì lý do CẤU TRÚC. Đo: 126 task khai
+    `phạm_vi_ghi`, **52 đường bị nhiều task khai** (`web/test/WORKLOG.md` 29 ·
+    `package.json` 25 · `multiwindow.inline.ts` 17). Nhưng đó là task hoàn thành
+    ở các thời điểm KHÁC NHAU — rule này dành cho việc chạy SONG SONG. Task file
+    chỉ khai ba trường, **không có trạng thái**, nên không phân biệt được đang mở
+    với đã đóng. Cài theo nghĩa đen ⇒ đỏ trên toàn bộ lịch sử, tệ hơn không có
+  - >
+    `<backlog-check>` chưa cài, và cài vào là ĐỎ NGAY: `CLAUDE.md` nói ô `[ ]`
+    *"chết ở gate"*, hiện 0 cổng làm việc đó nên mọi ô mở — kể cả những ô tôi vừa
+    mở — không chặn gì. KHÔNG tự cài: nó đổi thứ chặn được việc, là quyết định
+    của người, cùng loại với việc nối 9 cổng vào CI
+
+tu_bat_duoc:
+  - >
+    Phép quét đầu của tôi dùng khớp TÊN FILE (`grep -iE map`) và báo 4/8 lệnh
+    "CHƯA CÀI" — sai: `check_frozen` mang tên khác `<freeze-check>`. Tên file
+    không phải hợp đồng; phải đọc cổng làm gì. Sau khi đọc: chỉ 3 thiếu, và 1
+    trong 3 là không-áp-dụng
+  - >
+    Neo vá `  M02_kb:` hỏng vì file dùng CRLF (`'  M02_kb:\r'`). Bản sao lưu +
+    so sha đã giữ file nguyên vẹn qua lần hỏng đó
+
+đỏ_do: chưa quy được chủ  # ba lệnh vắng từ lúc áp khung
+
+do_do:
+  - cong: he-kinh.test.js
+    do_do_boi: ảnh 724662 byte người dùng thêm — `python core/tools/toi_uu_anh_nen.py`
+  - cong: check_frozen.py
+    do_do_boi: chờ NGƯỜI ký sau khi FR-039 duyệt
+  - cong: check_danh_muc.py · check_skill.py · check_running.py
+    do_do_boi: agent khác · và hệ quả của hai cổng trên

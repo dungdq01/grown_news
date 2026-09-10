@@ -1,0 +1,212 @@
+/* Cua so doc — moi gia tri di qua token cua s5 (M03-R4).
+   Khong go tay px cho spacing/font-size: 05_uiux/tokens.css thang moi tai lieu. */
+
+.gn-win {
+  position: fixed;
+  display: flex;
+  flex-direction: column;
+  background: var(--glass);
+  backdrop-filter: var(--blur-lift);          /* MOT blur duy nhat — DESIGN.md §3 */
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 24px 60px -12px rgb(0 0 0 / 28%);
+  overflow: hidden;
+  container-type: inline-size;                /* chu co theo BE RONG CUA SO */
+}
+
+.gn-win.gn-max {
+  inset: var(--s-2xs) !important;
+  width: auto !important;
+  height: auto !important;
+  border-radius: var(--radius);
+}
+
+.gn-win.gn-rs { user-select: none }
+
+/* ── thanh tieu de ─────────────────────────────────────────────────────── */
+.gn-t {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2xs);
+  padding: var(--s-2xs) var(--s-xs);
+  border-bottom: 1px solid var(--border-subtle);
+  cursor: move;
+  flex: 0 0 auto;
+}
+.gn-ic { width: var(--s-2xs); height: var(--s-2xs); border-radius: 50%; flex: 0 0 auto }
+.gn-tt {
+  flex: 1;
+  font-size: var(--fs-small);
+  font-weight: var(--w-head);                 /* luat 1: menu DAM + THANG */
+  font-style: normal;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.gn-ct { display: flex; gap: var(--s-3xs) }
+.gn-wb {
+  border: 0;
+  background: transparent;
+  color: var(--ink-2);
+  font-size: var(--fs-meta);
+  line-height: 1;
+  padding: var(--s-3xs) var(--s-2xs);
+  border-radius: var(--r-sm);
+  cursor: pointer;
+}
+.gn-wb:hover { background: var(--muted); color: var(--ink) }
+.gn-wb.gn-x:hover { background: var(--destructive); color: var(--destructive-foreground) }
+.gn-wb:focus-visible { outline: 2px solid var(--ring); outline-offset: 1px }
+
+/* ── tab khi nhieu ban cung nguon ──────────────────────────────────────── */
+.gn-tabs {
+  display: flex;
+  gap: var(--s-3xs);
+  padding: var(--s-3xs) var(--s-xs);
+  border-bottom: 1px solid var(--border-subtle);
+  flex: 0 0 auto;
+}
+.gn-tab {
+  border: 1px solid var(--border-subtle);
+  background: transparent;
+  color: var(--ink-2);
+  font-family: var(--f-mn);
+  font-size: var(--fs-micro);
+  padding: var(--s-3xs) var(--s-2xs);
+  border-radius: var(--r-sm);
+  cursor: pointer;
+}
+.gn-tab[aria-current="true"] {
+  background: var(--brand-bg);
+  color: var(--brand);
+  border-color: var(--brand);
+}
+
+/* ── than: muc luc + noi dung ──────────────────────────────────────────── */
+.gn-b { display: flex; flex: 1; overflow-y: auto; overflow-x: hidden }
+
+.gn-toc {
+  flex: 0 0 auto;
+  width: 15rem;
+  padding: var(--s-sm);
+  border-right: 1px solid var(--border-subtle);
+  position: sticky;
+  top: 0;
+  align-self: flex-start;
+}
+.gn-lb {
+  font-size: var(--fs-micro);
+  font-weight: var(--w-head);
+  color: var(--ink-3);
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  margin-bottom: var(--s-2xs);
+}
+.gn-toc ol { list-style: none; margin: 0; padding: 0 }
+.gn-toc button {
+  display: flex;
+  gap: var(--s-2xs);
+  width: 100%;
+  text-align: left;
+  border: 0;
+  background: transparent;
+  color: var(--ink-2);
+  font-size: var(--fs-meta);
+  line-height: var(--lh-ui);
+  padding: var(--s-3xs) var(--s-2xs);
+  border-radius: var(--r-sm);
+  cursor: pointer;
+}
+.gn-toc button:hover { background: var(--muted); color: var(--ink) }
+.gn-toc button[aria-current="true"] { background: var(--brand-bg); color: var(--brand) }
+.gn-n { font-family: var(--f-mn); font-size: var(--fs-micro); color: var(--ink-3) }
+
+.gn-doc {
+  flex: 1;
+  min-width: 0;
+  max-width: 37.5rem;                          /* cot doc 600px — 60-75 ky tu */
+  padding: var(--s-lg) var(--s-md);
+  /* Chu co theo BE RONG CUA SO, nhung chi noi toi da 1 bac (DESIGN.md §2).
+     Ban v14 dung clamp tu do cho 19.3px — to hon trang chu 4px, lech he. */
+  font-size: clamp(.9375rem, .9rem + .1cqw, 1rem);
+  line-height: var(--lh-read);
+}
+.gn-doc h1 { font-size: var(--fs-h2); line-height: var(--lh-h2); font-weight: var(--w-head) }
+.gn-doc h2 { font-size: var(--fs-h3); line-height: var(--lh-h3); margin-top: var(--s-lg) }
+.gn-ld { font-size: var(--fs-meta); color: var(--ink-3); font-style: var(--i-note) }
+
+/* ── chan: meta + so trang ─────────────────────────────────────────────── */
+.gn-f {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-2xs);
+  padding: var(--s-2xs) var(--s-xs);
+  border-top: 1px solid var(--border-subtle);
+  font-size: var(--fs-micro);
+  color: var(--ink-3);
+  flex: 0 0 auto;
+}
+.gn-meta { font-style: var(--i-note) }        /* luat 3: ghi chu NGHIENG */
+.gn-ex { color: var(--warning); font-style: normal }
+.gn-pg { font-family: var(--f-mn); font-variant-numeric: tabular-nums }
+.gn-f button {
+  border: 1px solid var(--border-subtle);
+  background: transparent;
+  color: var(--ink-2);
+  font-size: var(--fs-micro);
+  padding: var(--s-3xs) var(--s-2xs);
+  border-radius: var(--r-sm);
+  cursor: pointer;
+}
+.gn-f button:disabled { opacity: .4; cursor: default }
+
+/* ── tay keo gian 8 huong ──────────────────────────────────────────────── */
+.gn-rz { position: absolute; z-index: 2 }
+.gn-rz-n  { top: -3px; left: 8px; right: 8px; height: 6px; cursor: ns-resize }
+.gn-rz-s  { bottom: -3px; left: 8px; right: 8px; height: 6px; cursor: ns-resize }
+.gn-rz-w  { left: -3px; top: 8px; bottom: 8px; width: 6px; cursor: ew-resize }
+.gn-rz-e  { right: -3px; top: 8px; bottom: 8px; width: 6px; cursor: ew-resize }
+.gn-rz-nw { top: -3px; left: -3px; width: 12px; height: 12px; cursor: nwse-resize }
+.gn-rz-ne { top: -3px; right: -3px; width: 12px; height: 12px; cursor: nesw-resize }
+.gn-rz-sw { bottom: -3px; left: -3px; width: 12px; height: 12px; cursor: nesw-resize }
+.gn-rz-se { bottom: -3px; right: -3px; width: 12px; height: 12px; cursor: nwse-resize }
+
+/* ── dock cua so thu nho ───────────────────────────────────────────────── */
+#gn-dock {
+  position: fixed;
+  left: var(--s-xs);
+  bottom: var(--s-xs);
+  display: flex;
+  gap: var(--s-2xs);
+  align-items: center;
+  z-index: 39;
+}
+#gn-dock:empty { display: none }
+.gn-dlbl { font-size: var(--fs-micro); color: var(--ink-3); font-style: var(--i-note) }
+.gn-dk {
+  display: flex;
+  align-items: center;
+  gap: var(--s-3xs);
+  background: var(--glass-2);
+  backdrop-filter: var(--blur-lift);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--r);
+  padding: var(--s-3xs) var(--s-2xs);
+  font-size: var(--fs-micro);
+  color: var(--ink-2);
+  cursor: pointer;
+  max-width: 14rem;
+}
+.gn-dk i { width: var(--s-3xs); height: var(--s-3xs); border-radius: 50%; flex: 0 0 auto }
+.gn-dk span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis }
+
+/* Man hep: muc luc gap lai, cua so chiem gan het man */
+@container (max-width: 40rem) {
+  .gn-toc { display: none }
+  .gn-doc { padding: var(--s-md) var(--s-sm) }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gn-win, .gn-dk { transition: none !important }
+}

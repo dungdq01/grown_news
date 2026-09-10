@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "deny": [
+      "Write(./05_uiux/contracts/**)",
+      "Write(./06_modules/**/spec.md)",
+      "Write(./06_modules/**/rules.md)",
+      "Write(./core/assets/frontmatter.schema.json)",
+      "Write(./kb/concepts.yaml)",
+      "Write(./.githooks/**)"
+    ]
+  },
+  "enabledPlugins": {
+    "ui-theme-designer@claude-plugins-official": true,
+    "design@all-in-one": true,
+    "playwright@claude-plugins-official": true
+  }
+}

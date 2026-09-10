@@ -1,0 +1,143 @@
+id: WL-01K9N2FR036A56
+at: 2026-08-27
+by: claude
+buoc: s8 — FR-036 A5 (di trú bài thật) + A6 (tài liệu · FROZEN · skill ngoài repo)
+loai: đóng nhánh A của FR-036
+fr: FR-036-khung-than-bai-5-muc.md
+
+object:
+  task:
+    - 07_plan/M02_kb/tasks/T02-3-di-tru-khung-5-muc.md
+  a5_di_tru:
+    - kb/repo/hermes-agent.md          # 1580 -> 1491 từ, 9 mục -> 5 mục
+    - kb/_kho.sqlite                   # dựng lại từ export, fixpoint đạt
+  a6_hop_dong_song:
+    - 06_modules/M01_core/spec.md      # FROZEN — ký lại
+    - 06_modules/M01_core/diagram_flow.md
+    - 06_modules/M02_kb/model_flow.md
+    - 06_modules/M03_web/spec.md       # FROZEN — ký lại
+    - 06_modules/M03_web/ui_flow.md
+    - 03_docs/prd.md
+    - core/README.md
+    - 05_uiux/screen_inventory.md
+    - 05_uiux/DESIGN.md
+    - project_map.yaml
+    - .claude/skills/nap-bai/SKILL.md
+    - FROZEN.lock
+  a6_ngoai_repo:
+    - ~/.claude/skills/source-distiller/scripts/validate.py     # bản thứ tư, đã lạc hậu
+    - ~/.claude/skills/source-distiller/scripts/khung.py        # MỚI
+    - ~/.claude/skills/source-distiller/assets/khung-than-bai.json  # MỚI
+    - ~/.claude/skills/source-distiller/assets/frontmatter.schema.json
+    - ~/.claude/skills/source-distiller/examples/mau-dat-chuan.md
+    - ~/.claude/skills/source-distiller/references/format.md
+    - ~/.claude/skills/source-distiller/SKILL.md
+    - ~/.claude/skills/source-distiller/README.md
+  a6_dua_nguon_vao_repo:
+    - core/skill-src/format.md                       # MỚI
+    - core/skill-src/source-distiller.SKILL.md       # MỚI
+
+# ══ A5 · DI TRÚ — đường đi đúng theo FR-034, không phải "sửa file rồi xong" ══
+a5:
+  duong_di: >
+    kb/** là EXPORT sau FR-034 (kb_writers rỗng), nên di trú là: sửa export ->
+    dung_lai_db.py (file->DB, người chạy, server KHÔNG BAO GIỜ gọi) ->
+    xuat_kho.py về fixpoint. Lần xuất thứ hai ghi 0 file ⇒ fixpoint đạt.
+  anh_xa:
+    "§2 Ý tưởng lớn -> §1 Overview": nguyên văn (106 từ) — nó vốn đã là đoạn "nếu chỉ nhớ một điều"
+    "§1 Bối cảnh -> §2 Bối cảnh": nguyên văn (107)
+    "§3 Bản đồ + §4 Trục khái niệm -> §3.1 Đầu vào": >
+      cắt bảng 12 dòng -> 8 và 5 bullet -> 4. Bốn dòng bỏ (Gateway · Nén
+      trajectory · Curator · Evals · Delegation) đều XUẤT HIỆN LẠI ở mục khác,
+      nên cắt không mất địa chỉ nào. 310 -> 237 từ.
+    "§5 Cơ chế -> §3.2 Process": nguyên văn (297) — khớp đúng vai
+    "§3.3 Output": MỚI ~55 từ, ba đầu ra có địa chỉ (MEMORY/USER/SKILL.md · scorecard recall · skill archive)
+    "§6 Tinh túy -> §3.4": năm item `### 6.x` -> `#### 3.4.x`, bullet nguyên văn (385)
+    "§8 Lộ trình tiếp thu -> §4 Ý nghĩa thực tế": VIẾT LẠI, không paste — đổi vai từ "đọc gì trước" sang "dùng vào việc gì + một ví dụ có địa chỉ"
+    "§7 Dè chừng -> §5 Rủi ro và tầm nhìn": bảng nguyên văn + một câu tầm nhìn
+    "§9 Tự kiểm": BỎ (người dùng xác nhận)
+  do_duoc:
+    tu: "1580 -> 1491 · dưới trần mềm 1500 ⇒ HẾT cảnh báo trần mềm đã có từ trước"
+    dan_nhap: "213/1491 = 14.3% · trần 25%"
+    loi: "0 · còn một cảnh báo `5 khái niệm chờ duyệt danh mục` — có từ trước, ngoài phạm vi"
+    fixpoint: "xuất lần hai ghi 0 file"
+  hai_lan_vuot_tran_va_cach_sua: >
+    Lần dựng đầu ra 1506 — vượt trần MỀM 6 từ. Không nới trần: bỏ thêm một dòng
+    bảng (Delegation, đã xuất hiện ở §5) và gọn câu tầm nhìn ⇒ 1491.
+
+# ══ MỘT QUAN SÁT KHÔNG PHẢI CỦA A5, nhưng phải nói ═════════════════════════
+mat_mot_bai_thu:
+  hien_tuong: "DB sau A5 có 1 bài; trước đó (kiểm toán 26-08) có 2"
+  do_duoc: >
+    kb/article/ RỖNG, mtime 26-08 18:08 — tức file `thu-realtime.md` bị xoá HÔM
+    QUA, trước phiên hôm nay (kb/ mtime 18:30). `dung_lai_db.py` dựng từ ĐĨA nên
+    nó không xoá gì; đĩa đã không có file từ trước.
+  khong_do_A5: true
+  con_lay_lai_duoc: "web/site/article/thu-realtime.html (hiện vật build cũ) còn nội dung"
+  danh_gia: >
+    Đây là bài THỬ tôi tạo lúc kiểm realtime FR-035, không phải bài thật. Nhưng
+    nó phơi ra một tính chất thật của thủ tục: `dung_lai_db.py` dựng DB từ đĩa,
+    nên một file đã mất khỏi đĩa thành một dòng DB mất im lặng. Đúng lớp rủi ro
+    R1 mà FR-036/B4 sẽ phải canh cho media.
+
+# ══ A6 · CÁI ĐÁNG NÓI NHẤT: NĂM BẢN SAO KHUNG NGOÀI REPO ═══════════════════
+a6_bundle:
+  vi_sao_nguy: >
+    `~/.claude/skills/source-distiller/` là thứ THẬT SỰ viết ra bài. Nó giữ năm
+    bản sao khung, gồm `scripts/validate.py` — bản validator THỨ TƯ, đã lạc hậu
+    từ trước FR-034. Không sửa ⇒ mọi bài skill viết ra bị cổng mới trả về, và
+    lỗi hiện ở chỗ người dùng chứ không ở CI.
+  da_lam:
+    - "đồng bộ validate.py + khung.py + hai file assets + examples/mau-dat-chuan.md từ repo"
+    - "xoá __pycache__ (bytecode của bản validator cũ)"
+    - "references/format.md: bảng ngân sách từ 9 mục -> 5 mục · template thân bài · format cứng mục tinh túy `#### 3.4.x` · checklist đảo sàn 35% thành trần 25%"
+    - "SKILL.md + README.md: dãy tên mục, số cổng, mô tả cổng"
+  loi_da_do_va_sua: >
+    `SCHEMA_PATH` của validate.py (và `KHUNG_PATH` của khung.py) tính đường bằng
+    `HERE.parent.parent` — đúng ở repo (`core/src/source_distiller/` ->
+    `core/assets/`), LỆCH MỘT CẤP ở bundle (`<skill>/scripts/` -> `skills/assets/`).
+    Bản bundle nổ `FileNotFoundError` lúc import. Sửa: cả hai tìm theo DANH SÁCH
+    ỨNG VIÊN, chạy được ở cả hai layout. Kiểm: bản bundle validate mẫu ra 0 lỗi,
+    bản repo vẫn 0 lỗi trên kb/.
+  dua_nguon_vao_repo: >
+    `core/skill-src/format.md` + `core/skill-src/source-distiller.SKILL.md` — lần
+    sau drift nằm trong tầm cổng, không ở `~/.claude/` ngoài mọi phép kiểm.
+
+# ══ ĐIỀU KHÔNG SỬA, và vì sao ══════════════════════════════════════════════
+khong_sua:
+  ghi_chep_lich_su: >
+    `02_proposal/proposal.md` · `04_system/build_order.md` · `memory/decisions.md`
+    · `web/plugins/WORKLOG.md` · `07_plan/M03_web/tasks/T03-4` · `05_uiux/README.md`
+    · `05_uiux/REDESIGN-PLAN.md` · `05_uiux/wireframes/SCR-01` · `03_docs/spec_overview.md`
+    — chúng mô tả điều ĐÚNG LÚC ĐÓ. Sửa ghi chép lịch sử là xoá dấu vết, không
+    phải cập nhật.
+  comment_giai_thich_khung_cu: >
+    `khung.py` · `validate.py` · `check_khung.py` · `test_gates.py` ·
+    `sinh_kb_mock.py` · `05_intake/test_gate.py` · `T01-6` — chữ "9 mục" trong
+    đó là comment GIẢI THÍCH vì sao có thay đổi này. Bỏ nó là bỏ lý do.
+  contracts_sample: >
+    `05_uiux/contracts/analyses.sample.v1..v5.json` chứa
+    `"_derived_body_sections": "9 mục"` — grep ra 0 người đọc. Không bump 5 hash
+    frozen cho một comment chết.
+
+ky_lai_frozen:
+  hai_file: ["06_modules/M01_core/spec.md", "06_modules/M03_web/spec.md"]
+  du_dieu_kien: >
+    FR-036 đã DUYỆT, và FR-034 của agent kia đã ĐÓNG + ký xong (worklog C) — nên
+    ký lại không phải ký hộ một thay đổi chưa xong, đúng luật tôi tự đặt ở
+    WL-01K9M7KIEMTOANDB.
+  ket: "đã ký 26 file · check_frozen: pass · mọi file frozen khớp baseline"
+
+do_duoc_cuoi:
+  cong_python: "14/14 XANH"
+  pytest: "34 passed"
+  npm_test: "exit 0 · 46 file"
+  validate_kb: "1 file · 0 lỗi · 1 cảnh báo (danh mục, có từ trước)"
+  check_running: "XANH — đây là cổng A5 phải trả, và nó đã trả"
+  ban_bundle: "validate mẫu 0 lỗi · không còn dấu vết khung cũ trong bất kỳ file .md nào"
+
+nhanh_A_dong: true
+con_lai: >
+  Nhánh B (Super update — thư viện tài liệu/video). B2 bị chặn cứng bởi A2 và A2
+  đã xong, nên B mở được. Đơn vị quyết định vẫn là B4 (khớp nối export/import cho
+  byte); nếu B4 không xanh được thì xét lại "lưu trong DB" TRƯỚC khi viết FE.

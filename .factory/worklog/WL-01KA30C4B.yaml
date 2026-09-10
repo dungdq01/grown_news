@@ -1,0 +1,158 @@
+id: WL-01KA30C4B
+khi: 2026-09-04T17:20:00+07:00
+loai: ban_giao
+tac_nhan: claude-code
+viec: C4b — T12-14 (giấy) · T12-15 (8 cổng đỏ-trước) · T12-13 (worker) · T01-45 · T12-16 · T12-17
+module: M12_chungcat · M01_core
+
+nguoi_quyet: |
+  Chủ dự án 2026-09-04: "làm nốt các task để chuyển sang phần plan C4b" +
+  "check task và lên plan + implement hết cho plan C4b". Plan C4b do PM lên
+  (WL-01KA20S7C4B, 8 đơn vị).
+
+object:
+  - path: .factory/fr/FR-054-va-tran-1gb.md        # MỚI — lời mời ký 25MB→1GB
+  - path: 06_modules/M12_chungcat/spec.md          # FROZEN · §1 §2 §2.1 §5.0b
+  - path: 06_modules/M12_chungcat/rules.md         # FROZEN · M12-R8 · M12-R9
+  - path: chungcat/tests/check_worker_mot_vong.py
+  - path: chungcat/tests/check_worker_giet_giua_chung.py
+  - path: chungcat/tests/check_worker_song_song.py
+  - path: chungcat/tests/check_asr_khong_egress.py
+  - path: chungcat/tests/check_vtt_hop_le.py
+  - path: chungcat/tests/check_tran_hai_nhip.py
+  - path: chungcat/tests/check_transcript_hien_vat.py
+  - path: chungcat/tests/check_tai_url_allowlist.py
+  - path: chungcat/src/worker.py                   # MỚI — T12-13
+  - path: chungcat/src/vtt.py                      # MỚI — T12-16
+  - path: chungcat/src/asr.py                      # MỚI — T12-16
+  - path: chungcat/src/tai_nguon.py                # MỚI — T12-17
+  - path: chungcat/src/moi_truong.py               # MỚI — nạp .env
+  - path: chungcat/src/vong.py                     # nhan_viec · dat_giai_doan · dong_viec
+  - path: chungcat/src/api.py                      # nạp .env lúc khởi động
+  - path: chungcat/assets/nguon-transcript.json    # MỚI — bảng khai ba lối
+  - path: core/assets/media-mime.json              # +text/vtt · chi_dan_xuat
+  - path: core/assets/kho.schema.sql               # media.kieu_moc
+  - path: web/render/trang.mjs                     # lọc chi_dan_xuat khỏi facet
+  - path: web/build-fe.mjs                         # chiếu chi_dan_xuat ra khỏi bundle
+  - path: web/test/bon-chieu-facet.test.js         # khớp phép lọc
+  - path: .env.example                             # MỚI
+  - base_sha: 8535a26
+
+r5_do_truoc:
+  - luc: 2026-09-04T15:58:30+07:00
+    trang_thai: DO
+    lenh: 8 cổng mới của T12-15
+    ra: |
+      check_worker_mot_vong        ĐỎ · CHƯA CÓ MÃ — chungcat/src/worker.py
+      check_worker_giet_giua_chung ĐỎ · CHƯA CÓ MÃ — chungcat/src/worker.py
+      check_worker_song_song       ĐỎ · CHƯA CÓ MÃ — chungcat/src/worker.py
+      check_asr_khong_egress       ĐỎ · CHƯA CÓ MÃ — chungcat/src/asr.py
+      check_vtt_hop_le             ĐỎ · CHƯA CÓ MÃ — chungcat/src/vtt.py
+      check_tai_url_allowlist      ĐỎ · CHƯA CÓ MÃ — chungcat/src/tai_nguon.py
+      check_tran_hai_nhip          ĐỎ · thiếu bảng khai nguon-transcript.json
+      check_transcript_hien_vat    ĐỎ · thiếu cột kieu_moc · thiếu text/vtt
+    ghi_chu: |
+      Cả 8 đỏ vì THIẾU MÃ / THIẾU BẢNG KHAI, không vì ImportError của một gói —
+      _nap.py phân biệt hai ca đó, và workshop §1a cấm ca thứ hai tính là đỏ đúng.
+  - luc: 2026-09-04T17:15:00+07:00
+    trang_thai: XANH
+    lenh: 29 cổng chungcat/tests/*.py
+    ra: 29/29 exit 0
+
+do_do:
+  - lenh: python core/tests/check_g6a.py
+    ket_qua: "G6A: 6 điều kiện đạt trên cả 18 module"
+  - lenh: 29 cổng chungcat/tests/*.py
+    ket_qua: 29/29 exit 0
+  - lenh: python -m pytest core/tests -q
+    ket_qua: 45 passed
+  - lenh: cd web && npm test
+    ket_qua: exit 0
+  - lenh: python core/tests/check_frozen.py
+    ket_qua: |
+      FAIL · 2 file lệch baseline — M12 spec.md + rules.md.
+      ĐÚNG THIẾT KẾ: FR-054 + FR-059 đã mở, NGƯỜI ký. Agent KHÔNG ký.
+  - lenh: chạy thật — một lời gọi qua cửa Beeknoee
+    ket_qua: |
+      401 "Invalid or revoked API key" (request_id req_cc661ee69b2649a6967cd4fc).
+      Cùng lỗi qua curl trực tiếp VÀ qua /v1/management/me ⇒ khoá bị từ chối,
+      không phải lỗi mã. Đường ống đo được là đúng: request tới cửa, 401 về
+      sạch, egress.jsonl 1 dòng, khoá KHÔNG có trong log.
+
+do_do_boi: chua-quy-duoc-chu
+
+quyet_dinh:
+  - |
+      vong.py THÊM VÀO phạm vi T12-13 lúc thi công. `_duong()` bản đầu trỏ cứng
+      `new/`, nên sau nhịp claim đầu tiên mọi hàm ở dưới (đếm egress, đổi giai
+      đoạn) ném FileNotFoundError. Worker không thể claim mà không có một phép
+      claim ở tầng hàng đợi — PM đã khai "dùng ghi_nhan_gui/chay_lai sẵn có",
+      tức vong.py là phụ thuộc chứ không phải đất cấm.
+  - |
+      HAI LỖI CỦA TÔI, cổng bắt được, ghi ra vì cả hai là lớp lỗi lặp lại:
+      (1) `_duong_phan_hoi` đặt phản hồi CẠNH file job ⇒ với job chưa bị chiếm
+          nó rơi vào `new/`, phá bất biến §5.0 ("new/ chỉ chứa file HOÀN CHỈNH")
+          và check_idempotency đếm HAI việc sau một lần nạp. Sửa: phản hồi ở
+          `cur/`|`done/`, không bao giờ `new/`.
+      (2) `liet_ke` khớp cả `*.phan-hoi.json` ⇒ mỗi việc đã gọi model đếm thành
+          HAI. Lọc tường minh.
+  - |
+      JOB HỎNG KHÔNG ĐI VÀO `done/`. Nó về giai đoạn hỏng và ở lại `cur/` cho
+      `chay_lai`. Đẩy job hỏng sang `done/` là nói dối hai chiều: người đọc thấy
+      "xong", và `chay_lai` không tìm ra nó.
+  - |
+      check_khong_tu_duyet NỚI ĐÚNG CHỖ. Nó chặn mọi chuỗi chứa `/api/articles`,
+      mà quyết 1a của chủ dự án chốt đường ĐỌC nguyên liệu là
+      `GET /api/articles/media/<sha>` — cũng chứa chuỗi đó. Cấm ở đây là cấm cửa
+      GHI (POST đặt approved vô điều kiện), nên phép đo đổi sang PHƯƠNG THỨC:
+      0 lời gọi POST tới /api/articles. Vế cấm KHÔNG bị bỏ, nó được đo đúng chỗ.
+  - |
+      check_tran_hai_nhip bỏ 3600 khỏi phép quét số-gõ-cứng: 3600 là số GIÂY
+      TRONG MỘT GIỜ và nó xuất hiện hợp lệ trong mọi phép đổi mốc thời gian
+      (vtt._giay, vtt._moc). Quét nó thì cổng tố một phép chia là một trần gõ
+      cứng, và người sửa sẽ viết `60 * 60` để lách. Bù lại: thêm ba vế đo HÀNH VI
+      (nhịp hai ném khi không đọc được metadata · nhịp một chặn byte ở cửa ·
+      byte trong trần thì qua).
+  - |
+      asr.py KHÔNG import egress, và ThieuAsr thay ImportError trần: cổng phải
+      phân biệt THIẾU GÓI với THIẾU MÃ. Model tải vào CHUNGCAT_MODEL_DIR NGOÀI
+      repo — trong repo thì git status thấy 500MB và quy chủ mù đi (WO-039).
+  - |
+      tai_nguon.lenh_tai() TRẢ LỆNH, không chạy. yt_dlp.download() tự mở socket,
+      mà M12-R3 đòi đúng một hàm ra Internet — nên hàm này chuẩn bị và xin phép,
+      egress.gui() là chỗ đếm và log. `-x` (chỉ audio) vì FR-054 §1.1 chốt không
+      lưu byte video.
+  - |
+      text/vtt chọn thay application/json: JSON KHÔNG có magic (`{` là một byte)
+      nên nó sẽ là mục đầu tiên trong bảng mime làm YẾU lớp thứ sáu của intake —
+      lớp duy nhất soi byte. WEBVTT là magic thật, 6 byte, chuẩn W3C.
+  - |
+      chi_dan_xuat cho .vtt — và ba chỗ theo sau. Thêm một dòng mime làm HOME
+      PAGE VƯỢT TRẦN (61715/61440): trang.mjs render một chip lọc cho mỗi loại
+      nguồn, trên MỌI trang. Nhưng phép sửa không phải cắt byte — nó là sửa
+      NGHĨA: .vtt là hiện vật do MÁY sinh, một chip `vtt` ở bộ lọc tài liệu là
+      chip không bao giờ khớp bản ghi nào. Lọc ở SSR · chiếu ra khỏi bundle FE
+      (cổng define_MEDIA bắt được khoá chết) · cổng facet khớp theo.
+  - |
+      moi_truong.nap() chỉ điền biến CHƯA CÓ — env thật THẮNG file. Không thì
+      một .env cũ lặng lẽ đè giá trị người vận hành vừa export, và họ không có
+      cách nào biết mình đang chạy với khoá nào.
+
+keo_theo:
+  - |
+      NGƯỜI ký FROZEN.lock cho HAI file (M12 spec.md + rules.md) — FR-054 +
+      FR-059. Và một lượt ký thứ hai cho trần 1GB:
+      .factory/fr/FR-054-va-tran-1gb.md có diff + ba dòng giá (git-lfs 1GB free
+      ≈ ĐÚNG MỘT video · $5/50GB · CI skip-smudge).
+  - |
+      KHOÁ BEEKNOEE BỊ TỪ CHỐI — 401 "Invalid or revoked API key" cả qua adapter
+      lẫn qua curl trực tiếp, và cả trên /v1/management/me. Cần khoá còn hiệu
+      lực; request_id để mở ticket: req_cc661ee69b2649a6967cd4fc.
+  - |
+      CÒN HAI ĐƠN VỊ C4B CHƯA LÀM: T04-8 (git-lfs cho media trong CI) và T03-108
+      (nút Sinh transcript + màn đọc .vtt). T03-108 chặn cứng bởi ngân sách byte
+      — tải đầu /chung-cat/nhap/ còn 11 byte.
+  - |
+      sinh-transcript CHƯA vào worker.BANG_LOAI: các mảnh (asr · vtt ·
+      tai_nguon) đã có và có cổng, nhưng hàm dispatch nối chúng lại là phần còn
+      lại của T12-16. Bảng dispatch để sẵn đúng một entry.

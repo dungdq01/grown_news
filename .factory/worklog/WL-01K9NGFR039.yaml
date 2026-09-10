@@ -1,0 +1,116 @@
+id: WL-01K9NGFR039
+at: 2026-08-28
+by: claude
+buoc: s8 — FR-039 nhận mọi định dạng tài liệu, bảng mime đổi vai sang bảng RENDER
+loai: bàn giao FR-039 + mở FR-040 + sửa lỗ ID task trùng
+fr: FR-039-nhan-moi-dinh-dang-tai-lieu.md · FR-040-tach-route-theo-module.md
+
+object:
+  fr:
+    - .factory/fr/FR-039-nhan-moi-dinh-dang-tai-lieu.md   # MỞ TRƯỚC mọi thay đổi
+    - .factory/fr/FR-040-tach-route-theo-module.md        # MỞ, chưa cài
+  task:
+    - 07_plan/M01_core/tasks/T01-23-mo-dinh-dang-tai-lieu.md      # code
+    - 07_plan/M01_core/tasks/T01-24-test-dinh-dang-mo.md          # test
+    - 07_plan/M01_core/tasks/T01-27-test-id-task-duy-nhat.md      # test
+    - 07_plan/M08_api/tasks/T08-13-nhan-moi-dinh-dang.md          # code
+    - 07_plan/M03_web/tasks/T03-27-fe-nhan-moi-dinh-dang.md       # code
+    - 07_plan/M03_web/tasks/T03-28-test-dinh-dang-mo.md           # test
+  code:
+    - core/assets/media-mime.json            # khối `mac_dinh` + $comment đổi vai
+    - core/assets/frontmatter.schema.json    # FROZEN · media.mime enum → pattern
+    - core/tools/xuat_kho.py                 # DUOI_MAC_DINH thay ".bin" gõ tay
+    - web/api/dungchung.mjs                  # DANG_MIME đọc từ schema · duoiSuyRa
+    - web/plugins/multiwindow/src/scripts/multiwindow.inline.ts  # bỏ chặn theo đuôi
+  test:
+    - core/tests/check_dinh_dang_mo.py       # MỚI — 4 mục
+    - core/tests/check_g6b.py                # răng ID task trùng
+    - web/test/dinh-dang-mo.test.js          # MỚI — 5 mục, đo qua HTTP thật
+    - web/test/thu-vien.test.js              # 3 kỳ vọng hết hạn
+    - web/test/WORKLOG.md · web/WORKLOG.md · web/package.json
+  quyet_dinh:
+    - memory/decisions.md                    # luật thường trực ba module
+    - 06_modules/M01_core/backlog.md         # MỚI — hai ô mở
+
+may_xanh:
+  - "python core/tests/check_dinh_dang_mo.py  ->  pass (4 mục)"
+  - "cd web && node test/dinh-dang-mo.test.js  ->  pass (5 mục)"
+  - "cd web && npm test  ->  exit 0 (55 file)"
+  - "PYTHONIOENCODING=utf-8 pytest core/tests -q  ->  42 passed"
+  - "18/22 cổng check_*.py xanh"
+  - "ngân sách: gn.css 92/100 · gn.js 95/100 · trang lớn nhất 57/74 — không đổi"
+
+quyet_dinh_thiet_ke:
+  - >
+    Whitelist KHÔNG bị xoá — nó đổi VAI từ cổng NHẬN sang bảng RENDER. Ba thứ dẫn
+    xuất từ nó và cả ba im lặng hỏng nếu bảng biến mất: `content-type` phục vụ
+    (không bảng ⇒ phải sniff tên file, đúng thứ `nosniff` tồn tại để không tin) ·
+    `inline`/`attachment` từ `xem_truoc` (mất nó thì hoặc mọi thứ inline — nguy —
+    hoặc PDF HẾT xem trước, tức xoá một tính năng không ai xin xoá) · đuôi file
+  - >
+    Định dạng ĐÃ BIẾT giữ magic-byte. Người dùng xin bỏ cửa cho loại LẠ; bỏ luôn
+    cả nhánh này là nới rộng hơn thứ được xin. Với loại lạ thì lớp thứ sáu KHÔNG
+    TỒN TẠI (không có chữ ký để so) — nói "yếu đi" là nói giảm
+  - >
+    `media.mime` từ enum sang `pattern` chứ không sang `type: string` trần: chuỗi
+    này đi thẳng vào đầu đề `content-type`, nên một mime mang xuống dòng là tách
+    đầu đề. Bỏ danh sách ≠ bỏ phép kiểm
+  - >
+    `dungchung.mjs` ĐỌC pattern từ `frontmatter.schema.json`, không gõ lại regex.
+    Hai bản sẽ lệch, và lệch ở đây nghĩa là `luuHienVat` nhận một chuỗi mà
+    validate sẽ từ chối — hoặc ngược lại
+
+kiem_hai_chieu:
+  - "R5 ĐỎ TRƯỚC có thật: check_dinh_dang_mo 3 lỗi · dinh-dang-mo.test.js 9 lỗi"
+  - >
+    răng ID trùng: nhân bản một task file ⇒ đỏ kèm đường dẫn CẢ HAI file; xoá bản
+    sao ⇒ xanh lại
+
+tu_bat_duoc:
+  - >
+    SÁU ID task TRÙNG do chính tôi tạo qua bốn lượt (T01-8 · T01-9 · T03-10 ×3 ·
+    T03-11 ×3 · T03-12 · T03-13 · T03-14 · T05-2), và `check_g6b` exit 0 mọi
+    lượt. `tasks[tid] = …` là phép gán dict nên file sau GHI ĐÈ file trước —
+    `phạm_vi_ghi` của một trong hai KHÔNG được kiểm, tức R1 mất địa chỉ. Nó chỉ
+    lộ khi hai file trùng ID tình cờ tạo một VÒNG phụ thuộc: lộ vì MAY. Đã đánh
+    lại số 10 file, sửa 5 tham chiếu phụ thuộc, và thêm răng vào cổng
+  - >
+    Lý do tôi không thấy: `ls | tail` sắp theo CHỮ nên `T03-10` đứng trước
+    `T03-4` — sáu file mới nhất không nằm ở cuối danh sách
+  - >
+    Văn xuôi trong task file của tôi chứa literal khoá khai phụ thuộc, và parser
+    của `check_g6b` bắt khoá đó bằng regex trên CẢ file ⇒ nó đọc câu văn thành
+    một khai báo thật, trỏ tới một task không tồn tại. Cùng lớp lỗi với bình luận
+    chứa `id="v-nap"` ở C5
+  - >
+    Bốn lượt cổng tự sai (chi tiết ở web/test/WORKLOG.md): gửi sai hợp đồng nạp ·
+    §4 xanh vô căn cứ vì mọi request 404 · §4 rồi đỏ oan vì cấm cả dấu ngoặc BAO ·
+    §5 chết vì đo 413 bằng fetch dù đã biết không đo được
+  - "Sự cố escaping thứ 16 — `\\r\\n` qua heredoc thành CR CR LF thật"
+
+do_do:
+  - cong: core/tests/check_skill.py
+    do_do_boi: agent khác
+    quy_chu: không nằm trong tập file tôi đổi
+  - cong: core/tests/check_danh_muc.py
+    do_do_boi: chính tôi — nhưng KHÔNG tự sửa được
+    quy_chu: >
+      Thay đổi của tôi ở `core/assets/frontmatter.schema.json` làm bản schema
+      THỨ HAI (`core/skill-src/frontmatter.schema.json`) lỗi thời. `core/skill-src/**`
+      thuộc agent khác theo phân công của người dùng, nên tôi mở ô backlog thay
+      vì ghi vào đó. Cần người dùng định tuyến
+  - cong: core/tests/check_frozen.py
+    do_do_boi: chính tôi — CÓ FR, chờ NGƯỜI ký
+    quy_chu: >
+      `frontmatter.schema.json` lệch baseline. FR-039 đã mở TRƯỚC thay đổi và
+      người dùng đã chốt qua AskUserQuestion. Agent KHÔNG tự ký: bài học FR-037
+      ghi ở `memory/decisions.md`
+  - cong: core/tests/check_running.py
+    do_do_boi: hệ quả của hai cổng trên
+    quy_chu: nó chạy lại hai lệnh đó, không phải một lỗi thứ ba
+
+con_lai:
+  - "FR-040 · tách route `/api/bai-viet` · `/api/tai-lieu` · `/api/video`, giữ `/api/articles**` làm bí danh — CHƯA cài"
+  - "C6 · ba màn nạp riêng; TẠO đường video (chưa có). Ngân sách gn.js còn 5 KB"
+  - "C7 · CRUD tại chỗ; form Tài liệu phải có ô `media`"
+  - "C8 · BUG-1 `[hidden]` thua `.api-only` · BUG-2 `#acount` đếm cả trang"

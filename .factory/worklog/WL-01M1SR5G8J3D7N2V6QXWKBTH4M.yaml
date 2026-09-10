@@ -1,0 +1,95 @@
+ulid: 01M1SR5G8J3D7N2V6QXWKBTH4M
+thoi_diem: 2026-09-06T09:10+07:00
+tac_nhan: claude-opus-5
+loai: ban_giao
+module: M03_web
+don_vi: WO-061 · việc theo loại · hiện vật theo vai · ba tab tách bạch
+
+tu_bao_loi_do_cua_toi: >
+  Con số tôi báo ở lượt trước ("3032 vế, 0 FAIL" cho T03-116) là ĐO TRÊN BẢN
+  DỰNG CŨ. Chú thích CSS tôi thêm chứa DẤU HUYỀN NGƯỢC, mà nó nằm trong một
+  template literal — dấu ấy KẾT THÚC chuỗi, và `build-fe` chết từ đó. Tôi lại
+  chạy build với `>/dev/null` nên NUỐT LUÔN thông báo lỗi.
+  Hai bài học, cả hai của tôi: (1) không dấu huyền ngược trong chú thích nằm
+  trong template literal — đã trúng một lần trước; (2) KHÔNG nuốt stderr của
+  lệnh dựng: một lệnh dựng im lặng làm mọi phép đo phía sau nói về một vật
+  không tồn tại.
+  Đã đo lại trên bản dựng thật: 3041 vế, 0 FAIL.
+
+r5_do_truoc:
+  - don_vi: WO-061
+    lenh: node web/test/viec-theo-loai.test.js
+    ket_qua: "ĐỎ 4/5 vế"
+    đỏ_do: claude-opus-5
+
+ba_loi_mot_goc: >
+  Hệ coi MỌI việc là việc chưng cất, và coi MỌI hiện vật là thứ đáng chiếm chỗ
+  xem trước.
+  1. Video biến mất sau khi sinh transcript — `xemTruocHienVat` lấy cứng
+     `media[0]`, mà `[0]` giờ là `.vtt`, nên hàm thoát sớm và nhánh vẽ trình
+     phát không bao giờ chạy. KHÔNG mất dữ liệu (`url` YouTube nguyên vẹn);
+     mất CHỖ.
+  2. Cửa sổ việc gắn cứng nhãn "Chưng cất" cho mọi loại việc.
+  3. Hàng nháp `0 nháp` — hệ quả của (2): việc transcript KHÔNG BAO GIỜ sinh
+     nháp, mà câu kết chỉ mọi người sang hàng nháp bất kể loại. Nhãn nói dối,
+     người đi theo nhãn tới một nơi chắc chắn trống, rồi báo là lỗi. Đúng là
+     lỗi — chỉ không nằm ở hàng nháp.
+
+xac_minh_bang_du_lieu: >
+  Chủ dự án hỏi "mở nháp cũng chưa có bản nào là sao". Đo: hàng đợi có ĐÚNG MỘT
+  việc từng chạy, loại `sinh-transcript`; sổ egress hôm nay 5/5 dòng đều
+  `cua-asr`. Tức chưa lần chưng cất nào chạy — `0 nháp` là con số THẬT, và câu
+  hỏi của chủ dự án hoàn toàn hợp lý vì nhãn đã chỉ sai đường.
+
+quyet_dinh:
+  - loc_theo_co_khong_go_cung: >
+      Lọc hiện vật dẫn xuất bằng cờ `chi_dan_xuat` của `media-mime.json` — cờ ĐÃ
+      CÓ SẴN cho `.vtt`, chỉ chưa ai đọc nó ở FE. Gõ cứng `text/vtt` thì loại
+      dẫn xuất thứ hai (giọng đọc, tóm tắt máy) chiếm chỗ y hệt.
+  - cong_bat_them_mot_tang: >
+      `bang-khai-khong-mo` báo `chi_dan_xuat` bị LƯỢC khỏi bundle — nghĩa là
+      phép lọc tôi vừa viết sẽ lặng lẽ VÔ HIỆU (`undefined` không đỏ ở đâu).
+      Đã giữ trường lại trong bundle. Đó đúng là lý do cổng ấy tồn tại.
+  - ba_tab_tach_bach: >
+      Chủ dự án chốt: *"xem · chưng cất · transcript, tách biệt hoàn toàn"*.
+      Tab "Xem" nay LUÔN có. Trước đó tab bản ghi chỉ dựng khi >1 bản, nên với
+      bản ghi thường, bấm sang Chưng cất là MẤT ĐƯỜNG VỀ bài đang đọc.
+  - hai_loi_vao_nhap_deu_mo_CUA_SO: >
+      *xem bản nháp* ở cửa sổ việc, và bấm thẻ ở `/chung-cat/`. Rời trang là mất
+      CẢ HAI cửa sổ — nguồn đang đọc và cửa sổ việc — mà cả điểm của flow là
+      *vừa xem bản gốc vừa duyệt bản chưng cất bên cạnh*.
+      Việc CHƯA xong vẫn mở panel chi tiết: chưa có nháp thì không có gì để đọc.
+  - bam_the_thay_panel: >
+      Panel "CHI TIẾT VIỆC" nói giai đoạn · model · lần gửi — mà RÊ CHUỘT đã nói
+      đủ (`WO-048`). Cú bấm đang tiêu vào việc lặp lại một thông tin sẵn có,
+      trong khi thứ người mở màn này muốn là ĐỌC và DUYỆT.
+
+do_sau:
+  - lenh: node web/test/viec-theo-loai.test.js
+    ket_qua: "XANH 9/9 vế"
+  - lenh: cd web && npm test
+    ket_qua: "3041 vế ok · 0 FAIL (trên bản dựng THẬT)"
+  - lenh: cd web && node test/page-weight.test.js
+    ket_qua: "gn.css 102378 KHÔNG đổi · gn.js 84602/102400 · trang chủ 59241"
+  - lenh: python -m pytest core/tests -q
+    ket_qua: 49 passed
+  - lenh: 'for f in chungcat/tests/check_*.py; do python "$f"; done'
+    ket_qua: 37/37 XANH
+
+con_lai_chua_dao: >
+  Log ASR: "bỏ 128 cue thiếu mốc thời gian" trên một lần chạy. Model trả nhiều
+  cue khuyết `tu`/`den`, tức transcript đang MẤT CÂU. Chưa đào — nói ra để nó
+  không chìm.
+
+đỏ_do: claude-opus-5
+
+object:
+  - web/plugins/multiwindow/src/scripts/multiwindow.inline.ts
+  - web/plugins/cctab/src/cctab.inline.ts
+  - web/plugins/chungcat/src/chungcat.inline.ts
+  - web/build-fe.mjs
+  - web/test/viec-theo-loai.test.js
+  - web/package.json
+  - 07_plan/M03_web/tasks/T03-110b-test-tab-theo-doi.md
+  - web/WORKLOG.md
+  - web/test/WORKLOG.md

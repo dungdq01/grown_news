@@ -1,0 +1,87 @@
+ulid: 01M1TP4D6X2QW8H3N5VKJBZE07
+thoi_diem: 2026-09-06T22:10+07:00
+tac_nhan: claude-opus-5
+loai: ban_giao
+module: M12_chungcat + M08_api
+don_vi: T12-26 · job tải video theo chất lượng
+
+viec: >
+  Bậc chất lượng cho video URL là THẬT — host giữ sẵn các bậc, `yt-dlp -f`
+  chọn bậc lúc tải. Không transcode ở phía ta. File về thư mục tạm NGOÀI repo,
+  tự dọn theo hạn khai trong bảng.
+
+r5_do_truoc:
+  - don_vi: T12-26
+    lenh: python chungcat/tests/check_tai_video_chat_luong.py
+    ket_qua: >
+      ĐỎ — `nguong.json` chưa khai `chat_luong`, và
+      `AttributeError: module 'tai_nguon' has no attribute 'lenh_tai_video'`
+    đỏ_do: claude-opus-5
+
+do_sau:
+  - lenh: python chungcat/tests/check_tai_video_chat_luong.py
+    ket_qua: pass — 16/16 vế
+  - lenh: 'for f in chungcat/tests/check_*.py; do python "$f"; done'
+    ket_qua: 38/38 XANH
+  - lenh: cd web && npm test
+    ket_qua: exit 0 · 0 FAIL
+  - lenh: python -m pytest core/tests -q
+    ket_qua: 49 passed
+  - lenh: python core/tests/check_ky_tu_vo_hinh.py
+    ket_qua: pass
+
+quyet_dinh:
+  - ten: "`lenh_tai_video` KHÔNG dùng lại `lenh_tai`"
+    vi_sao: >
+      `lenh_tai` (`T12-17`) có `-x` — nó bóc AUDIO cho ASR. Dùng lại nguyên nó
+      thì người chọn 480p nhận về một file `.mp3`. Cổng có vế `2c` canh đúng
+      chỗ này, vì đây là loại lỗi mà mã đọc qua trông rất hợp lý.
+  - ten: "HAI bảng khai, hai chủ"
+    vi_sao: >
+      Bản đầu tôi nhét `chat_luong` vào bảng mà `kiem_host` đọc, và nó nổ
+      `KeyError: 'host_cho_phep'` ngay ở cổng — hai bảng khác nhau:
+      `nguon-transcript.json` khai NGUỒN (host được đọc, trần byte),
+      `nguong.json` khai NGƯỠNG VẬN HÀNH. Trộn chúng là cách một bảng bắt đầu
+      chứa thứ không phải việc của nó. Nay `bac_chat_luong()` đọc đúng bảng
+      thứ hai, và `lenh_tai_video(..., bang, bac)` nhận hai thứ rời.
+  - ten: "dọn lọc theo KHUÔN TÊN, không chỉ theo tuổi"
+    vi_sao: >
+      `%TEMP%` là nhà chung của cả máy. Một hàm "xoá mọi file cũ hơn 24h trong
+      thư mục tạm" là một lệnh phá hoại chạy im lặng. `_KHUON_TAM` đòi đúng
+      26 ký tự ULID + bậc + `.mp4`; cổng có vế `6c` dựng sẵn một file của
+      "người khác" và đòi nó CÒN NGUYÊN.
+  - ten: "dọn ở ĐẦU vòng, không ở cuối"
+    vi_sao: >
+      Cuối vòng là chỗ không chạy vào đúng những ngày hệ đang hỏng — tức đúng
+      những ngày ổ đĩa đầy nhanh nhất. Và dọn trượt thì NUỐT lỗi: file tạm còn
+      lại là phiền, một worker chết là hỏng việc.
+  - ten: "`thu_muc` đi KÈM `tep_tam` trong kết quả job"
+    vi_sao: >
+      Task file khai "trả `tep_tam` (tên file)". Nếu chỉ có tên thì cửa web
+      (Node) phải tự phân giải lại `CHUNGCAT_XUAT_TAM` — hai chỗ phân giải cùng
+      một đường bằng hai ngôn ngữ là hai chỗ để lệch, và ngày env đổi thì chỉ
+      một trong hai biết. Cửa web VẪN kiểm `basename` khớp khuôn trước khi mở:
+      tin vào chuỗi một tiến trình khác trả về là không tin gì cả.
+  - ten: "chưa xong KHÁC hết hạn"
+    vi_sao: >
+      Hai câu 404 riêng. Người đọc cần biết mình phải ĐỢI hay phải BẤM LẠI, và
+      gộp hai ca vào một câu là bỏ mất đúng thông tin ấy.
+
+chua_lam:
+  - >
+    KHÔNG chạy thật một lần tải video — nó tốn băng thông thật và ghi một dòng
+    egress thật. Cổng chứng minh **lệnh dựng đúng** (tham số format mang trần
+    chiều cao, host bị chặn trước request, file ra ngoài repo, dọn có hạn);
+    nó KHÔNG chứng minh yt-dlp tải được. Vế ấy cần một lần chạy tay, và đó là
+    quyết định của chủ dự án chứ không của tôi.
+  - >
+    FE chưa nối — hàng bậc chất lượng nằm ở `T03-121`, và `SCR-21` đang chờ
+    duyệt.
+
+object:
+  - chungcat/assets/nguong.json
+  - chungcat/src/tai_nguon.py
+  - chungcat/src/worker.py
+  - chungcat/tests/check_tai_video_chat_luong.py
+  - web/api/tho-cua.mjs
+  - web/api/router.mjs

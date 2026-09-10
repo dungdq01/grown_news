@@ -1,0 +1,58 @@
+id: WL-01KB42SONGSONG
+luc: 2026-09-09 (phien PM M13)
+ai: claude-fable-5-1 (PM M13)
+viec: nap checklist song song M13/Space vao plan M13 — ba cho sua + mot task HUY vi trung voi PM-Space
+gate: khong ky gi (plan la soft)
+object:
+  - 07_plan/M13_truyhoi/tasks/T13-5-facet-tap-nguon.md    # phu_thuoc += FR-080 DA AP (canh xuyen nhanh #1, checklist §3)
+  - 07_plan/M13_truyhoi/tasks/T13-1-test-unit.md          # kho tam KB_DIR + cong 8895-8899; Space khong dat R4 vao truyhoi/tests
+  - 07_plan/M04_ci/tasks/T04-10-check-scope-hai-task-mot-file.md   # HUY — trung [Space] T04-90
+  - .factory/worklog/WL-01KB42SONGSONG.yaml
+noi_dung: |
+  Doc `07_plan/song-song-m13-space-checklist.md` (do WL-01KA9SONGSONG sinh). Ba
+  dieu no doi o phia M13, da ap:
+   1. T13-5 phai khai `phu_thuoc: FR-080 da AP` — truoc do ve "doi space => tap
+      ung vien doi" cua AC1 khong co gi de do, va mot fixture bia cot `space` la
+      dung lop `#cong-xanh-vi-neo-sai`. Ghi ro: chua co FR-080 thi khoa nhan
+      duoc nhung moi ban ghi la space mac dinh.
+   2. T13-1 khai cong 8895-8899 + KB_DIR: hai nhanh cung may, `8787` la server
+      that cua chu du an va `8791` la cong that M13.
+   3. Ranh gioi cong R4: `core/tests/check_khong_ro_cheo_space.py` (chu: Space),
+      KHONG dat trong `truyhoi/tests/` — do la dat T13-1.
+  Ba dieu khac cua checklist DA XONG boi nguoi khac, do lai truoc khi ghi:
+   §0.2 worktree: `git worktree list` = 3 (main · ../gn-m13 [m13] · ../gn-space
+      [space]) — checklist do luc con 1.
+   §2.4 FROZEN.lock treo: da commit 8ccc653 "FR-075 dong … ky lai FROZEN.lock
+      (nguoi uy quyen)", tac gia Dung Dang 12:19 ⇒ QUY DUOC CHU, khong con treo.
+   §0.1 cong scope: PM-Space da mo `[Space] T04-90`.
+va_cham_toi_gay_ra: |
+  Toi tao `T04-10` cho DUNG cong scope ma PM-Space da mo o `T04-90`, vi khong
+  `ls 07_plan/M04_ci/tasks` truoc khi tao (chi `ls` dai cua minh). Ca hai cung
+  khai `core/tests/check_scope.py` ⇒ dung ca ma cong ay sinh ra de bat.
+  Xu ly: KHONG mo ban thu hai. `T04-10` viet lai thanh don vi HUY, `trang_thai:
+  dong`, pham_vi_ghi chi con chinh no (khong con tranh path). Khong sua file cua
+  nhanh kia (checklist §4).
+  Xin XOA file T04-10 bi tu choi quyen (Bash rm) ⇒ giu lai duoi dang HUY co
+  giai thich; no chua tung commit nen khong co dau vet nao khac.
+can_them_cho_T04-90: |
+  Hai ve ban cua toi co ma T04-90 nen nhan — de nghi, PM-Space quyet, toi KHONG sua:
+   1. dang ky cong vao `core/tests/test_gates.py` (T04-90 khai `Makefile`, chua
+      khai test_gates) — M04-R1: cong ngoai CI la cong khong rang.
+   2. chuan hoa `\` -> `/` va BO COMMENT sau `#` truoc khi so path: pham_vi_ghi
+      cua du an nay co comment cung dong o >=9 task (T13-0 · T01-51 · T13-6 ·
+      T08-35 · T03-129/130/131 · T08-38 · T12-31) ⇒ so tho se DO OAN.
+can_bump_project_map: "khong co gi luot nay (PM-Space giu but — checklist §2.3)"
+do_do:
+  - lenh: python core/tests/check_g6b.py
+    ket_qua: "T13-1 (4 AC/4 cmd) · T13-5 (2/2) ok; tong 13 loi — task team khac (T12-33 moi nhat), khong co T13/T01-5x/T04 nao trong danh sach do"
+  - lenh: git worktree list
+    ket_qua: "3 — main · gn-m13 [m13] · gn-space [space] (checklist §0.2 XONG)"
+  - lenh: "git log -1 -- FROZEN.lock"
+    ket_qua: "8ccc653 Dung Dang 2026-09-09 12:19 — het treo (checklist §2.4 XONG)"
+đỏ_do: "khong co do trong luot nay"
+khong_lam:
+  - "KHONG sua 07_plan/song-song-m13-space-checklist.md — do la artifact overview cua nguoi khac."
+  - "KHONG sua T04-90 hay bat ky task [Space] nao — de nghi ghi o `can_them_cho_T04-90`."
+  - "KHONG bump project_map (PM-Space giu but)."
+  - "KHONG tao FR moi (FR max = 080; dai moi la 081+ cho ca hai PM)."
+  - "KHONG commit, KHONG push."

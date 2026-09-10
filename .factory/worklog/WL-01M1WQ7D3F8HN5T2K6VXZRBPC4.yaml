@@ -1,0 +1,109 @@
+ulid: 01M1WQ7D3F8HN5T2K6VXZRBPC4
+thoi_diem: 2026-09-07T07:40+07:00
+tac_nhan: claude-opus-5
+loai: ban_giao
+module: M03_web + M08_api + M12_chungcat
+don_vi: bản chưng cất cũ vào thùng rác · gạch đỏ hai màn · phân loại 45 ô nợ M12
+
+viec: >
+  Chủ dự án giao hai việc rồi bảo làm tiếp phân loại nợ. Làm xong vòng một thì
+  chính chủ dự án bắt lỗi bằng ảnh: *"sao tôi vẫn thấy tồn đọng"* — vòng một
+  hụt đúng chữ NHÁP trong câu chốt.
+
+r5_do_truoc:
+  - don_vi: bản cũ vào rác
+    lenh: node web/test/ban-cu-vao-rac.test.js
+    ket_qua: "ĐỎ 10 vế (vòng 1) · ĐỎ 4 vế (vòng 2, sau khi chủ dự án bắt lỗi)"
+    đỏ_do: claude-opus-5
+
+do_sau:
+  - lenh: node web/test/ban-cu-vao-rac.test.js
+    ket_qua: pass — 14/14 vế
+  - lenh: cd web && npm test
+    ket_qua: exit 0 · 0 FAIL
+  - lenh: 'for f in chungcat/tests/check_*.py; do python "$f"; done'
+    ket_qua: 40/40 XANH
+
+vong_1_hut_gi:
+  chu_du_an_chot: >
+    *"các bản cũ (NHÁP) của bản chưng cất thì mặc định cho vào thùng rác"*
+  toi_lam: "chỉ dọn bài ĐÃ DUYỆT (`donBanCu` ở cửa duyệt)"
+  hut: >
+    Chữ **NHÁP** nằm ngay trong câu chốt và tôi đọc lướt qua. Một bản nháp
+    KHÔNG BAO GIỜ được duyệt thì `donBanCu` không bao giờ chạm tới — nên nó
+    nằm lại mãi, đúng cái chủ dự án chụp ảnh gọi là *"tồn đọng"*.
+  do_lai_sau_khi_bi_bat: >
+    4 việc `xong`: 2 `chung-cat-mot-nguon` (1 mới + 1 cũ) · 1 `sinh-transcript`
+    · 1 `tai-video`. Nháp của việc cũ (`e3be6337`) không còn trong hàng nháp
+    nhưng dòng việc vẫn mời *"xem bản nháp"*.
+
+vong_2_sua_gi:
+  - ten: "`donNhapCu` — nháp cũ cùng nguồn → `da_bo`"
+    o_dau: "`dungchung.mjs`, gọi từ cửa TẠO nháp (`loi-cua.mjs` C2)"
+    vi_sao_da_bo: >
+      `FR-057` chốt *bỏ ≠ xoá*: hàng CÒN, `ban_goc_ai` CÒN. Nó tốn token model
+      để tạo và là thứ duy nhất trả lời *"người đã sửa những gì"*.
+    chi_dung_trang_thai_nhap: >
+      `da_duyet` đã thành bài trong kho — đường của nó là thùng rác của KHO
+      (`donBanCu`). `da_bo` thì một chiều.
+  - ten: "gạch đỏ ở CẢ HAI màn"
+    do: >
+      Vòng một tôi chỉ sửa tab Chưng cất trong cửa sổ đọc. Màn `/chung-cat/`
+      là plugin KHÁC — chủ dự án nhìn nó thấy bốn thẻ xanh y hệt nhau.
+    sua: >
+      `danhDauCu` viết lại y hệt ở `chungcat.inline.ts`, cùng phép tính với
+      `cctab`. Hai màn nói cùng một sự thật thì phải tính nó bằng cùng một
+      phép — không thì có ngày chúng nói khác nhau.
+
+chay_that:
+  - "màn `/chung-cat/`: 4 thẻ, ĐÚNG 1 thẻ `cct-cu` — `line-through` màu `rgb(248,113,113)`"
+  - "ba thẻ còn lại `none` — đúng: `tai-video` và `sinh-transcript` khác loại, không so với `chung-cat`"
+
+rac_toi_de_lai_va_da_don:
+  - "8 bản nháp thử (`thu-nghiem-don-ban-cu-*`) — bỏ kèm lý do"
+  - "2 việc `chung-cat-mot-nguon` tôi POST để đo mã trả về — **một việc đã chạy tới `dang-goi-model`, tức đã tiêu một lời gọi model của chủ dự án**"
+  - "1 việc `tai-video` + 1 file 38 MB sót từ phép thử tự-lưu"
+  - "cuối cùng: hàng đợi còn 3 việc THẬT · hàng nháp còn 1 · thư mục tạm 0 mục · kho 5 bài"
+
+bai_hoc_ghi_ra:
+  - >
+    Đo một mã trả về (`POST /job` 201 hay 200) bằng một payload HỢP LỆ là khởi
+    động một việc thật. Đáng lẽ dùng payload KHÔNG hợp lệ — nó vẫn cho biết mã
+    mà không tiêu gì.
+  - >
+    Câu chốt của chủ dự án có chữ trong ngoặc (`(nháp)`) và chữ ấy là VẾ CHÍNH.
+    Đọc lướt một ngoặc đơn làm hụt nửa yêu cầu.
+
+phan_loai_no_M12:
+  truoc: 45 ô
+  sau: 36 ô
+  bang: "ghi thẳng vào `06_modules/M12_chungcat/backlog.md` — mục *PHÂN LOẠI NỢ*"
+  chia: "FR 15 · TASK 18 · ĐO LẠI 3"
+  dong_hom_nay:
+    - "#24 dịch vụ ghi trạng thái vào repo — `git ls-files chungcat/hang-doi` = 0, đã `.gitignore`"
+  do_duoc_ma_van_dung:
+    - "#31 `AC-7.1` đo bảng `chu_de→engine` — `model.json` KHÔNG có `chu_de`"
+    - "#29 113/113 dòng model `khu_vuc: khong-xac-dinh`"
+    - "#25 `POST /job` nạp lại: 201 và 201"
+    - "#32 `hop_dong.py` không có `stream`"
+    - "#28 CẢ `T12-8` lẫn `T12-12` đều khai `chungcat/tests`"
+  ba_ve_chan_G6C_backlog_khong_noi:
+    - "worklog đóng module: 0"
+    - "`project_map` chưa bump be/fe"
+    - "14 rule khai `S3` chưa đối chiếu bằng chứng"
+
+chua_lam:
+  - >
+    Đường DUYỆT-THẬT của `donBanCu` vẫn chưa có một lần chạy chứng minh:
+    fixture nháp liên tục trượt `validate` (`word_count`, `url_normalized`).
+    `donNhapCu` thì cũng mới có cổng tĩnh, chưa có lần tạo nháp thật thứ hai.
+
+object:
+  - web/api/dungchung.mjs
+  - web/api/loi-cua.mjs
+  - web/api/nhap-cua.mjs
+  - web/plugins/cctab/src/cctab.inline.ts
+  - web/plugins/chungcat/src/chungcat.inline.ts
+  - web/test/ban-cu-vao-rac.test.js
+  - web/package.json
+  - 06_modules/M12_chungcat/backlog.md

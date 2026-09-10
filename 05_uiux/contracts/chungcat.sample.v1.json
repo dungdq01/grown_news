@@ -1,0 +1,123 @@
+{
+  "$comment": "Data contract v1 — màn Chưng cất (M12). Job = file trong hàng đợi Maildir trên _inbox/; tên file ULID = idempotency key. Mỗi attempt là MỘT lần tài liệu rời máy => log sha256 PER-ATTEMPT (FR-043 bậc 4). retry_cap=2.",
+  "version": 1,
+  "jobs": [
+    {
+      "id": "01K9W2CHUNGCAT01",
+      "nguon_slug": "xgboost-stap-by-step",
+      "ho_so": "phan-tich",
+      "trang_thai": "done",
+      "tao_luc": "2026-09-01T08:10:00+07:00",
+      "attempts": [
+        {
+          "luc": "2026-09-01T08:10:05+07:00",
+          "model": "claude-sonnet-5",
+          "sha256_payload": "a3f1c2…9be0",
+          "token_vao": 16480,
+          "token_ra": 3120,
+          "chi_phi_usd": 0.064,
+          "ket_qua": "ok"
+        }
+      ],
+      "ra_inbox": "_inbox/chung-cat-xgboost-stap-by-step.md"
+    },
+    {
+      "id": "01K9W2CHUNGCAT02",
+      "nguon_slug": "thien-duong-chuot-tuong-lai-nhan-loai-giai-ma-loi-tien-tri-d",
+      "ho_so": "phan-tich",
+      "trang_thai": "processing",
+      "tao_luc": "2026-09-01T08:31:00+07:00",
+      "attempts": [
+        {
+          "luc": "2026-09-01T08:31:02+07:00",
+          "model": "claude-sonnet-5",
+          "sha256_payload": "77d0e8…41aa",
+          "token_vao": 11200,
+          "token_ra": null,
+          "chi_phi_usd": null,
+          "ket_qua": "dang-chay"
+        }
+      ],
+      "ra_inbox": null
+    },
+    {
+      "id": "01K9W2CHUNGCAT03",
+      "nguon_slug": "quartz-plugin-api",
+      "ho_so": "phan-tich",
+      "trang_thai": "failed",
+      "tao_luc": "2026-09-01T07:02:00+07:00",
+      "attempts": [
+        {
+          "luc": "2026-09-01T07:02:04+07:00",
+          "model": "claude-sonnet-5",
+          "sha256_payload": "cc01ab…7f52",
+          "token_vao": 15900,
+          "token_ra": 0,
+          "chi_phi_usd": 0.032,
+          "ket_qua": "loi-529-qua-tai"
+        },
+        {
+          "luc": "2026-09-01T07:12:04+07:00",
+          "model": "claude-sonnet-5",
+          "sha256_payload": "cc01ab…7f52",
+          "token_vao": 15900,
+          "token_ra": 0,
+          "chi_phi_usd": 0.032,
+          "ket_qua": "loi-529-qua-tai"
+        }
+      ],
+      "loi_hien_thi": "2/2 lần đều lỗi 529 — hết lượt thử. Mỗi lần thử đã là một lần tài liệu rời máy (2 dòng log sha256). Người quyết chạy lại.",
+      "ra_inbox": null
+    },
+    {
+      "id": "01K9W2CHUNGCAT04",
+      "nguon_slug": null,
+      "ho_so": "tong-hop",
+      "nguon": [
+        "xgboost-stap-by-step",
+        "thien-duong-chuot-tuong-lai-nhan-loai-giai-ma-loi-tien-tri-d"
+      ],
+      "trang_thai": "done",
+      "tao_luc": "2026-09-01T09:00:00+07:00",
+      "attempts": [
+        {
+          "luc": "2026-09-01T09:00:08+07:00",
+          "model": "gemini-3.7-flash",
+          "sha256_payload": "19fe07…d3c4",
+          "token_vao": 27600,
+          "token_ra": 4100,
+          "chi_phi_usd": 0.036,
+          "ket_qua": "ok"
+        }
+      ],
+      "ra_inbox": "_inbox/tong-hop-hoc-may-thuc-chien.md",
+      "$edge": "FR-044: ho_so tong-hop, nguon >=2, url grown://tong-hop/<slug>, địa chỉ MANG TÊN NGUỒN [slug:p.7]"
+    },
+    {
+      "id": "01K9W2CHUNGCAT05",
+      "nguon_slug": "storm-multi-perspective",
+      "ho_so": "phan-tich",
+      "trang_thai": "new",
+      "tao_luc": "2026-09-01T09:20:00+07:00",
+      "attempts": [],
+      "ra_inbox": null
+    }
+  ],
+  "nhap_xem_truoc": {
+    "job_id": "01K9W2CHUNGCAT01",
+    "title": "XGBoost từng bước — đọc lại bằng khai triển Taylor",
+    "citations_sampled": 9,
+    "citations_verified": 9,
+    "unverifiable_citations": false,
+    "muc": [
+      {
+        "ten": "3.2 Vì sao bậc hai",
+        "dia_chi": [
+          "[xgboost-stap-by-step.pdf:p.7]",
+          "[xgboost-stap-by-step.pdf:p.9]"
+        ]
+      }
+    ],
+    "$edge": "citations_* do MÁY đếm (B-A6) — màn chỉ HIỂN THỊ, không cho sửa tay"
+  }
+}

@@ -1,0 +1,12 @@
+# Ngưỡng của M07_curate — sửa MỘT chỗ, không rải trong mã (M07-R2).
+#
+# Kho hiện 0 bài. Cả ba số dưới đây là PHỎNG ĐOÁN và sẽ sai.
+# Chỉnh sau khi nạp 10 nguồn thật (chặng C của build order).
+
+decay_stale_days: 90    # decay_risk high quá ngần này ngày ⇒ nghi lỗi thời
+draft_stale_days: 14    # draft quá ngần này ngày ⇒ nhắc duyệt
+concept_merge_min: 2    # >= ngần này đề xuất gần nghĩa ⇒ gợi ý gộp
+
+# Vì sao 90: repo đổi API theo quý là nhịp thường thấy. CHƯA kiểm chứng.
+# Vì sao 14: hai tuần là lúc còn nhớ vì sao nạp bài đó. CHƯA kiểm chứng.
+# Vì sao 2: một đề xuất lẻ chưa thành xu hướng. CHƯA kiểm chứng.

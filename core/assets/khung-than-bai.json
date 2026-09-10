@@ -1,0 +1,83 @@
+{
+  "$comment": "NGUỒN KHAI DUY NHẤT của khung thân bài. Trước đây khung 9 mục được gõ tay ở SÁU nơi và đã trôi thành HAI bộ tên khác nhau (validator chỉ ép SỐ nên cả hai đều qua cổng). Thêm/bớt/đổi tên mục thì sửa ở ĐÂY, không sửa chỗ khác. Bốn đường dẫn xuất: khung.py (Python) · readFileSync (test Node) · esbuild --define __KHUNG__ trong web/build-fe.mjs (bundle FE, không có fs) · cổng core/tests/check_khung.py ép hai file .md và hai shell.html khớp (văn xuôi không dẫn xuất được).",
+  "phien_ban": 3,
+
+  "$comment_tran_tu_thu_vien": "FR-036/B2 — ban ghi ho so `thu-vien` (hien vat + nhan) khong co than bai. Than dai hon nguong nay nghia la day la ban PHAN TICH dat sai ho so, va cong noi ra thay vi im lang mien cong hinh dang cho no.",
+  "tran_tu_thu_vien": 400,
+  "tran_tu_mem": 1500,
+  "tran_tu_cung": 1800,
+
+  "$comment_tran_dan_nhap": "TRẦN, không phải SÀN. Bản trước là 'mục 5+6 ≥35%'. Khung 5 mục làm nó VÔ NGHĨA: §3 hút cả bốn mục cũ (3,4,5,6) nên nó ~70% thân bài kể cả khi phần dẫn nhập phình ra. Ý định không đổi — chặn người viết viết lại phần dẫn nhập thay vì đọc thật — nên đo ở CHỖ BỊ LẠM DỤNG.",
+  "tran_dan_nhap": 0.25,
+
+  "muc": [
+    {
+      "so": 1,
+      "ten": "Overview",
+      "nang": false,
+      "locator": false,
+      "dan_nhap": true,
+      "goi_y": "Một câu: bài này nói cái gì mới."
+    },
+    {
+      "so": 2,
+      "ten": "Bối cảnh",
+      "nang": false,
+      "locator": false,
+      "dan_nhap": true,
+      "goi_y": "Vấn đề gì tồn tại trước → vì sao nguồn này có."
+    },
+    {
+      "so": 3,
+      "ten": "Nội dung",
+      "nang": false,
+      "locator": false,
+      "dan_nhap": false,
+      "goi_y": "Bốn mục con dưới đây — giữ đúng tiêu đề `### 3.1` … `### 3.4`.",
+      "con": [
+        {
+          "so": "3.1",
+          "ten": "Đầu vào",
+          "locator": false,
+          "goi_y": "Nhận vào cái gì: dữ liệu, tiền đề, bối cảnh kỹ thuật."
+        },
+        {
+          "so": "3.2",
+          "ten": "Process",
+          "nang": true,
+          "locator": true,
+          "goi_y": "CƠ CHẾ THẬT: chạy thế nào, ở đâu. Mọi khẳng định kèm locator [file.py:10-40] hoặc [§3.4]."
+        },
+        {
+          "so": "3.3",
+          "ten": "Output",
+          "locator": true,
+          "goi_y": "Tạo ra cái gì, đo được ở đâu [locator]."
+        },
+        {
+          "so": "3.4",
+          "ten": "Tinh túy",
+          "nang": true,
+          "locator": true,
+          "goi_y": "Điều rút ra mà người đọc mang đi được: nó không hiển nhiên ở chỗ nào, dùng lại được vào việc gì, và tin tới đâu — kèm địa chỉ [§3.4]."
+        }
+      ]
+    },
+    {
+      "so": 4,
+      "ten": "Ý nghĩa thực tế",
+      "nang": false,
+      "locator": true,
+      "dan_nhap": false,
+      "goi_y": "Dùng được vào việc gì, và MỘT ví dụ thực tế có địa chỉ [locator]."
+    },
+    {
+      "so": 5,
+      "ten": "Rủi ro và tầm nhìn",
+      "nang": false,
+      "locator": false,
+      "dan_nhap": false,
+      "goi_y": "Chỗ nào sai, thiếu, hoặc chưa ai tái lập — và hướng đi tiếp."
+    }
+  ]
+}

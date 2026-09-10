@@ -1,0 +1,70 @@
+ulid: 01M26K5V2X8ZBQWDMKNPR9
+thoi_diem: 2026-09-09
+tac_nhan: claude-opus-5 (dev)
+loai: ban_giao
+module: M12_chungcat · M08_api
+don_vi: WO-072 — ảnh bìa cho mp4 trong kho + PDF, và luật "chỉ khi CHƯA có nền" (task C)
+
+chi_dao: '"note là video/url loại nào ko có nền mới áp dụng · khảo luôn tiktok douyin, mp4, other"'
+
+khao_moi_loai_nguon: >
+  Bảng đầy đủ ở `WO-072`. Tóm: youtube = ytimg đoán từ id (0 lời gọi) ·
+  tiktok/facebook/douyin = yt-dlp (WO-071) · host NGOÀI allowlist = icon, cố ý
+  vì `AC-V4` · mp4 byte trong kho = ffmpeg (WO này) · pdf = pypdfium2 (WO này) ·
+  docx/pptx/doc/ppt = cần LibreOffice, KHÔNG có trong hệ, nói thẳng ·
+  md/txt = không có gì render · bài viết = không hiện vật nào.
+  Đo kho thật: 6/6 video ĐÃ có ảnh trước WO này ⇒ WO này thêm ảnh cho đúng
+  MỘT bản ghi (PDF). Nói ra để không ai tưởng nó đổi cả kho.
+
+luat_chi_khi_chua_co_nen: >
+  MỘT phép quyết `chien_luoc_anh_bia(fm)` → None | "url" | "khung" | "pdf".
+  LÕI dùng nó để quyết CÓ XẾP việc không; THỢ dùng CHÍNH nó để quyết chạy nhánh
+  nào. Hai bên tự quyết là hai chỗ để lệch, và lệch ở đây nghĩa là gọi ra
+  Internet cho một bản ghi ĐÃ CÓ ảnh — tốn lời gọi, và ghi đè một ảnh đang đúng.
+  Trả None khi: đã có `image/*` · YouTube · không hiện vật render được · host
+  ngoài allowlist. Không dùng chung được MÃ (Python/JS) nên dùng chung LUẬT, và
+  cổng `7b`/`7c`/`7d` canh cho hai bản không trôi khỏi nhau.
+
+object:
+  - .factory/wo/WO-072-thumbnail-mp4-va-pdf.md
+  - chungcat/src/worker.py          # chien_luoc_anh_bia · _frame_mp4 · _trang_dau_pdf · _gan_anh_bia · _anh_bia_tu_url
+  - chungcat/assets/nguong.json     # be_rong_anh_bia = 640 + $vi_sao
+  - web/api/tho-cua.mjs             # xepViecThumbnail nhận cả tai-lieu + kho://
+  - chungcat/tests/check_sinh_thumbnail.py     # +vế 7 (11 ca) · 8-9 CHẠY THẬT · 10
+  - chungcat/tests/check_khong_cham_kho.py     # vá ĐỎ OAN, xem dưới
+
+r5_do_truoc: "ĐỎ vế 7 (chưa có `chien_luoc_anh_bia`) → xanh sau"
+do_duoc: "5/5 fixture hỏng đỏ, mỗi cái đỏ đúng vế; cộng 1 fixture cho cổng vừa vá"
+
+cong_do_OAN_va_cach_va: >
+  `check_khong_cham_kho` vế 3 gom mọi chuỗi `startswith("http")` rồi đòi chúng
+  là loopback/bảng khai. `u.startswith("http")` của `chien_luoc_anh_bia` là một
+  phép SO SÁNH SCHEME, không phải một URL — nhưng cổng bắt nó, và `M12-R1` báo
+  "chưa có răng" cho một thay đổi không đụng gì tới kho.
+  Vá: đòi thêm `"://" in n.value`. Mọi chỗ vế này ĐANG bắt đều có `://`, nên
+  phép siết KHÔNG nới răng nào — và đã chứng minh: gieo
+  `"https://ke-xau.example/…"` hằng trong mã ⇒ cổng vẫn ĐỎ.
+
+nghiem_thu_may_that:
+  - lenh: "POST /api/job {loai:sinh-thumbnail, slug:tai-lieu/xgboost-stap-by-step}"
+    ket_qua: >
+      xong · PNG 194 058 byte vào kho · `media[]` giữ NGUYÊN PDF gốc 2 976 936
+      byte cạnh ảnh · màn /tai-lieu/: thẻ pdf = ẢNH 659×852 hiện được, thẻ .md
+      vẫn icon (đúng — không có gì render).
+  - lenh: "cổng 8-9 CHẠY THẬT hai nhánh"
+    ket_qua: "ffmpeg → JPEG 16 315 byte (magic ffd8ff) · pypdfium2 → PNG 3 597 byte (magic 89504e47)"
+
+do_sau:
+  - lenh: "for f in chungcat/tests/check_*.py"
+    ket_qua: 51/51 XANH
+  - lenh: python -m pytest core/tests -q
+    ket_qua: 49 passed
+  - lenh: cd web && npm test
+    ket_qua: "exit 1 · ĐÚNG MỘT FAIL: page-weight trang chủ (WO-055 có chủ)"
+
+đỏ_do: "page-weight trang chủ — WO-055 có chủ từ 2026-09-05; WO này 0 byte HTML thêm"
+
+con_lai:
+  - "docx/pptx chưa có ảnh — cần LibreOffice, là một quyết định về phụ thuộc, chủ dự án quyết"
+  - "chưa có mẫu tiktok/douyin THẬT trong kho để nghiệm thu lối `url` cho hai host đó"
+  - "`la_dan_xuat` vẫn chưa bao giờ được ghi (nợ từ WO-071) — ảnh bìa lẽ ra phải mang `la_dan_xuat: 1`"

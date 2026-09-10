@@ -1,0 +1,149 @@
+<title>Grown_news Design Tokens</title>
+<style>
+:root{
+  --bg:#FFFFFF;--surface:#F7F7F8;--text:#18181B;--text-2:#52525B;--text-3:#71717A;
+  --brand:#C81E1E;--brand-hover:#A61B1B;--btn-bg:#C81E1E;--btn-fg:#FFFFFF;
+  --border:#D4D4D8;--warn:#854D0E;--warn-bg:#FFFBEB;--ok:#15803D;
+  --font-body:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;
+  --font-mono:"JetBrains Mono",ui-monospace,"Cascadia Code",monospace;
+  --fs-display:clamp(2rem,5vw,3rem);--fs-h2:1.5rem;--fs-body:1.0625rem;
+  --fs-lead:1.1875rem;--fs-meta:.875rem;--lh-body:1.7;
+  --w-prose:680px;--gap-inner:24px;--radius:6px;--radius-lg:8px;--accent-bar:3px;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0A0A0B;--surface:#161618;--text:#FAFAFA;--text-2:#A1A1AA;--text-3:#8B8B93;
+  --brand:#F87171;--brand-hover:#FCA5A5;--btn-bg:#DC2626;--btn-fg:#FFFFFF;
+  --border:#2E2E33;--warn:#FBBF24;--warn-bg:#1C1917;--ok:#4ADE80;}}
+:root[data-theme="dark"]{
+  --bg:#0A0A0B;--surface:#161618;--text:#FAFAFA;--text-2:#A1A1AA;--text-3:#8B8B93;
+  --brand:#F87171;--brand-hover:#FCA5A5;--btn-bg:#DC2626;--btn-fg:#FFFFFF;
+  --border:#2E2E33;--warn:#FBBF24;--warn-bg:#1C1917;--ok:#4ADE80;}
+
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:var(--font-body);
+  font-size:var(--fs-body);line-height:var(--lh-body);padding:48px var(--gap-inner)}
+.wrap{max-width:var(--w-prose);margin:0 auto}
+h1{font-size:var(--fs-display);line-height:1.15;margin:0 0 8px;font-weight:700}
+h2{font-size:var(--fs-h2);margin:64px 0 16px;font-weight:600;
+  border-bottom:1px solid var(--border);padding-bottom:8px}
+.sub{color:var(--text-2);margin:0 0 8px}
+.pill{display:inline-block;font-size:var(--fs-meta);color:var(--ok);
+  border:1px solid var(--ok);border-radius:999px;padding:2px 10px}
+.toggle{position:fixed;top:16px;right:16px;background:var(--btn-bg);color:var(--btn-fg);
+  border:0;border-radius:var(--radius);padding:8px 14px;font:inherit;font-size:var(--fs-meta);cursor:pointer}
+.sw{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px}
+.sw div{border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden}
+.sw i{display:block;height:56px}
+.sw b{display:block;font-size:var(--fs-meta);padding:8px 10px 2px;font-weight:600}
+.sw code{display:block;font-family:var(--font-mono);font-size:.75rem;
+  color:var(--text-3);padding:0 10px 8px}
+.lead,.warning,.essence{border-left:var(--accent-bar) solid;padding-left:var(--gap-inner);margin:24px 0}
+.lead{border-color:var(--brand);font-size:var(--fs-lead)}
+.warning{border-color:var(--warn);background:var(--warn-bg);color:var(--warn);
+  padding:16px 16px 16px var(--gap-inner);border-radius:0 var(--radius) var(--radius) 0}
+.essence{border-color:var(--brand);background:var(--surface);
+  padding:16px 16px 16px var(--gap-inner);border-radius:0 var(--radius-lg) var(--radius-lg) 0}
+.essence ul{margin:8px 0 0;padding-left:18px;font-size:var(--fs-meta);color:var(--text-2)}
+.loc{font-family:var(--font-mono);font-size:var(--fs-meta);background:var(--surface);
+  border-radius:4px;padding:1px 5px;color:var(--brand);text-decoration:none;
+  border:1px solid var(--border)}
+.loc:hover{background:var(--brand);color:var(--btn-fg)}
+.btn{background:var(--btn-bg);color:var(--btn-fg);border:0;border-radius:var(--radius);
+  padding:10px 18px;font:inherit;cursor:pointer}
+.btn2{background:transparent;color:var(--text);border:1px solid var(--border);
+  border-radius:var(--radius);padding:10px 18px;font:inherit;cursor:pointer}
+.chip{display:inline-block;border:1px solid var(--border);border-radius:999px;
+  padding:3px 12px;font-size:var(--fs-meta);color:var(--text-2);margin:0 6px 6px 0}
+.card{background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--radius-lg);padding:16px;margin:16px 0}
+.meta{font-size:var(--fs-meta);color:var(--text-3)}
+.ruler{display:flex;align-items:flex-end;gap:12px;margin-top:16px}
+.ruler div{background:var(--brand);opacity:.25;border-radius:2px 2px 0 0;
+  text-align:center;font-size:.7rem;color:var(--text)}
+table{width:100%;border-collapse:collapse;font-size:var(--fs-meta);margin-top:12px}
+th,td{text-align:left;padding:7px 10px;border-bottom:1px solid var(--border)}
+th{color:var(--text-3);font-weight:600}
+td.n{font-family:var(--font-mono);color:var(--ok)}
+:where(a,button):focus-visible{outline:2px solid var(--brand);outline-offset:2px}
+</style>
+
+<button class="toggle" onclick="var r=document.documentElement,d=r.getAttribute('data-theme')==='dark';r.setAttribute('data-theme',d?'light':'dark')">đổi tone</button>
+
+<div class="wrap">
+
+<span class="pill">26/26 cặp màu pass WCAG AA</span>
+<h1>Grown_news</h1>
+<p class="sub">Design tokens — đỏ &amp; trắng, light + dark. Bấm nút góc phải để đổi tone.</p>
+
+<h2>1 · Palette</h2>
+<div class="sw">
+  <div><i style="background:var(--bg);box-shadow:inset 0 0 0 1px var(--border)"></i><b>Background</b><code>#FFF / #0A0A0B</code></div>
+  <div><i style="background:var(--surface)"></i><b>Surface</b><code>#F7F7F8 / #161618</code></div>
+  <div><i style="background:var(--text)"></i><b>Text</b><code>#18181B / #FAFAFA</code></div>
+  <div><i style="background:var(--text-2)"></i><b>Text phụ</b><code>#52525B / #A1A1AA</code></div>
+  <div><i style="background:var(--brand)"></i><b>Brand ★</b><code>#C81E1E / #F87171</code></div>
+  <div><i style="background:var(--btn-bg)"></i><b>Nút nền</b><code>#C81E1E / #DC2626</code></div>
+  <div><i style="background:var(--warn)"></i><b>Cảnh báo</b><code>#854D0E / #FBBF24</code></div>
+  <div><i style="background:var(--ok)"></i><b>OK</b><code>#15803D / #4ADE80</code></div>
+</div>
+
+<div class="card" style="margin-top:20px">
+  <b>Vì sao brand có hai hex khác nhau</b>
+  <table>
+    <tr><th>Màu</th><th>trên trắng</th><th>trên đen</th></tr>
+    <tr><td>#C81E1E</td><td class="n">5.74 ✓</td><td style="color:var(--warn)">3.45 ✗</td></tr>
+    <tr><td>#F87171</td><td style="color:var(--warn)">2.77 ✗</td><td class="n">7.15 ✓</td></tr>
+  </table>
+  <p class="meta" style="margin:12px 0 0">Không màu nào đạt cả hai. Dùng một hex cho cả hai theme là hỏng một trong hai.</p>
+</div>
+
+<h2>2 · Typography</h2>
+<p style="font-size:var(--fs-display);line-height:1.15;font-weight:700;margin:0 0 4px">Tít bài — mệnh đề mô tả nguồn</p>
+<p class="meta">Inter 700 · clamp(2rem, 5vw, 3rem) · lh 1.15</p>
+
+<div class="lead">Vấn đề nó giải. Cách tiếp cận đặc trưng. Ai nên quan tâm.</div>
+<p class="meta">Sapo · 1.1875rem · viền trái 3px brand</p>
+
+<p style="margin-top:24px">Thân bài 1.0625rem, line-height 1.7. Nội dung 1500 từ đọc trong 7–9 phút thì khoảng thở giữa dòng quan trọng hơn số dòng trên màn hình. Dòng giới hạn 680px để giữ 60–75 ký tự.</p>
+
+<p><a class="loc" href="#">retry.py:44-71</a> <a class="loc" href="#">§4.2 Bảng 3</a> <a class="loc" href="#">12:04–13:30</a><br>
+<span class="meta">Locator là chip <b>bấm được</b> — neo địa chỉ là luật nền L2</span></p>
+
+<h2>3 · Spacing</h2>
+<div class="ruler">
+  <div style="height:24px;width:24px">24</div>
+  <div style="height:64px;width:64px">64</div>
+  <div style="height:96px;width:96px">96</div>
+</div>
+<p class="meta">trong mục 24 · giữa mục 64 · giữa section 96 (spacious)</p>
+
+<h2>4 · Component</h2>
+
+<div class="warning">⚠ 2 trích dẫn chưa kiểm được · 1 nguồn phản biện chưa giải quyết</div>
+<p class="meta">Cảnh báo dùng token <b>warn</b>, KHÔNG dùng brand. Lệch hue 31.8° (light) / 43.3° (dark) — tách bằng sắc độ, không bằng độ sáng.</p>
+
+<div class="essence">
+  <b>6.1 Cố định ranh giới thời gian trước khi sinh đặc trưng</b>
+  <ul>
+    <li><b>Không hiển nhiên vì:</b> rò rỉ xảy ra ở bước tính đặc trưng trượt</li>
+    <li><b>Tin cậy:</b> plausible · 2 nguồn độc lập</li>
+    <li><b>Bằng chứng:</b> <a class="loc" href="#">§3.4</a> <a class="loc" href="#">§4.1</a></li>
+    <li><b>Loại:</b> skill</li>
+  </ul>
+</div>
+
+<div class="card">
+  <b>paper · 14 trang · 7 phút đọc</b>
+  <p class="meta" style="margin:6px 0 0">tác giả · 2025-11-03 · CC-BY-4.0 · độ tin: plausible · 2 nguồn</p>
+  <p style="margin:10px 0 0">
+    <span class="chip">walk-forward-validation</span><span class="chip">data-leakage</span>
+  </p>
+</div>
+
+<p><button class="btn">Nút chính</button> <button class="btn2">Nút phụ</button></p>
+<p class="meta">Đỏ tối đa <b>3 lần</b> mỗi viewport. Không shadow — phân tầng bằng nền và viền.</p>
+
+<h2>5 · Không có</h2>
+<p class="meta">carousel · infinite scroll · popup đăng ký · stock photo · box-shadow · đỏ làm nền khối lớn</p>
+
+</div>

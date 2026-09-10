@@ -1,0 +1,21 @@
+at: 2026-08-18T02:50Z
+agent: claude
+step: s4 / thiết kế hệ thống
+did: >
+  Quyết Q1 treo từ s1 bằng bằng chứng, không đoán: đọc doc Quartz v4 xác nhận
+  filter plugin có signature shouldPublish(ctx, content) đọc được frontmatter
+  tuỳ ý, custom sort truyền qua quartz.ts, emitter nhận toàn bộ content.
+  Ba luật tòa soạn đều khả thi ⇒ ADR-01 chọn Quartz, thu phần tự viết về
+  ~125 dòng thay vì cả một app Next.js.
+
+  Ra đủ artifact s4: adr.md (4 quyết định) · diagrams/flow-tong.md (F0-F3,
+  phủ 4/4 module) · diagrams/data-model.md · security_baseline.md ·
+  build_order.md (B1 CI → B2 đo M1 → B3 web, có đường rẽ khi M1 fail) ·
+  env_plan.md · scaffold web/PLACEHOLDER.md + .github/workflows/ci.yml.template.
+
+  project_map bump v1 → v2: thêm M04_ci, thêm stack + custom_parts cho M03_web,
+  flows trỏ diagram thật, gaps chuyển sang dạng có id + vá_ở.
+
+  Kiểm bằng máy: map nhất quán, depends_on không vòng, diagram phủ 4/4 module,
+  6 artifact s4 tồn tại, 0 lỗi. Regression core: 14 test vẫn pass.
+object: 04_system/ + project_map.yaml v2

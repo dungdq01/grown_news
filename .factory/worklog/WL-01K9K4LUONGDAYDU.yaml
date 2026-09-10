@@ -1,0 +1,155 @@
+id: WL-01K9K4LUONGDAYDU
+at: 2026-08-24
+by: claude
+buoc: s8 (M03_web + M05_intake + M08_api)
+loai: fix (3 bug mat du lieu) + phu test ba luong
+fr: —  (FR-025 mo, cho nguoi ky)
+
+viec: >
+  Nguoi dung: "cac phan tren co the fix het, va chay test cases cho tat ca flow
+  upload/trang thai/crud di nhe — vi chung ta chuan bi co buoc big update giao
+  dien nua". Nen viec la: tra het no da neu, roi dung luoi test truoc khi doi UI.
+
+# ── No da tra ────────────────────────────────────────────────────────────
+no_da_tra:
+  check_running: >
+    XANH. Nguoi dung chon "them thang vao concepts.yaml". Da them
+    `prompt-injection` + `token-budget` qua ham ghi THAT (themVaoDanhMuc +
+    ghiNhatKyDanhMuc), roi chuyen bai tu concepts_proposed sang concepts qua
+    PUT /api/articles. Ket qua: `validate kb/ --strict` = 3 file · 0 loi ·
+    0 canh bao · exit 0. RUNNING.md: moi lenh chay that.
+  server_cu: "Tat 11 tien trinh `node server.mjs` sot tu 19/8 (nguoi dung chon 'tat het')."
+  cong_9_validate: "Viet FR-025, CHUA thi hanh — sua validate.py la doi hop dong CI."
+
+# ── Bug 1: hai duong ghi cung file, hai dinh dang ────────────────────────
+bug_dinh_dang_aliases:
+  hien_tuong: "hai khai niem moi in `aliases` dang BLOCK, 22 muc cu dang FLOW"
+  nguyen_nhan: >
+    `themVaoDanhMuc` dung `YAML.stringify` tran; `suaDanhMuc` dung `inDanhMuc()`
+    (ham in flow-style toi viet truoc do). Hai duong ghi CUNG mot file, hai kieu.
+  sua: "themVaoDanhMuc dung inDanhMuc. Git checkout roi them lai => flow-style, khop 22 muc cu."
+
+# ── Bug 2: gate.py GHI DE bai da co trong kho — MAT DU LIEU ──────────────
+bug_gate_ghi_de:
+  muc_do: NGHIEM TRONG — mat du lieu nguoi dung, im lang
+  do_bang_thuc_nghiem: >
+    1) Sua one_liner bai `nop-qua-web` tren web qua PUT (thanh "SUA TREN WEB").
+    2) Chay `python 05_intake/gate.py`.
+    3) Doc lai file: dong sua BIEN MAT, thay bang ban cu trong _inbox/.
+    Khong mot canh bao nao. Sau khi sua: chay lai dung quy trinh do => dong sua
+    CON NGUYEN.
+  nguyen_nhan: >
+    `gate.py:166` goi `dich.write_text()` khong kiem `dich.exists()`. M08_api co
+    _recycle/ + 409 cho dung ca nay (M08-R4: "mot click nham = mat bai"); duong
+    nay khong co gi. Cung mot kho, hai muc bao ve.
+  sua: "kiem `dich.exists()` => TRA LAI kem ly do + cach sua, khong ghi de, khong tu doi ten .v<n>"
+
+bug_gate_khong_don_inbox:
+  hien_tuong: "file da vao kho nam lai _inbox/, MOI lan chay gate lai xu ly lai tu dau"
+  quan_he: "Day chinh la co che cua bug tren — khong don thi ban cu ghi de kho mai mai"
+  sua: "doi ten `<ten>.da-vao-kho.md` (doi ten, KHONG unlink — cung tinh than M08-R4) + bo qua hau to do o dau vong lap"
+
+# ── Bug 3: MOI PUT tren bai approved deu ha xuong edited ─────────────────
+bug_put_ha_trang_thai:
+  muc_do: NGHIEM TRONG — bai roi khoi site sau mot lan bam Luu khong doi gi
+  chung_minh_bang_may: >
+    `delete fm.review_status` roi gan lai (articles.mjs:211-214) day khoa xuong
+    CUOI object. `YAML.stringify` in theo thu tu chen nen hai chuoi khac nhau du
+    moi gia tri y het. In ra: thu tu cu `id,review_status,origin,title` vs moi
+    `id,title,origin,review_status` — stringify KHAC nhau = true.
+  hau_qua: "M03-R1 chi publish `approved`, nen PUT y nguyen = bai roi khoi site, phai xin duyet lai"
+  hai_cach_sua_SAI_da_thu_va_loai:
+    sortKeys: >
+      `YAML.stringify(o,{sortKeys:true})` — co bi BO QUA IM LANG tren ban yaml
+      dang dung (do duoc: hai chuoi van khac nhau). Mot tuy chon khong co tac
+      dung ma khong bao loi la bay te hon khong co tuy chon.
+    replacer_mang: >
+      `JSON.stringify(o, Object.keys(o).sort())` — replacer dang mang XOA TRANG
+      object long: `skill_candidates:[{priority:3}]` va `[{priority:9}]` deu ra
+      `[{}]`. Loi NGUOC va nang hon: sua noi dung ma bai van giu `approved`.
+      Bat duoc bang cach tu thu 5 ca truoc khi tin.
+  sua: "ham chuan hoa DE QUY (sap khoa moi tang) roi so JSON. Kiem 5 ca: doi thu tu / doi gia tri long sau / thieu khoa / them khoa / doi thu tu mang."
+
+# ── Bug 4: vao_kho la ket luan CA LO, khong cua bai vua nop ──────────────
+bug_vao_kho_sai:
+  hien_tuong: "test in ra: output co dong 'vao kho bai-dat.md' NHUNG gate_ma=1 va vao_kho=false"
+  nguyen_nhan: >
+    `vao_kho: kq.ma === 0` doc EXIT CODE, ma exit code la ket luan ca lo. gate.py
+    xu ly moi file trong _inbox/, nen mot ban cu nao do con nam do va truot la du
+    lam exit != 0 — nguoi dung thay "chua vao kho" cho bai cua minh du no da vao.
+  sua: "ham `ketCuaFile(chu, ten)` doc dong `vao kho <ten>` / `TRA LAI <ten>`. Fail closed: khong thay dong nao => false."
+
+# ── Luoi test moi ────────────────────────────────────────────────────────
+khao_sat_do_phu:
+  cach: "1 agent doc doc lap moi nhanh code trong web/api + server.mjs + gate.py, doi chieu 30 file test"
+  ket_qua: "22 nhanh KHONG co test nao chay qua, xep theo muc: 9 nhom mat-du-lieu, 8 nhom du-lieu-sai, 5 nhom thong-bao-sai"
+  toi_khong_tin_bao_cao: "tu xac nhan tung ho tren code + thuc nghiem truoc khi sua. HO-1 (gate ghi de) toi da tim ra doc lap TRUOC khi bao cao ve."
+
+test_moi:
+  web/test/luong-day-du.test.js: >
+    Ma tran 16 cap chuyen trang thai (4 trang thai x 4 dich), khai DOC LAP voi
+    code — truoc day BANG_CHUYEN khong co test nao doc, nen noi bang (them mot
+    dich) la viec lam duoc ma khong ai biet.
+    Cong PUT y nguyen / doi frontmatter / doi gia tri LONG SAU.
+    DELETE 404/400/412 + doc dia khang dinh file con nguyen byte.
+    POST chan source_type/slug lay tu PAYLOAD (khac cong URL da co test).
+    Body khong JSON o ca 3 handler. PUT khong doi duoc id/source_type/slug.
+    Phan trang, filter category, GET 404, danh muc vang file.
+  web/test/luong-nap-bai.test.js: >
+    Luong nap END-TO-END, truoc day la DUONG GHI DUY NHAT khong co test hanh vi
+    nao (chi regex tinh trong no-write-path). 4 cong chan truoc khi ghi ·
+    tenAnToan whitelist (traversal khong thoat thu muc) · nop trung ten 409 va
+    ban dau nguyen byte · bai dat => draft + external + word_count may tinh ·
+    _inbox duoc don · gate KHONG ghi de bai da co.
+  05_intake/test_gate.py: "them khoi khong_ghi_de (5 phep kiem) va don_inbox (4 phep kiem)"
+
+vi_sao_truoc_day_khong_test_duoc: >
+  `INBOX` trong server.mjs va `INBOX`/`KB` trong gate.py la duong CUNG — moi phep
+  kiem se ghi vao _inbox/ va kb/ THAT. Do la ly do bug ghi de song lau: khong ai
+  dam viet test cho no. Da them `INBOX_DIR` (server.mjs) va `INBOX_DIR`/`KB_DIR`
+  (gate.py), cung khuon KB_DIR cua sinh_index.py va SITE/API_PORT/PYTHON.
+  Bai hoc chung: mot module khong co env override la mot module khong test duoc.
+
+test_cu_phai_sua:
+  danh-muc-them.test.js: >
+    Go cung "22 muc" o 3 cho. `kb/concepts.yaml` la danh muc SONG — nguoi dung
+    them nhan qua web la viec binh thuong (FR-019), hom nay thanh 24. Doi sang
+    dem luc bat dau (`SO_DAU`) va khang dinh DELTA. Test go cung con so tuyet doi
+    thi moi lan nguoi dung dung dung tinh nang la mot test do vi LY DO SAI.
+  _api.mjs: "them `tho` (body nguyen van) cho goi() + `inbox` cho batServer()"
+
+kiem_hai_chieu:
+  - "lui `dich.exists()` + bo doi ten trong gate.py => 3 phep kiem do, goi ten dung hau qua"
+  - "bo `WHERE luu_tru = 0` => 3 phep kiem do (hai-duong-doc-khop)"
+  - "lui khoa index ve `slug` => 4 phep kiem do"
+
+phep_kiem_toi_viet_SAI_va_tu_bat:
+  - >
+    `count("banIndex()") >= 3` KHONG bat duoc khi toi bo mot loi goi: con 1 dinh
+    nghia + 2 loi goi = 3, vua du nguong. Dem mot ten xuat hien bao nhieu lan la
+    phep kiem yeu. Doi thanh "moi renameSync co banIndex() di kem" — hoi quan he,
+    khong dem.
+  - >
+    So thu tu renameSync/capNhatIndex tren van ban THO: mot comment CUA TOI o dau
+    file khop truoc lan goi that => cong do vi ly do sai. Phai bo comment truoc
+    khi so. Cung lop loi voi phep kiem quet hex bat gia tri trong comment.
+  - "`per_page=0 => 1`: sai ky vong. `Number('0')||50` cho 50 — do la hanh vi dung."
+
+evidence:
+  - "cd web && npm test => exit 0, 32/32 file, 0 FAIL, 0 EBUSY"
+  - "npm run check => sach"
+  - "pytest core/tests -q => 30 passed"
+  - "python 05_intake/test_gate.py => 0 FAIL (8 khoi)"
+  - "13/13 cong check_* exit 0 — GOM check_running, thu do suot phien"
+  - "check_frozen: dung 1 file doi moi lan, ky lai 27 file"
+  - "validate kb/ --strict => 3 file · 0 loi · 0 canh bao · exit 0"
+
+no_con_lai:
+  - "FR-025 (cong 9 khong bat khi url_normalized VANG) — viet roi, CHO NGUOI KY."
+  - >
+    Con 13 ho nhom 2-3 chua phu (aliases chi-them, rollback khi check_danh_muc do,
+    PATCH/DELETE categories, 413 qua tran, 404 do router tra false). Chung khong
+    gay mat du lieu; danh sach day du trong khao sat.
+  - "Man Cho duyet chua duoc dongBoThe() (chi dong bo #grid2)."
+  - "Chua co cache-busting cho gn.js/gn.css — nen lam TRUOC buoc doi UI lon."
+  - "kb/ moi co 3 bai / 10 bai can cho M1."

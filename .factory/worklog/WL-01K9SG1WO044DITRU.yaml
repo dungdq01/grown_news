@@ -1,0 +1,75 @@
+ulid: 01K9SG1WO044DITRU
+khi: 2026-09-04T04:00+07:00
+tac_nhan: agent-thi-cong (Claude, phiên 6c7880c5)
+loai: ban-giao
+module: M08_api
+don_vi: WO-044 — DB cũ không theo DDL mới; dời DB + dựng đường di trú
+
+viec: |
+  Chủ dự án duyệt lối A. Nhưng phép duyệt đó dựa trên một tiền đề TÔI BÁO SAI,
+  và điều đó phải đứng đầu entry này.
+
+  ⚠️ TÔI BÁO SAI TIỀN ĐỀ. Trình lối A kèm câu *"DB rỗng 0 hàng"*. Thực tế
+  `audit_loi` có **9 hàng**. Nguyên nhân: lần kiểm đầu tôi gõ `audit_log` —
+  sai tên, bảng thật là `audit_loi` — nhận `no such table`, rồi ĐỌC MỘT LỖI
+  TÊN THÀNH MỘT SỰ THẬT VỀ DỮ LIỆU.
+  Chốt tự đặt đã cứu: `assert tong == 0` chạy NGAY TRƯỚC thao tác không hoàn
+  tác được, và nó DỪNG. Nhờ vậy 9 hàng được xuất ra file trước khi DB bị dời.
+  ⇒ Tôi KHÔNG xoá DB như phép duyệt cho phép; tôi DỜI nó (giữ được mọi thứ,
+    tốn 0), vì tiền đề của phép duyệt đã đổi.
+
+  HAI VIỆC, và việc thứ hai mới là việc thật:
+  1 · DB dev dời khỏi repo, dựng lại theo schema mới. Xác nhận trên server
+      THẬT: `GET /api/nhap-chung-cat` → 200, `PRAGMA table_info` ra 11 cột.
+  2 · Đường DI TRÚ `diTruLoi()` — chạy mỗi lần mở DB, idempotent qua
+      `PRAGMA table_info`. KHÔNG cột cờ "đã di trú": một cờ như vậy nói về LỜI
+      KHAI, còn `table_info` nói về thứ CÓ THẬT.
+      Dựng bảng mới + copy + đổi tên, KHÔNG `ALTER`: SQLite thêm được cột nhưng
+      **không sửa được `CHECK`**, mà T08-27 đổi enum 3→4 giá trị.
+      Dựng LẠI trigger `ban_goc_ai` — nó gắn với bảng CŨ và chết theo bảng.
+      `da_gui`/`bo` ánh xạ về `nhap`; giữ nguyên thì `INSERT` vỡ ở `CHECK` và
+      mất cả hàng.
+
+object:
+  - .factory/wo/WO-044-ddl-doi-cot-db-cu-khong-theo.md
+  - web/api/dungchung.mjs                 # diTruLoi() + gọi trong dungLoiDb
+  - web/test/loi-nhap-cua.test.js         # §6b — DB schema CŨ
+  - 06_modules/M08_api/backlog.md         # tick WO-044 + 2 ô mới
+  - "(ngoài repo) _loi.sqlite.truoc-T08-27 + audit_loi-truoc-T08-27.json"
+
+bang_chung:
+  - "ĐỎ-TRƯỚC §6b, mốc 2026-09-04T03:5x: `node web/test/loi-nhap-cua.test.js`
+     → FAIL `DB schema CŨ ⇒ cửa VẪN trả 200`, trả **500
+     {loi: no such column: khang_dinh_bi_tia}` — đúng bug WO-044"
+  - "SAU: §6b ok · cùng lệnh pass"
+  - "server THẬT: GET /api/nhap-chung-cat → 200 {dong:[],tong:0,tran:200} ·
+     GET …/khong-co → 404 · POST …/tra-lai {} → 422"
+  - "PRAGMA table_info(nhap_chung_cat) → 11 cột, có khang_dinh_bi_tia + ly_do"
+  - "node web/test/loi-cua.test.js → pass · api-guard → pass"
+  - "cd web && npm test → exit 0 · 2786 ok · 0 FAIL"
+
+do_do: khong-co-do-moi
+
+hoc_duoc: |
+  1 · MỘT TRUY VẤN TRẢ "KHÔNG CÓ" PHẢI PHÂN BIỆT HAI CÂU: *"bảng không tồn
+      tại"* và *"bảng rỗng"*. Tôi trộn chúng, và một phép duyệt của chủ dự án
+      đứng trên câu sai. Chốt kiểm-lại-ngay-trước-khi-làm là thứ đã cứu.
+
+  2 · BỘ CỔNG ĐO SAI CÂU HỎI, và 2785 phép đo xanh không nói được điều đó.
+      Mọi cổng trỏ `LOI_DB` vào thư mục tạm ⇒ luôn chạy trên DB MỚI TOANH, nơi
+      `CREATE TABLE IF NOT EXISTS` chạy thật. Chúng đo *"schema đúng khi dựng
+      từ đầu"*; không ai đo *"schema đúng khi DB đã có"* — và câu thứ hai là
+      câu người dùng gặp. `§6b` nay đo đúng ca đó.
+
+  3 · `T08-27` tôi viết *"chưa có dữ liệu thật ⇒ 0 migration"*. Đúng về DỮ
+      LIỆU, sai về FILE: một file rỗng vẫn có SCHEMA.
+
+keo_theo:
+  - "M08 backlog: `audit_loi` KHÔNG có đường backup — `XUAT_LOI` phủ ba bảng,
+     `ADR-06 (c)` khai ba bảng, `loi-cua.test.js` đo đúng ba ⇒ cổng XANH trong
+     khi bảng thứ tư không ai backup. NGƯỜI/PM quyết."
+  - "M08 backlog: kỷ luật phân biệt 'bảng không có' với 'bảng rỗng'"
+
+chua_xong: |
+  Hành động XOÁ nháp vẫn hở hợp đồng (chờ người). `audit_loi` chưa vào backup.
+  Gate G6C do NGƯỜI ký. Chưa commit.

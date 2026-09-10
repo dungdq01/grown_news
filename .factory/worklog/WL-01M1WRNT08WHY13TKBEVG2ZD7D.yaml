@@ -1,0 +1,64 @@
+ulid: 01M1WRNT08WHY13TKBEVG2ZD7D
+khi: 2026-09-07
+tac_nhan: claude-opus-5 (agent)
+loai: ban_giao
+don_vi: T03-124 bước 2 + FR-070
+tom_tat: >
+  FR-070 duyệt ⇒ áp vào spec M12 (§2.2 nguyên liệu rẽ theo LOẠI bản ghi · §2.3
+  mọi việc để lại con trỏ) + rule M12-R10, ký lại FROZEN.lock. SCR-22 duyệt ⇒
+  thi công nhịp sinh: dải 24 cột lấy nhịp từ CUE THẬT lúc phiên âm, ba vòng
+  xoay 3D lúc chưng cất.
+object:
+  - 06_modules/M12_chungcat/spec.md          # §2.2 + §2.3 (FR-070)
+  - 06_modules/M12_chungcat/rules.md         # M12-R10
+  - FROZEN.lock                              # ký lại 56 file
+  - .factory/fr/FR-070-chung-cat-video-lay-transcript-lam-nguyen-lieu.md
+  - 05_uiux/wireframes/SCR-22-nhip-sinh.md   # ĐÃ DUYỆT
+  - web/plugins/cctab/src/cctab.inline.ts    # veDaiSong · veVongNghi · KHOI_CSS
+  - web/test/nhip-sinh.test.js               # cổng MỚI, 14 vế
+  - 07_plan/M03_web/tasks/T03-110b-test-tab-theo-doi.md  # đăng ký 2 cổng
+  - web/package.json                         # npm test gọi cổng mới
+r5_do_truoc: >
+  web/test/nhip-sinh.test.js viết TRƯỚC mã, chạy ĐỎ 6/12 vế. Sau khi cắm mã:
+  xanh 14/14.
+do_do: >
+  Cổng còn phải ĐỎ ĐƯỢC. Dựng 5 fixture hỏng ở thư mục tạm (không đụng file
+  thật): dải bịa bằng Math.random · animation lọt ra ngoài guard · guard giấu
+  cả khối · dải bỏ aria-hidden · vòng xoay kèm phần trăm. Lượt đầu 2/5 ca XANH
+  OAN — vế 3 neo vào một mẫu khớp cả TÊN LỚP CSS ".ns-vong", nên nó cắt trúng
+  CSS chứ không trúng thân hàm; vế 6 bắt được aria-hidden của veVongNghi thay
+  vì của dải. Cùng hạng lỗi với mẫu "tran" khớp chữ transcript. Vá neo ⇒ 5/5
+  ca hỏng đều đỏ.
+  Lượt thứ hai vế 3 ĐỎ OAN trên file ĐÚNG: cửa sổ 400 ký tự tràn sang veTienDo,
+  nơi phan_tram là HỢP LỆ (thanh tải file của T12-27). Cắt đúng thân hàm.
+đỏ_do: >
+  token-only + nut-song đỏ vì CHÍNH THAY ĐỔI NÀY (quy chủ bằng git status,
+  không phải đỏ của người khác): 5 giá trị px gõ tay (gap 2px · border-radius
+  1px · ba margin âm) và cổng mới chưa nằm trong npm test. Đã vá: gap dùng
+  --s-3xs; bỏ bo góc, vì một token bo nhỏ nhất trên cột rộng 13px là một cái
+  vòm, và gõ tay 1px để né điều đó là đúng thứ token-only cấm; ba vòng chồng
+  bằng grid một ô thay cho absolute + margin âm nửa cỡ.
+quyet_dinh:
+  - >
+    Dải KHÔNG phải phổ âm thanh. FE không bao giờ cầm byte audio (M12-R1) —
+    không AudioContext, không FFT. Chiều cao cột = số cue + số ký tự SINH THÊM
+    trong nhịp poll vừa rồi. SCR-22 chọn lối này và nói rõ vì sao: một dải nhảy
+    múa trong lúc thợ đã chết tệ hơn không có dải.
+  - >
+    Chưng cất dùng VÒNG XOAY, không dải tần — chưng cất không có âm thanh, vẽ
+    dải ở đó là mượn hình của một việc khác (cùng lỗi "mượn màu của chiều phân
+    loại khác" mà SCR-20 đã cấm). Và KHÔNG thanh phần trăm: ta không đo được
+    model còn bao lâu, bịa một con số là hứa một thứ mình không đo được.
+  - >
+    Guard chuyển động viết chiều OPT-IN (no-preference) theo idiom sẵn có của
+    chunk, KHÔNG theo khối "reduce animation-none" mà SCR-22 vẽ. Quên một luật
+    ở chiều tắt-sau là một animation LỌT QUA; quên ở chiều opt-in thì chỉ là
+    một thứ đứng yên. Cổng đo cái bất biến, không đo cách viết.
+ngan_sach: >
+  Hiệu ứng đi HẲN vào chunk cctab — gn.js 101932/102400 và gn.css 102763/104448
+  KHÔNG đổi một byte (đo bằng page-weight.test.js).
+may_xanh: >
+  web 115/115 · chungcat 43/43 · pytest core 49 passed · check_frozen pass ·
+  check_g6b còn 5 lỗi M18 (có TRƯỚC đơn vị này, không thuộc nó).
+con_no: >
+  E2E chế độ that chưa bật lại (chủ dự án dặn tắt). Backlog M12 còn 36 ô.

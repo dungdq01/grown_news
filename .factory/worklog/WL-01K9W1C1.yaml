@@ -1,0 +1,132 @@
+id: WL-01K9W1C1
+at: 2026-09-01
+by: claude
+buoc: "C1 (build_order) — S8+S9: bang khai dang dia chi + phep phan giai + citations_* thanh dan xuat"
+loai: code; va G-6 + G-7; thoa B-A5 + B-A6
+task: [T01-42-test-dia-chi-phan-giai.md, T01-43-dia-chi-phan-giai.md]
+
+object:
+  - core/assets/dia-chi.json                 # MOI — 5 dang, cot manh + bat_link_gay
+  - core/src/source_distiller/validate.py    # bo LOCATOR_RE; +tach_dia_chi/phan_giai; §7 viet lai; +§7b/§7c; §8 dung so may dem; --kho/--no-kho; --fix ghi 3 truong
+  - core/pyproject.toml                      # +pypdf>=6.0
+  - core/tests/check_dia_chi.py              # MOI — cong S3, 13 phep
+  - core/tests/check_khung.py                # muon LOCATOR_RE da xoa -> tach_dia_chi
+  - core/tests/test_gates.py                 # doi chu thong bao; DAN_XUAT +3 khoa
+  - core/tools/sinh_kb_mock.py               # luot HAI tinh citations_* + unverifiable tu than da sinh
+  - kb-mock/**                               # 16 file: sinh lai, so do BO SINH tinh
+  - 07_plan/M01_core/tasks/T01-42-*.md, T01-43-*.md
+
+evidence:
+  - "check_dia_chi.py => 13/13 xanh, exit 0"
+  - "pytest core/tests -q => 42 passed"
+  - "29 cong Python => 25 xanh; 4 do la 4 do CU (danh_muc, frozen, running, skill)"
+  - "do nhan dang tren kb + kb-mock: 73/86 dia chi nhan dang, 13 bo qua — ca 13 la chuoi trong khoi ma"
+  - "check_kb_mock => pass, 16 file 0 loi"
+  - "sinh_kb_mock.py chay HAI lan lien tiep => check_kb_mock van pass (on dinh)"
+  - "kb/ THAT: xgboost-taylor-bac-hai khai 3/3, may dem 15/0"
+
+# ══ PHAN DANG GIA NHAT ═════════════════════════════════════════════════
+G-6_do_duoc_bang_mot_cau: >
+  LOCATOR_RE cu khop MOI ngoac vuong 2-80 ky tu. Tren ban phan-tich duy nhat cua
+  kho: 15 dia chi [§...] THAT, cong mot day so [2, 1, 0.5, -0.5, -1, -2] va mot
+  cong thuc Taylor — ca hai deu dang duoc tinh la "co dia chi".
+  Sau C1: 15 nhan dang, 0 phan giai duoc, hai thu kia bi BO QUA im lang.
+
+toi_khai_18_ma_that_ra_15: >
+  Trong task file va docstring cong toi viet "18 dia chi". Dem lai bang
+  `grep -o | sort | uniq -c`: 3+2+2+2+2+1+1+1+1 = 15. Toi cong nham.
+  Da sua trong ca ba cho. Bai hoc lap lai: so nao viet ra cung phai dem lai ngay
+  truoc khi viet, ke ca so minh vua do 5 phut truoc.
+  LOI THU HAI CUNG LOP trong cung task: toi viet '8/11 muc'. Dem lai bang may:
+  CAN_LOCATOR chi co BON muc (3.2, 3.3, 3.4, 4) va CA BON deu co dia chi —
+  4/4, khong phai 8/11. So 11 la tong moi tieu de ##/### cua bai, mot phep dem
+  KHAC cau dang noi. Hai lan trong mot task: toi dem mot thu roi dan no cho mot
+  cau hoi khac.
+
+BA lo cua chinh toi, deu lo ra bang CHAY chu khong bang doc:
+  1_file_dong_khoa_cung_md: >
+    Khai `file-dong` la `...\.md:dong`. Chay tren kb-mock: 42/55 cho "khong nhan
+    dang" la `nguon.py:10-40`. Toi thu hep dinh dang ma khong do truoc.
+  2_json_dumps_tu_escape: >
+    Sua regex bang json.dumps voi HAI backslash => file ra `\.` => regex thanh
+    "backslash roi ky tu bat ky". Nhan dang tut 31 -> 17. Lan viet tay can HAI,
+    lan qua json.dumps can MOT — hai duong ghi cung mot file, hai luat escape.
+  3_link_gay_suy_tu_manh_la_DO_OAN: >
+    Ban dau: dia chi nao `manh != khong` ma khong phan giai duoc => bao "link
+    gay". Nhung `[backend]` trong mot vi du `category: [backend]` khop dang
+    `slug` y het mot dia chi that. Bao link gay cho no la phat nguoi viet vi mot
+    dau ngoac trong khoi ma. => them cot `bat_link_gay`, CHI `:p.N` va `:t=`
+    (cu phap khong the go nham) moi duoc do.
+
+cong_tu_BAT_theo_bo_cuc_thu_muc_xung_quanh: >
+  main() doan goc kho = target.parent.parent cho file le, roi bat cong neu thu
+  muc do co bat ky */*.md nao. Trong tmp cua pytest, mot thu muc anh em cua mot
+  test KHAC lam dieu kien do dung => cong tu bat va --fix ghi them truong, lam
+  test_fix_chi_dan_xuat do. Mot cong bat/tat theo thu muc xung quanh thi khong
+  doan duoc; khong doan duoc thi khong tin duoc.
+  => tu dong CHI khi target la THU MUC; file le phai khai `--kho`.
+
+§8_viet_cho_thoi_SO_TU_KHAI_nen_phai_doi: >
+  "verified < sampled => loai ca ban" dung khi so la LOI KHAI: khai verified <
+  sampled la tu nhan that bai. Voi so MAY DEM, verified < sampled la ca BINH
+  THUONG cua moi bai trich nguon ngoai kho. Giu nguyen la bien lua chon "gan co,
+  khong loai bai" cua chu du an thanh "do cung" — nguoc chi dao.
+  Bien mot so tu-khai thanh so may-dem doi Y NGHIA cua moi luat doc so do. Phai
+  ra soat tung luat, khong chi doi cho tinh.
+
+toi_sua_du_lieu_SINH_RA_bang_--fix_va_no_bi_lui_ngay: >
+  Sau C1, 16 file kb-mock do (citations_sampled khai 0, than co 4 dia chi). Toi
+  chay `validate kb-mock/ --fix` => xanh. Chay tiep vong kiem toan bo => DO LAI,
+  va `git status kb-mock` TRONG: file da bi lui ve ban commit.
+  Thu pham: RUNNING.md:110 khai lenh `sinh_kb_mock.py`, `check_running` chay no.
+  Va bai hoc nay DA DUOC GHI SAN trong chinh file do, dong 65, cho word_count:
+    "Truoc FR-015 toi sua bang validate --fix — nhung lan sinh lai NAO cung de
+     nguoc lai. Sua o day la sua tan goc: noi sinh ra than phai la noi tinh no."
+  Toi doc dong do TRUOC khi sua (no o ngay tren doan minh dang doc) va van lam
+  dung cai viec no can. Ket luan: du lieu SINH RA khong duoc va — phai sua BO
+  SINH. Da them mot luot thu hai trong sinh_kb_mock.py, tinh ba truong tu than
+  da sinh; chay hai lan lien tiep cho ket qua on dinh.
+  Luot RIENG chu khong tinh trong vong ghi file: `phan_giai` hoi 'dia chi co tro
+  vao thu KHO CO khong', ma kho chi day du sau khi moi file da duoc ghi — tinh
+  trong vong la de ket qua phu thuoc thu tu vong lap.
+
+khai_thieu_pham_vi_ghi_vi_khong_grep_truoc: >
+  T01-42 khai `core/tests/check_dia_chi.py` + `test_gates.py`. Thieu
+  `check_khung.py` — no import `LOCATOR_RE`, hang toi xoa. Grep `LOCATOR_RE`
+  truoc khi khai thi da thay. Da khai BO SUNG vao task file truoc khi cham file,
+  kem ly do; task chua ai ky nen day la lap ke hoach lai, khong phai noi tai cho.
+
+toi_bao_XONG_khi_CI_dang_do: >
+  Bao cao C1: '42 test pass, 25/29 cong xanh, khong them do nao'. Ca ba so DUNG.
+  Nhung `ci.yml:43` chay `validate.py kb/ --strict`, va lenh do nay exit 1 — ba
+  loi cua ban ghi chua di tru. Tuc C1 vua ha CI xuong DO, va toi khong noi.
+  Loi khong nam o so, nam o PHAM VI phep do: toi quet `core/tests/check_*.py` roi
+  ket luan ve 'toan bo cong'. CI co bon buoc chay validate/pytest TRUC TIEP, khong
+  qua mot file check_*. Quet mot ho file roi bao ve ca he thong la do SAI THU.
+  R2 noi ro: chua may xanh thi chua xong. Nen C1 CHUA xong — no cho mot don vi
+  M02 (mot lenh) truoc khi co the goi la xong.
+  LAN THU HAI cung loi, do sau do: chay 80 test web tung cai => 79/80, do la
+  `api-crud.test.js` §7 — cung nguyen nhan (cua ghi khong sinh citations_*, roi
+  test validate ca THU MUC). Nen cau 'khong them do nao' cua toi sai o HAI be
+  mat: CI va bo test web. Ca hai deu nam ngoai ho `core/tests/check_*.py` ma
+  toi da quet. Bai hoc: truoc khi noi 'khong pha gi', liet ke cac BE MAT co
+  rang (CI · pytest · check_* · npm test), roi chay du — dung quet mot ho file.
+
+cong_vua_viet_KHONG_chay_o_noi_co_rang: >
+  `check_dia_chi.py` khong co trong ci.yml. Dem lai: MUOI cong Python vang mat,
+  khong phai tam nhu backlog ghi (thieu `check_map` va chinh `check_dia_chi`).
+  Cong nay la TOAN BO rang cua B-A5/B-A6. Khong dang ky thi luat chong-bia vua
+  dung chi ton tai tren may nguoi viet ra no.
+  Khong tu noi vao CI: o backlog co san giai thich — noi ma khong chung minh duoc
+  no con xanh tren runner la tu nhan xong (R2), va do la viec cua M04_ci.
+
+do_do:
+  check_danh_muc + check_skill: "nguyen nhan la FR-039 CUA TOI; cho sua o core/skill-src (agent khac so huu) — xem WL-01K9V3FR045 phan dinh chinh"
+  check_frozen: "cho NGUOI ky — FR-034/036 + FR-041 + FR-042"
+  check_running: "he qua cua hai muc tren"
+
+no_con_lai:
+  - "kb/ THAT chua di tru: xgboost-taylor-bac-hai khai 3/3, may dem 15/0. `kb/**` thuoc M02_kb, KHONG thuoc boundary M01 => don vi viec KHAC, khong noi vao C1. Lenh: validate kb/ --fix, roi dung_lai_db.py de day file->DB."
+  - "`[slug]` tran khong bao link gay (qua nhap nhang voi YAML inline list). Link gay cua bare slug KHONG duoc phat hien — danh doi co y, ghi trong bang khai."
+  - "`slug-moc` chi kiem duoc ban ghi la video, KHONG kiem duoc moc nam trong thoi luong — muon kiem phai tai video ve, ma LOI khong goi ra ngoai (B-E2)."
+  - "FR-044 cong T2 (dia chi cua ban tong-hop mang ten nguon) dung lai duoc bang nay, nhung `nguon` chua co trong schema (deny chan) => chua cai duoc."

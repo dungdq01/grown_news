@@ -1,0 +1,394 @@
+/* ══════════════════════════════════════════════════════════════════
+   GROWN_NEWS — DESIGN TOKENS  ·  s5 FROZEN v1  ·  2026-08-18
+   Nguồn duy nhất: trích thẳng từ 05_uiux/prototype/app-v20.html
+   Mọi module ở s6 import file này, KHÔNG gõ lại giá trị.
+
+   Đã kiểm bằng máy:
+   · 32/32 cặp tương phản pass WCAG AA trên 4 loại ảnh nền
+   · Palette biểu đồ pass dataviz/validate_palette.js cả 2 mode
+   · 0 cỡ chữ gõ tay ngoài thang · 2 họ chữ · weight chỉ từ token
+   ══════════════════════════════════════════════════════════════════ */
+
+:root{
+
+  color-scheme:light;
+  --s-3xs:4px;--s-2xs:8px;--s-xs:12px;--s-sm:16px;--s-md:24px;
+  --s-lg:32px;--s-xl:48px;--s-2xl:64px;
+  /* Sans có x-height cao hơn serif ~5% ⇒ hạ nhẹ cỡ đọc, siết tracking.
+     text-sm/text-base của shadcn = .875/1rem — bám theo đó. */
+  /* THANG CHỮ — 10 bậc, mỗi bậc một vai. Xem TYPOGRAPHY.md */
+  --fs-micro:.75rem;   /* 12 · nhãn HOA, badge, ngày, số trang        */
+  --fs-meta:.8125rem;  /* 13 · nút, tab, locator, mô tả danh sách     */
+  --fs-small:.875rem;  /* 14 · ô nhập, tít thẻ lưới                   */
+  --fs-body:.9375rem;  /* 15 · nền giao diện                          */
+  --fs-read:1rem;      /* 16 · thân bài trong cửa sổ đọc              */
+  --fs-lead:1.125rem;  /* 18 · sapo, câu trích nhấn mạnh              */
+  --fs-h3:1.25rem;     /* 20 · tít phụ, tên panel                     */
+  --fs-h2:1.5rem;      /* 24 · tiêu đề mục 1-9                        */
+  --fs-h1:2rem;        /* 32 · tít bài                                */
+  --fs-hero:2.5rem;    /* 40 · số KPI                                 */
+  /* FR-027f · BA bậc `ui_guide §3` đòi mà thang 10 bậc trên KHÔNG có. Thiếu
+     chúng là lý do 9 luật `font-size` trong prototype.css gõ px trực tiếp —
+     và `token-only.test.js` không thấy vì nó miễn cả file đó. */
+  --fs-nano:.65625rem; /* 10.5 · siêu dữ liệu nhỏ nhất (§3: 10.5–12.5) */
+  --fs-card:.96875rem; /* 15.5 · tít thẻ nhỏ (§3)                      */
+  --fs-stat:1.6875rem; /* 27 · số liệu bậc dưới (§3: 27–34)            */
+  /* Tít nổi bật §3 — bậc DUY NHẤT co theo khung, nên nó là clamp chứ
+     không phải một số. Neo 30↔44px = 1.875↔2.75rem. */
+  --fs-feat:clamp(1.875rem,3.1vw,2.75rem);
+  --fs-logo:1.0625rem; /* 17 · CHỈ chữ "G" của logo trong ô 38px.
+                              `ui_guide §10` xếp logo là ngoại lệ sẵn
+                              (nó cũng là chỗ duy nhất được viết hex tay) */
+  /* line-height theo cấp — càng lớn càng chặt */
+  --lh-tight:1.05;--lh-h1:1.15;--lh-h2:1.3;--lh-h3:1.35;
+  --lh-lead:1.5;--lh-ui:1.55;--lh-read:1.65;
+  /* FR-027d · .06em → .12em. `ui_guide §3`: "Nhãn vùng 12px · 600 ·
+     letter-spacing .13em, HOA" và "Chữ càng nhỏ giãn càng rộng".
+     .06em ở 12px là 0.72px — mắt gần như không thấy giãn, nên nhãn HOA đọc ra
+     một khối chữ dính. .12em = 1.44px, đủ để từng chữ tách ra.
+     Chọn .12 chứ không .13: 17 chỗ dùng token này, và .12em ở 10.5px (nhãn
+     rail) đã là 1.26px — thêm nữa thì nhãn 5 chữ tràn khỏi chip 54px. */
+  --tr-lb:.12em;
+
+  /* ═══ BA LUẬT CHỮ ═══
+     1 · Menu: ĐẬM + THẲNG (weight 600, không nghiêng)
+     2 · Header và nội dung CÙNG CỠ — khác nhau ở weight, không ở size.
+         Header 600, nội dung 400. Chữ không cần to.
+     3 · Ghi chú / cảnh báo / lỗi: NGHIÊNG.
+     Ba biến dưới đây là toàn bộ hệ — mọi chỗ tham chiếu, không gõ tay. */
+  --w-head:600;      /* tiêu đề, nhãn vùng, tít bài  */
+  --w-bold:700;      /* CHỈ logo và số liệu lớn      */
+  --w-body:400;      /* nội dung, mô tả, dữ liệu     */
+  --i-note:italic;   /* ghi chú, cảnh báo, lỗi       */
+
+  /* ── shadcn/ui token map — cặp <surface>/<surface>-foreground ──
+     Kiểm tương phản trước khi áp: 22/22 cặp pass WCAG AA. */
+  /* FR-027b · .9 → .7. Người dùng nhìn bản chạy thật và nói đúng: ở chế độ
+     SÁNG kính không hiện — alpha .9 nghĩa là chỉ 10% ảnh xuyên qua, mắt đọc ra
+     "tấm trắng", không phải mặt kính.
+
+     .8 là mức thấp nhất giữ được CẢ BỐN màu chữ đạt AA — kể cả đỏ thương hiệu.
+     Đo trên ảnh `public/light/` đang dùng, nền nhạt nhất #6D6D6D:
+
+       alpha  nền trộn   chữ mờ   đỏ #C81E1E
+        .90   #F2F2F1     5.16      5.16     (bản trước — chỉ 10% ảnh xuyên qua)
+        .80   #E7E8E7     5.16      4.67  ←  chọn: 20% xuyên qua, cả bốn dư thật
+        .78   #E5E6E5     5.06      4.58     đỏ chỉ dư 0.08 — sát mép
+        .74   #E1E1E1     4.84      4.39     đỏ TRƯỢT
+        .70   #DDDDDD     4.66      4.22     đỏ TRƯỢT
+
+     RÀNG BUỘC BINDING là ĐỎ, không phải chữ mờ. `#C81E1E` là màu thương hiệu
+     (`ui_guide §1`: "Đỏ #C81E1E là mực in") — làm nó tối đi để lấy thêm 10% độ
+     trong là đổi thứ người đọc nhận ra tờ báo bằng, để lấy một hiệu ứng. Không
+     đáng. Nên alpha dừng ở .8 và đỏ giữ nguyên.
+
+     `--muted-foreground` vẫn tối thêm một bước (#65656C → #5F5F66): ở .8 nó
+     không cần, nhưng ở .9 nó ĐÃ trượt trên ảnh thật (4.34) — sửa đó là trả nợ
+     cũ, độc lập với alpha. */
+  /* FR-042 · HỌ BE thay trắng tinh — người dùng chỉ vào bản chạy: "trắng tinh
+     khôi". Đổi SẮC, GIỮ ĐỘ SÁNG: lập luận alpha .8 ở trên neo vào độ sáng nền,
+     và trọng tài là sinh_contrast_audit.py — không phải mắt. Chế độ tối không đổi. */
+  --background:rgba(252,249,242,.8);      --foreground:#17171A;
+  --card:rgba(250,246,237,.72);           --card-foreground:#17171A;
+  --popover:rgba(252,249,242,.94);        --popover-foreground:#17171A;
+  --primary:#C81E1E;                      --primary-foreground:#FFFFFF;
+  --primary-hover:#A61B1B;
+  --secondary:#F0EADC;                    --secondary-foreground:#3A3A42;
+  /* FR-027 · #6B6B74 → #65656C. Nợ CŨ, không do FR-027 sinh ra: bản sáng
+     không đổi alpha, nhưng bản audit 2.0.0 (viết TAY) đo chữ mờ trên nền GIẢ
+     ĐỊNH `#F0F5F7` — sáng 243, ngoài khoảng ảnh thật (109–137). Đo lại trên
+     ảnh đang dùng: `#6B6B74` chỉ 4.34/4.39 — TRƯỢT AA suốt từ đầu.
+     `#65656C` cho 4.76 trên nền tệ nhất (dư 0.26), và vẫn 5.63 trên nền đặc.
+     Chọn nó chứ không `#68686F` (4.55): sát mép thì thêm một ảnh sáng hơn là
+     lật sang trượt. */
+  --muted:#F0EADC;                        --muted-foreground:#5F5F66;
+  --accent:#F4EDE1;                       --accent-foreground:#8F1515;
+  --destructive:#B3261E;                  --destructive-foreground:#FFFFFF;
+  --success:#15803D;
+  --tt-draft:#1D4ED8;                      /* T03-120 · draft — xanh dương */
+  /* Màu LOẠI VIỆC (2026-09-07). KHÔNG mượn `--c-*`: đó là màu của loại NGUỒN,
+     và trộn hai chiều phân loại vào một màu là lỗi `SCR-20` đã cấm. */
+  --vl-chungcat:#7C3AED;  --vl-transcript:#0E7490;  --vl-taivideo:#B45309;
+  --warning:#854D0E;                      --warning-bg:rgba(255,251,235,.8);
+  --border:#DBD3C0;                       --border-subtle:rgba(23,23,26,.055);
+  --input:#DBD3C0;                        --ring:#C81E1E;
+  --edge:rgba(255,252,244,.66);
+
+  /* ═══ CHẤT LIỆU KÍNH — MỘT giá trị cho MỌI bề mặt nổi ═══
+     Trước đây .top blur 20px/sat 1.3 · .pn blur 18/1.15 · .bk blur 24/1.2
+     ⇒ ba chất liệu khác nhau trên cùng màn hình. Thanh menu trông như
+     tấm đục dán lên, không cùng hệ với panel bên dưới. */
+  --blur-lift:blur(22px) saturate(1.22);
+
+  /* ═══ VỆT SÁNG CHÉO — FR-027 ═══
+     Thứ thứ tư của "kính iPhone" (ui_guide §4). Ba thứ kia đã có từ trước:
+     --edge (viền 1px) · --e-top (gờ sáng mép trên) · --blur-lift (nhoè nền).
+     Thiếu vệt sáng thì panel là "ô mờ", không phải mặt kính — mắt đọc ra
+     vật liệu qua PHẢN CHIẾU, không qua độ mờ.
+
+     157° chứ không 180°: nguồn sáng chéo từ trên-trái đọc ra là ánh sáng
+     thật; dọc đúng trục đọc ra là gradient trang trí.
+
+     Dừng ở 64% và KHÔNG có màu ở cuối: vệt phải tắt trước khi tới đáy panel,
+     nếu không nó thành một lớp phủ và làm chữ ở nửa dưới nhạt đi. Đây là
+     background-IMAGE nên nó KHÔNG đổi màu chữ — chỉ nằm trên mặt nền. */
+  --gloss:linear-gradient(157deg,
+  /* xem chu thich o khoi kia */
+  --hov:rgba(23,23,26,.04);
+    rgba(255,255,255,.10), rgba(255,255,255,.028) 34%, rgba(255,255,255,0) 64%);
+
+  /* ═══ THANG ĐỘ NỔI — FR-011 ═══
+     DESIGN.md §3 từng chốt "không shadow trừ cửa sổ nổi và thẻ khi hover;
+     phân tầng bằng nền và viền". Trên nền ảnh phong cảnh, phân tầng bằng
+     viền không đủ: panel kính mờ hoà vào ảnh và mắt không đọc ra lớp nào
+     trước lớp nào.
+
+     BỐN mức, không hơn. Mỗi mức HAI tầng shadow — gần+sắc để bắt cạnh, xa+mềm
+     để tạo chiều sâu. Một tầng duy nhất cho ra vết mờ dẹt, không ra khối.
+     Viền sáng ở đỉnh (--e-top) mô phỏng ánh sáng từ trên: thứ làm mặt kính
+     trông có bề dày mà không cần gradient. */
+  --e-1:0 1px 2px rgba(23,23,26,.05), 0 2px 8px -2px rgba(23,23,26,.06);
+  --e-2:0 1px 2px rgba(23,23,26,.06), 0 8px 24px -6px rgba(23,23,26,.10);
+  --e-3:0 2px 4px rgba(23,23,26,.07), 0 16px 40px -10px rgba(23,23,26,.14);
+  --e-4:0 4px 8px rgba(23,23,26,.08), 0 28px 64px -14px rgba(23,23,26,.24);
+  --e-top:inset 0 1px 0 rgba(255,255,255,.55);
+
+  /* ═══ VIỀN NHẤN — FR-014 (sửa lần 2) ═══
+     Nền GIỮ NGUYÊN rgba(252,252,251,.9) — nó nằm trong 50 cặp contrast-audit
+     đã validate (frozen, 0 fail trên 4 loại ảnh nền). Đổi nền là mọi cặp đó
+     lạc hậu. Viền không chứa chữ nên chỉ cần đạt 1.35:1 ⇒ chỗ rẻ nhất để thêm
+     màu.
+
+     MỘT màu, không gradient ba hue. Lượt đầu tôi làm gradient xanh-đỏ-xanh lá
+     và nó vừa VỠ (mask reset, tràn cả mặt panel) vừa SAI hướng: cầu vồng trên
+     sáu panel là quá ồn cho một tờ báo tri thức. Người dùng gọi đúng — "trẻ
+     trâu".
+
+     Chọn hue: `--c-video` (xanh) làm viền nhấn. Nó xa `--brand` đỏ nhất trong
+     palette nên không tranh với dấu nhấn thương hiệu, và đã validate CVD. */
+  --vien-nhan:color-mix(in srgb,var(--c-video) 34%,var(--edge));
+
+  /* bí danh giữ tương thích với code cũ */
+  --glass:var(--background);--glass-2:var(--card);
+  --ink:var(--foreground);--ink-2:var(--secondary-foreground);--ink-3:var(--muted-foreground);
+  --line:var(--border);--line-2:var(--border-subtle);
+  --brand:var(--primary);--brand-2:var(--primary-hover);--brand-bg:var(--accent);
+  --ok:var(--success);--warn:var(--warning);--warn-bg:var(--warning-bg);
+  --c-repo:#C81E1E;--c-paper:#0D7D63;--c-video:#1D63C7;--c-article:#8A6D00;
+  /* SCR-25 · MÀU ĐỊNH DẠNG TÀI LIỆU. `--c-*` ở trên khoá theo `source_type`,
+     mà pdf/docx/pptx/md/txt ĐỀU là `tai-lieu` ⇒ chúng dùng chung một màu và
+     một lưới toàn tài liệu là mảng phẳng. Năm hue này là thứ phân biệt chúng
+     ở cỡ thẻ — bốn glyph pdf/docx/pptx/txt cố ý CÙNG một hình (tờ giấy góc
+     gấp), chỉ khác chữ bên trong (`public/icon/XUAT-XU.md`).
+     Video KHÔNG có token riêng theo host (chủ dự án chốt 2026-09-08 câu 2):
+     youtube/tiktok/douyin/fb dùng chung `--c-video`, phân biệt bằng ICON. */
+  --c-pdf:#B23A17;--c-docx:#3F45B8;--c-pptx:#B5610A;--c-md:#4A5568;--c-txt:#5B6E5E;
+  /* `docs` va `announcement` la source_type CHUA co mau — hai loai bai viet
+     con lai da co `--c-repo`/`--c-paper`/`--c-article` o dong tren. */
+  --c-docs:#0E6E8C;--c-announcement:#8A3E7A;
+  --veil:linear-gradient(180deg,rgba(248,243,231,.35),rgba(240,233,217,.6));
+  /* FR-042 lượt 2 · ba lớp phủ ẢNH tách token theo chế độ. Người dùng: "ảnh
+     nền bị mờ và hơi bóng". Veil KHÔNG hạ được — đo bằng sinh_contrast_audit:
+     .32 là chữ-mờ-trên-kính trượt AA ngay. Ba lớp dưới audit không mô hình
+     (chúng nằm DƯỚI panel, chỉ phủ ảnh) nên giảm được: loé .5→.22, vignette
+     .34→.16, hạt .4→.18. Chế độ tối giữ nguyên số cũ. */
+  --flare-o:.22; --vign-a:.16; --grain-o:.18;
+  /* MỘT font cho toàn bộ giao diện: Inter (FR-018).
+     Bản trước dùng HAI họ — Inter cho nội dung, JetBrains Mono cho nhãn/số —
+     và mỗi màn hoá ra một kiểu chữ khác nhau: nút, nhãn vùng, mục lục, số đếm
+     đều mono trong khi tiêu đề và thân bài là sans. Người dùng yêu cầu một
+     kiểu chữ áp cho MỌI màn.
+     `--f-mn` còn lại đúng MỘT vai: MÃ THẬT (khối lệnh, output nguyên văn của
+     gate.py / validate.py). Ở đó bề rộng ký tự cố định là chức năng — cột
+     thẳng hàng, phân biệt 0/O và 1/l — không phải lựa chọn thẩm mỹ.
+     Vai "nhãn" của nó chuyển thành letter-spacing + tabular-nums + HOA, giữ
+     nguyên trên cùng một họ chữ. Quy chuẩn: 05_uiux/TYPOGRAPHY.md */
+  --f-ui:'Inter',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --f-mn:'JetBrains Mono',ui-monospace,'Cascadia Mono',Consolas,monospace;
+  /* luật 4 của TYPOGRAPHY.md: mọi số thẳng cột */
+  /* radius shadcn: --radius .625rem, các bậc dẫn xuất */
+  /* FR-027d · THANG BÁN KÍNH theo `ui_guide §4`:
+     "panel lớn 20px · thẻ 16px · nút/chip 10–11px · ô nhỏ 6px"
+
+     Bản trước: 10 / 10 / 8 / 6 — bốn bậc dồn trong 4px, tức gần như MỘT bậc.
+     Đó là lý do panel đọc ra "hộp cứng" chứ không phải mặt kính: kính iPhone
+     mềm vì bán kính LỚN so với nội dung, và vì các bậc CÁCH nhau đủ xa để mắt
+     đọc ra thứ tự lớp (panel bọc thẻ, thẻ bọc nút).
+
+     Ánh xạ đã đo, không đoán — mỗi token đúng một vai:
+       --radius-lg (= --r)      .pn      panel   → 20px
+       --radius-md              .cd      thẻ     → 16px
+       --radius-sm (= --r-sm)   .bt .kp  nút/ô   → 11px
+     `--radius` giữ vai BASE = bậc nút/chip, vì shadcn tính các bậc từ nó. */
+  /* ═══ MẶT KHÔNG BLUR — FR-027e, `ui_guide §6a` ═══
+     "Chỉ panel lớn và thanh điều hướng được dùng blur. Thẻ nhỏ dùng `--pns`
+     đặc hơn, KHÔNG blur — nhìn gần như y hệt, rẻ hơn nhiều."
+
+     Vì sao đắt: mỗi lớp `backdrop-filter` buộc trình duyệt chụp lại nền phía
+     sau MỖI KHUNG HÌNH, mà nền đang có ảnh + veil + parallax. Lưới 24 thẻ ×
+     blur = 24 lần chụp/khung.
+
+     `.9` chứ không `.8` như panel lớn: không có blur thì nền lộ rõ hơn, phải
+     đặc hơn mới giữ được chữ. Đo trên nền tệ nhất (#6D6D6D): chữ mờ 5.66 ·
+     đỏ 5.11 — cao hơn cả panel lớn, nên an toàn. */
+  --pns:rgba(252,252,251,.9);
+
+  /* ═══ MẶT KHỐI 3D — FR-027e ═══
+     Ba mặt ba màu giả MỘT nguồn sáng cố định trên-trái: nóc sáng nhất (nhận
+     trực tiếp), mặt trước vừa, mặt hông tối nhất (nghiêng khỏi nguồn). Đây là
+     cái làm khối đọc ra 3D — cùng một màu cho ba mặt thì nó là hình vẽ phẳng.
+     Ba bộ b1/b2/b3 cho ba cột (duyệt / chờ / loại), giá trị từ trang-chu.html. */
+  --b1t:#E05A5A; --b1f:#C81E1E; --b1s:#9A1515;   /* cột 1 — đỏ, cùng họ --brand */
+  --b2t:#C2C5CA; --b2f:#9A9EA5; --b2s:#7B7E84;   /* cột 2 — xám vừa */
+  --b3t:#DCDEE1; --b3f:#BBBEC2; --b3s:#9DA0A5;   /* cột 3 — xám nhạt */
+  --gridline:rgba(23,23,26,.08);                 /* lưới mặt phẳng nền */
+  --planeb:rgba(23,23,26,.18);                   /* viền mặt phẳng   */
+
+  --radius:.6875rem;                            /* 11px — nút/chip */
+  --radius-lg:1.25rem;                          /* 20px — panel    */
+  --radius-md:1rem;                             /* 16px — thẻ      */
+  --radius-sm:var(--radius);                    /* 11px            */
+  --radius-xs:.375rem;                          /*  6px — ô nhỏ    */
+  --r:var(--radius-lg);--r-sm:var(--radius-sm);--w-read:600px;
+  --r-pill:999px;                               /* viên thuốc — chip/badge */
+  /* FR-027f · HẰNG SỐ BỐ CỤC của `ui_guide §9`.
+     Cố ý KHÔNG nhét vào thang `--s-*` (4/8/12/16/24/32/48/64): nhịp của bản
+     tham khảo là 18/26/28, một thang KHÁC. Trộn hai thang vào một tên là
+     cách chắc nhất để sau này ai đó chọn sai bậc.
+     `--rail-w` quan trọng nhất: rail và phần bù của khung nội dung PHẢI khớp
+     nhau, và `rail-trai.test.js` đang phải KIỂM điều đó. Cho cả hai đọc cùng
+     một token thì nó khớp do CẤU TẠO, không cần ai kiểm. */
+  --rail-w:78px;                                /* rail trái       §9 */
+  --mid-w:1440px;                               /* khung giữa      §9 */
+  --mid-pad:48px;                               /* máng hai bên    §9 */
+  --mid-bot:120px;                              /* chân trang         */
+  --pn-py:26px;--pn-px:28px;                    /* panel kính      §4 */
+  --pn-gap:18px;                                /* giữa hai panel     */
+}
+
+[data-theme="dark"]{
+
+  color-scheme:dark;
+  /* FR-027 · panel TRONG hơn để thấy ảnh phía sau (ui_guide §4 "kính iPhone").
+     .88 → .62 là con số ĐO ĐƯỢC, không chọn theo mắt:
+
+       nền tệ nhất = vùng giữa dark-5.jpg, độ sáng 151.7 → #989898
+       veil tối nhạt nhất .50 → panel alpha a → chữ trên đó:
+
+         a    ink    ink-2  ink-3
+        .55  12.20   9.43   4.90   ← ink-3 chỉ còn 0.4 dư so với 4.5
+        .62  13.08  10.11   5.26
+        .88  16.00  12.38   6.43   (bản trước)
+
+     Chọn .62 chứ không .55: cách ngưỡng 4.5 một khoảng thật, nên thêm một ảnh
+     sáng hơn sau này không lật ngay sang trượt. Guide dùng .6 — .62 là cùng
+     cảm giác, đo được an toàn hơn.
+
+     BẢN SÁNG GIỮ .9 — CỐ Ý, không phải bỏ sót. Ảnh sáng làm nền nhạt nên chữ
+     TỐI cần panel ĐẶC mới đọc được. Đo trên light-4.jpg (vùng giữa 109.2):
+     alpha .60 → muted-foreground 3.52 TRƯỢT · .84 → 4.45 · .88 → 4.63 PASS.
+     Hai chế độ hai alpha là hệ quả vật lý, không phải thiếu nhất quán. */
+  --background:rgba(14,15,17,.62);        --foreground:#F2F2F0;
+  --card:rgba(21,23,25,.7);               --card-foreground:#F2F2F0;
+  --popover:rgba(18,20,22,.95);           --popover-foreground:#F2F2F0;
+  --primary:#F87171;                      --primary-foreground:#1A0B0B;
+  --primary-hover:#FCA5A5;
+  --secondary:#1E2126;                    --secondary-foreground:#D6D6DA;
+  --muted:#1E2126;                        --muted-foreground:#9A9AA4;
+  --accent:#251A1B;                       --accent-foreground:#FCA5A5;
+  --destructive:#F87171;                  --destructive-foreground:#1A0B0B;
+  --success:#4ADE80;
+  --tt-draft:#7DA9FF;                      /* T03-120 · draft — hệ tối */
+  --vl-chungcat:#C4B5FD;  --vl-transcript:#67E8F9;  --vl-taivideo:#FCD34D;
+  --warning:#FBBF24;                      --warning-bg:rgba(28,25,23,.8);
+  --border:#2A2D33;                       --border-subtle:rgba(242,242,240,.06);
+  --input:#2A2D33;                        --ring:#F87171;
+  --edge:rgba(255,255,255,.09);
+
+  /* ĐỘ NỔI Ở TONE TỐI — đen trên đen thì vô hình.
+     Hai thứ đổi: bóng ĐẬM hơn (nền tối hấp thụ, cần alpha cao mới thấy cạnh),
+     và viền sáng đỉnh MỜ hơn (.55 ở tone sáng thành vạch trắng chói ở đây).
+     Đây là lý do không dùng chung một bộ giá trị cho cả hai tone. */
+  --e-1:0 1px 2px rgba(0,0,0,.30), 0 2px 8px -2px rgba(0,0,0,.34);
+  --e-2:0 1px 2px rgba(0,0,0,.34), 0 8px 24px -6px rgba(0,0,0,.46);
+  --e-3:0 2px 4px rgba(0,0,0,.38), 0 16px 40px -10px rgba(0,0,0,.56);
+  --e-4:0 4px 8px rgba(0,0,0,.42), 0 28px 64px -14px rgba(0,0,0,.68);
+  --e-top:inset 0 1px 0 rgba(255,255,255,.07);
+
+  /* VỆT SÁNG Ở TONE TỐI — ĐẬM hơn tone sáng, ngược với --e-top.
+     Nghe như trái nhau nhưng cùng một lý do: cái mắt đọc là ĐỘ TƯƠNG PHẢN
+     với nền, không phải trị số alpha.
+       --e-top là một VẠCH 1px: .55 trên nền thẫm thành đường trắng chói ⇒ hạ.
+       --gloss là một VỆT LOÃNG trải 64% panel: .10 trên nền thẫm gần như tan
+       ⇒ nâng lên .14 mới đọc ra mặt kính.
+     Đây cũng là lý do bản tối cần vệt: panel giờ alpha .62 (trong hơn .88 cũ)
+     nên nó dễ lẫn vào ảnh — vệt sáng là thứ tách nó ra. */
+  --gloss:linear-gradient(157deg,
+  /* WO-019 · `--hov` bi DUNG 3 cho trong `prototype.css` ma CHUA KHAI
+     o dau ca — hover cua tab rail vi the khong doi mau gi. Gia tri
+     thu hoi tu `trang-chu.html`, ban goc cua token nay. */
+  --hov:rgba(255,255,255,.06);
+    rgba(255,255,255,.14), rgba(255,255,255,.04) 34%, rgba(255,255,255,0) 64%);
+
+  /* Không blur ở tone tối — cùng khoảng cách với `--background` (.62 → .78):
+     đặc hơn panel lớn vì không có blur che nền. */
+  --pns:rgba(14,15,17,.78);
+
+  /* MẶT KHỐI 3D Ở TONE TỐI — nóc SÁNG hơn, hông TỐI hơn so với tone sáng.
+     Nền thẫm nên khoảng cách giữa ba mặt phải rộng hơn mới đọc ra thể tích;
+     cùng lý do `--e-*` đậm hơn ở đây (nền tối hấp thụ). */
+  --b1t:#E04B4B; --b1f:#A51D1D; --b1s:#7A1414;
+  --b2t:#8E939C; --b2f:#5F646C; --b2s:#464A51;
+  --b3t:#4D5158; --b3f:#36393E; --b3s:#2A2C31;
+  --gridline:rgba(255,255,255,.07);
+  --planeb:rgba(255,255,255,.14);
+
+  --c-repo:#D15C56;--c-video:#008FD7;--c-paper:#00A276;--c-article:#A08400;
+  /* SCR-25 · cùng năm hue, nâng độ sáng cho nền tối — dải như bốn dòng trên. */
+  --c-pdf:#E0714A;--c-docx:#8F86F0;--c-pptx:#E5913A;--c-md:#93A3B8;--c-txt:#9CB3A0;
+  --c-docs:#3FA8C9;--c-announcement:#C97FBA;
+
+  /* VIỀN NHẤN Ở TONE TỐI — alpha CAO hơn tone sáng.
+     Nền thẫm hấp thụ nên 34% ở đây gần như vô hình; 52% mới đọc được.
+     Người dùng muốn "thân viền sáng" ở tone tối — đây là chỗ đó. */
+  --vien-nhan:color-mix(in srgb,var(--c-video) 52%,var(--edge));
+  --veil:linear-gradient(180deg,rgba(6,14,20,.5),rgba(4,10,16,.72));
+  --flare-o:.5; --vign-a:.34; --grain-o:.4;   /* FR-042 lượt 2 — giữ số cũ của bản tối */
+}
+
+
+/* ══════════════════════════════════════════════════════════════════
+   BA LUẬT CHỮ — áp cho mọi module
+   1 · Menu: ĐẬM (600) + THẲNG
+   2 · Header và nội dung CÙNG CỠ, khác nhau ở weight
+   3 · Ghi chú / cảnh báo / lỗi: NGHIÊNG
+   ══════════════════════════════════════════════════════════════════ */
+
+body{
+  background:var(--bg,transparent);
+  color:var(--foreground);
+  font-family:var(--f-ui);
+  font-size:var(--fs-body);
+  line-height:var(--lh-ui);
+  font-variant-numeric:tabular-nums;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* nhãn — MỘT class duy nhất, dùng khắp nơi */
+.lbl{font-family:var(--f-ui);font-size:var(--fs-micro);line-height:var(--lh-tight);
+  text-transform:uppercase;letter-spacing:var(--tr-lb);color:var(--muted-foreground)}
+
+/* ghi chú — luật 3 */
+.note{font-family:var(--f-ui);font-size:var(--fs-micro);color:var(--muted-foreground);
+  font-style:var(--i-note);line-height:1.55}
+
+/* chất liệu kính — MỘT blur cho MỌI bề mặt nổi */
+.surface{background:var(--background);border:1px solid var(--edge);
+  border-radius:var(--radius-lg);backdrop-filter:var(--blur-lift)}
+
+:where(a,button,input,select,summary,[tabindex]):focus-visible{
+  outline:2px solid var(--ring);outline-offset:2px}
+
+@media (prefers-reduced-motion:reduce){
+  *{animation-duration:.01ms!important;transition-duration:.01ms!important}
+}

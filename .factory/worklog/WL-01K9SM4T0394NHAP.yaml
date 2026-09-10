@@ -1,0 +1,79 @@
+ulid: 01K9SM4T0394NHAP
+khi: 2026-09-04T06:30+07:00
+tac_nhan: agent-thi-cong (Claude, phiên 6c7880c5)
+loai: ban-giao
+module: M03_web
+don_vi: T03-94 — màn hàng đợi nháp `/chung-cat/nhap/`
+
+viec: |
+  Màn triage cho bản nháp chưng cất, dùng LẠI chunk `chungcat` — nó là màn DƯỚI
+  url module chưng cất, nên chunk của module đó là chỗ đúng cả về byte lẫn nghĩa.
+
+  BA quyết định, tất cả từ một câu: ĐÂY LÀ MÀN NGƯỜI KÝ DUYỆT một bản do MÁY
+  viết.
+  1 · `⚠ đã tỉa N` dựng **TRƯỚC** cụm nút. Bản bị cắt bớt khẳng định mà không
+      nói ra thì người duyệt ký vào bản đã bị tỉa và tin đó là bản đầy đủ.
+      BA ca phân biệt: `>0` cảnh báo · `0` "không có" · `null` **"CHƯA ĐO"** —
+      `null` và `{so:0}` đọc ra hai câu khác nhau.
+  2 · Bản chưa ai sửa NÓI RA "Trùng bản AI gốc". Im lặng đọc ra như "chưa tải
+      xong", và người sẽ đợi một thứ không bao giờ tới.
+  3 · BA nút, không bốn. `FR-046 §1` chưa có trạng thái "đã bỏ" nên `T08-22`
+      chưa mở cửa Xoá, và `S18` cấm render nút gọi đường chưa có.
+
+object:
+  - web/plugins/chungcat/src/chungcat.inline.ts   # +10011 byte nguồn
+  - core/assets/man-hinh.json                     # +màn `chung-cat-nhap`
+  - web/render/shell.html · web/plugins/home-pages/shell.html   # 1 mốc rỗng
+  - web/render/trang.mjs                          # CHUNK_MAN + tách `cat_khi_khac`
+  - web/test/chung-cat-nhap.test.js               # cổng, dời từ thư mục task
+  - web/package.json
+  - 06_modules/M03_web/backlog.md                 # tick T03-94 + tách cờ + 2 ô
+
+bang_chung:
+  - "ĐỎ-TRƯỚC (rule.md mục 8), mốc 2026-09-04T06:0x: cổng đỗ ở thư mục task →
+     **14 lỗi**, đỏ vì THIẾU MÀN (`man-hinh.json` chưa có · shell chưa có view ·
+     mã chưa có hàm dựng)"
+  - "SAU: `node web/test/chung-cat-nhap.test.js` → pass"
+  - "TRÌNH DUYỆT THẬT — bốn ca:
+     rỗng ⇒ '0 nháp' + 'Chưa có bản nháp nào…' (KHÁC dải 'KHÔNG hỏi được');
+     1 nháp ⇒ mở chi tiết + `?nhap=<ulid>` + 'CHƯA ĐO số khẳng định bị tỉa' +
+       'Trùng bản AI gốc' + đúng ba nút;
+     Duyệt ⇒ 409 nguyên văn 'kho đã có docs/… — sửa bài đó, đừng duyệt nháp
+       thành bản thứ hai';
+     Trả lại 'abc' ⇒ chặn NGAY ở FE; lý do đủ dài ⇒ `tra_lai` và LÝ DO HIỆN LẠI
+       trên thẻ (AC4)"
+  - "trang chủ 61433/61440 · tải đầu max 279325/280576 · chunk chungcat 2/14 màn"
+  - "cd web && npm test → exit 0 · 2856 ok · 0 FAIL"
+
+do_do: khong-co-do-moi
+
+hoc_duoc: |
+  1 · `cat_khi_khac` MANG HAI NGHĨA và chúng va nhau LẦN THỨ HAI. (1) "cắt khỏi
+      trang khác" — việc render; (2) "là màn NẠP" — thứ cụm `+ nạp` lọc theo.
+      `T03-98` va lần một (`/dot-hai/` mọc trong `+ nạp`); lần này màn nháp CẦN
+      nghĩa (1) nhưng không được nhận nghĩa (2).
+      Tách bằng `cat_khi_khac && module` — chỉ màn NẠP mới có `module`, nên
+      không phải thêm một cờ thứ ba.
+
+  2 · `catMotMan` khớp CHUỖI MỞ chính xác `<div class="view" id="v-…">`. Mốc của
+      tôi có `data-mount` ⇒ `indexOf` không thấy ⇒ view KHÔNG bị cắt ⇒ trang chủ
+      vượt trần. **Không một thông báo nào** — chỉ một con số byte ở cổng khác.
+      Ô nợ M03 ghi hai lối sửa.
+
+  3 · Cổng tôi viết neo vào MỘT TÊN HÀM (`ccNhapDung`) mà mã đặt tên khác — lớp
+      lỗi đã trúng SÁU cổng ở T03-104, và tôi tự tái phạm trong cùng phiên. Đổi
+      sang neo vào MỐC `v-chungcatnhap`: shell khai nó, nên nó là hợp đồng thật.
+
+  4 · Và một phép đo quét quá rộng: `review_status` trong CẢ mã FE trúng
+      `ban.review_status = "approved"` của luồng duyệt bài KHO — một dòng hợp lệ
+      không liên quan. Thu về thân màn nháp.
+
+keo_theo:
+  - "M03 backlog: `catMotMan` khớp chuỗi mở chính xác — cần regex hoặc một phép
+     kiểm 'màn cat_khi_khac thật sự vắng khỏi trang khác'"
+  - "M03 backlog: nút Sửa nói thật là chưa có màn soạn nháp — PM xếp đơn vị đó"
+  - "M08 backlog: Xoá nháp vẫn chờ NGƯỜI (FR-046 không có trạng thái 'đã bỏ')"
+
+chua_xong: |
+  Xoá nháp · `audit_loi` vào backup — hai quyết định đã duyệt, chưa làm.
+  Gate G6C do NGƯỜI ký. Chưa commit.

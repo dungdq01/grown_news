@@ -1,0 +1,117 @@
+id: WL-01K9NBFR036B8
+at: 2026-08-28
+by: claude
+buoc: s8 — FR-036/B8 bản ghi mock thư viện (B8a) + FE xem trước hiện vật (B8b)
+loai: bàn giao B8
+fr: FR-036-khung-than-bai-5-muc.md
+
+object:
+  task:
+    - 07_plan/M01_core/tasks/T01-14-mock-thu-vien.md              # B8a code
+    - 07_plan/M01_core/tasks/T01-15-mien-host-video.md            # B8b khai báo
+    - 07_plan/M03_web/tasks/T03-17-fe-xem-truoc-hien-vat.md       # B8b code FE
+    - 07_plan/M03_web/tasks/T03-18-test-xem-truoc-hien-vat.md     # B8b test
+    - 07_plan/M08_api/tasks/T08-9-chi-muc-mang-ho-so-media.md     # B8b bug builder thứ ba
+  b8a:
+    - core/tools/sinh_kb_mock.py
+    - kb-mock/tai-lieu/bao-cao-chi-phi-suy-luan.md    # MỚI
+    - kb-mock/video/hoi-thao-context-engineering.md   # MỚI
+    - project_map.yaml                                # v13 -> v14: kb-mock/** vào be M01_core
+  b8b:
+    - core/assets/media-mime.json                     # + mien + id_tu cho video_host
+    - web/plugins/multiwindow/src/scripts/multiwindow.inline.ts  # xemTruocHienVat · idVideo · nhungVideo
+    - web/api/articles.mjs                            # chiMucMo mang ho_so + media
+    - web/styles/prototype.css                        # .hv · .hv-f · .hv-c · .hv-play
+  test:
+    - web/test/media-cua-so.test.js                   # MỚI — 30 phép kiểm
+    - web/package.json
+    - web/test/WORKLOG.md
+    - web/WORKLOG.md · web/styles/WORKLOG.md
+  plan:
+    - "C:/Users/Admin/.claude/plans/c-c-users-admin-downloads-grown-news-up-bright-newt.md"
+
+may_xanh:
+  - "cd web && node test/media-cua-so.test.js  ->  pass (30 phép kiểm)"
+  - "cd web && npm test  ->  exit 0 (51 file)"
+  - "python core/tests/check_kb_mock.py  ->  pass (16 file, đúng 1 ca âm đã khai)"
+  - "pytest core/tests -q  ->  42 passed · 18/19 cổng check_*.py xanh"
+  - >
+    6/6 răng ĐỎ được sau hai lượt siết; hai file gốc khôi phục nguyên byte
+    (inline.ts 4afbf0c7fb954563 · articles.mjs c2319778739af7dc)
+
+do_do:
+  - cong: core/tests/check_skill.py
+    do_do_boi: agent khác
+    quy_chu: không nằm trong tập file tôi đổi ở lượt này
+
+con_lai:
+  - "B9 — tổng hợp All: số đếm trên `tatCa`, thước đo CHẤT LƯỢNG chỉ trên `ho_so === phan-tich` (M09-R4)"
+  - "B10 — tài liệu + hồ sơ quyết định (egress, git 25 MB, runbook di trú)"
+  - >
+    Nợ đã ghi: GC blob bỏ dở bên DB (backlog M08_api) · ci.yml lạc hậu 7 file
+    test (backlog M03_web) · check_worklog so số bằng substring (backlog M03_web)
+
+# ══ BUG THẬT tìm ra trong lượt này: CÓ BỐN builder `Ban`, không hai ══════════
+#
+# B7a thêm `ho_so`+`media` vào `banTuDb` và `docTuDia`, và `hai-ban-shape` canh
+# hai bên đó khớp nhau. Tôi đã tưởng đó là toàn bộ tập bản song sinh.
+#
+# Cửa sổ đọc lấy `BAI` từ HAI ĐƯỜNG JSON KHÁC NHAU:
+#   bản mock  ->  /mock/static/open-index.json   (dựng từ data.mjs)
+#   bản THẬT  ->  /api/index                     (articles.mjs:chiMucMo)
+# `chiMucMo` là danh sách trường gõ tay THỨ BA. Cộng bản thứ tư trong
+# `expected-render.test.js` (fixture của test — drift ở đó làm test đo một hình
+# dạng cũ mà vẫn xanh).
+#
+# Hệ quả ĐO ĐƯỢC: xem trước hiện vật chạy trên `/mock/` và IM LẶNG không chạy
+# trên kho thật. Không cổng nào bắt được, vì `hai-ban-shape` chỉ biết hai bản.
+#
+# BÀI HỌC: đếm bản song sinh theo SỐ ĐƯỜNG DỮ LIỆU TỚI MÀN HÌNH, không theo số
+# hàm trong một file. Một file có hai hàm giống nhau thì dễ thấy; hai file ở hai
+# module cùng dựng một hình dạng thì không.
+
+# ══ Cổng của tôi vacuous BỐN lần, và tất cả cùng một nguyên nhân ════════════
+#
+# `media-mime.json` được NHÚNG NGUYÊN BẢNG vào bundle qua `define`. Nên mọi phép
+# kiểm dạng `js.includes("<khoá trong bảng>")` LUÔN đúng — nó đo sự tồn tại của
+# BẢNG, không đo việc code CÓ ĐỌC bảng. Kiểm hai chiều bắt được cả bốn:
+#
+#   1 `xem_truoc` — đổi `loai.xem_truoc === "iframe"` thành `loai.duoi === ".pdf"`
+#     (FE tự đoán thay vì đọc khai) ⇒ cổng VẪN XANH.
+#   2 `id_mau` — bỏ xác nhận id ở cửa nhúng ⇒ VẪN XANH.
+#   3 host video — chèn `src="${v.nhung}${v.id}"` vào hàm dựng (hết
+#     click-to-load) ⇒ VẪN XANH, vì tôi chỉ so với HẰNG literal còn bundle giữ
+#     `v.nhung` là THAM CHIẾU BIẾN.
+#   4 `download` — bỏ hẳn nút tải về ⇒ VẪN XANH, vì `download` còn ở chỗ khác
+#     trong bundle (link tải template .md).
+#
+# Sửa cả bốn bằng CÙNG một cách: cắt THÂN HÀM theo ngoặc khớp rồi đo trong đó.
+# Và cho phép `nhung-video` (tên act) trong khi cấm `.nhung` (truy cập thuộc
+# tính) — cấm cả chuỗi là đỏ oan, cấm ít hơn là không có răng.
+
+# ══ Ba quyết định về xem trước ══════════════════════════════════════════════
+#
+# 1 · Dạng xem trước ĐỌC từ `xem_truoc`, không do FE phán. `iframe` cho thứ
+#     trình duyệt render được; `the` + nút tải về cho ppt/word. Và
+#     `content-disposition: attachment` ở server (B6) CHÍNH LÀ chính sách đó —
+#     FE chỉ nói ra, không quyết lại.
+#
+# 2 · CLICK-TO-LOAD, và nó phải được canh bằng cấu tạo: hàm dựng xem trước
+#     KHÔNG được nhắc `.nhung`. Nhúng video là lần đầu sản phẩm gọi ra mạng
+#     ngoài, và người dùng ký cho HAI HOST, không ký cho "mọi lần mở trang".
+#
+# 3 · XÁC NHẬN id HAI LẦN: `idVideo` rút + kiểm `id_mau` lúc vẽ, `nhungVideo`
+#     kiểm LẠI lúc bấm. Giữa hai thời điểm đó, DOM là thứ ai cũng sửa được bằng
+#     devtools — `data-vid` không phải nguồn tin cậy.
+
+# ══ B8a — vì sao KHÔNG thêm vào contract ════════════════════════════════════
+#
+# `analyses.sample.v5.json` là hợp đồng G5 frozen, và `expected-render.test.js`
+# dựng `Ban` THẲNG TỪ contract để so `_expected_render`. Thêm bản ghi vào đó là
+# bump 5 hash + mở FR cho một thứ chỉ để XEM giao diện. Nên hai bản ghi thư viện
+# khai trong `sinh_kb_mock.py`, tách khỏi vòng lặp đọc contract.
+#
+# `media` viết FLOW JSON — parser YAML tự chế của `docTuDia` không đọc được
+# block MAPPING (đo ở B7a). Cổng B8b đo điều này TỪ NGOÀI: `duLieuMock()` phải
+# trả `media.sha256` đúng; block style ⇒ `null` ⇒ mất im lặng.
+

@@ -1,0 +1,66 @@
+entry: ban-giao
+ulid: 01M2G8XATX69EV0XZVCJWFXF19
+ngay: 2026-09-09
+module: M12_chungcat
+don_vi: [T12-34, T12-35]
+wo: [WO-078, WO-079]
+tieu_de: >-
+  Ba lop cua mot bao loi 502: viec moi noi tiep, cue rac bo qua, chunk thu lai ngam
+
+object:
+  - .factory/wo/WO-078-viec-moi-khong-thay-tien-do-cu.md
+  - .factory/wo/WO-079-thu-lai-ngam-khi-cua-502.md
+  - 07_plan/M12_chungcat/tasks/T12-34-tien-do-theo-slug.md
+  - 07_plan/M12_chungcat/tasks/T12-35-thu-lai-ngam-va-cue-dao-moc.md
+  - chungcat/src/worker.py
+  - chungcat/src/asr_cua.py
+  - chungcat/assets/nguong.json
+  - chungcat/tests/check_tien_do_theo_slug.py
+  - chungcat/tests/check_thu_lai_ngam.py
+
+ba_lop: |
+  1 502 tu cua Beeknoee — KHONG phai bug cua ta, khong sua duoc tu phia ta.
+  2 Viec MOI khong thay tien do cu => moi lan 502 mat ca ban phien am. WO-078.
+  3 Mot cue dao moc / mot 502 giua chung giet ca job. WO-079.
+
+y_tuong_chu_du_an_va_dinh_chinh: |
+  Chu du an de xuat: *"noi so lan gui/job tu 2 len 5-10, moi lan gui co che do
+  tu dong retry khi dut (request user va request ngam)"*.
+
+  Kien truc ay DA CO phan lon: checkpoint theo cue (.tien-do.vtt), `bat_dau`
+  tiep tu cho dut, vong chunk trong `phien_am` chinh la "request ngam", va
+  `ghi_nhan_gui` goi MOT lan cho ca job nen `lan_gui` da la "request user".
+
+  DINH CHINH mot diem: noi `lan_gui` len 5-10 KHONG cuu duoc ca nay. No dem
+  LUOT JOB, nen noi chi cho khoi dong lai nhieu luot hon — moi luot van chet o
+  dung chunk ay. Don dung la thu lai CHINH CHUNK vua dut. Sua dung cho thi
+  khong phai noi `M12-R6`, va ve 4 cua cong canh cho no khong bi noi nhan dip.
+
+sua: |
+  1 Cue `den <= tu` => bo qua + dem + in ra, cung cho dang bo cue THIEU moc.
+    Ly le da nam san o dong chu thich ngay tren: *"bo mot cue thi mat mot cau —
+    thay duoc; doan mot cue thi sai lech ca dong thoi gian"*. Chi la chua ai ap
+    cho ca "moc dao".
+  2 `loi_tam_thoi(e)` — 5xx/429/mang/timeout thi thu lai; 401/403/422 nem NGAY.
+    Doc `status_code` qua getattr, khong `isinstance(httpx.*)`: `egress` nap
+    httpx LUOI de cong chay duoc khi vang goi.
+  3 Vong thu lai quanh loi goi cua, tran + gian cach tu `nguong.json`
+    (`tran_thu_lai_cua: 3`, `[2,5,12]` giay). Moi lan van di qua `egress.gui()`
+    => van mot dong so, van tinh byte. Thu lai ngam khong duoc la egress vo hinh.
+
+nghiem_thu_that: |
+  Chinh ban ghi chu du an bao loi:
+    - viec truoc chet o 151 cue / 10:42 (502), roi 172 cue / 12:23 (cue dao moc)
+    - viec moi: "tiep tu 743s (172 cue da co)" => chay tiep
+    - "bo 4 / 31 / 26 cue thieu moc hoac dao moc" — 61 cue rac, truoc day MOI
+      CAI trong so do du giet ca viec
+    - ket qua: **xong**, hien vat text/vtt 31 749 byte, **255 cue toi 18:54**
+
+do_do: |
+  M12 54/54 xanh. core pytest 49 passed.
+
+con_lai: |
+  Lop 1 (cua 502) chi het khi khong con phu thuoc cua: loi `faster-whisper`
+  local, 0 egress. Nhung s1 da do: `worker.py` KHONG `import asr` o dau,
+  `_chon_loi` luon tra `cua-asr` — bang khai dang hua mot duong du phong KHONG
+  TON TAI (G-16). Do van la o mo.

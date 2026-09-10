@@ -1,0 +1,71 @@
+entry: ban-giao
+ulid: 01KB4DBONBUOC
+ngay: 2026-09-10
+module: xuyen module — bon buoc cua chu du an
+tieu_de: >-
+  Bon buoc chu du an giao: (1) remote — CHUA LAM DUOC, khong co URL · (2) SCR-27 tam duyet —
+  ghi vao T03-125 AC0 · (3) 2 video tieng Trung — CHUA THAY trong kho · (4) M12 ve truoc
+  giu nguyen — rule.md 18
+
+object:
+  - .claude/rule.md                                    # +muc 18
+  - memory/decisions.md                                # +entry 2026-09-10 (dong bang M01-M12)
+  - 07_plan/M03_web/tasks/T03-125-ui-tim-toan-van.md   # AC0 +dong "tam duyet 2026-09-10" + dieu kien xanh that
+  - .factory/worklog/WL-01KB4DBONBUOC.yaml
+
+chi_dao_nguyen_van: |
+  2026-09-10: "3. tai 2 video url tieng Trung · 4. chung ta chot lai tu m12 ve truoc giu
+  nguyen, ko doi gi nua · 1. Them remote — ban vui long lam giup toi luon · 2. toi tam duyet SCR-27"
+
+buoc_1_remote_KHONG_lam_duoc: |
+  git remote -v RONG. Tim URL: grep github.com/<user>/<repo> trong *.md/*.yml/*.json/*.toml
+  (loai _quartz, node_modules, jackyzha0, anthropic, _backup, 01_research) ⇒ 0 khop cho
+  du an; `gh` khong cai. ⇒ KHONG co URL de them. Toi khong tu tao repo tren dich vu nao
+  — do la tai khoan cua chu du an. CAN: chu du an dua URL (hoac tao repo roi dua URL).
+  Lenh khi co: `git remote add origin <url>` trong Grown_news (mot lan cho ca 3 worktree),
+  roi `git push -u origin main` va tu ../gn-m13 `git push -u origin m13`.
+
+buoc_2_SCR27_tam_duyet: |
+  Ban nhap dev o scratchpad phien dev (…/8c1765d2…/scratchpad/SCR-27-tim-toan-van.DRAFT.md),
+  116 dong, du 7 muc: 6 luat M12 · hinh dang panel · 4 trang thai · bang hanh vi sau
+  hanh dong · chu qua chu-giao-dien · co y khong co · byte+cong · 3 cau hoi cho nguoi duyet.
+  Toi DOC ban do truoc khi ghi duyet. Khop T03-125 (6 luat, 4 trang thai, chunk rieng,
+  moc mot dong vao multiwindow — rule 15). Mot diem dang chu y: §3 dong "bam/Enter" da
+  tinh truoc ca C3 — "chua co id thi cuon toi dong line_start" — tuc T03-125 AC2 co duong
+  xanh TAM ngay ca khi T03-149 chua xong; van giu phu_thuoc T03-149 vi "cuon dung anchor"
+  moi la AC.
+  Ghi "TAM DUYET" vao T03-125 AC0 kem dieu kien xanh that: file vao 05_uiux/wireframes/
+  (bo DRAFT), commit tren m13. Ba cau hoi §7 (panel vs cua so · chip 6+▾ · k=20) CHUA co
+  cau tra loi — chu du an duyet tam nghia la chap nhan phuong an ban nhap chon; ghi ra
+  de dev khong hoi lai.
+
+buoc_3_hai_video_tieng_Trung_CHUA_THAY: |
+  Kho hom nay: 11 video (hom qua 9). Do chu Han trong than+frontmatter tung video:
+    webmcp  han=241  (url youtu.be/Wl9tcoVuLjA, media=0, KHONG transcript) — CU, khong phai moi
+    3 video moi nhat khac: han=0
+  Transcript .vtt trong kho: 2 (ecomerce-skill-claude · primeagent-github) — ca hai
+  KHONG tieng Trung. Hang doi M12 new/ RONG, worker :8790 song.
+  ⇒ "da tai 2 video url" = tai ve MAY hay dan URL o dau do, CHUA vao kho. AC-6.3 can bai
+  TRONG KHO co transcript. Con thieu: (a) dang ky 2 URL qua man nap video (/video/nap/)
+  hoac API, (b) M12 sinh-transcript (model.json co ngon_ngu zh), (c) chunk hien vat T13-7
+  index duoc. CAN chu du an: dan 2 URL (hoac duong file) de dev M13 nap.
+
+buoc_4_rule_18: |
+  Hieu "giu nguyen" = dong bang PHAM VI (khong task moi, khong doi spec, khong doi quy
+  trinh team M12), KHONG dong bang MA (bug van sua). Nêu thành gia dinh o decisions de bi
+  bac neu sai. He qua: rule 17 chi ap tu M13/Space; FR-078/079 van cua team M12 khi ranh;
+  M13 KHONG cho. Hai o backlog M13 tro M12 doi nghia thanh "no co ten, hoan theo moc".
+  Toi KHONG mo lai de nghi "bao team M12 mo nhanh m12" nua.
+
+đỏ_do: "khong chay cong; khong co do"
+
+cho_NGUOI_quyet:
+  - "URL remote (hoac tao repo roi dua URL) — buoc 1 chan o day."
+  - "2 URL video tieng Trung dan vao dau? Chua thay trong kho — buoc 3 chan o day."
+  - "Gia dinh rule 18 'dong bang pham vi, khong dong bang ma' — dung khong?"
+
+khong_lam:
+  - "KHONG tao repo remote — tai khoan cua chu du an."
+  - "KHONG doi file SCR-27 tu scratchpad dev vao wireframes — do la commit cua dev tren m13."
+  - "KHONG tu nap 2 video — khong biet URL."
+  - "KHONG bao team M12 doi nhanh nua — rule 18."

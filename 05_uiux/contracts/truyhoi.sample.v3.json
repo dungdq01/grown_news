@@ -1,0 +1,244 @@
+{
+  "$comment": "v3 — MỘT hợp đồng cho MỌI client (FR-072 §1.1, duyệt 2026-09-07). Đổi so với v2: bỏ `chunk_id` (nó là `rowid`, đổi mỗi lần dựng lại chỉ mục ⇒ client giữ nó là giữ con trỏ hụt) · thêm `doc_id` = slug (khoá `M14/data_flow §2` đã chốt cho `citations[].doc_id`) · thêm `dia_chi` (dạng PHÂN GIẢI ĐƯỢC hôm nay qua core/assets/dia-chi.json) · thêm `body` đầy đủ làm bằng chứng trích dẫn (M13-R4: `snippet()` trần 64 token nên CHỈ làm preview) · thêm `nguon_van_ban`. Giữ từ v2: `so_ban_ghi_trong_pham_vi` trả CÙNG lời gọi (ui_flow §2a) · `bm25` ở trong data nhưng UI KHÔNG hiện (§3 — số âm không nghĩa với người đọc) · 0 kết quả phải nói 'không có trong kho' và được ĐẾM (§2b, tín hiệu điểm rẽ hybrid).",
+  "$comment_hai_chu_nguon": "CHỮ `nguon` MANG HAI NGHĨA trong cùng một payload, và cả hai đều do FR-072 §1.1 chốt — viết ra đây để không ai đọc lẫn: (1) `pham_vi.nguon` là FACET loại nguồn (`pdf` · `youtube` · `tai-len`…), cùng khoá TANG mà FE đang dùng, lọc LÚC HỎI; (2) `nguon` ở GỐC payload là TẬP NGUỒN Knowledge — danh sách slug gắn vào một con bot, do M14 giải từ `bot` rồi truyền xuống (M14 AC-8.4/8.5). Cùng kiểu dữ liệu (mảng chuỗi), khác trục. Chốt PM 2026-09-09: KHÔNG đổi tên (đổi là đảo một FR đã duyệt, và M14/model_flow §2 đã khai `nguon` là khoá bắt buộc); ô backlog M13 mở để theo dõi.",
+  "$comment_hien_vat": "CHUNK TỪ HIỆN VẬT VĂN BẢN (FR-072 §1.3) giữ ĐỦ 10 khoá, ba khoá không có nghĩa cho một cue transcript thì mang giá trị `null` — một giá trị KHAI, cùng lối `nguon: null` mà chính FR chốt, chứ không phải khoá vắng. Với `text/vtt`/`.srt`: `anchor` · `line_start` · `line_end` = null, `dia_chi` dùng dạng `slug-moc` (`<slug>:t=mm:ss`, đã có trong dia-chi.json, `manh: mot_phan`). Với `.md`/`.txt` người tải lên: chunk theo `##`/`###` như `than`, nên ba khoá đó CÓ giá trị và `dia_chi` là dạng `file-dong`. Chốt PM 2026-09-09 (chủ dự án duyệt) — 0 khoá mới ⇒ 0 đổi hợp đồng.",
+  "$comment_space": "`pham_vi.space` DÀNH SẴN (chốt PM 2026-09-09 · chủ dự án duyệt · khảo Space §6): khoá nhận và validate được từ ngày đầu, nhưng cột `space` trong view `ban_ghi` chỉ tồn tại sau FR-080 ⇒ tới lúc đó mọi bản ghi coi như space mặc định `mac-dinh`, và vế 'đổi space thì tập ứng viên đổi' CHƯA đo được (T13-5 khai `phụ_thuộc: FR-080 đã ÁP`). Dành sẵn để đợt Space không phải mở lại một spec đã ký.",
+  "version": 3,
+  "chunks": [
+    {
+      "doc_id": "xgboost-taylor-bac-hai",
+      "file": "kb/docs/xgboost-taylor-bac-hai.md",
+      "anchor": "vi-sao-bac-hai",
+      "line_start": 84,
+      "line_end": 121,
+      "dia_chi": "docs/xgboost-taylor-bac-hai.md:84-121",
+      "heading_path": "XGBoost Taylor bậc hai › 3.2 Vì sao bậc hai",
+      "nguon_van_ban": "than",
+      "phan_loai": "tai-lieu",
+      "loai_nguon": "pdf",
+      "trang_thai": "approved",
+      "concepts": [
+        "gradient-boosting"
+      ]
+    },
+    {
+      "doc_id": "xgboost-stap-by-step",
+      "file": "kb/tai-lieu/xgboost-stap-by-step.md",
+      "anchor": "muc-tieu-huan-luyen",
+      "line_start": 12,
+      "line_end": 30,
+      "dia_chi": "tai-lieu/xgboost-stap-by-step.md:12-30",
+      "heading_path": "XGBoost step by step › Mục tiêu huấn luyện",
+      "nguon_van_ban": "than",
+      "phan_loai": "tai-lieu",
+      "loai_nguon": "pdf",
+      "trang_thai": "approved",
+      "concepts": [
+        "gradient-boosting"
+      ]
+    },
+    {
+      "doc_id": "thien-duong-chuot-tuong-lai-nhan-loai-giai-ma-loi-tien-tri-d",
+      "file": "kb/video/thien-duong-chuot-tuong-lai-nhan-loai-giai-ma-loi-tien-tri-d.md",
+      "anchor": null,
+      "line_start": null,
+      "line_end": null,
+      "dia_chi": "thien-duong-chuot-tuong-lai-nhan-loai-giai-ma-loi-tien-tri-d:t=03:15",
+      "heading_path": "Thiên đường chuột › transcript",
+      "nguon_van_ban": "hien-vat:text/vtt",
+      "phan_loai": "video",
+      "loai_nguon": "youtube",
+      "trang_thai": "approved",
+      "concepts": [
+        "ai-x-risk"
+      ],
+      "$edge": "chunk theo CUE, không theo heading — ba khoá neo dòng là `null` TƯỜNG MINH, neo thật nằm ở `dia_chi` dạng slug-moc. `nguon_van_ban` nói ra đây là transcript ASR (FR-054 §1.4: chữ *verified* đổi nghĩa ở đó), không phải câu của bài viết."
+    },
+    {
+      "doc_id": "ghi-chu-hoi-thao-rag",
+      "file": "kb/_media/9f2c1ab4d5e60718.md",
+      "anchor": "ba-cau-hoi-con-lai",
+      "line_start": 7,
+      "line_end": 19,
+      "dia_chi": "_media/9f2c1ab4d5e60718.md:7-19",
+      "heading_path": "Ghi chú hội thảo RAG › Ba câu hỏi còn lại",
+      "nguon_van_ban": "hien-vat:text/plain",
+      "phan_loai": "tai-lieu",
+      "loai_nguon": "tai-len",
+      "trang_thai": "approved",
+      "concepts": [
+        "rag"
+      ],
+      "$edge": "hiện vật `.md` người tải lên (T03-111 đã cho `text/markdown`/`text/plain` vào bảng mime): chunk theo `##`/`###` như `than`, nên ba khoá neo dòng CÓ giá trị. M13 đọc nó QUA API của LÕI, KHÔNG mở kb/_media/** (M13-R3 · FR-072 §1.3 tính chất 2)."
+    }
+  ],
+  "truy_van_mau": [
+    {
+      "$mo_ta": "ca thường — có phạm vi facet, `nguon: null` KHAI TƯỜNG MINH nghĩa cả kho",
+      "yeu_cau": {
+        "cau_hoi": "vì sao khai triển bậc hai",
+        "pham_vi": {
+          "pl": [
+            "tai-lieu"
+          ],
+          "space": "mac-dinh"
+        },
+        "nguon": null,
+        "k": 20
+      },
+      "tra_ve": {
+        "ket_qua": [
+          {
+            "doc_id": "xgboost-taylor-bac-hai",
+            "file": "kb/docs/xgboost-taylor-bac-hai.md",
+            "anchor": "vi-sao-bac-hai",
+            "line_start": 84,
+            "line_end": 121,
+            "dia_chi": "docs/xgboost-taylor-bac-hai.md:84-121",
+            "heading_path": "XGBoost Taylor bậc hai › 3.2 Vì sao bậc hai",
+            "body": "Khai triển bậc hai giữ được thông tin độ cong mà gradient bậc nhất bỏ mất. Với hàm mất mát khả vi hai lần, xấp xỉ Taylor đến bậc hai cho một bài toán con dạng đóng ở mỗi lá, nên bước cập nhật không cần dò tìm.",
+            "nguon_van_ban": "than",
+            "bm25": -7.41
+          },
+          {
+            "doc_id": "xgboost-stap-by-step",
+            "file": "kb/tai-lieu/xgboost-stap-by-step.md",
+            "anchor": "muc-tieu-huan-luyen",
+            "line_start": 12,
+            "line_end": 30,
+            "dia_chi": "tai-lieu/xgboost-stap-by-step.md:12-30",
+            "heading_path": "XGBoost step by step › Mục tiêu huấn luyện",
+            "body": "Hàm mất mát được xấp xỉ bậc hai quanh dự đoán hiện tại. Mục tiêu huấn luyện vì thế tách được theo từng lá, và giá trị tối ưu của một lá là tỉ số giữa tổng gradient và tổng hessian cộng hệ số điều hoà.",
+            "nguon_van_ban": "than",
+            "bm25": -3.02
+          }
+        ],
+        "so_ban_ghi_trong_pham_vi": 2,
+        "tong": 2
+      }
+    },
+    {
+      "$mo_ta": "MỘT hàm chuẩn hoá cho cả chỉ mục lẫn câu hỏi (M13-R1): gõ không dấu vẫn thấy",
+      "yeu_cau": {
+        "cau_hoi": "bac hai khong dau",
+        "pham_vi": {
+          "space": "mac-dinh"
+        },
+        "nguon": null,
+        "k": 20
+      },
+      "tra_ve": {
+        "ket_qua": [
+          {
+            "doc_id": "xgboost-taylor-bac-hai",
+            "file": "kb/docs/xgboost-taylor-bac-hai.md",
+            "anchor": "vi-sao-bac-hai",
+            "line_start": 84,
+            "line_end": 121,
+            "dia_chi": "docs/xgboost-taylor-bac-hai.md:84-121",
+            "heading_path": "XGBoost Taylor bậc hai › 3.2 Vì sao bậc hai",
+            "body": "Khai triển bậc hai giữ được thông tin độ cong mà gradient bậc nhất bỏ mất. Với hàm mất mát khả vi hai lần, xấp xỉ Taylor đến bậc hai cho một bài toán con dạng đóng ở mỗi lá, nên bước cập nhật không cần dò tìm.",
+            "nguon_van_ban": "than",
+            "bm25": -7.41
+          }
+        ],
+        "so_ban_ghi_trong_pham_vi": 4,
+        "tong": 1
+      }
+    },
+    {
+      "$mo_ta": "TẬP NGUỒN Knowledge — `nguon` ở gốc là danh sách slug do M14 giải từ `bot`; đây là trục KHÁC với `pham_vi.nguon`",
+      "yeu_cau": {
+        "cau_hoi": "transcript nói gì về lời tiên tri",
+        "pham_vi": {
+          "space": "mac-dinh"
+        },
+        "nguon": [
+          "thien-duong-chuot-tuong-lai-nhan-loai-giai-ma-loi-tien-tri-d"
+        ],
+        "k": 5
+      },
+      "tra_ve": {
+        "ket_qua": [
+          {
+            "doc_id": "thien-duong-chuot-tuong-lai-nhan-loai-giai-ma-loi-tien-tri-d",
+            "file": "kb/video/thien-duong-chuot-tuong-lai-nhan-loai-giai-ma-loi-tien-tri-d.md",
+            "anchor": null,
+            "line_start": null,
+            "line_end": null,
+            "dia_chi": "thien-duong-chuot-tuong-lai-nhan-loai-giai-ma-loi-tien-tri-d:t=03:15",
+            "heading_path": "Thiên đường chuột › transcript",
+            "body": "Lời tiên tri không nằm ở số lượng chuột chết, mà ở chỗ đàn chuột còn sống vẫn còn đủ thức ăn. Điều sụp đổ trước tiên là cấu trúc xã hội, không phải nguồn lực.",
+            "nguon_van_ban": "hien-vat:text/vtt",
+            "bm25": -5.18
+          }
+        ],
+        "so_ban_ghi_trong_pham_vi": 1,
+        "tong": 1
+      }
+    },
+    {
+      "$mo_ta": "0 kết quả TRÊN TOÀN KHO — phải nói 'không có trong kho', và sự kiện này được ĐẾM (AC-7.1, tín hiệu điểm rẽ vector)",
+      "$edge": "kho hôm nay có 0 bài chữ Hán ⇒ vế tiếng Trung của AC-6.1 khai `soft` KÈM LÝ DO; điều kiện lật là một SỐ (≥2 bài tiếng Trung thật, phồn thể HOẶC giản thể — chủ dự án 2026-09-09), không phải một fixture bịa",
+      "yeu_cau": {
+        "cau_hoi": "記憶體 最佳化",
+        "pham_vi": {
+          "space": "mac-dinh"
+        },
+        "nguon": null,
+        "k": 20
+      },
+      "tra_ve": {
+        "ket_qua": [],
+        "so_ban_ghi_trong_pham_vi": 4,
+        "tong": 0
+      }
+    },
+    {
+      "$mo_ta": "0 kết quả TRONG PHẠM VI — khác hẳn 0 trên toàn kho: gợi ý nới phạm vi, và số bản ghi trong phạm vi nói ra người dùng đang hỏi trên tập nào (B-C2)",
+      "yeu_cau": {
+        "cau_hoi": "retry vô hạn",
+        "pham_vi": {
+          "pl": [
+            "video"
+          ],
+          "space": "mac-dinh"
+        },
+        "nguon": null,
+        "k": 20
+      },
+      "tra_ve": {
+        "ket_qua": [],
+        "so_ban_ghi_trong_pham_vi": 1,
+        "tong": 0
+      }
+    },
+    {
+      "$mo_ta": "BA CA 403 — người gọi ngoài `goi_duoc`, `aud` sai, thiếu khoá (AC-1.6 · M13-R6 · ADR-08 Z9). Bên NHẬN cưỡng chế, không phải bên gọi.",
+      "yeu_cau": {
+        "$tu": "artifact",
+        "$aud": "truyhoi",
+        "cau_hoi": "bất kỳ",
+        "pham_vi": {},
+        "nguon": null,
+        "k": 5
+      },
+      "tra_ve": {
+        "$ma": 403,
+        "loi": "`artifact` không có trong `goi_duoc` của dịch vụ `truyhoi` (core/assets/dich-vu.json). Thêm khách = một phần tử vào mảng + một khoá chiều, không sửa mã."
+      }
+    },
+    {
+      "$mo_ta": "THIẾU KHOÁ `nguon` ⇒ 400, không rơi về cả kho (AC-5.3 · cổng T8 FR-072). `nguon: null` là một giá trị KHAI; khoá vắng là một câu chưa nói.",
+      "yeu_cau": {
+        "cau_hoi": "vì sao khai triển bậc hai",
+        "pham_vi": {},
+        "k": 20
+      },
+      "tra_ve": {
+        "$ma": 400,
+        "loi": "thiếu khoá `nguon`. Cả kho thì gửi `nguon: null` — mặc định phải TƯỜNG MINH trong payload, không phải một nhánh vắng."
+      }
+    }
+  ]
+}

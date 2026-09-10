@@ -1,0 +1,55 @@
+id: WL-01K9P8VONGDOI
+at: 2026-08-29
+by: claude
+buoc: cổng SỬA · XOÁ · KHÔI PHỤC chạy thật, cả ba loại trong một kho
+loai: bàn giao (cổng tích hợp — nửa sau vòng đời)
+
+object:
+  task:
+    - 07_plan/M03_web/tasks/T03-63-test-vong-doi-ba-loai.md
+  test:
+    - web/test/vong-doi-ba-loai.test.js   # MỚI — 6 mục, 34 phép
+    - web/package.json
+
+may_xanh:
+  - "cd web && node test/vong-doi-ba-loai.test.js -> pass (34 phép)"
+  - "quét web 74/75 (chỉ `he-kinh`) · 22/26 cổng Python · pytest 42"
+  - >
+    Luật nặng nhất đi qua đường THẬT: xoá cả ba bản, rồi
+    `GET /api/articles/media/<sha>` vẫn **200** — byte sống sót (M09-R1). Và
+    khôi phục trả cả ba về ĐÚNG danh sách của loại mình
+
+vi_sao_khac_vong_doi_bai:
+  - >
+    `vong-doi-bai.test.js` đi vòng này cho MỘT bài viết. Ở đây cả ba loại cùng
+    MỘT kho, nên một `xoaBai` xoá nhầm bảng, hay một `recycle` chỉ phủ
+    `articles`, sẽ lộ ra — với một loại duy nhất thì không có gì để lẫn
+
+ba_loi_harness_va_bai_hoc:
+  - >
+    **PUT kèm `slug` khác ⇒ server TỪ CHỐI HẲN (400)**, không lặng lẽ bỏ qua như
+    tôi giả định. Hệ quả: phép *"slug không đổi"* xanh vì KHÔNG CÓ GÌ ĐỔI CẢ.
+    Server chặt hơn tôi tưởng, và cái xanh đó là xanh vô nghĩa
+  - >
+    **DELETE đòi `If-Match`.** Quên nó ⇒ cả ba trả 400, và §4 (*byte sống sót SAU
+    khi xoá*) cùng §5 (*trở lại danh sách*) XANH VÔ NGHĨA — chẳng có gì bị xoá
+    thì byte tất nhiên còn, bản ghi tất nhiên còn. **Phép quan trọng nhất của cả
+    file xanh vì lý do sai.** Đã thêm tự kiểm vật liệu: bản ghi phải THỰC SỰ rời
+    danh sách trước khi nói bất cứ điều gì về byte
+  - >
+    **Thay thân bài viết bằng một câu ⇒ 422 `Thiếu mục: 1, 2, 3, 4, 5…`** — hồ sơ
+    `phan-tich` đòi khung 5 mục; `thu-vien` thì không, nên tài liệu/video qua
+    được. Đó là server phân biệt ĐÚNG hai hồ sơ, không phải lỗi
+  - >
+    Cả ba lần, phản xạ đầu là "hệ thống hỏng". Cả ba lần, đọc hết thông báo thì
+    ra HARNESS sai — và mỗi thông báo đã nói đúng chỗ ngay từ đầu
+
+đỏ_do: chưa quy được chủ  # không lỗi sản phẩm nào; cổng cài thêm để phủ chỗ trống
+
+do_do:
+  - cong: he-kinh.test.js
+    do_do_boi: ảnh 724662 byte người dùng thêm — `python core/tools/toi_uu_anh_nen.py`
+  - cong: check_frozen.py
+    do_do_boi: chờ NGƯỜI ký sau khi FR-039 duyệt
+  - cong: check_danh_muc.py · check_skill.py · check_running.py
+    do_do_boi: agent khác · và hệ quả của hai cổng trên

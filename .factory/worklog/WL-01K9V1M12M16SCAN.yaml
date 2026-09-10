@@ -1,0 +1,46 @@
+id: WL-01K9V1M12M16SCAN
+at: 2026-09-01
+by: claude
+buoc: "s1-research dot ba — khao chi tiet M12-M16 (services LLM + tich hop)"
+loai: artifact khao sat; KHONG dong ma san pham
+gate: >
+  project_map.yaml khai skipped_gates [G1, G2, G3] => ghi chu theo giao thuc,
+  khong phai artifact ky gate
+
+object:
+  - 01_research/m12-m16-services-scan.md     # MOI — raw dot ba, 148 claims + phan bien
+  - 01_research/research_summary.md           # +§10 con tro (khong ghi de §1-§9)
+
+cach_lam: >
+  Workflow 12 agent song song: 4 track (M12 · M13 · M14+M15 · M16) × 2 goc khao
+  doc lap + 1 agent phan bien/track. Phan bien fetch lai CHINH nguon tu khai
+  hoac tim nguon mau thuan — 56 claim duoc kiem (14/track), ket qua:
+  47 CONFIRMED · 5 REFUTED · 4 PLAUSIBLE.
+  Claim khong nguon mang co [gia dinh] ngay tu schema — khong the len bao cao
+  ma khong khai.
+
+phan_bien_bat_duoc_5_claim_sai: >
+  (1) so token/trang PDF Claude chep sai ngu canh tu doc; (2) tin "Gemini Flash
+  tang gia 2027" gan cho nguon KHONG noi dieu do; (3) heading-aware chunking gan
+  cho bai firecrawl khong chua no; (4) trich Vectara dung nguyen van nhung SAI
+  URL; (5) free tier Google TTS chep sai tu chinh nguon. Ca 5 deu la lop loi
+  #tu-khai — neu khong co vong phan bien thi 5 con so nay da vao spec s6.
+
+ket_qua_dang_gia_nhat:
+  - "R-g DA DONG: Discord gateway = WebSocket GOI RA, khong mo cong — nguon chinh thuc. Bot private <10.000 user chi bat toggle MESSAGE_CONTENT (nguong la 10k user, KHONG phai 100 server nhu ghi chu cu)"
+  - "Claude Citations API co that, tra page_location/char_location + cited_text — khop thang B-A5; BAY: khong dung chung structured output cung request => pipeline 2 buoc"
+  - "Chi phi chung cat ~$0.05-0.17/bai Sonnet 5 => chi phi KHONG phai rang buoc cua M12"
+  - "M13 giai doan nay: CHI FTS5+BM25; remove_diacritics 2 (mac dinh 1 co bug ky tu hai dau 'ộ' trung tieng Viet); KHONG embedding API vi encode luc search bat LOI goi Internet"
+  - "Van phai verify may sau model: citation khong-rang-buoc sai 37-94% (Tow Center); 57% generate-then-cite la post-rationalization"
+  - "3 cau s4 bo ngo co dap de xuat: Maildir tren _inbox/, ULID = idempotency key, retry cap 2 + log sha256 PER-ATTEMPT"
+  - "Zalo Bot API chinh thuc DA ton tai (bot.zapps.me/docs, long-polling) — hoan van dung, nhung menh de 'khong co API' het dung cho BOT"
+
+evidence:
+  - "workflow wv9uo58ws: 12/12 agent xong, 0 loi, 237 luot tool, ~729k token"
+  - "wc -c 01_research/m12-m16-services-scan.md => ~122.7k chars"
+  - "grep -c 'REFUTED' trong bang phan bien => 5"
+
+no_con_lai:
+  - "5 cau chi tra loi duoc bang THU NGHIEM (§0 cuoi): Citations tren tieng Viet · NFC/NFD · go khong dau? · piper vi_VN · thinking token %"
+  - "Gia Google/Azure TTS chua doi chieu nguyen van trang goc (fetch bi cut)"
+  - "s6 cho M12/M13/M14 gio du lieu de viet spec"

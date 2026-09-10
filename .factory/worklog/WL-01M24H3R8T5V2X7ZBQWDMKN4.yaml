@@ -1,0 +1,77 @@
+ulid: 01M24H3R8T5V2X7ZBQWDMKN4
+thoi_diem: 2026-09-09
+tac_nhan: claude-opus-5 (dev)
+loai: ban_giao
+module: M03_web · M08_api · M12_chungcat
+don_vi: WO-070 / T03-129 — màn thùng rác VIỆC (task A của PLAN-2026-09-09)
+
+viec: >
+  Chủ dự án: *"chưa có màn thùng rác thật, mới có tổng hợp thùng rác ở kho"*.
+  WO-068 dựng ngăn `rac/` + `GET /api/job?rac=1`, WO-067 dựng `POST /lai` —
+  không màn nào đọc chúng, nên việc hỏng vào rác rồi BIẾN MẤT khỏi mọi màn.
+
+dinh_tuyen: >
+  PATCH. Không file nào trong phạm vi nằm trong FROZEN.lock. Tab thứ ba của
+  `/chung-cat/` chứ KHÔNG màn mới: một màn mới cần một dòng `man-hinh.json` +
+  markup trong shell, mà shell đi theo MỌI trang và trần HTML trang chủ đang âm.
+
+object:
+  - .factory/wo/PLAN-2026-09-09-ba-viec.md
+  - .factory/wo/WO-070-man-thung-rac-viec.md
+  - 07_plan/M03_web/tasks/T03-129-man-thung-rac-viec.md
+  - chungcat/src/api.py                    # do_DELETE /viec/<ulid>
+  - chungcat/src/vong.py                   # xoa_han()
+  - web/api/tho-cua.mjs                    # cuaXoaViec
+  - web/api/router.mjs                     # DELETE /api/viec/<id>
+  - web/plugins/chungcat/src/chungcat.inline.ts   # tab rac · ccNapRac · 2 hành động · nhomLoc(hong)
+  - web/test/thung-rac-viec.test.js        # cổng MỚI, 20 vế
+  - web/package.json · 07_plan/M03_web/tasks/T03-110b-…md
+
+r5_do_truoc: "ĐỎ 16/20 trước mã · xanh 20/20 sau"
+
+do_duoc: >
+  5/5 fixture hỏng đỏ, và MỖI cái đỏ có TÊN VẾ (không phải đỏ vì crash):
+  bỏ chặn 'chỉ xoá việc trong rác'(3d) · xoá luôn sổ egress(3b) ·
+  chay_lai không kéo tiến độ(2b) · bỏ câu 'vết chi phí vẫn giữ'(4e) ·
+  bỏ nhánh hong của nhomLoc(4f).
+
+ba_lo_trong_chinh_CONG_cua_toi_phep_thu_bat_duoc:
+  - >
+    Gate gieo vào hàng đợi TẠM rồi hỏi THỢ THẬT ở `:8790` — nó không bao giờ
+    thấy. Cổng đỏ vì SAI LÝ DO, đúng thứ `workflow §1a` cấm. Vá: dựng THỢ TẠM
+    bằng `api.chay(cong=…)` qua `-c`, KHÔNG chạy thẳng `api.py` — `__main__`
+    của nó gọi `chay()` không tham số ⇒ bind cổng THẬT 8790 và giành với THỢ
+    đang chạy (chính `api.py:417` cảnh báo: `SO_REUSEADDR` trên Windows cho hai
+    socket cùng cổng bind THÀNH CÔNG, nên hỏng mà không ai kêu).
+  - >
+    Vế 3b đọc thẳng `readFileSync` ⇒ sổ bị xoá thì cổng CHẾT thay vì báo. "Đỏ vì
+    crash" không nói cho ai biết vế nào hỏng. Vá: đếm phòng hộ, trả -1.
+  - >
+    Vế 4e quét CẢ FILE bằng `/chi phí|egress/` ⇒ khớp luôn toast "Sổ chi phí giữ
+    nguyên", nên nó XANH cả khi câu `confirm()` đã mất chữ. Vá: neo vào đúng
+    chuỗi trong `confirm()` — chỗ người dùng thật sự đọc.
+
+quyet_dinh_dang_ke: >
+  Câu xác nhận xoá phải NÓI RA THỨ KHÔNG MẤT: "VẾT CHI PHÍ VẪN GIỮ — sổ egress
+  là một file riêng". Không nói thì người dùng tưởng xoá là mất luôn con số đã
+  tiêu, và họ sẽ giữ rác lại vì sợ mất sổ tiền. `xoa_han` không đụng
+  `egress.*.jsonl`, và vế 3b canh đúng điều đó.
+
+lo_nho_kem_theo: >
+  `nhomLoc()` không có nhánh `hong` ⇒ rơi về `"cho"`. Hôm nay vô hại vì việc
+  hỏng nằm trong `rac/` và `/api/job` không kể rác — nhưng vô hại DO HOÀN CẢNH,
+  không do thiết kế. Đã thêm nhánh tường minh.
+
+do_sau:
+  - lenh: node web/test/thung-rac-viec.test.js
+    ket_qua: pass — 20/20
+  - lenh: "for f in chungcat/tests/check_*.py"
+    ket_qua: 50/50 XANH
+  - lenh: cd web && npm test
+    ket_qua: "exit 1 · ĐÚNG MỘT FAIL: page-weight trang chủ"
+
+đỏ_do: >
+  `page-weight` trang chủ 63 199/61 440 — WO-055 đã có chủ từ 2026-09-05. Đơn
+  vị này 0 byte HTML thêm vào trang chủ (tab dựng bằng JS trong chunk).
+
+con_lai: "task B (thumbnail video URL) · task C (mp4 + PDF) của PLAN-2026-09-09"

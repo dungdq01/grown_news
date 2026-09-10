@@ -1,0 +1,81 @@
+id: WL-01K9NNWO013
+at: 2026-08-28
+by: claude
+buoc: WO-013/1 — sửa một bản về màn nạp CỦA MODULE đó
+loai: bàn giao WO-013 phần 1
+wo: WO-013-sua-dung-man-va-crud-tai-cho.md
+
+object:
+  wo:
+    - .factory/wo/WO-013-sua-dung-man-va-crud-tai-cho.md
+  task:
+    - 07_plan/M03_web/tasks/T03-36-sua-ve-dung-man.md    # code
+    - 07_plan/M03_web/tasks/T03-37-test-sua-dung-man.md  # test
+  code:
+    - web/plugins/multiwindow/src/scripts/multiwindow.inline.ts   # manNapCua
+    - web/build-fe.mjs      # hai PHÉP CHIẾU: __NAP_CUA__ · __DUONG__
+  test:
+    - web/test/sua-dung-man.test.js   # MỚI — 3 mục
+    - web/test/WORKLOG.md · web/package.json
+  plan:
+    - "C:/Users/Admin/.claude/plans/c-c-users-admin-downloads-grown-news-up-bright-newt.md"
+
+may_xanh:
+  - "cd web && node test/sua-dung-man.test.js  ->  pass (3 mục)"
+  - "cd web && npm test  ->  exit 0 (60 file)"
+  - "gn.js **99359 / 102400 byte — dư 3041** (trước đơn vị này: dư 5)"
+
+chan_doan_dao_nguoc_plan:
+  - >
+    Plan "sự thật 7" + rủi ro R3 nói *"dễ mất `media` im lặng khi sửa tài liệu"*.
+    ĐO TRÊN KHO TẠM: SAI. `guiFormThat` bắt đầu bằng `{...FM_GOC}` nên `media` đi
+    qua nguyên vẹn — PUT 200, `media` sau BẰNG trước từng ký tự. `FM_GOC` có vòng
+    đời kín (đặt ở `suaTuCua`, xoá ở `datLaiForm`)
+  - >
+    Ca xấu nhất `FM_GOC = null` KHÔNG mất dữ liệu im lặng: validate trả **422**
+    vì schema đòi `media` cho `ho_so: thu-vien`. Kho được bảo vệ bằng CẤU TRÚC
+  - >
+    Cái CÒN sai và khác hẳn: `suaTuCua` gọi `doiView("napbaiviet")` KHÔNG ĐIỀU
+    KIỆN — sửa một tài liệu/video đưa người dùng sang màn nạp BÀI VIẾT. Đó là
+    "gộp chung màn" người dùng cấm, và nhìn thấy được
+
+do_duoc:
+  - >
+    `__MAN__` nhúng NGUYÊN `man-hinh.json` vào bundle chỉ để dựng `DUONG`
+    (id_shell → path). `lotComment` lột `$comment*` nhưng KHÔNG lột
+    `$loi`/`$alias`/`$slug`/`$bo`, nên toàn bộ văn xuôi giải thích đi thẳng vào
+    `gn.js`. Chiếu xuống hai trường: **99359 byte, dư 3041** — từ dư 5
+  - >
+    Tham chiếu `__NHOM__` kéo cả `loai-nguon.json`: +1047 byte. Thay bằng phép
+    chiếu chỉ NGOẠI LỆ + khoá `""` mặc định
+
+quyet_dinh_thiet_ke:
+  - >
+    Hai phép chiếu tính LÚC BUILD từ chính bảng khai — không phải bản gõ tay thứ
+    hai, cùng nguyên tắc `lotComment`. Đổi bảng khai thì phép chiếu đổi theo
+  - >
+    Mặc định của `__NAP_CUA__` là khoá `""`, KHÔNG phải hằng `"napbaiviet"` gõ
+    trong FE: một tên màn gõ tay lần thứ hai lệch đúng vào hôm màn đó đổi id
+  - >
+    "Bundle hết chỗ" hoá ra là "bundle đang chở văn xuôi". Đo trước khi kết luận
+    phải tách bundle — kết luận vội đã suýt thành một đơn vị việc lớn không cần
+
+kiem_hai_chieu:
+  - "R5 ĐỎ TRƯỚC có thật: 2 lỗi (không có hàm tra · `doiView` đích gõ cứng)"
+  - "trả `manNapCua` về đích cố định ⇒ đỏ cho `tai-lieu` và `video`"
+  - >
+    đổi `id_shell` của màn nạp video trong bảng khai ⇒ CẢ cổng lẫn code đi theo
+    (cổng vẫn xanh) — đó là bằng chứng dẫn xuất thật, không phải trùng hợp
+  - "cả hai lượt phá hoàn tác khớp sha256"
+
+do_do:
+  - cong: check_skill.py
+    do_do_boi: agent khác
+  - cong: check_danh_muc · check_frozen · check_running
+    do_do_boi: chính tôi, từ FR-039 — hai ô backlog M01 chờ người dùng
+
+con_lai:
+  - "WO-013/2 · form sửa tài liệu có ô `media` (xem tên + cỡ, thay được) — giờ CÓ ngân sách"
+  - "WO-013/3 · CRUD trên màn danh sách, bắt TRƯỚC dòng `.bk` guard của `bam()`"
+  - "C8 · BUG-1 `[hidden]` thua `.api-only` · BUG-2 `#acount` đếm cả trang"
+  - "C9 · spec ba module · wireframe · ký lại FROZEN.lock"

@@ -1,0 +1,16 @@
+at: 2026-08-18T02:35Z
+agent: human
+step: gate / G1 + G2 + G3
+did: >
+  Người ký ba gate cùng lúc theo nhịp đã chốt (gộp s1-s3, trình một lần).
+
+  G1 đóng: research_summary duyệt; 5 khoảng trống G-1..G-5 mỗi cái trỏ về
+  ≥1 bằng chứng trong solutions_scan.md.
+
+  G2 đóng: proposal duyệt; 6 scope-in truy về G-1..G-5; 4 nhóm metric có số
+  và cách đo. PHẠM VI THÔ CHỐT — đổi scope từ đây phải mở FR.
+
+  G3 đóng: brd + prd + spec_overview duyệt; kiểm truy ngược bằng máy cho
+  0 lỗi trên 13 ràng buộc BRD, 7 mục PRD, 4 module. Mỗi module truy về PRD,
+  mỗi ràng buộc BRD có ≥1 chỗ tiêu thụ.
+object: 01_research/ 02_proposal/ 03_docs/ + commit d1cc207

@@ -1,0 +1,96 @@
+ulid: 01M1TW6H8J4RC2M9V5XKPBDQ73
+thoi_diem: 2026-09-07T00:20+07:00
+tac_nhan: claude-opus-5
+loai: ban_giao
+module: M03_web
+don_vi: T03-121 · menu Tải xuống đợt hai
+
+viec: >
+  Bốn yêu cầu chủ dự án giao, sau khi `SCR-21` được duyệt: neo menu đúng nút ·
+  bỏ nhãn "File gốc" mù mờ · menu ba nhóm cho màn video · hàng bậc chất lượng.
+
+ac0_wireframe: >
+  `SCR-21` duyệt 2026-09-06 với ba chốt: hỏi cho MỌI bản gốc nhị phân (không
+  ngưỡng byte) · bày đủ 5 bậc · thư mục tạm 72h (đã đổi `tran_xuat_tam_gio`
+  24 → 72 trong `chungcat/assets/nguong.json`).
+
+r5_do_truoc:
+  - don_vi: T03-121
+    lenh: node web/test/menu-tai-dot-hai.test.js
+    ket_qua: "ĐỎ 16 vế"
+    đỏ_do: claude-opus-5
+
+do_sau:
+  - lenh: node web/test/menu-tai-dot-hai.test.js
+    ket_qua: pass — 22/22 vế
+  - lenh: cd web && npm test
+    ket_qua: exit 0 · 3164 vế ok · 0 FAIL
+  - lenh: python -m pytest core/tests -q
+    ket_qua: 49 passed
+  - lenh: python core/tests/check_ky_tu_vo_hinh.py
+    ket_qua: pass
+
+goc_that_cua_bug_neo:
+  do: >
+    Đây là phần đáng giá nhất của lượt. Cổng của tôi XANH, mà bug vẫn tái hiện
+    trên màn: `getComputedStyle(details.tx).position` trả **`static`**, menu
+    lệch phải **540px**, bung ra giữa màn đè chữ.
+  nguyen_nhan: >
+    `TX_CSS` mở đầu bằng BA DÒNG VĂN XUÔI. Vốn nó là một chú thích `/* … */`,
+    nhưng bộ cắt chú thích của build (`catBinhLuanJs`) gỡ mất cặp dấu và để
+    lại chữ TRẦN nằm trong chuỗi CSS. Bộ phân tích CSS nuốt cả đoạn ấy làm một
+    selector rác kéo tới dấu `{` đầu tiên ⇒ **rule đầu tiên biến mất** — đúng
+    cái rule `details.tx{position:relative}` mà cả cái neo dựa vào.
+  he_qua_nguoc: >
+    Bản hotfix ở `prototype.css` mà tôi gỡ trong `T03-119` (vì "trùng") KHÔNG
+    THỪA — nó là bản DUY NHẤT chạy được. Tôi gỡ nó và bug quay lại nguyên vẹn,
+    trong khi cổng vẫn xanh. Bài học: "trùng" đo trên NGUỒN không có nghĩa là
+    trùng trên thứ TRÌNH DUYỆT nhận.
+  chua_bang_cach: >
+    Chú thích ra NGOÀI chuỗi, và thêm vế cổng `1g2` đọc chuỗi `TX_CSS` trong
+    nguồn rồi đòi dòng đầu tiên là một SELECTOR. Đã ĐỎ-THỬ: chèn một dòng văn
+    xuôi ⇒ cổng đỏ, nêu đúng chuỗi vi phạm; hoàn tác ⇒ xanh.
+
+bug_thu_hai_cung_kieu:
+  do: >
+    Hộp thoại xác nhận không mở, console `TypeError: Cannot read properties of
+    null (reading 'dataset')`. Handler đọc nút qua `nutAct`
+    (`closest("[data-act]")`) trong khi nút bản gốc mang `data-taigoc` — không
+    có `data-act` ⇒ `nutAct` là `null` ⇒ ném ngay dòng đầu.
+  chua: "`closest(\"[data-taigoc]\")` / `closest(\"[data-taibac]\")` — tìm đúng nút của mình"
+  cong_cu_khong_thay: >
+    Cổng XANH cả TRƯỚC lẫn SAU bug này. Thêm vế `3b3` cấm `nutAct.dataset.
+    (taigoc|taibac)`. Hai bug trong một lượt cùng một họ: **cổng đọc nguồn
+    không thay được một lần chạy thật**, và tôi đã khai giới hạn ấy ngay đầu
+    file cổng.
+
+nen_khong_dac:
+  do: "`--card` là token KÍNH — `rgba(250,246,237,.72)`. Chữ dưới lòi qua menu."
+  chua: >
+    Đổi sang `--secondary` (`#F0EADC` sáng / `#1E2126` tối) — ĐẶC ở cả hai hệ.
+    Vế cổng `1e2` nay đọc GIÁ TRỊ token trong `tokens.css` và từ chối mọi
+    `rgba(…, 0.x)`, chứ không chỉ đọc TÊN token như bản đầu.
+
+chay_that:
+  cach: "server phụ cổng 8799; bản ghi tài liệu + một nút dựng đúng khuôn cho ca chưa có dữ liệu"
+  do_duoc:
+    - "AC1 neo: `details.tx` position=`relative` · lệch phải **0.0px** (trần 2px) · `menu.bottom ≤ nút.top` · nền `rgb(240,234,220)` ĐẶC · z-index 20"
+    - "AC2 nhãn: `PDF · 2.8 MB · bao-cao-chi-phi.pdf` — dựng từ `mime_ten` + `so_byte`, không còn chữ *File gốc*"
+    - "AC3 hộp thoại: tiêu đề *Tải bản gốc*, nút *Tải 2.8 MB*; HUỶ ⇒ **0 request** thêm (đếm `performance.getEntriesByType`)"
+    - "AC4 ba nhóm dựng đúng: VIDEO (Xem trên nguồn · hàng bậc 360/480/720/1080/goc) · TRANSCRIPT (srt/txt/docx) · BẢN CHƯNG CẤT (`⌁ chưa sinh — Chưng cất ngay →`, mờ NHƯNG có href)"
+  chua_do_duoc: >
+    Kho hiện KHÔNG có bản ghi nào mang hiện vật NHỊ PHÂN (đo: 0 media khác
+    `text/vtt`), nên nhãn `PDF · 2.8 MB` thử trên một nút dựng đúng khuôn, chứ
+    không trên một PDF thật. Vế nhãn-từ-dữ-liệu-thật cần một lần nạp tài liệu.
+
+no_ghi_them:
+  - "`hoi()` có nhánh dự phòng `prompt()/confirm()` khi markup `<dialog>` vắng — vi phạm `FR-022` CÓ SẴN, không phải của T03-121. Vế cổng `3d` GHI NHẬN nó; vế ấy đỏ ⇒ nợ đã trả."
+  - "Nhiều cổng quét NGUYÊN VĂN nguồn nên một CHÚ THÍCH làm chúng đỏ oan — lượt này dính hai lần (`nut-tai-xuong` neo `Tải xuống`, `thu-vien-nap` bắt số GiB trong chú thích)."
+
+object:
+  - core/assets/xuat-dang.json
+  - chungcat/assets/nguong.json
+  - web/plugins/multiwindow/src/scripts/multiwindow.inline.ts
+  - web/test/menu-tai-dot-hai.test.js
+  - web/package.json
+  - 05_uiux/wireframes/SCR-21-menu-tai-xuong-dot-hai.md

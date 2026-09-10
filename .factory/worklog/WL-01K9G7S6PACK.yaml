@@ -1,0 +1,78 @@
+at: 2026-08-18T15:10Z
+agent: claude
+step: s6 — module spec + pack (G6A) cho cả 7 module
+did: >
+  Viết 7 module pack, mỗi pack 6 artifact: spec.md · rules.md ·
+  diagram_flow.md · data_flow.md · ui_flow.md · model_flow.md.
+  06_modules/ trước đó rỗng hoàn toàn.
+
+  Nguyên tắc áp dụng suốt: AC hard phải có lệnh CHẠY THẬT. Mỗi lần viết
+  xong một AC hard thì chạy thử lệnh đó ngay. Ba lần lệnh không chạy được
+  và ba lần xử lý khác nhau:
+
+  1. M02 AC-2.3.1 (url_normalized): -k chọn 0 test VÀ không có hàm chuẩn
+     hoá nào trong core/ ⇒ hạ soft, khai nợ. Đúng.
+  2. M02 AC-2.2.2 (reject_reason): -k chọn 0 test nên tôi hạ soft — SAI.
+     Đọc lại validate.py:163 thì cổng CÓ thật. Lỗi ở chỗ chọn lệnh, không
+     phải thiếu cổng. Viết check_reject_reason.py, trả về hard.
+  3. M03: sáu AC trỏ web/test/*.js chưa tồn tại vì module chưa có code.
+     Giữ hard + khai thẳng ở §2.6 rằng đây là ĐẶC TẢ TEST s8 phải viết,
+     và G6C sẽ tụt chúng xuống soft nếu lệnh vẫn chưa chạy được.
+
+  Viết 4 script kiểm mới, chạy được ngay tại s6 thay vì đợi s8:
+    check_g6a.py            điều kiện đóng G6A, 6 phép kiểm
+    check_ci_teeth.py       AC-2.1.1 M04 — phá 5 luật, khẳng định CI đỏ
+    check_version_pin.py    AC-2.3.1 M04 — workflow vs pyproject
+    check_reject_reason.py  AC-2.2.2 M02
+    check_mermaid.py        cú pháp mọi diagram (viết ở lượt M02)
+    06_skillgen/test_sample_coverage.py  AC-2.5.1 M06
+
+  HAI SCRIPT ĐỎ CÓ CHỦ Ý — lỗi thật đang tồn tại, không sửa lén ở s6:
+    check_version_pin      workflow 3.11 vs pyproject >=3.9 (ADR-02 chưa
+                           thi hành). Nợ của đơn vị việc B1.
+    test_sample_coverage   sample thiếu NEW và OVERLAP, không có ca
+                           priority<25. NEW là nhánh CHÍNH của M06.
+                           Sửa = đụng contract G5 ⇒ FR + bump v3.
+
+  check_g6a.py bắt 4 lỗi của chính tôi trong 2 lượt chạy:
+    lượt 1: 2 AC bị báo "hard không cmd" — SAI, lỗi ở script: nó đếm chữ
+            `hard` trong văn bản giải thích. Sửa regex đọc nhãn đầu dòng.
+    lượt 2: 2 AC của M03 thật sự thiếu nhãn ở vị trí chuẩn (nhãn nằm sau
+            phần nội dung tràn dòng). Chuẩn hoá format.
+
+verify:
+  hard:
+    - "pytest core/tests -q                     => 19 passed"
+    - "python core/tests/check_g6a.py           => 6 điều kiện đạt trên 7 module"
+    - "python core/tests/check_mermaid.py       => 14 blok mermaid pass"
+    - "python core/tests/check_ci_teeth.py      => 5 luật phá đều đỏ"
+    - "python core/tests/check_reject_reason.py => cổng đóng cả hai chiều"
+    - "python scratchpad/g3.py                  => truy ngược hai chiều đầy đủ"
+  do_co_chu_y:
+    - "python core/tests/check_version_pin.py          => exit 1, ADR-02 chưa thi hành"
+    - "python 06_skillgen/test_sample_coverage.py      => exit 1, thiếu NEW/OVERLAP"
+
+ra:
+  - 06_modules/M0{1..7}_*/            # 42 file: 7 module × 6 artifact
+  - core/tests/check_g6a.py
+  - core/tests/check_ci_teeth.py
+  - core/tests/check_version_pin.py
+  - core/tests/check_reject_reason.py
+  - core/tests/check_mermaid.py
+  - 06_skillgen/test_sample_coverage.py
+  - 07_curate/thresholds.yaml
+  - project_map.yaml                  # v6: spec trỏ pack, entity SkillDraft, used_by
+
+so_lieu:
+  rule_tong: 31            # M01:4 M02:4 M03:6 M04:4 M05:4 M06:5 M07:4
+  ac_hard: 34
+  ac_soft: 11
+  be_mat: {S1: 3, S2: 12, S3: 14, S4: 2}
+
+no_go:
+  - 6 AC hard của M03 chưa chạy được (web/ chưa có code) — đặc tả test cho s8
+  - M04-R4 đang vi phạm: pyproject >=3.9 vs workflow 3.11
+  - M06 AC-2.5.1 đang đỏ: sample thiếu NEW/OVERLAP ⇒ FR bump contract v3
+  - M02-R2 (chỉ M01/M05 ghi kb/) là S2, chưa có deny S1 — cần path thật ở s7
+  - AC-2.3.2 của M05 (người thật mở link) KHÔNG có bề mặt máy — giới hạn thật,
+    không phải nợ sẽ trả

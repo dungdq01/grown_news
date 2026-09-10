@@ -1,0 +1,108 @@
+id: WL-01K9S5WO038
+at: 2026-08-29
+by: claude
+buoc: s8 — WO-038, bon don vi tren HAI module (M01_core T01-39/40 · M03_web T03-86/87)
+loai: muc Tinh tuy la MOT o van xuoi; bo han cau truc con
+wo: .factory/wo/WO-038-tinh-tuy-mot-o-van-xuoi.md
+
+chi_dao_nguoi_dung: >
+  "Tinh tuy: chung ta chi can 1 header duy nhat la tinh tuy, sau do tat ca la
+  text van ban go vao, giong cac o khac. Cac fields nhu 'chuyen giao', 'tin
+  cay'... -> bo het, giu dung truong cha la tinh tuy thoi."
+
+object:
+  - core/assets/khung-than-bai.json    # bo khoi `tinh_tuy` (toi_da+bullets) · bo co tren 3.4 · goi_y thanh van xuoi
+  - core/src/source_distiller/khung.py # bo TINH_TUY_MAX/BULLETS/O + nhanh than_mau
+  - core/src/source_distiller/validate.py  # bo §6 + ESSENCE_BULLETS + ESSENCE_ITEM_RE
+  - core/tests/check_khung.py          # muc 3b MOI + §4 doi dich; bo import TINH_TUY_O
+  - core/tests/test_gates.py           # test §6 doi DICH sang §7 (locator), khong xoa trang
+  - web/plugins/multiwindow/src/scripts/multiwindow.inline.ts + .js  # go themTinhTuy/gomTinhTuy/raiTinhTuy/TT_B/TT_MAX/TT_O
+  - web/test/form-van-xuoi.test.js     # viet lai cho hop dong moi, them §3 VONG KHEP
+  - web/test/khung-8-o.test.js         # §4 dao chieu: KHONG duoc sinh `####`
+  - web/test/_khung.mjs · web/test/_api.mjs · api-crud · cua-so-doc
+  - 07_plan/M01_core/tasks/T01-{39,40}* · 07_plan/M03_web/tasks/T03-{86,87}*
+
+he_qua_phai_NOI_TRUOC_khi_sua: >
+  `validate.py` §6 doi MOI bai co `#### 3.4.x` kem du 5 dong bullet. Giu luat do
+  ma bo o con = form sinh ra bai ma chinh kho tu choi (422) — hai dau noi hai hop
+  dong. Nen §6 phai bo theo, va cai MAT la: tinh tuy thoi duoc may kiem, khong
+  con gi ep nguoi viet tra loi "bang chung dau" va "loai gi". Da bao truoc khi
+  sua, khong bao sau.
+
+KHONG_phai_di_tru_do_duoc: >
+  Bai cu co `#### 3.4.1` van doc nguyen ven nhu van xuoi: `chiaKhuc()` chi khop
+  `^###\s*\d\.\d\s` va `^##\s*\d\s*\.`, ma `####` khong khop cai nao (sau `###`
+  la `#`, khong phai khoang trang). Do tren kb/docs/xgboost-taylor-bac-hai.md —
+  bai DUY NHAT trong kho co `####`: validate tra 0 loi.
+
+# ══ PHAN DANG GIA NHAT ═════════════════════════════════════════════════
+npm_test_DUNG_o_cong_do_dau_tien: >
+  BAO CAO TRUOC CUA TOI SAI. `package.json` noi 80 cong bang `&&`, nen mot cong
+  do la moi cong SAU no khong chay. `he-kinh` (anh nen 708 KB, do tu 08-28) dung
+  o vi tri ~29, nen khi toi bao "npm test 79/80 xanh" o WL-01K9S4WO037 thi 51
+  cong cuoi CHUA HE CHAY.
+  Do bang cach chay TUNG FILE: `for f in test/*.test.js; do node "$f"; done`.
+  Phat hien them: `khung-8-o` da do san tu WO-037 (con doi nhan nut `8 o`) va
+  toi khong biet suot mot don vi viec.
+  Bai hoc: mot chuoi `&&` la mot cong DUY NHAT deo mat na 80 cong. Ke ca khi
+  no xanh, no chi noi "khong co cong nao do TRUOC cong do dau tien".
+
+doi_bang_khai_la_DU_cho_hanh_vi: >
+  Sau T01-40 (chi sua ba file Python/JSON), cong FE §1 da XANH ngay: `TT_O` suy
+  tu co `tinh_tuy` nen no thanh rong, va muc 3.4 roi ve nhanh muc la binh thuong.
+  Nghia la man hinh da dung TRUOC khi toi cham mot dong FE nao. T03-87 chi don
+  ma chet — nhung ma chet do ton 2569 byte bundle, nen no khong phai viec thua.
+
+do_CHIEU_NGUOC_cua_moi_lan_bo_luat: >
+  Bo mot luat la viec de lam hong theo cach khong ai thay. Ba cho da lam chieu
+  nguoc, khong cho nao xoa trang:
+    - `check_khung`: bo doi `####`, nhung THEM doi 3.4 van `nang` + van trong
+      CAN_LOCATOR.
+    - `test_gates`: test §6 doi DICH sang §7 (bo het locator cua 3.4 thi phai do).
+      Lan dau viet no chi bo MOT locator trong ba — test xanh vi de, khong vi
+      dung. Phai bo ca ba.
+    - `khung-8-o` §4: dao chieu tu "phai co ####" thanh "khong duoc co ####",
+      giu nguyen phep neo bang ky tu mo chuoi (`###` la chuoi con cua `####`).
+
+cong_do_vi_FIXTURE_suy_bien_chu_khong_vi_san_pham: >
+  `thu-vien` · `luong-nap-bai` · `api-crud` do sau khi bo bullets. Nguyen nhan
+  do duoc: `thanBai()` de MOI muc noi dung la `—` (1 tu) va chi song qua cong
+  `tran_dan_nhap` nho 5 dong bullet don them ~30 tu. Bo bullets => muc 1+2 vot
+  len 36% > tran 25%.
+  Cong DUNG; fixture moi la thu suy bien — mot bai co than rong thi phan dan
+  nhap chiem het la chuyen duong nhien. Chua bang cach cho fixture hinh dang
+  cua BAI THAT (muc 3-5 co chu), khong bang cach noi tran.
+  Cach tim: khong doan — dung lai loi goi `validate.py` cua `chayValidate()`
+  tung tham so mot, vi test cat thong bao con 200 ky tu va phan noi ly do bi cat.
+
+_khung_mjs_la_BAN_GUONG_cua_khung_py: >
+  Doi bang khai lam `_khung.mjs` NEM (`KHUNG.tinh_tuy.bullets` undefined), keo
+  theo moi cong dung `thanBaiKhung()`. Ban guong khong dan xuat duoc thi no la
+  cho troi — day la lan thu hai file nay lech (lan truoc: bo ten muc khac nhau).
+
+evidence:
+  - "python core/tests/check_khung.py => do 5 muc truoc, exit 0 sau"
+  - "pytest core/tests => 42 passed"
+  - "validate kb/docs/xgboost-taylor-bac-hai.md => 0 loi (bai cu khong phai di tru)"
+  - "node web/test/form-van-xuoi.test.js => pass, gom §3 vong khep rai->rap 8/8 o"
+  - "node web/test/khung-8-o.test.js => pass"
+  - "chay TUNG file: 80 cong, do 5 — deu KHONG phai cua WO nay (xem do_do)"
+  - "gn.js 102314 -> 99892 (tra lai 2422 byte, du 2508)"
+
+do_do:
+  he_kinh: "chua quy duoc chu — anh nen 708 KB co tu 08-28; can `python core/tools/toi_uu_anh_nen.py`"
+  page-weight + mo-ta-va-nut-nap + nap-ba-khung + o-nhan-nap: >
+    agent khac — CUNG MOT nguyen nhan: `gn.css` 103670/102400. Toi khong cham
+    file CSS nao trong WO nay; `styles/prototype.css` sua 20:24 va
+    `render/trang.mjs` 20:18, deu sau lan cham cuoi cua toi vao hai file do
+    (khong co). Don vi FR-041/WO-036 dang do.
+  check_danh_muc + check_skill: "agent khac — hai ban schema core/skill-src lech core/assets"
+  check_frozen: "cho NGUOI ky"
+  check_running + check_worklog: "he qua cua hai muc tren"
+
+no_con_lai:
+  - "NGUOI CHOT: mo form viet bai — muc 3.4 phai la MOT textarea, goi y van xuoi, khong o con nao"
+  - "NGUOI CHOT: mo mot bai cu (xgboost-taylor-bac-hai) ra sua — muc 3.4 phai giu nguyen ca doan `#### 3.4.1 …`"
+  - "05_uiux/wireframes/SCR-05 mo ta hop dong CU (dong 69-71, 109-113) — o backlog M03 da mo; thuoc 05_uiux"
+  - "`.f-che` CSS mo coi tu WO-037 van con — gio dang co gia hon vi gn.css vuot tran"
+  - "npm test la mot chuoi `&&`: no khong bao gio noi duoc 'bao nhieu cong xanh'. Dang mot o backlog CI?"

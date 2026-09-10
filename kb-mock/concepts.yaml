@@ -1,0 +1,22 @@
+# Danh mục khái niệm kiểm soát — seed ban đầu
+# Luật: LLM chỉ được chọn id từ danh sách này cho trường `concepts`.
+# Không tìm được mục phù hợp thì ghi vào `concepts_proposed`, chờ người duyệt.
+# Duyệt lô theo tuần: thêm mục mới, hoặc map thành alias của mục đã có.
+
+
+# ĐÃ XOÁ SẠCH (FR-031) — người dùng nhập lại từng mục qua màn Danh mục.
+# File PHẢI TỒN TẠI dù rỗng: validate.py coi *thiếu file* là "cổng chống tự
+# sinh khái niệm đang TẮT". Rỗng = danh mục đóng, chưa có mục nào.
+- id: talkshow
+  label_vi: Talkshow
+- id: algorithm
+  label_vi: Algorithm
+  aliases: [linear]
+- id: agent
+  label_vi: Ứng dụng AI Agent
+  aliases: [promt, loop, harness]
+- id: hermes
+  label_vi: Hermes Agent
+- id: news
+  label_vi: Tin tức
+  aliases: [news]

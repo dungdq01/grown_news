@@ -1,0 +1,153 @@
+id: WL-01KA40GIAMSATM12
+khi: 2026-09-04
+loai: giam_sat
+tac_nhan: claude-opus-5
+vai: soat NGOAI — khong viet ma M12
+module: M12_chungcat (giam sat) · anh huong M03_web · M08_api · M18_nguoidung
+
+TU_KHAI_XUNG_DOT_LOI_ICH: >
+  Thuoc do nay MOT PHAN la cua toi: toi viet 06_modules/M12_chungcat/testcases.md
+  PHAN II + PHAN III va 18 o backlog. Luat goc noi "khong ai duoc so huu thu dung
+  de danh gia minh" — nen toi KHONG cham diem bang "khop y toi", chi bang LENH
+  CHAY DUOC va so do. Moi ket luan duoi day co mot lenh hoac mot con so kem theo.
+
+tien_do_do_duoc:
+  chungcat_file: 100
+  task_s7: "18 file T12-0 … T12-18 (THIEU T12-3 — chua ro doi so hay bo)"
+  bang_khai: "chungcat/assets/{model,cua,nguon-transcript,nguong}.json — DU, gom
+    ca nguon-transcript.json cua FR-054"
+  hang_doi: "chungcat/hang-doi/new/ co 6 job JSON — Maildir CHAY THAT"
+  lenh_AC_cua_spec: "23/23 TON TAI va XANH"
+  backlog_M12: "43 o mo · 12 o DA DONG"
+  check_frozen: "XANH — nghia la FROZEN.lock DA DUOC KY (FR-053 + FR-054 da ap)"
+
+SAT_DOCS — bang chung, khong phai cam tinh:
+  - muc: "model.json co DU 6 cot research doi"
+    do: "kieu_structured · nguong_lech_schema · che_do · thu_vien_pdf · giay_phep
+      · ho_tro_citations — ca 6 CO"
+  - muc: "AC-3.2 HAI VE lam DUNG — day la o backlog quan trong nhat cua PHAN II"
+    do: |
+      check_quote_co_that.py khai tuong minh DO_KHI / XANH_KHI, va fixture nhung
+      DU BON nguyen nhan toi doi:
+        ligature `ﬁ` (U+FB01) · `boost-\ning` · khoang trang kep · nhay cong/gach dai
+      XANH_KHI: "bat duoc bia VA khong do oan, va nguong doc tu nguong.json"
+  - muc: "verify.py ba tang, nguong o bang khai"
+    do: "_LIG tuong minh · NFKC · casefold · fuzzy >= nguong doc tu nguong.json
+      'kem so do lam bang chung chon nguong'"
+  - muc: "HON docs mot cho"
+    do: >
+      verify.py:36 ghi "Ligature khong nam trong NFKC cua MOI ban Unicode — khai
+      tuong minh cho chac". Docs cua toi chi noi "go ligature"; ho tim ra LY DO
+      phai khai tay. Do la mot phat hien cua ho, khong phai cua toi.
+  - muc: "dinh_vi() dung chu ky DOI DON VI NEO"
+    do: "dinh_vi(quote, khoi: list[dict], nguong) — dung research §16, tuc duong
+      video dung lai duoc y nguyen, khong nhanh 'neu la video thi...'"
+  - muc: "chat luong worklog cua team"
+    do: >
+      WL-01KA38: do bang LENH ('29 cổng chungcat/tests/*.py → 29/29 exit 0',
+      'npm test exit 0', 'chạy thật — RESTART :8790 rồi POST /job'), co
+      do_do_boi: chua-quy-duoc-chu, va keo_theo kem SO DO ('tải đầu
+      /chung-cat/nhap/ còn 191 byte') thay vi 'thieu thoi gian'. Dung khuon R6.
+
+LECH — sau cong khung DO, va team KHONG THAY vi pham vi may cua ho:
+  co_che_goc: >
+    Team do "29/29 cong chungcat/tests + npm test" — XANH, va DUNG trong pham vi
+    do. R2 noi "khong may xanh thi chua xong"; may cua ho XANH. Van de la PHAM VI
+    CUA MAY: tap bang chung khong gom core/tests/check_*.py.
+    Va: ca SAU cong do DEU CO trong .github/workflows/ci.yml — nhung chungcat/ con
+    `??` (chua commit) nen CI CHUA TUNG CHAY tren viec nay.
+    => Do khong phai loi ky luat. Do la mot cho MAY khong voi toi, va no khop dung
+       phat hien cu "12/29 cong tung vang khoi CI".
+
+  do_1_NANG_NHAT:
+    ten: "SPLIT-BRAIN tran hien vat — hai ban khai lech 41x"
+    do: |
+      core/assets/media-mime.json      tran_byte              = 1 073 741 824  (1 GB)
+      core/assets/frontmatter.schema.json media.items.so_byte.maximum = 26 214 400 (25 MB)
+      mtime: media-mime.json 09-04 21:38 (DA SUA) · schema 09-02 22:30 (KHONG sua)
+    do_hanh_vi: |
+      jsonschema tren media.items:
+        25 MB  QUA · 40 MB CHAN · 1 GB CHAN  ("greater than the maximum of 26214400")
+      server THAT, kho tam, PDF 40 MB (magic %PDF- that):
+        POST /api/articles/media  -> HTTP 201  so_byte 41 943 040
+        POST /api/articles        -> HTTP 422
+        bang media   : 41 943 040 byte NAM LAI
+        bang tai_lieu: 0 hang
+      => BLOB MO COI 40 MB. Moi file 25 MB < n <= 1 GB di duoc qua CUA NHAN roi bi
+         CUA GHI chan, va byte nam lai trong kho.
+    hai_cong_bat_doc_lap: |
+      check_dinh_dang_mo: "FR-039 KHONG doi tran — bo whitelist lam tran thanh
+        cong DUY NHAT o cua nhan, noi no cung luc la bo not cong con lai"
+      check_media_ddl:    "tran hien vat 1024 MB — 1 rang buoc DDL khong ban that"
+    nguyen_nhan_goc: >
+      Chi dao "file video duoi 1Gb" cua chu du an la cho DUONG BAN GIAO NGUYEN LIEU
+      (cua vao job M12), KHONG phai cho HIEN VAT KHO. Agent kia da viet dung dieu
+      nay o FR-054 §8.2: "HAI CUA KHAC NHAU, khong phai mot". Team ap con so vao
+      CUA SAI — va cua do la cua co FR-039 bao ve.
+    dinh_huong_sua: >
+      Con so 1 GB thuoc mot HANG THU BA (TRAN_NGUYEN_LIEU), khong thuoc
+      media-mime.json:tran_byte. Tra tran_byte ve 26 214 400 (khop schema), roi khai
+      1 GB o cho cua duong ban giao. M09-R5 da lap tien le: TRAN (1 MB) va
+      TRAN_MEDIA (25 MB) la HAI hang vi mot ly do dung y het.
+    do_do_boi: "team M12 (thay doi media-mime.json 09-04 21:38); khong worklog nao
+      cua ho nhac 1073741824 — do la cho no thanh im lang"
+
+  do_2:
+    ten: "web/test/cai-dat.test.js BI XOA => M18-R5 va M18-R6 MAT RANG"
+    do: "ls web/test/cai-dat.test.js -> No such file. check_rule_surfaces:
+      'M18-R5 · test/cai-dat.test.js THIEU trong mot thu muc DA TON TAI' (x2)"
+    y_nghia: >
+      Do la don vi TEST viet DO-TRUOC theo R5 (T08-17b). Xoa no lam hai rule khai
+      S3 tro thanh soft theo dung R3. KHONG phai toi xoa — toi TAO no.
+    do_do_boi: chua-quy-duoc-chu
+
+  do_3:
+    ten: "Ba man moi vao thanh menu, cong khong doi theo"
+    do: |
+      man-hinh.json them: chung-cat · chung-cat-nhap (nhom noidung) · dot-hai (hethong)
+      check_khai_mot_noi: "dung 7 man thuoc thanh menu (duoc 8)" +
+                          "nhom NOI DUNG co 4 muc" (thuc te 6)
+    y_nghia: >
+      Day la QUYET DINH doi (them man cho M12), khong phai bug. Nhung cong giu con
+      so cu va khong o nao ghi => quyet dinh song im lang. Va no cham thoa thuan
+      "7 muc, hai nhom" cua C5.
+      ⚠️ Cong con nham mot chuyen: M12 spec §8 khai "giao dien | Z7 — giao dien
+      thuoc web/; THO chi backend". Man /chung-cat/ nam o web/ nen KHONG vi pham Z7;
+      no chi vi pham con so trong cong.
+    do_do_boi: "team M12 / M03 (man-hinh.json)"
+
+  do_4:
+    ten: "check_db_dung_cho: `ma_moi` va `phien` bi khai xuat ra file"
+    do: "'`ma_moi` KHONG duoc xuat trang thai ra file (ADR-06 c) nhung mot exporter
+      co khai — ma la bi mat, phien la session' (M08-R6 · M18-R2)"
+    do_do_boi: chua-quy-duoc-chu
+
+  do_5:
+    ten: "check_worklog: ba so lieu lech"
+    do: "dong prototype.css = 3046 · test = 91 · test `hien-vat-gan` thieu tai lieu"
+    y_nghia: >
+      Cung lop loi *tu khai* da tim thay o TAM module dot mot. Lan nay no lech vi
+      team THEM test (85 -> 91) ma khong cap nhat hai WORKLOG.md — tuc cong dang
+      lam dung viec cua no.
+    do_do_boi: "team (them test)"
+
+object:
+  - path: .factory/worklog/WL-01KA40GIAMSATM12.yaml
+    ghi_chu: "ban ghi giam sat — KHONG sua artifact nao cua team"
+
+khong_lam:
+  - "KHONG mo o backlog trong 06_modules/M12_chungcat/backlog.md — team dang SUA
+     file do (43 o mo, 12 dong). Bai hoc luot truoc: toi sua FR-054 cua agent khac
+     va bi chu du an chan. Cho chu du an cho phep truoc khi ghi vao artifact ho dang giu."
+  - "KHONG sua media-mime.json — tra tran ve 25 MB la DAO mot con so chu du an
+     vua chot; phai noi ro no thuoc cua nao TRUOC khi sua."
+  - "KHONG tao lai cai-dat.test.js — can biet ai xoa va vi sao truoc."
+  - "KHONG commit, KHONG push."
+
+cho_NGUOI_quyet:
+  - "Tran 1 GB thuoc CUA NAO: duong ban giao nguyen lieu (hang thu ba) hay hien vat
+     kho (media-mime.json)? Hom nay no dang o cua thu hai va sinh blob mo coi."
+  - "cai-dat.test.js: tao lai (M18-R5/R6 co rang lai) hay ha hai rule ve soft?"
+  - "check_khai_mot_noi: cap nhat con so cong (7->10 man, NOI DUNG 4->6) hay dua ba
+     man moi ra khoi thanh menu?"
+  - "Co cho toi mo o backlog trong M12 khong, hay de team tu ghi?"

@@ -1,0 +1,80 @@
+id: WL-01K9PDWO032
+at: 2026-08-29
+by: claude
+buoc: WO-032 — `referrerpolicy="no-referrer"` làm YouTube trả Lỗi 153
+loai: bàn giao WO-032
+wo: WO-032-no-referrer-lam-youtube-loi-153.md
+
+object:
+  wo:
+    - .factory/wo/WO-032-no-referrer-lam-youtube-loi-153.md
+  task:
+    - 07_plan/M03_web/tasks/T03-72-test-referrerpolicy.md   # test
+    - 07_plan/M03_web/tasks/T03-73-referrerpolicy-origin.md # code
+  code:
+    - web/plugins/multiwindow/src/scripts/multiwindow.inline.ts   # nhungVideo
+  test:
+    - web/test/media-cua-so.test.js   # §5 MỚI
+
+may_xanh:
+  - "ĐỎ TRƯỚC (R5): `KHÔNG phải \`no-referrer\` (đang là \`no-referrer\`)`"
+  - >
+    THÍ NGHIỆM MỘT BIẾN, trên trình duyệt thật: hai `<iframe>` cạnh nhau, cùng
+    một video, cùng một trang, khác ĐÚNG một thuộc tính —
+    `no-referrer` ⇒ *Error 153 · Video player configuration error*;
+    `origin` ⇒ video nạp bình thường (thumbnail + nút play)
+  - >
+    Chốt lần hai với giá trị ĐỌC THẲNG TỪ `gn.js` đã build (không gõ lại):
+    `origin` ⇒ video nạp. Ảnh chụp cả hai lần
+  - "quét web 75/76 (chỉ `he-kinh`) · dọn sạch trang thử và server sau khi đo"
+
+bug:
+  - >
+    `nhungVideo()` đặt `referrerpolicy="no-referrer"`. YouTube TỪ CHỐI PHÁT khi
+    khung nhúng không gửi `Referer` — đó chính là Lỗi 153. Ý định riêng tư là
+    thật, nhưng nó tắt luôn tính năng
+  - >
+    `origin` là CHẶT NHẤT trong những giá trị còn chạy được: gửi
+    `http://localhost:8787`, KHÔNG gửi đường dẫn trang đang đọc. Mặc định của
+    trình duyệt cũng chạy nhưng rộng hơn mức cần
+
+cach_do:
+  - >
+    `curl` KHÔNG phân giải được: trang nhúng trả HTML giống nhau, và chuỗi
+    "153" xuất hiện trong bảng lỗi chung của cả hai bản. Đếm chuỗi ở đây là
+    phép đo mù
+  - >
+    Thứ phân giải được là THÍ NGHIỆM MỘT BIẾN trên trình duyệt: hai iframe cùng
+    trang, đổi đúng một thuộc tính, rồi CHỤP MÀN HÌNH. Một biến, hai kết quả
+
+cong_do_gia_tri_chu_khong_do_hanh_vi:
+  - >
+    §5 đo GIÁ TRỊ thuộc tính, và nói ra vì sao: một cổng gọi YouTube mỗi lần
+    chạy là cổng đỏ theo ĐƯỜNG TRUYỀN, không theo mã. Bằng chứng hành vi nằm ở
+    WO-032; cổng canh cho nó khỏi trôi ngược
+  - >
+    HAI VẾ, không một: cấm `no-referrer` VÀ đòi một giá trị CÓ gửi origin. Chỉ
+    cấm `no-referrer` thì `same-origin` lọt qua và hỏng y hệt — nó cũng không
+    gửi gì khi sang một origin khác
+
+tu_bat_duoc:
+  - >
+    Chú thích tôi vừa viết chứa chuỗi `youtube` + `-nocookie`, và `media-cua-so`
+    §2 có một phép kiểm ÂM tìm đúng chuỗi đó trong `.ts` (chống gõ tay host).
+    Cổng ĐÚNG, chữ của tôi sai — đã diễn đạt lại. Lớp lỗi *"bình luận của tôi
+    phá chính cổng của tôi"* đã trúng nhiều lần trong dự án này
+
+khong_doi:
+  - >
+    Miền nhúng riêng của YouTube giữ nguyên (nó chặn cookie theo dõi, không liên
+    quan lỗi 153). M09-R3 giữ nguyên: `src` vẫn chỉ dựng từ whitelist + regex id
+
+đỏ_do: chưa quy được chủ  # `no-referrer` có từ lúc dựng khung nhúng
+
+do_do:
+  - cong: he-kinh.test.js
+    do_do_boi: ảnh 724662 byte người dùng thêm — `python core/tools/toi_uu_anh_nen.py`
+  - cong: check_frozen.py
+    do_do_boi: chờ NGƯỜI ký sau khi FR-039 duyệt
+  - cong: check_danh_muc.py · check_skill.py · check_running.py
+    do_do_boi: agent khác · và hệ quả của hai cổng trên

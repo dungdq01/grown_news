@@ -1,0 +1,57 @@
+ulid: 01M1PK06VSK1G4K5GBFT0GEW3G
+thoi_diem: 2026-09-04T23:41+07:00
+tac_nhan: claude-opus-5
+loai: ban_giao
+module: M03_web
+don_vi: T03-110 + T03-110b
+viec: >
+  Tab "Chưng cất" trong cửa sổ đọc: lọc việc theo slug của bản ghi đang mở,
+  chip ENUM giai_doan (không %), poll 4s CHỈ khi còn việc `dang-*`/`cho` VÀ tab
+  còn `aria-current`, gửi thành công thì đổi sang tab (gửi trượt thì không).
+  Thân tab ở CHUNK nạp-theo-yêu-cầu, không ở bundle chung.
+
+r5_do_truoc:
+  luc: 2026-09-04T22:48+07:00
+  lenh: node web/test/tab-theo-doi-chung-cat.test.js
+  ket_qua: 7 vế ĐỎ — tất cả "chưa có tab"
+  đỏ_do: claude-opus-5 (cổng viết trước mã, đúng R5)
+
+do_sau:
+  - lenh: node web/test/tab-theo-doi-chung-cat.test.js
+    ket_qua: "pass · gn.js 102260/102400 · gn.css 102002/102400"
+  - lenh: node web/test/page-weight.test.js
+    ket_qua: >
+      ok chunk `cctab` nạp THEO YÊU CẦU (0 màn phát thẻ) ·
+      tải đầu nặng nhất 281652/300463 · trang lớn nhất 69624/75776
+  - lenh: cd web && npm test
+    ket_qua: exit 0 (đã đăng ký cổng mới vào `scripts.test`)
+  - lenh: 'for f in chungcat/tests/check_*.py; do python "$f"; done'
+    ket_qua: 30/30 XANH
+  - lenh: python -m pytest core/tests -q
+    ket_qua: 45 passed
+
+chan_lai:
+  ly_do: >
+    Thân tab KHÔNG vừa `gn.js` — đo được 103555/102400 (dư -1155) và trang chủ
+    266786/266240. Cắt gọn hết mức chỉ lấy lại 204 byte. FR-061 cấm nới bundle
+    CHUNG, nên phải đổi thiết kế sang chunk nạp lúc bấm.
+  ngoai_pham_vi:
+    - web/plugins/cctab/src/cctab.inline.ts
+    - web/render/assets.mjs
+    - web/test/page-weight.test.js
+  fr: FR-062 — CHỜ CHỦ DỰ ÁN ký. Không nới tại chỗ.
+
+keo_theo:
+  - >
+    `multiwindow.inline.ts:2366` có `esc2` trùng nguyên văn `esc` ở dòng 297 —
+    nợ của đơn vị khác, KHÔNG sửa trong đợt này (luật "chỉ dọn mớ của mình").
+    Đáng một ô backlog nếu cần byte về sau.
+
+object:
+  - web/plugins/cctab/src/cctab.inline.ts
+  - web/plugins/multiwindow/src/scripts/multiwindow.inline.ts
+  - web/render/assets.mjs
+  - web/test/tab-theo-doi-chung-cat.test.js
+  - web/test/page-weight.test.js
+  - web/package.json
+  - .factory/fr/FR-062-tab-chung-cat-thanh-chunk-nap-theo-yeu-cau.md

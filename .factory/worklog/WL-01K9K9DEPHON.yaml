@@ -1,0 +1,132 @@
+id: WL-01K9K9DEPHON
+at: 2026-08-24
+by: claude
+buoc: s8 (M03_web) + s5 (tokens)
+loai: doi thang ban kinh + chu + them tang 3 + parallax
+fr: FR-027-he-kinh-tren-anh.md (muc FR-027d)
+
+viec: >
+  Nguoi dung: "cơ bản đúng rồi nhưng chưa đẹp — đọc lại ui_guide đi, xem cần
+  làm gì cho đẹp, nếu cần thì thay đổi layout".
+
+cach_lam: >
+  DOC LAI ui_guide.md roi DO tung muc voi hien trang, khong nhin roi doan. Bon
+  khoang cach tim duoc, moi cai mot con so cu the.
+
+# ── §4 · THANG BAN KINH — khoang cach lon nhat ───────────────────────────
+ban_kinh:
+  guide: "panel lon 20px · the 16px · nut/chip 10-11px · o nho 6px"
+  hien_trang: "--radius-lg 10 · --radius 10 · --radius-md 8 · --radius-sm 6"
+  chan_doan: >
+    Bon bac don trong 4px, tuc gan nhu MOT bac. Do la ly do panel doc ra "hop
+    cung" chu khong phai mat kinh: kinh iPhone mem vi ban kinh LON so voi noi
+    dung, va vi cac bac CACH nhau du xa de mat doc ra thu tu lop (panel boc the,
+    the boc nut).
+  anh_xa_do_duoc_khong_doan:
+    - ".pn  panel -> var(--r)         = --radius-lg -> 20px"
+    - ".cd  the   -> var(--radius-md)               -> 16px"
+    - ".bt  nut   -> var(--r-sm)      = --radius-sm -> 11px"
+    - ".kp  o KPI -> var(--r-sm)                    -> 11px"
+  sua: "--radius .6875rem (11px base) · --radius-lg 1.25rem (20) · --radius-md 1rem (16) · --radius-sm = --radius · them --radius-xs .375rem (6)"
+
+# ── §3 · CHU ─────────────────────────────────────────────────────────────
+nhan_vung_gian_chu:
+  guide: "Nhan vung 12px · 600 · letter-spacing .13em, HOA. Va: chu cang nho gian cang rong."
+  hien_trang: "--tr-lb: .06em"
+  chan_doan: ".06em o 12px la 0.72px — mat gan nhu khong thay gian, nen nhan HOA doc ra mot khoi chu dinh"
+  sua: ".12em (= 1.44px)"
+  vi_sao_khong_13: "17 cho dung token nay; .12em o 10.5px (nhan rail) da la 1.26px — them nua thi nhan 5 chu tran khoi chip 54px"
+
+so_lieu_KPI:
+  guide: "So lieu 27-34px · 600 · -.02em · line-height:1"
+  hien_trang: "--fs-hero = 2.5rem = 40px"
+  chan_doan: "40px la bac cua TIT NOI BAT. So to hon tit lam o KPI hut mat hon noi dung — nguoc thu tu doc."
+  sua: "--fs-h1 (32px) + line-height:1 + letter-spacing -.02em"
+  vi_sao_line_height_1: "so mot dong thi moi phan line-height du bien thanh khoang trang lech trong o"
+
+# ── §1 · TANG 3 CON THIEU ────────────────────────────────────────────────
+tang_3:
+  do: >
+    ui_guide §1 khai BON tang, du an chi co BA: .sky (z-3) -> .mist (z-2) ->
+    .grain (z-1) -> noi dung. Thieu dung tang "gom mat ve giua", nen nen trai
+    deu va khong co tam — panel noi len nhung mat khong biet nhin dau truoc.
+  them: ".flare (3 diem loe) + .vign (vignette), gia tri be nguyen tu trang-chu.html"
+  an_toan_voi_tuong_phan_DO_DUOC: >
+    Ca hai o z-index 3, panel o 5+ — chung nam DUOI panel nen chi doi mau NEN ma
+    panel tron ra, khong lam nhat chu nao. Ca te nhat (loe trang .20 x opacity .5
+    tren anh nhat nhat) cho nen #E9EAE9: chu 14.83 · chu mo 5.25 · do 4.76 — ca
+    ba PASS. contrast-audit sinh lai: 62 cap · 0 truot.
+  vign_khong_dung_opacity: "no da khai alpha trong gradient; them mot lop opacity nua la nhan hai lan va mat kiem soat con so da do"
+  §6c_khong_vi_pham: "ca hai TINH — khong animation, khong mix-blend-mode"
+
+# ── §4 · THANH 2px DAU PANEL ─────────────────────────────────────────────
+thanh_2px:
+  guide: "Dau bang co thanh 2px chi loai nguon: linear-gradient(90deg,#c81e1e,rgba(200,30,30,0))"
+  vi_sao_gradient_khong_dac: >
+    Dac la mot VACH MAU; mo dan la mot TIA SANG — no noi "bat dau o day" ma
+    khong them mot mang mau. ui_guide §1: "Mau chi dung lam net, khong lam mang."
+  dung_pseudo_element: >
+    `border-top` khong nhan gradient, va `.cd` dang dung `border-top-color`
+    inline cho mau loai nguon (emitter dat) nen doi no la dung markup.
+  mien_tru_brk: "vung Noi bat da co vien do rieng — khong chong them mot tia do nua (cung ly `.pn.brk::after{display:none}` tu FR-014)"
+
+# ── §7 · PARALLAX ────────────────────────────────────────────────────────
+parallax:
+  guide: "Ba lop, ba toc do — cang xa cang cham. photo: translate3d(0, y*0.07, 0)"
+  lam: "chi lop anh (.sky), he so 0.07 dung nhu ban tham khao"
+  ba_chot_moi_cai_mot_ly_do:
+    reduced: "TAT HAN, khong giam bien do — DESIGN.md §7 noi 'tat hoan toan'"
+    tick_raf: "`scroll` ban hang tram lan/giay; ghi transform moi lan la buoc tinh lai layer lien tuc. rAF gop ve 1 lan/khung."
+    document_hidden: "khong tinh khi tab an"
+  chi_transform: "transform chay tren compositor, khong kich hoat layout. `.sky` da co will-change:transform."
+  go_listener_va_reset: >
+    `gan()` chay lai moi lan nav SPA ⇒ listener chong. Va tra `.sky` ve vi tri
+    goc: dieu huong SPA giu lai phan tu, nen transform cu dong lai la anh lech
+    mot doan o man moi ma khong ai hieu vi sao.
+
+bug_do_TRUOC_khi_no_xay_ra:
+  hien_tuong: "chua xay ra — tinh ra truoc"
+  do: >
+    Parallax dich `.sky` xuong y*0.07. Trang cao ~2400px cho 168px dich, ma
+    `inset:-5% 0 0` chi du 54px o man 1080 => day anh se LO mot dai trong.
+  sua: "inset:-2% 0 -18% — 194px du o day, du cho trang 2700px. Dinh chi can -2% vi parallax luon dich XUONG (scrollY >= 0)."
+
+# ── Hai cong bat toi, ca hai dung vai ────────────────────────────────────
+opacity_khong_pha_contrast:
+  bat: "`.flare` opacity 0.5 -> ink-2 2.70:1"
+  dung_hay_sai: "SAI DUONG — `.flare` khong co chu, khong co `color`, va nam DUOI panel"
+  sua: "them vao danh sach mien, cung nhom `.grain` ('phan tu KHONG chua chu'), kem con so da do"
+  khong_noi_long_cong: "chi mien mot selector co ly do ghi ro, khong doi nguong 4.5"
+
+he_kinh_test_cua_toi_sai:
+  bat: "'co khoa khung hinh (~30fps)' do tren parallax"
+  nguyen_nhan: >
+    Phep kiem chi tim chuoi `requestAnimationFrame` nen gop HAI cach dung khac
+    han nhau:
+      VONG LAP TU CHAY  `raf = requestAnimationFrame(step)` goi lai chinh no,
+                        chay mai => phai khoa khung (§6d)
+      THROTTLE SU KIEN  rAF goi MOT lan cho moi dot scroll roi het => khoa khung
+                        la vo nghia, no von da <= 1 lan/khung
+  sua: >
+    Nhan dien vong lap tu chay bang regex "ham goi lai chinh no"; throttle thi
+    canh BA chot khac (document.hidden · reduced-motion · go listener).
+  cung_lop_loi: "dem/tim mot CHUOI roi ket luan ve HANH VI"
+
+evidence:
+  - "cd web && npm test => exit 0, 35/35 file, 0 FAIL"
+  - "npm run check => sach"
+  - "13/13 cong check_* exit 0"
+  - "sinh_contrast_audit.py => 62 cap · 0 truot (sau khi them tang 3)"
+  - "mock/index.html 44.2 KB (tran 48) · gn.css 132.7 KB (tran 160) · gn.js 67.4 KB (tran 100)"
+  - "gn.js co du 5 dau: translate3d · rAF · document.hidden · prefers-reduced-motion · removeEventListener(scroll)"
+  - "check_frozen: khop, ky lai 27 file"
+
+no_con_lai:
+  - >
+    CANVAS HAT (§6d/§8) chua co — 120 hat · DPR 1 · 30fps · noi toi da 2 hang
+    xom. `he-kinh.test.js` da co san khoi canh no, chap nhan "chua co" la trang
+    thai hop le.
+  - "KHOI 3D CSS (§8) chua co — bar van la HTML ngang. Doi no la doi `oBar()` trong emitter."
+  - "BA VONG TU CHUYEN (§5) chua co — 6s tin noi bat · 5s bieu do · 7s anh nen (anh nen DA co san trong plugin backdrop)."
+  - "#hero co perspective(1800px) (§7) chua co."
+  - "FR-025 · FR-026 ve B — CHO NGUOI KY."

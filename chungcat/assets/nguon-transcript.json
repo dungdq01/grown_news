@@ -1,0 +1,69 @@
+{
+  "$comment": "BẢNG KHAI NGUỒN TRANSCRIPT — FR-054 §1.5. Ba lối sinh transcript cho một bản ghi video, đổi bằng bảng khai chứ không bằng mã (AC-V5). Cùng khuôn model.json / cua.json: một nguồn khai, mọi tầng đọc.",
+  "$vi_sao_tieu_egress": "Cột NẶNG NHẤT của bảng này, và nó là một mệnh đề PHÁP LÝ chứ không phải một cờ kỹ thuật. `tai_ve` VẪN là lời gọi ra Internet (nó tải audio VỀ), nên nó vẫn phải qua cửa egress duy nhất (M12-R3) và host vẫn phải trong allowlist (AC-6.3) — nhưng KHÔNG có byte nào của TA đi ra, nên `tieu_egress: false`. `dich_vu` thì audio của ta RỜI MÁY: `tieu_egress: true`. Trộn hai nghĩa của chữ egress vào một cột là cách con số này bắt đầu nói dối (FR-054 §1.5).",
+  "$vi_sao_uu_tien": "Chốt 2026-09-04 (chủ dự án: 'nên làm cả 2 và ưu tiên call dịch vụ llm trước — tiện nhất thì làm'). Cơ sở đo được: cửa hiện dùng có 23 model nhận audio cộng các model `*-stt`, nên lối `dich_vu` không còn đắt như lúc mở FR-054 — nó là lối TIỆN NHẤT (0 gói mới, 0 model tải về). Ba lối GIỮ NGUYÊN, không lối nào bị bỏ: `ytdlp-asr-local` là đường DUY NHẤT khi audio không được rời máy, và đó là ràng buộc pháp lý chứ không phải một tuỳ chọn hiệu năng.",
+  "$vi_sao_tran_hai_nhip": "M12-R9. Hai số biết được ở hai thời điểm: BYTE biết ngay ở cửa nhận job; THỜI LƯỢNG chỉ biết sau khi đọc metadata, mà đọc metadata đã là tải file về. Đo một nhịp thì hoặc chặn quá muộn (đã tốn 8 phút ASR cho một video gửi nhầm), hoặc chặn bằng một con số ĐOÁN từ byte — mà bitrate biến thiên hàng chục lần, nên phép đoán sai theo cả hai chiều.",
+  "$vi_sao_host_cho_phep": "Allowlist HOST, không phải allowlist URL: một URL đầy đủ có query, có redirect, và so khớp URL là so khớp một thứ đổi mỗi lần. `AC-V4` đòi chặn TRƯỚC request — nên phép so phải làm được trên chỉ cái host, thứ có ngay từ khi phân giải URL.",
+  "phien_ban": 1,
+  "tran_video_byte": 1073741824,
+  "tran_audio_byte": 524288000,
+  "tran_giay": 3600,
+  "host_cho_phep": [
+    "www.youtube.com",
+    "youtube.com",
+    "youtu.be",
+    "www.tiktok.com",
+    "tiktok.com",
+    "www.facebook.com",
+    "facebook.com",
+    "fb.watch",
+    "douyin.com",
+    "www.douyin.com"
+  ],
+  "nguon": [
+    {
+      "ten": "cua-asr",
+      "loai": "dich_vu",
+      "uu_tien": 1,
+      "dich": null,
+      "$dich_la": "null ⇒ lấy host của CỬA đang dùng (cua.json). Gõ host ở đây là bản thứ hai của một thứ đã khai, và nó lệch đúng vào ngày đổi cửa.",
+      "khu_vuc": "khong-xac-dinh",
+      "can_key": true,
+      "tieu_egress": true,
+      "giay_phep": "theo điều khoản của cửa",
+      "$vi_sao": "Model nhận audio trực tiếp — 0 gói mới, 0 model tải về, nhanh nhất. Đánh đổi: audio RỜI MÁY, và bộ chọn phải HIỆN điều đó trước khi người bấm (cùng hạng với §4.0c của chưng cất)."
+    },
+    {
+      "ten": "file-nguoi-tai",
+      "loai": "file",
+      "uu_tien": 2,
+      "dich": null,
+      "khu_vuc": "tai-cho",
+      "can_key": false,
+      "tieu_egress": false,
+      "giay_phep": "của người nạp",
+      "$vi_sao": "Người đã có bản chữ thì không tiêu gì cả — rẻ nhất, nhưng cần người. Đây cũng là đường DUY NHẤT khi nguồn không tải được và không gửi được."
+    },
+    {
+      "ten": "ytdlp-asr-local",
+      "loai": "tai_ve",
+      "uu_tien": 3,
+      "dich": null,
+      "$dich_la": "null ⇒ host lấy từ chính URL của bản ghi video, và phải nằm trong `host_cho_phep`.",
+      "khu_vuc": "tai-cho",
+      "can_key": false,
+      "tieu_egress": false,
+      "giay_phep": "yt-dlp Unlicense · faster-whisper MIT",
+      "$vi_sao": "0 egress, chạy offline. Đường dự phòng khi audio KHÔNG ĐƯỢC rời máy. Đo (nghiên cứu §17): faster-whisper `small` INT8 ≈ 8× realtime trên CPU ⇒ video 30 phút ≈ 4 phút, nên checkpoint theo block phải THẬT."
+    }
+  ],
+  "tran_than_cua_byte": 8388608,
+  "$vi_sao_tran_than_cua_byte": "GIA DINH BAN DAU DA SAI — sua 2026-09-05 (T12-21). Bản trước viết rằng cửa từ chối vì thân request ~17 MB quá lớn. Đo lại trên clip 8 GIÂY (~43 KB base64, nhỏ hơn 400 lần) thì cửa từ chối Y HỆT. Nguyên nhân thật là tiền tố `data:audio/...;base64,` trong truong `data`: gửi base64 TRẦN thì cùng clip ấy trả 200 kèm bản phiên âm thật. Phép chẩn đoán đi sai đường vì `egress._httpx_stream` khai `so_chunk = 0` rồi không bao giờ tăng, nên câu lỗi luôn nói `chunk=0` — đọc như 'cửa không gửi gì', tức như một vấn đề kích thước. Cổng chẩn đoán nói dối tốn hơn cổng vắng. GIU LAI con số 8 MiB làm lan can, KHÔNG phải làm phép đo: trần thân thật của cửa vẫn chưa ai đo được, và audio nén ở mức T12-21 (mono 16 kHz 32k) cho ~26 phút dưới mức này — trùng khoảng cửa còn xử lý nổi.",
+  "$vi_sao_khong_stream_cho_asr": "Đo 2026-09-05: lối `stream: true` cắt nội dung ở ~175 GIÂY transcript với MỌI độ dài nguồn (thử 5 và 10 phút, cùng ra ~175s) — cửa không tôn trọng `max_tokens` khi stream. Lối không-stream tôn trọng: 14.382 completion token, phủ trọn nguồn 19 phút. Nên `asr_cua` KHÔNG stream, khác lối chưng cất. Đánh đổi: không-stream thỉnh thoảng ăn 502 từ hạ tầng trước cửa.",
+  "$vi_sao_douyin": "WO-071 · `douyin.com` thêm 2026-09-09 cho job `sinh-thumbnail`. Nó đã là một `video_host` được phép NHÚNG từ lâu (`media-mime.json`), nhưng chưa bao giờ được phép GỌI RA — hai danh sách trả lời hai câu khác nhau, và đó là lý do chúng tách. Thêm ở đây nghĩa là `yt-dlp` được phép hỏi douyin, không nghĩa là gì thêm.",
+  "host_khong_lay_anh_bia": [
+    "douyin.com",
+    "www.douyin.com"
+  ],
+  "$vi_sao_host_khong_lay_anh_bia": "Host DUOC PHEP goi ra (nam trong `host_cho_phep`) nhung KHONG lay duoc anh bia. Hai cau hoi khac nhau, nen hai danh sach — y het ly le da tach `host_cho_phep` khoi `video_host` cua `media-mime.json`. Douyin, do 2026-09-09 tren URL that cua chu du an: `yt-dlp` CO extractor [Douyin], nhung ca dang `/jingxuan/course?modal_id=` (Unsupported URL) lan dang chuan `/video/<id>` deu chet — dang chuan bao 'Fresh cookies (not necessarily logged in) are needed', ke ca khi da co curl_cffi. Dua cookie phien vao la dua mot bi mat vao duong egress: quyet dinh cua NGUOI, khong phai cua mot task. Khong co dong nay thi `chien_luoc_anh_bia` tra 'url' cho douyin va LOI xep mot job CHAC CHAN hong — moi ban ghi douyin de lai mot viec trong thung rac."
+}

@@ -1,0 +1,121 @@
+ulid: 01M1XZ4K7M2P9R5T3VQHNBWDF6
+thoi_diem: 2026-09-07T12:10+07:00
+tac_nhan: claude-opus-5
+loai: ban_giao
+module: M12_chungcat + M03_web
+don_vi: nguồn dài cắt đoạn · T12-27 · T03-122
+
+viec: >
+  Chủ dự án test E2E một video 58 phút, việc hỏng. Chốt: *"Bắt buộc là A —
+  xử lý việc nối đoạn trước"* và *"video có 1 tiếng mà không xử lý được thì
+  vứt"*. Sau đó là chuỗi tách transcript khỏi chưng cất.
+
+r5_do_truoc:
+  - don_vi: nguồn dài
+    lenh: python chungcat/tests/check_nguon_dai_cat_doan.py
+    ket_qua: "ĐỎ 2 vế"
+    do_tren_may: "[worker] c47f2bb1… HỎNG · VuotTran: audio 37028349 byte > trần 33554432"
+    đỏ_do: "có sẵn (mã T12-21/22), không phải của lượt này"
+  - don_vi: T12-27
+    lenh: python chungcat/tests/check_chung_cat_dung_transcript.py
+    ket_qua: "ĐỎ 8 vế"
+    đỏ_do: claude-opus-5
+  - don_vi: T03-122
+    lenh: node web/test/cua-so-transcript.test.js
+    ket_qua: "ĐỎ 7 vế"
+    đỏ_do: claude-opus-5
+
+do_sau:
+  - lenh: 'for f in chungcat/tests/check_*.py; do python "$f"; done'
+    ket_qua: 43/43 XANH
+  - lenh: cd web && npm test
+    ket_qua: exit 0 · 0 FAIL
+  - lenh: python -m pytest core/tests -q
+    ket_qua: 49 passed
+
+nguon_dai_goc_that:
+  do: >
+    `cat_doan` ĐÃ CÓ từ `T12-22`. Nhưng ngay HAI DÒNG TRÊN nó, `phien_am` so
+    CẢ FILE với `tran` — mà `tran` là trần của MỘT LỜI GỌI. Cả file không bao
+    giờ đi trong một lời gọi; các ĐOẠN mới đi. Phép so ấy phủ định đúng cơ chế
+    đứng ngay sau nó.
+  con_so_muon_nham: >
+    `tran` worker truyền vào là `nguong.json.tran_payload_byte` (32 MiB) —
+    trần payload JSON của CHƯNG CẤT, mượn sang cho audio.
+  sua:
+    - "bỏ phép so cả-file trong `phien_am`"
+    - "worker truyền `tran_audio_byte` (500 MB, CỦA TA) thay vì trần bài toán khác"
+  giu_nguyen: >
+    Phép chặn ĐÚNG ở `_phien_am_mot_doan`: từng đoạn, sau nén, sau base64, so
+    với `tran_than_cua_byte`.
+  khong_noi_tran_8MiB:
+    ly_do: >
+      Chủ dự án bảo *"nới trần lên cao"*. Nhưng `tran_than_cua_byte` là trần
+      của CỬA Beeknoee, không phải của ta. Sửa số trong bảng khai của mình
+      không làm họ nhận thân to hơn — nó chỉ khiến ta gửi rồi ăn từ chối, và
+      mất một `lan_gui` (trần `M12-R6` chỉ có 2).
+    da_noi_cho_chu_du_an: "và chủ dự án đồng ý — *rất hợp lý*"
+  chay_that:
+    cach: "dựng audio 58 phút bằng ffmpeg, chặn ở tầng `_gui` — 0 mạng, 0 model"
+    ket_qua: >
+      nguồn 40.1 MB → **6 đoạn**; đoạn 1–5 thân **3.05 MB**, đoạn 6 **2.55 MB**
+      — LỌT HẾT trần 8 MB.
+
+t12_27:
+  hai_lo_mot_goc: >
+    `ket_qua` của MỌI việc `sinh-transcript` là `null` — hàm trả
+    `{sha256, cue, model_asr}` nhưng không gọi `ghi_ket_qua`, còn `mot_vong`
+    chỉ giữ khoá `citations`. Không có con trỏ ⇒ chưng cất không tra được
+    transcript, và màn không mở được detail.
+  nguyen_lieu_sai: >
+    `_doc_nguon` đọc `than`. Với video URL, `than` là phần MÔ TẢ vài dòng —
+    nên "chưng cất video" là chưng cất mô tả, và model được yêu cầu dựng một
+    bài đủ khung từ vài dòng: nó chỉ còn cách bịa. Lỗi KHÔNG tự lộ: bản nháp
+    vẫn ra, vẫn đủ mục, vẫn qua `validate`.
+  sua: >
+    `vtt_sang_van` + `_doc_transcript`; `chay_chung_cat` rẽ theo loại. Video
+    CHƯA có transcript ⇒ NÉM kèm câu chỉ đường, KHÔNG rơi về `than`.
+  do_that: "`_doc_transcript('video/cai-dat-…')` trả đúng chữ transcript thật"
+
+t03_122:
+  lam: "`moCuaSoTranscript(slug, canh)` — cửa sổ `kieu: \"transcript\"`, không chạy `tai()`"
+  mot_duong: >
+    Thẻ ở `/chung-cat/` và dòng trong tab gọi CÙNG hàm. Hai đường là hai chỗ
+    để lệch — bài học `veNutBanChungCat` bóc sai phong bì đã trả giá.
+  do_that: "bấm thẻ ⇒ cửa sổ `Transcript · Cài Đặt và Thiết Lập Hermes trên VPS` · **213 cue** · 0 lỗi console"
+
+ba_loi_cua_toi_trong_luot:
+  - ten: "dấu nháy thừa"
+    do: "`build-fe` chết `Unterminated string literal`; suýt báo xanh trên bản dựng CŨ"
+  - ten: "`mw is not defined`"
+    do: >
+      Chép thói quen của chunk `cctab` sang chunk `chungcat` — chunk này lấy
+      cầu thẳng từ `globalThis`. Ra `ReferenceError` ngay cú bấm đầu.
+  - ten: "chèn khối vào giữa hai mốc của một cổng KHÁC"
+    do: >
+      Cổng `viec-theo-loai` neo bằng KHOẢNG CÁCH giữa `data-ccmo` và
+      `ccMoNhap`; khối tôi chèn đẩy chúng xa quá 1400 ký tự ⇒ đỏ OAN.
+    xu_ly: "chuyển khối xuống cạnh nhánh `data-ccnhap`, KHÔNG nới cổng"
+
+viec_E2E_cua_chu_du_an:
+  da_tat: "worker dừng · việc chuyển `dung` giữ bản khai ở `done/` · xoá audio tạm 35 MB"
+
+con_lai_trong_chuoi:
+  - "T03-123 — nút Chưng cất chỉ mở sau transcript, mở cửa sổ thứ ba"
+  - "T03-124 — hiệu ứng sóng âm, WIREFRAME `SCR-22` TRƯỚC"
+  - "FR-070 chờ chủ dự án duyệt (spec M12 frozen)"
+
+object:
+  - chungcat/src/asr_cua.py
+  - chungcat/src/worker.py
+  - chungcat/tests/check_nguon_dai_cat_doan.py
+  - chungcat/tests/check_chung_cat_dung_transcript.py
+  - web/plugins/cctab/src/cctab.inline.ts
+  - web/plugins/chungcat/src/chungcat.inline.ts
+  - web/test/cua-so-transcript.test.js
+  - web/package.json
+  - .factory/fr/FR-070-chung-cat-video-lay-transcript-lam-nguyen-lieu.md
+  - 07_plan/M12_chungcat/tasks/T12-27-transcript-de-lai-con-tro-va-lam-nguyen-lieu.md
+  - 07_plan/M03_web/tasks/T03-122-cua-so-transcript-rieng.md
+  - 07_plan/M03_web/tasks/T03-123-cua-so-chung-cat-sau-transcript.md
+  - 07_plan/M03_web/tasks/T03-124-hieu-ung-song-am-va-chung-cat.md

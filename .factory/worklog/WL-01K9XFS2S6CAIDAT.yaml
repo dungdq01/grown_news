@@ -1,0 +1,239 @@
+id: WL-01K9XFS2S6CAIDAT
+at: 2026-09-03
+by: claude
+buoc: "s2 -> s3 -> s4 -> s6 cho 'Quan ly va cai dat he thong' (bo qua s5 theo chi dao)"
+loai: bon tang factory cho mot mo rong pham vi; GOP vao M18, khong mo M20
+gate: FR-055 CHO DUYET · G6A xanh 18 module · project_map v26->v27
+      # KHONG phai G2: project_map:29 khai skipped_gates [G1,G2,G3]
+
+object:
+  - .factory/fr/FR-055-o-quyen-sua-duoc-tu-web.md    # MOI (thay cho proposal-3)
+  - 02_proposal/proposal-3-quan-ly-cai-dat.md        # -> con tro sang FR-055
+  - 03_docs/brd.md
+  - 03_docs/prd.md
+  - 03_docs/spec_overview.md
+  - 04_system/adr.md
+  - 04_system/security_baseline.md
+  - project_map.yaml
+  - 06_modules/M18_nguoidung/spec.md
+  - 06_modules/M18_nguoidung/rules.md
+  - 06_modules/M18_nguoidung/testcases.md
+
+evidence:
+  - "check_g6a: M18 36 hard / 0 soft; G6A xanh 18 module"
+  - "project_map parse OK v27, 11 entity (them CaiDat)"
+  - "o [ ] mo tren M18: 0"
+  - "check_rule_surfaces DO 2 cho — DUNG: M18-R5/R6 tro test/cai-dat.test.js chua co"
+  - "pytest core/tests -q => 45 passed"
+
+# ══ QUYET DINH LON NHAT: GOP MAN, TACH `viec` ══════════════════════
+gop_khong_mo_M20: >
+  s1 tim tien le TACH (Strapi: "separation of concerns") nhung doc ca bai thi ly
+  do KHONG PHAI AN NINH. Va cau "co he nao HOI TIEC vi gop" => KHONG TIM THAY
+  hoi tiec khai bang chu.
+  Nhung co CVE tra loi dung cau hoi:
+    CVE-2024-3283  — cua /admin/system-preferences (CAI DAT), truong
+                     multi_user_mode (CHE DO XAC THUC) => TAO DUOC MOT ADMIN.
+    CVE-2026-32715 — hai nam sau, CUNG CAP CUA: hai endpoint GENERIC cho vai
+                     manager trong khi moi be mat khac cham cung setting do
+                     chi cho admin.
+  => Cai gay hai KHONG phai hai thu o cung mot man. La MOT ENDPOINT GENERIC
+     MANG MOT QUYEN THO.
+  QUYET: gop MOT man, tach BON viec (moi-nguoi-moi · thu-hoi · xem-audit ·
+  sua-cai-dat). KHONG dat so M20 — FR-051 §7 da do M18 la module NGANG nen
+  gop/tach "re hon binh thuong, quyet muon khong dat".
+  NIST AC-5 + ASVS V4.3.3 doi tach truc QUYEN <-> AUDIT, KHONG doi tach truc
+  NGUOI DUNG <-> CAI DAT.
+
+# ══ BA TANG — ranh gioi giua chung LA quyet dinh (ADR-07) ══════════
+ba_tang: >
+  bat bien  -> ma + DDL CHECK        -> KHONG AI doi, ke ca chu, ke ca qua form
+  schema o  -> O_SUA_DUOC trong ma   -> khong ai doi QUA WEB (sua = PR + review)
+  gia tri o -> bang cai_dat o DB     -> chu, qua web
+  Tang GIUA phan biet quyet dinh nay voi "mot form sua DB": DB chi giu GIA TRI
+  cua o DA DUOC KHAI TON TAI TRONG MA. Khong duong nao de mot form TAO RA mot
+  o moi.
+  OWASP ASVS 4.0.3 V4.1.2 (CWE-639, bat buoc tu L1) KHONG CAM policy sua duoc —
+  no noi "unless SPECIFICALLY AUTHORIZED". Ba tang tren LA chu do.
+
+# ══ BON VE KHONG THUONG LUONG, moi ve mot CVE ══════════════════════
+bon_ve: >
+  1. duyet-bai khong bao gio la mot o      — CVE-2024-3283
+  2. vai khong la mot o; enum khoa DDL     — CVE-2026-9796 (TOCTOU doi TEN vai)
+  3. cua ghi khong nhan object             — CVE-2026-31942 (LibreChat mat API
+     key cua MOI NGUOI vi mot phep spread dat sai thu tu)
+  4. viec sua-setting khong sua DANH SACH o — CVE-2026-17601
+  VE NEN, re hon ca bon: gia_tri la BOOLEAN, khong o nao duoc dien giai thanh
+  duong dan/lenh/URL/ma. CVE-2024-3104 (9.8) · CVE-2024-3028/3025 (truong
+  setting => XOA DUOC FILE SQLITE) · CVE-2026-32625 (noi suy TRONG TANG VALIDATE
+  => ro JWT_SECRET).
+  Voi ve nen, mot loi bo sot phep kiem vai ton TOAN VEN DU LIEU. Khong co no,
+  no ton MAY CHU.
+
+# ══ BA QUYET DINH s4 (ADR-07 "Doi thi") ════════════════════════════
+break_glass_CHOT_khong_lam: >
+  s1 khai ba duong va noi khong duoc thieu CA HAI duong dau:
+    1 chan ha chu cuoi (Entra · Entra PIM · Directus · Strapi — BON san pham)
+      => DA CO (cong Y10)
+    2 break-glass ngoai UI (kubeadm super-admin.conf · Keycloak bootstrap-admin)
+      => CO Y KHONG LAM
+    3 gieo lai tu QUYEN moi lan khoi dong (k8s auto-reconciliation) => LAM
+  Vi sao khong lam duong 2: no la mot CUA HAU THUONG TRUC, va s1 khai no phai
+  kem NAM nghia vu (danh dau tam tren UI · xoa bang tay · phuc hoi doi dung
+  tien trinh · ghi audit · bao dong). Voi MOT admin duy nhat, nam nghia vu do
+  KHONG CO AI KIEM CHEO.
+  Ca CON HO, chap nhan CO Y THUC: chu duy nhat mat quyen truy cap => khong co
+  duong vao. Duong ra la sqlite3 tren file .db — CHAM MAY, khong cham UI. Chap
+  nhan duoc vi web/ chi nghe 127.0.0.1: ai cham duoc file thi da cham duoc may.
+  CAU NAY DOI NEU M17_cong dua he ra Internet.
+
+pin_Node_24: >
+  node:sqlite Node 24 co setAuthorizer (v24.10.0) + defensive (v24.14.0, mac
+  dinh true) => tu choi SQLITE_DROP_TRIGGER va SQLITE_PRAGMA NGAY TRONG TIEN
+  TRINH, chan han writable_schema.
+  Node 22 EOL 2027-04-30; Node 24 LTS EOL 2028-04-30 => du sao cung phai len.
+  NHUNG: phong thu theo LOP, khong phai giai phap — khong doi gi voi sqlite3 CLI
+  hay rm. No chi chan mot LOI LAP TRINH, khong chan mot nguoi co quyen file.
+  Va do duoc: PRAGMA defensive tren Node 22 la NO-OP IM LANG.
+
+nhan_chung_ngoai: >
+  CHOT: git push sang remote co receive.denyNonFastForwards + denyDeletes.
+  Du an CHUA CO remote (git remote -v rong) nen day la lan dau dung — dung voi
+  hai co do RE HON dung roi siet sau.
+  Phai cong bo (so_hang, head, thoi_diem), KHONG chi hash: chi hash thi CAT DUOI
+  van cho chuoi hop le (RFC 9162 §1).
+  VAN CHUA GIAI cho audit_loi: no dung FR-050 cach 2 (ban lui DB LOI khong vao
+  git vi chua du lieu ca nhan). _audit.jsonl la audit cua KHO, khac file.
+
+# ══ PHEP THU CUA s6 — 2/13 AC mo ho, CA HAI CUNG MOT LOI CUA TOI ═══
+phep_thu: >
+  13 AC moi · 11 viet duoc ngay · 2 mo ho.
+  AC-10.2 "khong co danh sach khoa bi cam" => DO SU VANG MAT, dung lop loi B8b
+    da sua BA LAN trong du an nay (AC-3.1 · AC-4.1 · AC-6.1). Xanh oan ngay khi
+    ai do dat ten danh sach chan la gi khac.
+    => doi sang do thu CO MAT: them mot viec moi ma khong khai => BI TU CHOI.
+  AC-10.6 "khong sua duoc DANH SACH o sua duoc" => MO HO: O_SUA_DUOC la hang
+    trong MA, nen "sua no qua web" VON BAT KHA va AC do khong do duoc gi.
+    Nguy hiem THAT hep hon: neu sua-cai-dat LA mot o thi chu tat no roi KHONG
+    AI BAT LAI DUOC (tu khoa).
+    => phat bieu lai thanh mot cau DEM DUOC: sua-cai-dat khong trong tap o.
+  CA HAI cung mot loi: viet AC noi "cai gi KHONG duoc ton tai" thay vi "cai gi
+  PHAI XAY RA khi thu". Lan thu TU trong du an.
+  Va spec §9 CUA CHINH TOI da ghi luat: "AC bat dau bang KHONG => hoi ngay
+  'toi do cai CO MAT nao?'". Toi viet luat do roi vi pham no HAI LAN trong
+  MUOI BA AC.
+
+# ══ MOT SO TRONG s1 phai khai la SUY LUAN, khong phai fact ═════════
+khong_co_nguong: >
+  s1 tim KY va KHONG TIM THAY nguong cong bo dang "duoi N nguoi thi RBAC la
+  thua": 14 truy van, 9 PDF grep TOAN VAN (Ferraiolo & Kuhn 1992, Sandhu 1996,
+  NIST IR 7316, RTI 2002, RTI 2010, ANSI INCITS 359-2004, Zanzibar 2019...) cho
+  break-even / threshold / firm size / small organization — TOAN BO AM TINH.
+  => Moi cau "6 nguoi thi RBAC la thua" (KE CA cau s1 tu viet) la SUY LUAN.
+  Da khai thang the trong FR-055 §6f va spec §10.9. Khong de no doc thanh fact.
+
+s1_TU_SUA_mot_de_xuat_cua_chinh_no: >
+  Ban nhap cua s1 de nghi ban dau chuoi audit qua KENH TELEGRAM cua M18 — SAI,
+  vi bai trong channel do admin SO HUU nen admin sua va xoa duoc, tuc vi pham
+  dung LUAT GOC ("khong ai duoc so huu thu dung de danh gia minh").
+  s1 tu bat va tu ghi ra thay vi im lang sua. Giu lai trong FR-055 §9 (R3.6)
+  vi no la vi du cua dung lop loi proposal nay chong.
+
+do_do:
+  check_rule_surfaces: "TOI — M18-R5/R6 tro test/cai-dat.test.js chua co. DUNG thu cong do ton tai de bat."
+
+no_con_lai:
+  - "FR-055 CHO DUYET — chua ai duyet"
+  - "s5 BO QUA theo chi dao ('se lam sau') — man 'Quan ly va cai dat he thong' chua co wireframe"
+  - "web/test/cai-dat.test.js CHUA VIET — M18-R5/R6 dang tro vao no, check_rule_surfaces do"
+  - "check_frozen se do: M18 spec.md + rules.md doi theo FR-055 — NGUOI ky"
+  - "nhan chung cho audit_loi chua co duong (dung FR-050 cach 2)"
+  - "break-glass CO Y khong lam — doi lai neu M17_cong dua he ra Internet"
+  - "s8 chua chay: bang cai_dat, O_SUA_DUOC, cua ghi, gieo lai luc khoi dong"
+
+# ══ BO SUNG cung ngay — chu du an chat van dung, toi lam SAI DUONG ══
+chuyen_proposal3_thanh_FR054: >
+  Chu du an hoi: "tai sao khong gop vao proposal 2 ma tao ra proposal 3, trong
+  khi phan nay chung ta cho no thuoc M18?"
+  Do lai, ba so:
+    a) project_map.yaml:29 khai skipped_gates: [G1, G2, G3] — du an vao khung o
+       GIUA (entry: mid-framework). Nen mot file o 02_proposal/ KHONG DONG GATE
+       NAO; no la giay to toi tu them.
+    b) proposal-2 KHONG NHAC M18 mot lan nao. Ca mot MODULE vao bang FR-045 ->
+       FR-048, hoan toan khong qua proposal. Nen mot TINH NANG cua module do
+       lai can proposal rieng la NGUOC TI LE.
+    c) Luat rieng cua s2 chi dung MOT duong, va khong phai "proposal moi":
+       "Proposal duyet xong = pham vi tho CHOT. Doi => FR, khong am tham phinh
+       o s3."
+  => Da chuyen thanh FR-055; proposal-3 thanh CON TRO.
+  Noi dung s3/s4/s6 (B-B6 · U11 · ADR-07 · §9 · §10) KHONG DOI — chung dung cho;
+  chi THE LOAI cua tai lieu chu la sai.
+  So FR-053 DA BI CHIEM (FR-053-nguoi-chon-model-va-bon-sua-m12.md) nen dung
+  FR-055 — kiem TRUOC khi dat so, khong doan.
+
+lop_loi_lap_lai_cua_toi: >
+  Toi da viet DUNG luat nay cho M19_baihoc hai ngay truoc — "duong dung: FR mo
+  rong pham vi -> PRD + proposal -> s6" — roi lan nay lam proposal MA KHONG CO FR.
+  Cung hinh dang voi hai lan khac trong phien: spec §9 cua chinh toi ghi luat
+  "AC bat dau bang KHONG => hoi ngay do cai CO MAT nao", roi toi vi pham no hai
+  lan trong 13 AC.
+  => Toi biet luat, viet ra luat, roi khong ap no cho chinh minh. Ghi ra vi day
+  la thu khong mot cong nao bat duoc.
+
+# ══ BO SUNG · .env theo service + BIT LO env con ═══════════════════
+env_theo_service:
+  object:
+    - 04_system/env-theo-service.md         # MOI
+    - 04_system/env_plan.md                 # tro sang file tren
+    - 02_proposal/proposal-3-quan-ly-cai-dat.md   # +§12
+    - web/api/dungchung.mjs                 # +envCon (allowlist 14 bien)
+    - web/server.mjs                        # :117 -> envCon()
+    - web/test/loi-cua.test.js              # +8 ca ENV
+  chi_dao: >
+    "toi muon tat ca xac thuc hay api key / token ... deu de trong .env, vi sau
+    nay tich hop thi can luu rat nhieu thu o env — zalo, tele, bank, fb...
+    file .env can tao tuong ung tung module / services"
+    va: "token bank thi sau nay co service payment roi bo vao"
+
+  TOI_DA_DOC_QUA_LOI_B_E2: >
+    Toi tung noi ".env o LOI thi B-E2 chet". SAI.
+    B-E2 nguyen van: "Moi loi goi model di qua MOT module. web/api/** KHONG BAO
+    GIO goi ra Internet." Do la luat ve EGRESS, khong phai ve CHO CHUA BI MAT.
+    Khong tai lieu nao trong du an cam .env.
+    Va yeu cau cua chu du an ("moi service mot .env") CHINH LA co che giu B-E2
+    dung: neu .env cua web/ khong chua khoa model thi cau "web/ khong co gi de
+    xac thuc nen khong goi model duoc" van dung NGUYEN VAN — chi la thuc thi
+    bang FILE thay vi bang "go tay bien moi truong".
+    => Cach cua chu du an MANH HON nguyen trang, vi nguyen trang KHONG CO CO CHE
+       NAO: do duoc 0 dong dotenv/--env-file trong ca du an, trong khi env_plan
+       khai BA file .env. Ca ba la van xuoi.
+    Hau qua that cua nguyen trang: KHOA_DICH_VU chi song khi ai do go tay bien
+    truoc khi khoi dong => bay cua C1-C7 CHUA TUNG CHAY NGOAI TEST.
+
+  lo_do_duoc_BA_cho_khong_phai_mot: >
+    dungchung.mjs:432 · :482 · server.mjs:117 — ca ba truyen `{...process.env}`
+    xuong tien trinh Python con. Nen moi bi mat cua LOI chay vao validate.py va
+    xuat_kho.py — va tien trinh do chay ma co `--fix` GHI VAO KHO.
+    "Mot .env cho moi service" KHONG DU neu ranh gioi tien trinh RO XUONG DUOI.
+    => envCon(): ALLOWLIST 14 bien. Do duoc sau khi sua: 10 bien xuong con,
+       0 bi mat. Cong 8 ca o loi-cua.test.js.
+    ALLOWLIST chu khong denylist: mot denylist "tru KHOA_*" se bo sot bien thu
+    hai ai do them sau. CVE-2018-8007 di vong dung mot blacklist.
+
+  token_bank_KHONG_o_web: >
+    Chu du an chot: "sau nay co service payment roi bo vao".
+    Ghi kem LY DO de lan sau khong ai dat sai cho: van de KHONG PHAI cho chua,
+    ma la TIEN TRINH NAO GOI RA NGAN HANG. Neu web/api/** goi thi B-E2 vo —
+    khong vi .env, ma vi web/ co mot duong egress.
+
+  BINH_LUAN_CUA_TOI_PHA_PHEP_DEM_LAN_THU_SAU: >
+    Ca "khong phai denylist" ban dau regex chu `denylist|blacklist` va no khop
+    CHINH BINH LUAN cua toi trong envCon (dong giai thich vi sao dung allowlist).
+    Doi sang do HANH VI: dat mot bien ngoai allowlist => doi no VANG trong env
+    con.
+    Day la lan thu SAU trong phien. Luat da ghi ba lan roi va toi van lap:
+    PHEP DEM TREN MA NGUON PHAI BO CHU THICH — khong ngoai le.
+
+# Doi so 2026-09-03: moi tham chieu FR-054 trong file nay tro toi ban
+# 'o quyen sua duoc tu web', nay la FR-055. FR-054 gio la duong VIDEO
+# (agent khac, 09-03 03:43) — hai file tung mang mot id.

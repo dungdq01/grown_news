@@ -1,0 +1,221 @@
+{
+  "$comment": "v2 — khớp ui_flow M12 §2: job {ulid, giai_doan, lan_thu, model_chon, model_da_dung, ly_do_dung}. giai_doan enum: cho · dang-doc-nguon · dang-goi-model · dang-verify · xong · dung. ly_do_dung enum: het-tran-thu-lai · nguyen-lieu-sai · model-tu-choi (3 lý do = 3 hành động khác nhau của người).",
+  "version": 2,
+  "giai_doan_enum": [
+    "cho",
+    "dang-doc-nguon",
+    "dang-goi-model",
+    "dang-verify",
+    "xong",
+    "dung"
+  ],
+  "jobs": [
+    {
+      "ulid": "01K9W2CHUNGCAT01",
+      "loai": "chung-cat-mot-nguon",
+      "nguon_slug": "xgboost-stap-by-step",
+      "giai_doan": "xong",
+      "lan_thu": 1,
+      "model_chon": "claude-sonnet-5",
+      "model_da_dung": "claude-sonnet-5",
+      "ly_do_dung": null,
+      "khang_dinh_bi_tia": {
+        "so": 2,
+        "ly_do": "trích không tìm thấy nguyên văn trong nguồn"
+      },
+      "sha256_moi_lan": [
+        "a3f1c2…9be0"
+      ],
+      "chi_phi_usd": 0.064
+    },
+    {
+      "ulid": "01K9W2CHUNGCAT02",
+      "loai": "chung-cat-mot-nguon",
+      "nguon_slug": "thien-duong-chuot-tuong-lai-nhan-loai-giai-ma-loi-tien-tri-d",
+      "giai_doan": "dang-goi-model",
+      "lan_thu": 1,
+      "model_chon": "claude-sonnet-5",
+      "model_da_dung": null,
+      "ly_do_dung": null,
+      "khang_dinh_bi_tia": null,
+      "sha256_moi_lan": [
+        "77d0e8…41aa"
+      ],
+      "chi_phi_usd": null
+    },
+    {
+      "ulid": "01K9W2CHUNGCAT03",
+      "loai": "chung-cat-mot-nguon",
+      "nguon_slug": "quartz-plugin-api",
+      "giai_doan": "dung",
+      "lan_thu": 2,
+      "model_chon": "claude-sonnet-5",
+      "model_da_dung": "claude-sonnet-5",
+      "ly_do_dung": "het-tran-thu-lai",
+      "khang_dinh_bi_tia": null,
+      "sha256_moi_lan": [
+        "cc01ab…7f52",
+        "cc01ab…7f52"
+      ],
+      "chi_phi_usd": 0.064,
+      "$canh_a": "ui_flow §3a: KHÔNG hiện 'đang chạy' mãi — dừng là dừng, kèm lý do phân loại"
+    },
+    {
+      "ulid": "01K9W2CHUNGCAT04",
+      "loai": "tong-hop-chu-de",
+      "nguon": [
+        "xgboost-stap-by-step",
+        "thien-duong-chuot-tuong-lai-nhan-loai-giai-ma-loi-tien-tri-d"
+      ],
+      "giai_doan": "xong",
+      "lan_thu": 1,
+      "model_chon": "claude-sonnet-5",
+      "model_da_dung": "gemini-3.7-flash",
+      "ly_do_dung": null,
+      "khang_dinh_bi_tia": {
+        "so": 1,
+        "ly_do": "địa chỉ không mang tên nguồn"
+      },
+      "sha256_moi_lan": [
+        "19fe07…d3c4"
+      ],
+      "chi_phi_usd": 0.036,
+      "$canh_c": "ui_flow §3c: model THẬT SỰ dùng ≠ model chọn (dự phòng bắn) — web phải hiện model đã dùng"
+    },
+    {
+      "ulid": "01K9W2CHUNGCAT05",
+      "loai": "chung-cat-mot-nguon",
+      "nguon_slug": "storm-multi-perspective",
+      "giai_doan": "cho",
+      "lan_thu": 0,
+      "model_chon": "claude-sonnet-5",
+      "model_da_dung": null,
+      "ly_do_dung": null,
+      "khang_dinh_bi_tia": null,
+      "sha256_moi_lan": [],
+      "chi_phi_usd": null
+    }
+  ],
+  "ly_do_dung_enum": {
+    "het-tran-thu-lai": "đã thử 2 lần đều lỗi — người quyết chạy lại hay bỏ",
+    "nguyen-lieu-sai": "nguồn thiếu chữ (scan hỏng, trang trắng) — sửa nguyên liệu rồi nạp lại",
+    "model-tu-choi": "model từ chối nội dung — đổi model trong bảng khai hoặc bỏ"
+  },
+  "$checkpoint": "quyết 2026-09-02: M12 CÓ checkpoint theo giai đoạn — job dừng mang chay_lai_tu = giai đoạn hỏng; Chạy-lại mặc định từ đó (từ-đầu là lựa chọn phụ, vì mỗi lần từ-đầu = toàn văn rời máy nữa).",
+  "log_mau": {
+    "01K9W2CHUNGCAT03": [
+      {
+        "luc": "07:02:01",
+        "giai_doan": "dang-doc-nguon",
+        "chu": "đọc 41 trang, giữ số trang"
+      },
+      {
+        "luc": "07:02:04",
+        "giai_doan": "dang-goi-model",
+        "chu": "lần 1 · lỗi 529 quá tải — vết sha256 cc01ab…7f52"
+      },
+      {
+        "luc": "07:12:04",
+        "giai_doan": "dang-goi-model",
+        "chu": "lần 2 · lỗi 529 quá tải — vết sha256 cc01ab…7f52"
+      },
+      {
+        "luc": "07:12:05",
+        "giai_doan": "dung",
+        "chu": "hết trần thử lại · checkpoint còn: dang-doc-nguon"
+      }
+    ],
+    "01K9W2CHUNGCAT01": [
+      {
+        "luc": "08:10:01",
+        "giai_doan": "dang-doc-nguon",
+        "chu": "23 trang"
+      },
+      {
+        "luc": "08:10:05",
+        "giai_doan": "dang-goi-model",
+        "chu": "claude-sonnet-5 · 16480 vào / 3120 ra"
+      },
+      {
+        "luc": "08:11:40",
+        "giai_doan": "dang-verify",
+        "chu": "11 khẳng định · 9 đối chiếu được · tỉa 2"
+      },
+      {
+        "luc": "08:11:42",
+        "giai_doan": "xong",
+        "chu": "nháp vào Hàng đợi duyệt"
+      }
+    ]
+  },
+  "chay_lai_tu": {
+    "01K9W2CHUNGCAT03": "dang-goi-model"
+  },
+  "$nhap_db": "FR-046: nháp + bản-AI-gốc + revision sống trong DB; bài đã vào kho thì file kb/ vẫn là chân lý.",
+  "nhap": [
+    {
+      "job_ulid": "01K9W2CHUNGCAT01",
+      "title": "XGBoost từng bước — đọc lại bằng khai triển Taylor",
+      "trang_thai": "da_sua",
+      "sua_luc": "2026-09-02T08:40:00+07:00",
+      "citations_sampled": 9,
+      "citations_verified": 9,
+      "khang_dinh_bi_tia": {
+        "so": 2,
+        "ly_do": "trích không tìm thấy nguyên văn trong nguồn"
+      },
+      "ban_goc_ai": "Khai triển bậc hai giữ được thông tin độ cong, nên mỗi bước đi chuẩn hơn gradient thường.",
+      "ban_hien_tai": "Khai triển bậc hai giữ thông tin độ cong của hàm mất mát, nên mỗi vòng boosting bước chuẩn hơn dùng riêng gradient bậc nhất."
+    },
+    {
+      "job_ulid": "01K9W2CHUNGCAT04",
+      "title": "Học máy thực chiến — tổng hợp 2 nguồn",
+      "trang_thai": "nhap",
+      "sua_luc": null,
+      "citations_sampled": 12,
+      "citations_verified": 11,
+      "khang_dinh_bi_tia": {
+        "so": 1,
+        "ly_do": "địa chỉ không mang tên nguồn"
+      },
+      "ban_goc_ai": "Hai nguồn cùng chỉ ra: kiểm chứng phải giữ thứ tự thời gian khi dữ liệu là chuỗi. [xgboost-stap-by-step:p.7]",
+      "ban_hien_tai": "Hai nguồn cùng chỉ ra: kiểm chứng phải giữ thứ tự thời gian khi dữ liệu là chuỗi. [xgboost-stap-by-step:p.7]"
+    },
+    {
+      "job_ulid": "01K9W2CHUNGCATX0",
+      "title": "Universe 25 — đọc tách dữ liệu khỏi suy diễn",
+      "trang_thai": "tra_lai",
+      "sua_luc": "2026-09-01T22:10:00+07:00",
+      "ly_do_tra": "mục 4 suy diễn vượt phạm vi nguồn — chưng lại với phạm vi hẹp hơn",
+      "citations_sampled": 7,
+      "citations_verified": 5,
+      "khang_dinh_bi_tia": {
+        "so": 3,
+        "ly_do": "trích không tìm thấy nguyên văn"
+      },
+      "ban_goc_ai": "Thí nghiệm chứng minh xã hội loài người sẽ sụp đổ theo cùng cách.",
+      "ban_hien_tai": "Thí nghiệm chứng minh xã hội loài người sẽ sụp đổ theo cùng cách."
+    }
+  ],
+  "nhap_xem_truoc": {
+    "ulid": "01K9W2CHUNGCAT01",
+    "title": "XGBoost từng bước — đọc lại bằng khai triển Taylor",
+    "citations_sampled": 9,
+    "citations_verified": 9,
+    "unverifiable_citations": false,
+    "khang_dinh_bi_tia": {
+      "so": 2,
+      "ly_do": "trích không tìm thấy nguyên văn trong nguồn"
+    },
+    "muc": [
+      {
+        "ten": "3.2 Vì sao bậc hai",
+        "dia_chi": [
+          "[xgboost-stap-by-step.pdf:p.7]",
+          "[xgboost-stap-by-step.pdf:p.9]"
+        ]
+      }
+    ],
+    "$canh_b": "ui_flow §3b: người duyệt phải THẤY đã có gì bị tỉa — bài trông hoàn chỉnh mà không nói đã bị tỉa là nói dối"
+  }
+}

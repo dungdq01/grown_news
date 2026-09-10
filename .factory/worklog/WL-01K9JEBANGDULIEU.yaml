@@ -1,0 +1,103 @@
+id: WL-01K9JEBANGDULIEU
+at: 2026-08-20
+by: claude
+buoc: s8 (M03_web)
+loai: fix — dựng lại hàng danh mục theo lối bảng dữ liệu
+fr: FR-021 (đã duyệt) — chỉ CSS + một ngưỡng JS, không sửa file frozen
+
+viec: >
+  Người dùng lượt 2: "Vẫn chưa ưng, có cách nào khoa học và đẹp hơn không? gọn
+  gàng, chữ không cần tô đậm, line gọn. Nói chung như những designer chuyên
+  nghiệp nhất hay làm ý."
+
+hai_luot_truoc_toi_lam_SAI_HUONG:
+  what: >
+    Lượt 1 và 2 tôi THÊM: tô đậm nhãn, viền trái màu mỗi hàng, sọc chẵn-lẻ, nền
+    xám quanh id, nút đỏ. Càng thêm càng rối — và người dùng nói đúng hai lần.
+  bai_hoc: >
+    "Đẹp hơn" trong bảng dữ liệu là BỚT, không phải thêm. Lần này tôi ĐO chiều
+    cao thật rồi cắt, thay vì chọn màu.
+
+do_duoc_va_do_la_goc_van_de:
+  nut_quyet_dinh_chieu_cao_hang: >
+    `.bt` cao 32px (spec shadcn h-9), hàng padding 4+4=8px ⇒ NÚT quyết định
+    chiều cao hàng, không phải nội dung. 22 hàng × ~40px = 880px, buộc phân
+    trang 12 mục.
+  chuan_bang_du_lieu: >
+    Linear/Notion/GitHub: hàng 32-36px, chữ 13-14px, nút 20-24px hoặc chỉ icon.
+    22 hàng × 32 = 704px — vừa một màn 900px, không cần cắt.
+  ket_qua: "704px thay vì 880px, thấp hơn 20%. Ngưỡng phân trang 12 → 20."
+
+bon_thu_BO_DI_moi_thu_mot_ly_do:
+  1_chu_dam: >
+    Trong bảng, ĐẬM là để nhấn MỘT ô giữa các ô thường. Đậm hết thì không nhấn
+    gì, chỉ nặng. Nhãn về weight 400; phân cấp bằng ĐỘ ĐẬM CỦA MÀU
+    (--ink cho nhãn, --ink-3 cho id và số) chứ không bằng độ dày nét.
+  2_vien_trai_mau: >
+    22 vạch đỏ dọc trang là nhiễu, và màu đã nói ở tab. Không cần nói lại 22 lần.
+  3_soc_chan_le: "kẻ ngang 1px làm đúng việc đó mà nhẹ hơn nhiều"
+  4_nut_chu_HOA_luon_hien: >
+    44 khối chữ HOA trên một màn. Đổi sang chữ thường 12px, không viền không nền,
+    cao 24px; chỉ rõ màu khi rê vào hàng.
+
+mot_thu_THEM_cot_thang:
+  what: "`.rc-r` từ flex sang grid 4 cột: 3.5rem · 1fr · auto · auto"
+  vi_sao: >
+    Bảng đọc được là bảng có CỘT THẲNG. Flex tự do làm số/nhãn/id/nút lệch nhau
+    mỗi hàng — mắt phải tìm lại mỗi dòng.
+
+nut_xoa_lan_thu_BA_moi_dung:
+  luot_1: "nền đỏ đặc — 8 khối đỏ dàn dọc, nút phá huỷ nổi nhất màn hình"
+  luot_2: "viền đỏ + opacity .55 — tôi tự tính ra nó phá contrast (2.67:1)"
+  luot_3_hien_tai: >
+    CHỈ màu chữ: --ink-3 khi im, --destructive khi rê vào hàng, đổ đỏ khi rê
+    vào chính nút. Màu ĐẶC nên contrast giữ 5.59:1 — không cần opacity, và mỗi
+    bậc là một token đã audit.
+
+loi_CSS_TU_BAT_specificity:
+  what: >
+    Khối FR-021c khai `.rc-r{border:0}` để bỏ viền trái. Nhưng `.rc-r.r-cpt`
+    (khối lượt trước) có specificity CAO HƠN nên `border-left` của nó vẫn thắng
+    — CSS mới trông đúng mà trang vẫn có vạch màu.
+  sua: "XOÁ 7 dòng đó, không phải ghi đè. Để lại comment cảnh báo tại chỗ."
+  cung_lop_loi: "đúng họ với bug 'sửa bản không thắng cascade' đã gặp ở FR-013"
+
+sua_mot_cong_TOI_tu_viet_sai_muc_tieu:
+  what: >
+    `opacity-khong-pha-contrast.test.js` khối 3 ĐÒI phải có luật
+    `.rc-r .bt{opacity:...}`. FR-021c bỏ opacity ⇒ cổng đỏ trên code ĐÚNG.
+  sua: >
+    Đổi thành "NẾU có opacity thì phải pass". Nhánh else ghi lại ngưỡng đã tính
+    (.85 pass · .80 trượt) để lần sau ai định làm mờ nút thì khỏi đo lại.
+  bai_hoc: "cổng phải canh TÍNH CHẤT (đọc được), không canh CÁCH LÀM (phải có opacity)"
+
+giup_phien_song_song:
+  what: >
+    markup-matches-css đỏ vì `.dlg-than` và `.hoi-chu` — hai class phiên song
+    song vừa thêm cho hộp thoại hỏi (FR-022, thay confirm()). Chưa có CSS.
+  lam_gi: "thêm CSS cho hai class đó — đúng phạm vi file tôi đang sửa, không để cổng đỏ"
+
+verify:
+  loai: hard
+  ket_qua:
+    npm_run_check: sạch
+    web_test: 26/26 file, exit 0
+    cong_may: 3/3 đã chạy (frozen · danh_muc · running)
+    build: exit 0
+  kiem_CSS_da_build:
+    - ".rc-r{display:grid} + grid-template-columns:3.5rem ... — cột thẳng"
+    - ".rc-r .bt{grid-column:4;height:1.5rem} — nút không còn quyết định chiều cao"
+    - "viền trái màu: đã sạch khỏi gn.css"
+    - "sọc chẵn-lẻ / chữ đậm / nền quanh id: đã bỏ"
+  do_duoc: "22 hàng: 880px → 704px (-20%); ngưỡng phân trang 12 → 20"
+  frozen: "check_frozen exit 0"
+
+no:
+  - "Chưa xem trên màn thật sau lượt này — người dùng sẽ nói."
+  - "Hàng 32px và chữ 13px là chuẩn bảng dữ liệu desktop; trên màn hẹp có thể
+     chật. Chưa có @media cho `.rc-r` (grid 4 cột giữ nguyên ở mọi bề rộng)."
+  - "Cột id dùng `justify-self:end` nên id dài ngắn khác nhau thì mép trái id
+     không thẳng. Đổi sang cột cố định thì id dài bị cắt — chọn cái này vì id
+     là thông tin phụ."
+  - "`.bt` gốc vẫn 32px (spec shadcn) — chỉ nút TRONG hàng bị hạ xuống 24px.
+     Không đổi `.bt` toàn cục: nó dùng ở 30+ chỗ khác."

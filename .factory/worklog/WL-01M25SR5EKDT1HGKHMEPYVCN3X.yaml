@@ -1,0 +1,67 @@
+entry: ban-giao
+ulid: 01M25SR5EKDT1HGKHMEPYVCN3X
+ngay: 2026-09-09
+module: [M12_chungcat, M03_web]
+don_vi: T12-36
+wo: WO-080
+tieu_de: >-
+  Tu xep viec NOI TIEP khi co tien; chuoi hien ro tren the
+
+object:
+  - .factory/wo/WO-080-tu-noi-tiep-viec-va-hien-chuoi.md
+  - 07_plan/M12_chungcat/tasks/T12-36-tu-noi-tiep-va-hien-chuoi.md
+  - chungcat/src/worker.py
+  - chungcat/assets/nguong.json
+  - chungcat/tests/check_tu_noi_tiep.py
+  - web/plugins/chungcat/src/chungcat.inline.ts
+
+viec: |
+  Hoan tat y tuong chu du an: *"tu dong gui lai request tu luc bi ngat"*. Gio
+  moi lam duoc — WO-078 cho viec moi thay tien do viec cu, WO-079 cho chunk thu
+  lai ngam. Truoc hai cai do, tu tao viec tiep chi la tu dong hoa mot su lang phi.
+
+dieu_kien_la_CAI_CHAN: |
+  Chi de khi CA BA: loai `sinh-transcript`, chang noi tiep duoc, va **CO TIEN**
+  (giay cuoi luc hong > giay luc luot bat dau). Dieu kien CO TIEN khong phai mot
+  phep toi uu — no la cai chan duy nhat giua "tu noi tiep" va "vong lap co hoa
+  don": mot job chet o giay 0 ma van de job con thi moi lan cua om la mot chuoi
+  viec vo tan, moi viec gui byte that. Dung bat bien WO-069 da dung de dong vong
+  lap vo han, nay dung lam dieu kien cho mot vong lap CO ICH.
+
+  Lan can thu hai: `tran_noi_tiep_tu_dong: 5` (bang khai). Mot chuoi tien 1 giay
+  moi luot van ket thuc, nhung sau rat nhieu viec.
+
+  M12-R6 KHONG doi: moi viec noi tiep la ULID moi, lan_gui rieng tu 0, tran 2
+  giu nguyen. Ve 5b canh cho no khong bi noi nhan dip.
+
+ui: |
+  Ba cau chu du an hoi, ba manh tren the:
+    hong tai dau?    the rac: chang + ly do (da co) + `da phien am toi mm:ss`
+    chay lai tu dau? the viec ke: `noi tiep n` + `tu mm:ss` + 10 ky tu ULID cha
+    ra sao?          the cha mang `da_noi_tiep` tro XUOI toi viec con
+  Va cau "het 2 lan gui — tao viec moi neu can" NHUONG CHO khi may da tu tao:
+  de nguyen no la day nguoi di tao mot viec thu hai trung lap.
+
+do_do_duoc_chung_minh:
+  - gieo: bo phep CO TIEN => ve 2 va 2a DO
+  - gieo: bo tran chuoi   => ve 3 DO
+nghiem_thu_that: |
+  Gieo mot job hong o `dang-goi-model` sau khi tien toi 642s:
+    [worker] aaaa... · tien toi 642s => tu xep viec noi tiep a50d7bc7... (lan 1/5)
+    CHA: hong o dang-goi-model | tien toi 642.0 | da_noi_tiep a50d7bc7a1
+    CON: lan_noi_tiep 1 | tiep_tu_giay 642.0 | noi_tiep_tu aaaaaaaaaa | lan_gui 0
+
+hai_lan_cong_do_sai_ly_do: |
+  1 Cong ban dau boc moi khoi bang `if callable(ham):`. Khi ham chua ton tai no
+    bao dung 2 loi — 9 ve con lai IM LANG, va mot cong im lang doc nhu mot cong
+    xanh. Thay bang mot ham rong: ve DUONG do dung, ve AM van xanh that.
+  2 Ve 5 do "ten xuat hien sau cho dinh nghia" — mot proxy, va no do oan ngay
+    khi ham boc dat TRUOC ham duoc boc. Doi sang do DUNG hai mat xich: ca hai
+    nhanh `except` cua `mot_vong` goi `_tu_noi_tiep`, va `_tu_noi_tiep` goi
+    `xep_viec_noi_tiep`.
+  Va mot NameError: `asr_cua` la import CUC BO trong worker, muon no o cap
+  module la mot loi cho san. Doc thang `ASSETS / nguong.json` nhu hai cho khac
+  trong chinh file ay.
+
+do_do: |
+  M12 55/55 xanh. core pytest 49 passed. gn.js 104 195/104 448.

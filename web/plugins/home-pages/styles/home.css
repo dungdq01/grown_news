@@ -1,0 +1,229 @@
+/* ═══ Trang chu / Tat ca / Cho duyet — SCR-02 wireframe G5 ═══
+   Bon vung, BON LAYOUT FAMILY khac nhau (DESIGN.md §4): khong family nao lap.
+   Moi gia tri qua token cua 05_uiux/tokens.css — khong go tay px. */
+
+.gn-page {
+  margin: 0;
+  background: var(--background);
+  color: var(--ink);
+  font-family: var(--f-ui);
+  font-size: var(--fs-body);
+  line-height: var(--lh-read);
+}
+
+.gn-skip {
+  position: absolute;
+  left: -9999px;
+}
+.gn-skip:focus {
+  left: var(--s-xs);
+  top: var(--s-xs);
+  z-index: 100;
+  background: var(--card);
+  padding: var(--s-2xs) var(--s-xs);
+  border-radius: var(--r-sm);
+}
+
+/* ── thanh tren ────────────────────────────────────────────────────────── */
+.gn-top {
+  display: flex;
+  align-items: center;
+  gap: var(--s-lg);
+  padding: var(--s-xs) var(--s-md);
+  border-bottom: 1px solid var(--border-subtle);
+  background: var(--glass);
+  backdrop-filter: var(--blur-lift);
+  position: sticky;
+  top: 0;
+  z-index: 30;
+}
+.gn-brand {
+  font-size: var(--fs-lead);
+  font-weight: var(--w-bold);
+  color: var(--brand);
+  text-decoration: none;
+}
+.gn-nav { display: flex; gap: var(--s-sm) }
+.gn-nav a {
+  font-size: var(--fs-small);
+  font-weight: var(--w-head);      /* luat 1: menu DAM + THANG */
+  font-style: normal;
+  color: var(--ink-2);
+  text-decoration: none;
+}
+.gn-nav a:hover { color: var(--brand) }
+.gn-nav a:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px }
+
+main { max-width: 85rem; margin: 0 auto; padding: var(--s-lg) var(--s-md) }
+
+/* Panel cach nhau --s-2xl: 24px lam hai vung trong nhu mot khoi lien */
+.gn-v + .gn-v { margin-top: var(--s-2xl) }
+
+.gn-h {
+  display: flex;
+  align-items: baseline;
+  gap: var(--s-xs);
+  font-size: var(--fs-h3);
+  font-weight: var(--w-head);
+  margin: 0 0 var(--s-sm);
+}
+.gn-all {
+  font-size: var(--fs-meta);
+  font-weight: var(--w-body);
+  color: var(--ink-3);
+  text-decoration: none;
+  margin-left: auto;
+}
+.gn-all:hover { color: var(--brand) }
+.gn-note { font-size: var(--fs-meta); color: var(--ink-3); font-style: var(--i-note) }
+
+/* ── the bai ───────────────────────────────────────────────────────────── */
+.gn-card {
+  background: var(--card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius);
+  padding: var(--s-sm);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-2xs);
+}
+.gn-card:hover {
+  border-color: var(--brand);
+  box-shadow: 0 8px 24px -8px rgb(0 0 0 / 18%);
+}
+.gn-card:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px }
+.gn-card h3 {
+  margin: 0;
+  font-size: var(--fs-body);       /* luat 2: header va noi dung CUNG CO */
+  font-weight: var(--w-head);      /* khac nhau o WEIGHT */
+  line-height: var(--lh-ui);
+}
+.gn-card.gn-lon h3 { font-size: var(--fs-h3); line-height: var(--lh-h3) }
+.gn-lead {
+  margin: 0;
+  font-size: var(--fs-meta);
+  color: var(--ink-2);
+  line-height: var(--lh-ui);
+}
+.gn-card footer {
+  display: flex;
+  gap: var(--s-2xs);
+  align-items: center;
+  margin-top: auto;
+  font-size: var(--fs-micro);
+  color: var(--ink-3);
+}
+.gn-p { font-family: var(--f-mn); font-variant-numeric: tabular-nums }
+.gn-cred { font-style: var(--i-note) }
+.gn-badge {
+  color: var(--warning);
+  background: var(--warning-bg);
+  padding: 0 var(--s-3xs);
+  border-radius: var(--r-sm);
+  font-style: normal;
+}
+
+.gn-kind {
+  font-family: var(--f-mn);
+  font-size: var(--fs-micro);
+  padding: 0 var(--s-3xs);
+  border-radius: var(--r-sm);
+  border: 1px solid currentcolor;
+  align-self: flex-start;
+}
+.gn-k-repo { color: var(--c-repo) }
+.gn-k-paper { color: var(--c-paper) }
+.gn-k-video { color: var(--c-video) }
+.gn-k-article { color: var(--c-article) }
+.gn-k-docs, .gn-k-announcement { color: var(--ink-3) }
+
+/* ── vung 1 · luoi BAT DOI XUNG ────────────────────────────────────────── */
+.gn-grid-noi { display: grid; grid-template-columns: 2fr 1fr; gap: var(--s-sm) }
+.gn-col { display: flex; flex-direction: column; gap: var(--s-sm) }
+
+/* ── vung 2 · DANH SACH ───────────────────────────────────────────────── */
+.gn-list { list-style: none; margin: 0; padding: 0 }
+.gn-list li {
+  display: flex;
+  align-items: center;
+  gap: var(--s-xs);
+  padding: var(--s-2xs) 0;
+  border-bottom: 1px solid var(--border-subtle);
+  cursor: pointer;
+}
+.gn-list li:hover .gn-t2 { color: var(--brand) }
+.gn-list li:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px }
+.gn-list time {
+  font-family: var(--f-mn);
+  font-size: var(--fs-micro);
+  color: var(--ink-3);
+  flex: 0 0 auto;
+}
+.gn-t2 { flex: 1; font-size: var(--fs-small) }
+
+/* ── vung 3 · KPI + BAR ───────────────────────────────────────────────── */
+.gn-kpi { display: flex; gap: var(--s-xl); margin-bottom: var(--s-sm) }
+.gn-kpi div { display: flex; flex-direction: column }
+.gn-kpi b {
+  font-family: var(--f-mn);
+  font-size: var(--fs-hero);       /* hero CHI cho con so, khong cho chu */
+  font-weight: var(--w-bold);
+  line-height: var(--lh-tight);
+  font-variant-numeric: tabular-nums;
+}
+.gn-kpi span { font-size: var(--fs-micro); color: var(--ink-3) }
+
+.gn-bars { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--s-3xs) }
+.gn-bars li { display: flex; align-items: center; gap: var(--s-2xs) }
+.gn-bl { flex: 0 0 5rem; font-size: var(--fs-micro); color: var(--ink-2) }
+.gn-bar { flex: 1; height: var(--s-3xs); background: var(--muted); border-radius: var(--r-sm) }
+.gn-bar i { display: block; height: 100%; border-radius: var(--r-sm); background: currentcolor }
+.gn-bn {
+  flex: 0 0 auto;
+  font-family: var(--f-mn);
+  font-size: var(--fs-micro);
+  color: var(--ink-3);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── vung 4 · LUOI THE ────────────────────────────────────────────────── */
+.gn-grid-the {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
+  gap: var(--s-sm);
+}
+
+/* ── man Tat ca — bang ────────────────────────────────────────────────── */
+.gn-tb { width: 100%; border-collapse: collapse; font-size: var(--fs-small) }
+.gn-tb th {
+  text-align: left;
+  font-weight: var(--w-head);
+  font-size: var(--fs-micro);
+  color: var(--ink-3);
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  padding: var(--s-2xs);
+  border-bottom: 1px solid var(--border);
+}
+.gn-tb td { padding: var(--s-2xs); border-bottom: 1px solid var(--border-subtle) }
+.gn-tb a { color: var(--brand); text-decoration: none }
+.gn-tb a:hover { text-decoration: underline }
+.gn-num { font-family: var(--f-mn); font-variant-numeric: tabular-nums; text-align: right }
+.gn-st-draft td { color: var(--ink-3) }
+.gn-st-rejected td { color: var(--ink-3); text-decoration: line-through }
+
+.gn-empty {
+  padding: var(--s-xl);
+  text-align: center;
+  color: var(--ink-3);
+  font-style: var(--i-note);
+  border: 1px dashed var(--border);
+  border-radius: var(--radius);
+}
+
+@media (max-width: 50rem) {
+  .gn-grid-noi { grid-template-columns: 1fr }
+  .gn-kpi { gap: var(--s-md) }
+  .gn-top { flex-direction: column; align-items: flex-start; gap: var(--s-2xs) }
+}

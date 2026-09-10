@@ -1,0 +1,97 @@
+id: WL-01K9XCCHOT4
+at: 2026-09-02
+by: claude
+buoc: "Chu du an chot 4 muc: ky FROZEN · FR-050 cach 2 · FR-051 ma tran + chi dao setting · FR-052 cach 1"
+loai: thi hanh quyet dinh + thi cong FR-050
+gate: FROZEN da ky lai (56 file); FR-050 CHOT va THI CONG; FR-051/052 CHOT chua thi cong
+
+object:
+  - FROZEN.lock                     # ky lai sau khi FR-049 doi M18 spec
+  - .factory/fr/FR-050-*.md         # -> DA CHOT cach 2 + §6
+  - .factory/fr/FR-051-*.md         # -> DA CHOT + §6 ma tran + §7 chi dao setting
+  - .factory/fr/FR-052-*.md         # -> DA CHOT cach 1
+  - .gitignore                      # _luu + _backup deu IGNORE (dao chieu)
+  - web/api/dungchung.mjs           # LUU_LOI -> _backup/ o GOC; +trangThaiBanLui
+  - web/test/loi-cua.test.js         # +X4 (5 ca) +X7 (3 ca)
+
+evidence:
+  - "check_frozen --ky => 56 file; chay lai => pass"
+  - "X4: git ls-files KHONG co web/_luu/ va KHONG co _backup/"
+  - "X4b: LUU_LOI mac dinh = join(GOC, '_backup') — do bang regex tren ma nguon"
+  - "X7 DO TRUOC (khong co ham) roi xanh sau khi cai trangThaiBanLui"
+  - "loi-cua xanh · rate-limit xanh"
+  - "FR-052 di tru: do duoc CHI 1 ban ghi co media / tong 3; bang media 1 hang"
+
+# ══ FR-050 CACH 2 LAT MOT VE CUA ADR-06 — ghi ro, khong de am ═══════
+he_qua_that: >
+  ADR-06 (c) viet "ba bang dang cuu nay di dung duong B-C1" — tuc export ra file
+  ROI COMMIT VAO GIT. Sau cach 2, ve COMMIT VAO GIT khong con.
+  Va env_plan khai "clone repo la co du CONG MOT LENH". Cau do HET DUNG cho DB
+  cua LOI: clone cho ban kho, ma, va moi thu dung lai duoc tu file — KHONG cho
+  ban 5 tai khoan va moi chat_id da buoc.
+  DIEM YEU THAT cua cach 2, da ghi vao .gitignore va vao dungchung.mjs ngay cho
+  nguoi ta doc khi di tim ban lui:
+    MAT O BACKUP = MAT TAI KHOAN. Khong co ban thu hai o dau ca.
+    Cach 1 co git remote lam ban thu hai; cach 2 khong.
+  Kho (kb/) VAN dung B-C1 nhu cu vi no DUNG LAI DUOC TU FILE. Hai loai du lieu,
+  hai co che — va do la ly do ADR-06 ton tai.
+
+X7_ve_de_bo_nhat: >
+  Sau cach 2, mot `clone` moi se CHAY DUOC va KHONG CO TAI KHOAN NAO — va do
+  trong GIONG HET mot he thong moi tinh chua moi ai.
+  trangThaiBanLui() phan biet hai ca:
+    "chua moi ai"          -> DB rong, _backup rong  => binh thuong
+    "backup khong o day"   -> DB CO nguoi, _backup thieu => CANH BAO co so lieu
+  Cung lop loi ui_flow §3 da ghi, va du an DA VAP dung no mot lan o man Danh muc
+  (commit 0035fa3: "Danh muc ket 'dang tai...': o do phai NOI RA khi tai that bai").
+  Ham nay KHONG tu khoi phuc gi — chi TRA LOI. Mot ham khoi phuc tu dong o day
+  se chay dung vao luc nguoi ta chua kip nghi.
+
+# ══ CHI DAO MOI O FR-051 §7 — DOI HANG, khong chi them mot man ═════
+phan_quyen_thanh_setting_on_off: >
+  Nguyen van: "note lai la phan quyen lam tinh nang on/off - setting de admin
+  co the edit ngay tren web => co the them module setting nua; neu can co the
+  gop voi quan ly nguoi dung luon => Quan ly va cai dat he thong (nen research
+  them)".
+  DIEU NAY DOI HANG: ma tran quyen o §6 la MA. Mot ma tran sua duoc tren web la
+  DU LIEU. Va no cham dung LUAT GOC cua du an:
+    "Khong ai duoc so huu thu dung de danh gia minh."
+  Neu phep kiem quyen DOC TU DB va DB SUA DUOC tu mot form web, thi thu quyet
+  dinh "ai lam duoc gi" tro thanh thu GHI DUOC BOI ben bi no kiem soat. Mot
+  phien admin bi chiem khong chi lam duoc viec cua admin — no VIET LAI DUOC
+  bang quyen, va sau do moi phep kiem deu "dung".
+  Hom nay rui ro NHO (mot admin duy nhat, web/ chi nghe 127.0.0.1). Nhung
+  M17_cong ton tai DE dua he nay ra Internet. Ngay do toi thi bang quyen
+  sua-duoc-qua-web la be mat tan cong DAT NHAT trong ca he.
+  BA RANG BUOC toi de nghi (da ghi vao FR-051 §7):
+    a) B-B1 KHONG BAO GIO la mot o on/off — phai o MA, khong o DB
+    b) doi quyen ghi audit_log, va audit KHONG sua duoc qua setting
+    c) SCR-16 da khai "KHONG form"; chi dao nay MO mot duong ghi o do nen phai
+       noi ro O NAO mo, va moi o khac van dong
+  CHUA THI CONG: s1 chua (chu du an da noi "nen research them"), s2 chua
+  ("cai dat he thong" khong co trong scope-in dot hai), s3 chua.
+  Cung hinh dang M19_baihoc => can FR MO RONG PHAM VI.
+  KHONG dat so M20: dat so cho mot module chua qua s2 la tao mot con tro tro
+  vao cho trong.
+
+gop_M18_hay_module_rieng_CHUA_quyet: >
+  Du kien dang can: M18 la module NGANG (khong so huu file ma nao). Mot module
+  cai-dat cung NGANG. Hai module NGANG cung dich M03 + M08 thi ranh gioi giua
+  chung la GIAY, khong phai ma — nen "gop" va "tach" o day RE hon binh thuong,
+  va QUYET MUON KHONG DAT.
+
+FR_052_di_tru_re_nhat_luc_nay: >
+  Do truoc khi thi cong: CHI 1 ban ghi co media (tong 3), bang media 1 hang.
+  Di tru cach 1 (media thanh mang) cham DUNG MOT ban ghi.
+  Day la con so re nhat no se co — moi ban ghi thu-vien them vao tu hom nay se
+  lam no dat hon.
+
+do_do:
+  khong_co_do_moi: "check_frozen tu do sang xanh sau khi ky"
+
+no_con_lai:
+  - "FR-052 (d) CHOT cach 1 nhung CHUA thi cong: media thanh mang + di tru 1 ban ghi"
+  - "FR-051 (c) CHOT ma tran nhung CHUA thi cong: enum dong + chokepoint + Y1..Y6"
+  - "FR-050 X6 chua lam: sua cau chu o env_plan + ADR-06 cho khop cach 2"
+  - "FR moi CHUA mo: 'Quan ly va cai dat he thong' — can s1 research + s2 proposal"
+  - "Chuyen 22 rule sang bo ba lenh/do_khi/xanh_khi: sau a..d, theo tung module"

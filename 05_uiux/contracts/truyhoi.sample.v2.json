@@ -1,0 +1,102 @@
+{
+  "$comment": "v2 — ui_flow M13: so_ban_ghi_trong_pham_vi trả CÙNG kết quả (§2a, một lời gọi); bm25 giữ trong data nhưng UI KHÔNG hiện (§3 — số âm không nghĩa với người đọc); 0 kết quả phải nói 'không có trong kho' + được đếm (§2b, tín hiệu điểm rẽ hybrid).",
+  "version": 2,
+  "chunks": [
+    {
+      "id": 1,
+      "file": "kb/docs/xgboost-taylor-bac-hai.md",
+      "anchor": "vi-sao-bac-hai",
+      "heading_path": "XGBoost Taylor bậc hai › 3.2 Vì sao bậc hai",
+      "line_start": 84,
+      "line_end": 121,
+      "phan_loai": "tai-lieu",
+      "loai_nguon": "pdf",
+      "trang_thai": "approved",
+      "concepts": [
+        "gradient-boosting"
+      ]
+    },
+    {
+      "id": 2,
+      "file": "kb/video/thien-duong-chuot-tuong-lai-nhan-loai-giai-ma-loi-tien-tri-d.md",
+      "anchor": "loi-tien-tri",
+      "heading_path": "Thiên đường chuột › 2. Lời tiên tri",
+      "line_start": 40,
+      "line_end": 66,
+      "phan_loai": "video",
+      "loai_nguon": "youtube",
+      "trang_thai": "approved",
+      "concepts": [
+        "ai-x-risk"
+      ]
+    },
+    {
+      "id": 3,
+      "file": "kb/tai-lieu/xgboost-stap-by-step.md",
+      "anchor": "muc-tieu-huan-luyen",
+      "heading_path": "XGBoost step by step › Mục tiêu huấn luyện",
+      "line_start": 12,
+      "line_end": 30,
+      "phan_loai": "tai-lieu",
+      "loai_nguon": "pdf",
+      "trang_thai": "approved",
+      "concepts": [
+        "gradient-boosting"
+      ]
+    }
+  ],
+  "truy_van_mau": [
+    {
+      "q": "vì sao khai triển bậc hai",
+      "pham_vi": {
+        "phan_loai": "tai-lieu"
+      },
+      "so_ban_ghi_trong_pham_vi": 2,
+      "ket_qua": [
+        {
+          "chunk_id": 1,
+          "bm25": -7.41,
+          "snippet": "…khai triển «bậc hai» giữ được thông tin độ cong mà gradient bậc nhất bỏ mất…"
+        },
+        {
+          "chunk_id": 3,
+          "bm25": -3.02,
+          "snippet": "…hàm mất mát xấp xỉ «bậc hai» quanh dự đoán hiện tại…"
+        }
+      ],
+      "tong": 2
+    },
+    {
+      "q": "bac hai khong dau",
+      "pham_vi": {},
+      "so_ban_ghi_trong_pham_vi": 3,
+      "ket_qua": [
+        {
+          "chunk_id": 1,
+          "bm25": -7.41,
+          "snippet": "…khai triển «bậc hai»…"
+        }
+      ],
+      "tong": 1,
+      "$edge": "một hàm chuẩn hoá cho cả kho lẫn câu hỏi: không dấu vẫn thấy"
+    },
+    {
+      "q": "記憶體 最佳化",
+      "pham_vi": {},
+      "so_ban_ghi_trong_pham_vi": 3,
+      "ket_qua": [],
+      "tong": 0,
+      "$edge": "không có trong kho — sự kiện 0-kết-quả được ĐẾM (tín hiệu điểm rẽ)"
+    },
+    {
+      "q": "retry vô hạn",
+      "pham_vi": {
+        "phan_loai": "video"
+      },
+      "so_ban_ghi_trong_pham_vi": 1,
+      "ket_qua": [],
+      "tong": 0,
+      "$edge": "0 kết quả TRONG PHẠM VI — gợi ý nới phạm vi, khác hẳn 0 trên toàn kho"
+    }
+  ]
+}

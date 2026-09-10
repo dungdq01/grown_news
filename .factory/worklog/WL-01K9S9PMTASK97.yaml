@@ -1,0 +1,67 @@
+ulid: 01K9S9PMTASK97
+khi: 2026-09-03T18:40+07:00
+tac_nhan: agent-thi-cong (Claude, phiên 6c7880c5)
+loai: ky-gate-chuan-bi
+module: M03_web
+don_vi: rà ba task mới của PM (T03-93 · T03-94 · T03-97) + hai lỗi R1 của T08-20
+
+viec: |
+  PM đảo hướng: bỏ gom `/dot-hai/`, mỗi module phase-2 một URL + button menu
+  riêng (`.claude/rule.md` mục 5 · T03-97). Ba task mới qua `check_g6b` sạch về
+  CẤU TRÚC, nhưng sáu lỗi NGHĨA mà cổng đó không đo được:
+
+  1 · **Hai màn sống bằng cửa KHÔNG TỒN TẠI.** T03-93 khai `GET /api/job` +
+      `GET /api/viec/<id>`; T03-94 khai "cửa LÕI T08-19" cho hàng đợi nháp. Đo
+      `web/api/router.mjs`: chỉ có `GET /api/model`, `POST /api/job`,
+      `POST /api/nhap-chung-cat` — KHÔNG cửa ĐỌC nào. `check_g6b` đo
+      `phạm_vi_ghi` và AC/cmd, không đo *"cửa mà AC dựa vào có thật không"*.
+  2 · **Ba `cmd` của T03-97 không đo được AC của chúng** (`#cổng-không-đỏ-được`):
+      hai vế dùng `check_g6b.py` (nó không đọc chữ trong task file, không đọc
+      `rule.md`), một vế dùng `sinh_dot_hai.py` — lệnh SINH, xanh khi chạy xong
+      kể cả khi sidebar sinh ra vẫn theo nhóm gom.
+  3 · **T03-97 khai sửa hai task, thực tế phải sửa NĂM.**
+      `grep -lE "Xưởng|xuong" 07_plan/M03_web/tasks/T03-9*.md` → 92·93·95·96·97.
+      T03-95 khai *"badge trên đúng MỘT mục nav (Xưởng)"* — mục đó nay tên
+      **Chưng cất**; badge trỏ sai mục là badge nói dối.
+  4 · **`~150B dư` sai** — đo thật `gn.css` **39 byte** (102361/102400). Ba màn
+      của đợt đều thêm CSS ⇒ đơn vị giảm-béo phải đi TRƯỚC, không đi sau.
+  5 · **`/dot-hai/` vẫn sống và nay chỏi rule 5** — không đơn vị nào tháo, và
+      T03-97 không khai file nào để tháo được. Quyết định của NGƯỜI.
+  6 · **T08-20 (của chính lượt trước) có HAI lỗi R1** máy bắt đúng:
+      `web/package.json` ngoài boundary M08 (`web/api/**`) — nó là đất M03.
+      Tự ghi nhận lượt trước còn nhẹ hơn sự thật: không chỉ thiếu khai, mà là
+      file của module khác.
+
+object:
+  - 07_plan/M03_web/tasks/T03-93-man-xuong.md        # khối ⛔ hai cửa ĐỌC chưa có
+  - 07_plan/M03_web/tasks/T03-94-man-hang-doi-nhap.md # khối ⛔ cửa nháp chưa có
+  - 07_plan/M03_web/tasks/T03-97-tach-url-menu-theo-module.md # +T03-95, 3 cmd đo được
+  - 07_plan/M03_web/tasks/T03-96-test-fe-dot-hai.md  # cổng đỗ đâu + đo sai hợp đồng
+  - 07_plan/M03_web/tasks/T03-92-nut-chung-cat-ngu-canh.md · T03-95-*.md  # số 39B
+  - 07_plan/M03_web/tasks/T03-91-test-cua-loi.md     # NHẬN web/package.json
+  - 07_plan/M08_api/tasks/T08-20-cua-tho-cho-fe.md   # GỠ web/package.json
+  - 06_modules/M03_web/backlog.md · 06_modules/M08_api/backlog.md
+
+bang_chung:
+  - "check_g6b.py: 33 lỗi → 29 lỗi (hai lỗi R1 của T08-20 hết; không lỗi mới)"
+  - "node web/test/loi-tho-cua.test.js → pass"
+  - "node web/test/page-weight.test.js → gn.css 102361/102400"
+  - "grep -n '\"job\"|\"viec\"' web/api/router.mjs → chỉ POST job, không có viec"
+
+do_do: khong-co-do-moi
+
+hoc_duoc: |
+  `check_g6b:46` đọc TRỌN phần sau khoá phụ-thuộc làm MỘT id, VÀ regex đó quét
+  cả dòng chú thích. Ba lần tự gây đỏ trong một lượt: chú thích nhắc lại tên
+  khoá y nguyên ⇒ sinh một phụ-thuộc-treo. Viết chú thích về một khoá thì đừng
+  gõ khoá đó nguyên văn.
+
+keo_theo:
+  - "M08 backlog — PM mở T08-21 (GET /api/job + /api/viec/<id>) và T08-22
+     (cửa ĐỌC + 4 hành động nháp). Hai màn đứng chờ."
+  - "M03 backlog — NGƯỜI chọn lối cho /dot-hai/ (giữ overview · tháo · redirect)"
+  - "M03 backlog — đơn vị giảm-béo gn.css đi TRƯỚC T03-93/94/95"
+
+chua_xong: |
+  Không sửa mã lượt này — chỉ giấy. Ba task vẫn CHẶN cho tới khi có T08-21/22.
+  Gate do NGƯỜI ký.

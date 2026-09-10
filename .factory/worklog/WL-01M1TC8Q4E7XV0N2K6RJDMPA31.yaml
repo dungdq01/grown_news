@@ -1,0 +1,101 @@
+ulid: 01M1TC8Q4E7XV0N2K6RJDMPA31
+thoi_diem: 2026-09-06T19:20+07:00
+tac_nhan: claude-opus-5
+loai: ban_giao
+module: M03_web
+don_vi: T03-119 · sau một phán quyết, màn phải NÓI ĐỦ và ĐỔI NGAY
+
+viec: >
+  Hai triệu chứng chủ dự án báo — "Loại/Bỏ xong phải F5" và "toast mù" — là một
+  gốc: màn làm xong việc rồi nhưng KHÔNG nói mình vừa làm gì, và nói bằng chữ
+  của máy. Thêm bộ nút phân vai theo logic chủ dự án chốt cùng ngày.
+
+r5_do_truoc:
+  - don_vi: T03-119
+    lenh: node web/test/sau-phan-quyet.test.js
+    ket_qua: >
+      ĐỎ 7 vế (đợt 1, cửa sổ bài kho) + ĐỎ 5 vế (đợt 2, cửa sổ nháp). Câu cũ
+      đo được trong nguồn: `bao(false, \`Đã ghi ${den} vào kho\`)` — không chủ
+      ngữ, và `rejected` là giá trị enum lọt ra câu cho người.
+    đỏ_do: claude-opus-5
+
+do_sau:
+  - lenh: node web/test/sau-phan-quyet.test.js
+    ket_qua: pass — 12/12 vế
+  - lenh: cd web && npm test
+    ket_qua: 3114 vế ok · 0 FAIL
+  - lenh: ./.venv/Scripts/python.exe -m pytest core/tests -q
+    ket_qua: 49 passed
+
+hinh_dang:
+  - "`NHAN_TT` — MỘT bảng chữ người cho bốn `review_status`"
+  - "`toastPhanQuyet` — mỗi câu đủ ba vế: bài nào · thành gì · giờ nằm đâu"
+  - "`capNhatThe(slug, tt)` — thẻ đổi TẠI CHỖ; `null` ⇒ gạch rồi mới gỡ"
+  - "nhãn ngữ cảnh chân cửa sổ: BẢN NHÁP / KHO — chưa lên site / ĐANG TRÊN SITE"
+  - >
+    ba cụm nút CHÍNH · THƯỜNG · NGUY, cùng luật ở CẢ HAI cửa sổ (bài kho +
+    nháp). Cụm nguy hiểm tách phải có `margin-left:auto` + vạch; `≤640px` thì
+    xuống hàng riêng, không chen giữa.
+  - >
+    ô "Duyệt xong cho hiện trên site luôn", MẶC ĐỊNH TẮT — làm hộ cú bấm thứ
+    hai, không thay quyết định. `M12-R2`: máy tự approve là máy chấm bài mình.
+
+chay_that:
+  cach: >
+    Chặn ĐÚNG MỘT lời gọi ghi (`PATCH .../status`) ở tầng `window.fetch`, mọi
+    fetch khác đi thật. Lý do: `draft → rejected` là MỘT CHIỀU (`status.mjs:59-62`)
+    — thử thật trên bài của chủ dự án là hỏng dữ liệu không lùi được.
+  do_duoc:
+    - "PATCH body đúng: `{to:'rejected', reject_reason:'…'}`"
+    - >
+      toast: `Đã loại "…" — bài VẪN nằm trong kho kèm lý do, không mất đi đâu.`
+    - "thẻ: `cd st-draft` → `cd st-rejected`, chữ `· draft` → `· rejected`, KHÔNG F5"
+    - "thanh nút vẽ lại ngay: ✕ Loại biến mất (đã rejected), nhãn KHO — chưa lên site"
+    - "cụm nguy hiểm cách cụm giữa 69.2px + vạch trái 0.8px"
+  kho_khong_doi: >
+    Đo lại sau phép thử: `review_status = draft`, `reject_reason = None`.
+    Không ghi gì vào kho.
+
+chan_lai:
+  - ly_do: >
+      `gn.css 102754/102400`. QUY CHỦ: một phiên KHÁC thêm khối chú thích
+      `T03-117 hotfix` vào `web/styles/prototype.css` lúc 18:44 (tôi ghi
+      18:52, và tôi không chạm file CSS nào trong đợt này). Khối ấy là BẢN THỨ
+      HAI của luật `.tx` mà tôi đã cố ý tiêm từ chunk để giữ trần `FR-061`.
+    xu_ly: >
+      GỘP, không xoá trắng: hai sửa ĐÚNG của bản ấy — độ đặc hiệu `details.tx`
+      (rule `details` chung thắng `.tx`) và token `--card`/`--line` (`--surface`
+      KHÔNG tồn tại, nền menu rơi về fallback) — đã chuyển vào `TX_CSS`. Chỗ
+      cũ để lại chú thích nói vì sao không đặt luật ở đây.
+  - ly_do: >
+      Cổng `nut-tai-xuong.test.js` đỏ OAN vì nó neo bằng `indexOf("Tải xuống")`
+      và một chú thích mới của tôi chứa đúng chuỗi ấy.
+    xu_ly: >
+      ĐỔI CHÚ THÍCH của mình, KHÔNG nới cổng — cổng là thước, và bên bị chấm
+      không cầm bút sửa thước. Ô nợ đã mở cho đơn vị test `T03-110b`.
+  - ly_do: >
+      Cổng `chung-cat-nhap.test.js` grep chuỗi `Đưa lên site` nên không phân
+      biệt được NÚT với Ô CHỌN. Nhãn chủ dự án đặt cho ô chọn trùng chuỗi ấy.
+    xu_ly: >
+      Đổi nhãn thành *"Duyệt xong cho hiện trên site luôn"* (giữ nguyên nghĩa)
+      và MỞ Ô NỢ — chữ trên màn đang bị hình dạng của cổng nắn, đó là điều
+      phải nói ra chứ không lặng lẽ chịu.
+
+no_moi:
+  - >
+    Bản nháp chưng cất KHÔNG có `title` (`frontmatter.title = None`), nên thẻ,
+    tiêu đề cửa sổ và toast đều hiện slug. Không phải lỗi FE — FE không được
+    bịa tiêu đề. Ô nợ trỏ `chungcat/src/worker.py::_dung_nhap`.
+
+chua_lam:
+  - "T03-120 — wireframe SCR-20 TRƯỚC, chủ dự án duyệt rồi mới code (AC0)"
+
+object:
+  - web/plugins/multiwindow/src/scripts/multiwindow.inline.ts
+  - web/plugins/cctab/src/cctab.inline.ts
+  - web/styles/prototype.css
+  - web/package.json
+  - web/test/sau-phan-quyet.test.js
+  - 07_plan/M03_web/tasks/T03-119-sau-phan-quyet-man-phai-noi-va-doi.md
+  - 07_plan/M03_web/tasks/T03-110b-test-tab-theo-doi.md
+  - 06_modules/M03_web/backlog.md

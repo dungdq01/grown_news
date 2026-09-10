@@ -1,0 +1,72 @@
+id: WL-01K9NKUIVAMATFILE
+at: 2026-08-28
+by: claude
+buoc: soi UI trên trình duyệt thật · sửa BUG màn nạp mở sai · KHÔI PHỤC file bị git xoá
+loai: sự cố + bàn giao sửa lỗi
+fr: FR-038-tach-ba-module-noi-dung.md
+
+su_co:
+  gi_da_xay_ra: >
+    Trong lượt kiểm hai chiều cho `manTuUrl`, tôi dùng `git checkout -- <file>`
+    làm lệnh HOÀN TÁC. Người dùng đã dặn "bỏ qua git, tôi chưa cần push commit
+    gì cả", nên cây làm việc chưa commit và `checkout` không lùi về "trước lúc
+    phá" — nó lùi về commit 184514f, tức TRƯỚC cả FR-036.
+  mat_gi: >
+    `web/plugins/multiwindow/src/scripts/multiwindow.inline.ts` mất 21 hàm —
+    toàn bộ FE của FR-036 (khung 5 mục · kho hiện vật) · FR-037 · FR-038/C5+C6a ·
+    FR-039. Git không có đường lùi: `stash` rỗng, `fsck` chỉ trả hai dangling
+    tree, không blob.
+  khoi_phuc_tu: >
+    `multiwindow.inline.js` — bản build ngay trước đó, 86 hàm đầy đủ. esbuild
+    dùng `bundle:false` nên mã giữ nguyên hình dạng; ba bảng khai nằm ở ba dòng
+    `var define_X_default` đầu file, thay lại thành `__KHUNG__`/`__MEDIA__`/`__MAN__`
+    nên KHÔNG có bảng nào bị nhúng cứng.
+  con_mat_that: >
+    CHÚ THÍCH và KIỂU. esbuild lột cả hai. Ở dự án này chú thích chở LÝ DO nên
+    đó là phần đắt nhất; 670 escape `\uXXXX` cũng phải de-escape lại (chỉ ký tự
+    >= U+00A0 — đổi cả control range là đúng lớp lỗi 0x08 của B7b).
+  bai_hoc: >
+    `git` KHÔNG phải lệnh hoàn tác khi cây làm việc chưa commit. Phá/hoàn tác
+    phải dùng bản lưu BYTE (`read_bytes`/`write_bytes`) rồi so sha256 — khuôn đã
+    dùng ĐÚNG ở bốn lượt trước trong cùng phiên, và tôi bỏ nó ở lượt này.
+
+bug_da_sua:
+  - >
+    `/tai-lieu/nap/` hiện màn DANH SÁCH tài liệu, không hiện màn nạp. Tiêu đề
+    trang nói "Nạp tài liệu", thân trang nói "Chưa có tài liệu nào".
+    Gốc: `manTuUrl()` lấy `p.split("/")[0]` nên `/tai-lieu/nap/` cho `tai-lieu`
+    và khớp màn danh sách; SSR đặt đúng, rồi `khoiDong()` GHI ĐÈ.
+    Sửa: khớp CẢ đường, sắp theo độ dài giảm dần, lấy khớp dài nhất.
+  - >
+    CỔNG CỦA TÔI BỎ LỌT: `man-nap-rieng.test.js` §2 hỏi "khối có trong DOM
+    không" — có mặt trong tài liệu ≠ được HIỆN. Thêm §5 canh HAI tầng: SSR
+    (chuỗi `view on`) và FE (phép khớp đường có ranh giới `/` + sắp theo độ dài).
+  - "Tìm ra bằng TRÌNH DUYỆT, không bằng test. 57 file test đều xanh khi bug này sống."
+
+object:
+  code:
+    - web/plugins/multiwindow/src/scripts/multiwindow.inline.ts   # khôi phục + manTuUrl
+  test:
+    - web/test/man-nap-rieng.test.js   # +§5 màn đang mở khớp URL
+  no:
+    - 06_modules/M03_web/backlog.md    # 4 ô: chú thích đắp lại · 4 cổng đo hình thức
+
+may_xanh:
+  - "cd web && npm test  ->  exit 0 (57 file)"
+  - "PYTHONIOENCODING=utf-8 pytest core/tests -q  ->  42 passed"
+  - "18/22 cổng check_*.py — bốn đỏ y hệt trước, không thêm đỏ mới"
+  - "ngân sách: gn.css 92/100 · gn.js 95/100 · trang lớn nhất 55/74"
+  - >
+    xác nhận trên trình duyệt: `/tai-lieu/nap/` chỉ hiện `v-naptailieu`, có ô
+    chọn file, KHÔNG có form viết bài
+
+kiem_hai_chieu:
+  - >
+    trả `manTuUrl` về bản `split("/")[0]` ⇒ §5 đỏ hai vế. (Chính lượt phá này là
+    lúc tôi dùng `git checkout` — nên lượt sau chỉ dùng bản lưu byte.)
+
+do_do:
+  - cong: check_skill.py
+    do_do_boi: agent khác
+  - cong: check_danh_muc · check_frozen · check_running
+    do_do_boi: chính tôi, từ FR-039 — hai ô backlog M01 đang chờ người dùng

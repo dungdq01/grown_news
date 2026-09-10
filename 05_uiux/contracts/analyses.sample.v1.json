@@ -1,0 +1,592 @@
+{
+  "$comment": "ĐÃ THAY BỞI v2 — giữ để đọc git diff. v1 lệch khỏi prototype sau 20 lượt sửa.",
+  "contract_version": "1.0.0",
+  "generated_from": "core/assets/frontmatter.schema.json",
+  "note": "Shape = frontmatter của file .md trong kb/, cộng 3 trường DẪN XUẤT do lớp build sinh (đánh dấu _derived). Web đọc đúng shape này; core ghi đúng shape này.",
+  "_derived_fields": {
+    "_derived_reading_minutes": "ceil(word_count / 200) — hiển thị 'x phút đọc'",
+    "_derived_body_sections": "9 mục tách từ thân bài, key là số mục",
+    "_derived_variants": "các bản khác cùng url_normalized — sinh khi gộp, KHÔNG có trong frontmatter"
+  },
+  "analyses": [
+    {
+      "$case": "CHUẨN — paper, approved, đủ trường, có skill_candidate DEEPEN",
+      "id": "src_good01",
+      "slug": "vi-du-dat-chuan",
+      "source_type": "paper",
+      "url": "https://arxiv.org/abs/2411.00002",
+      "url_normalized": "arxiv.org/abs/2411.00002",
+      "version_id": "v2",
+      "protocol_version": "2.0",
+      "analyzed_at": "2026-08-17",
+      "title": "Ví dụ đạt chuẩn",
+      "author": "Nguyen Van A",
+      "publisher": "arXiv",
+      "published_at": "2025-11-03",
+      "size": "14 trang",
+      "license": "CC-BY-4.0",
+      "decay_risk": "medium",
+      "archetype": null,
+      "one_liner": "File mẫu minh họa đầy đủ ràng buộc của protocol 2.0",
+      "concepts": [
+        "walk-forward-validation",
+        "data-leakage"
+      ],
+      "concepts_proposed": [],
+      "tags": [
+        "time-series",
+        "forecasting"
+      ],
+      "credibility_max": "plausible",
+      "corroboration_factor": 1.3,
+      "independent_sources": 2,
+      "contradicted_by": [],
+      "skill_candidates": [
+        {
+          "capability": "walk-forward-cv-design",
+          "verdict": "DEEPEN",
+          "target_skill": "ml-engineer",
+          "credibility": "plausible",
+          "why_now": "Pipeline dự báo UNIS đang chia train test theo tỷ lệ ngẫu nhiên",
+          "score": {
+            "relevance": 5,
+            "frequency": 4,
+            "durability": 5,
+            "corroboration_factor": 1.3,
+            "cost": 2
+          },
+          "priority": 65,
+          "draft_trigger": "Dùng khi thiết kế cross-validation cho dữ liệu chuỗi thời gian"
+        }
+      ],
+      "origin": "pipeline",
+      "origin_tool": null,
+      "origin_protocol_version": "2.0",
+      "conformance": "A",
+      "citations_sampled": 0,
+      "citations_verified": 0,
+      "unverifiable_citations": false,
+      "review_status": "approved",
+      "reviewed_by": "dung.dang",
+      "reject_reason": null,
+      "word_count": 202,
+      "unresolved_count": 0,
+      "_derived_reading_minutes": 2
+    },
+    {
+      "$case": "EDGE — repo có archetype, credibility verified, priority cao nhất ⇒ TIÊU ĐIỂM của SCR-02",
+      "id": "src_repo01",
+      "slug": "consumer-idempotent-dedupe",
+      "source_type": "repo",
+      "url": "https://github.com/example/event-consumer",
+      "url_normalized": "github.com/example/event-consumer",
+      "version_id": "a1b2c3d",
+      "protocol_version": "2.0",
+      "analyzed_at": "2026-08-18",
+      "title": "event-consumer",
+      "author": "example-org",
+      "publisher": "GitHub",
+      "published_at": "2026-02-10",
+      "size": "137 file",
+      "license": "MIT",
+      "decay_risk": "low",
+      "archetype": "application",
+      "one_liner": "Consumer đọc hàng đợi có khả năng gửi trùng, khử trùng bằng khoá lũy đẳng ở tầng staging",
+      "concepts": [
+        "idempotency",
+        "staging-table-pattern",
+        "eventual-consistency"
+      ],
+      "concepts_proposed": [
+        "retry-jitter"
+      ],
+      "tags": [
+        "backend",
+        "queue"
+      ],
+      "credibility_max": "verified",
+      "corroboration_factor": 1.0,
+      "independent_sources": 1,
+      "contradicted_by": [],
+      "skill_candidates": [
+        {
+          "capability": "idempotency-key-design",
+          "verdict": "NEW",
+          "target_skill": null,
+          "proposed_name": "idempotent-event-consumer",
+          "credibility": "verified",
+          "why_now": "Tầng tích hợp ERP Bravo đang xử lý trùng bản ghi bằng kiểm tra thủ công",
+          "score": {
+            "relevance": 5,
+            "frequency": 4,
+            "durability": 5,
+            "corroboration_factor": 1.0,
+            "cost": 2
+          },
+          "priority": 50,
+          "draft_trigger": "Dùng khi thiết kế consumer đọc từ hàng đợi hoặc webhook có khả năng gửi trùng"
+        }
+      ],
+      "origin": "pipeline",
+      "origin_tool": null,
+      "origin_protocol_version": "2.0",
+      "conformance": "A",
+      "citations_sampled": 0,
+      "citations_verified": 0,
+      "unverifiable_citations": false,
+      "review_status": "approved",
+      "reviewed_by": "dung.dang",
+      "reject_reason": null,
+      "word_count": 1487,
+      "unresolved_count": 2,
+      "_derived_reading_minutes": 8
+    },
+    {
+      "$case": "EDGE — DẢI CẢNH BÁO: external + trích dẫn không kiểm được + CÓ nguồn phản biện. Badge external.",
+      "id": "src_ext001",
+      "slug": "blog-prompt-caching-2023",
+      "source_type": "article",
+      "url": "https://blog.example.com/prompt-caching?utm_source=x",
+      "url_normalized": "blog.example.com/prompt-caching",
+      "version_id": "2026-08-16",
+      "protocol_version": "2.0",
+      "analyzed_at": "2026-08-16",
+      "title": "Prompt caching giảm 40% chi phí",
+      "author": "Vendor Corp",
+      "publisher": "Vendor Blog",
+      "published_at": "2023-06-01",
+      "size": "2400 từ",
+      "license": null,
+      "decay_risk": "high",
+      "archetype": null,
+      "one_liner": "Bài vendor nói caching giảm chi phí, số liệu thiếu điều kiện đo",
+      "concepts": [
+        "context-management"
+      ],
+      "concepts_proposed": [
+        "prompt-caching"
+      ],
+      "tags": [
+        "llm"
+      ],
+      "credibility_max": "conflicted",
+      "corroboration_factor": 0.6,
+      "independent_sources": 1,
+      "contradicted_by": [
+        "src_paper02"
+      ],
+      "skill_candidates": [
+        {
+          "capability": "prompt-cache-tuning",
+          "verdict": "OUT_OF_SCOPE",
+          "target_skill": null,
+          "credibility": "conflicted",
+          "reason_rejected": "Vendor viết về sản phẩm của chính họ; số liệu 40% thiếu baseline và phần cứng"
+        }
+      ],
+      "origin": "external",
+      "origin_tool": "gemini-2.5-pro",
+      "origin_protocol_version": null,
+      "conformance": "B",
+      "citations_sampled": 2,
+      "citations_verified": 1,
+      "unverifiable_citations": true,
+      "review_status": "approved",
+      "reviewed_by": "dung.dang",
+      "reject_reason": null,
+      "word_count": 980,
+      "unresolved_count": 4,
+      "_derived_reading_minutes": 5
+    },
+    {
+      "$case": "EDGE — GỘP: cùng url_normalized với bản dưới ⇒ SCR-01 hiện TAB, SCR-02 đếm là 1 bài",
+      "id": "src_var001",
+      "slug": "storm-multi-perspective",
+      "source_type": "paper",
+      "url": "https://arxiv.org/abs/2402.14207",
+      "url_normalized": "arxiv.org/abs/2402.14207",
+      "version_id": "v1",
+      "protocol_version": "2.0",
+      "analyzed_at": "2026-08-15",
+      "title": "STORM: tổng hợp đa góc nhìn",
+      "author": "Stanford",
+      "publisher": "arXiv",
+      "published_at": "2024-02-22",
+      "size": "18 trang",
+      "license": "CC-BY-4.0",
+      "decay_risk": "medium",
+      "archetype": null,
+      "one_liner": "Mô phỏng phỏng vấn chuyên gia đa góc nhìn để sinh bài dài có trích dẫn",
+      "concepts": [
+        "retrieval-chunking",
+        "eval-harness"
+      ],
+      "concepts_proposed": [],
+      "tags": [
+        "llm",
+        "research"
+      ],
+      "credibility_max": "plausible",
+      "corroboration_factor": 1.3,
+      "independent_sources": 2,
+      "contradicted_by": [],
+      "skill_candidates": [],
+      "origin": "pipeline",
+      "origin_tool": null,
+      "origin_protocol_version": "2.0",
+      "conformance": "A",
+      "citations_sampled": 0,
+      "citations_verified": 0,
+      "unverifiable_citations": false,
+      "review_status": "approved",
+      "reviewed_by": "dung.dang",
+      "reject_reason": null,
+      "word_count": 1320,
+      "unresolved_count": 1,
+      "_derived_reading_minutes": 7,
+      "_derived_variants": [
+        "src_var002"
+      ]
+    },
+    {
+      "$case": "EDGE — bản thứ hai CÙNG url_normalized, do AI khác đọc. KHÔNG hiện thành bài riêng.",
+      "id": "src_var002",
+      "slug": "storm-multi-perspective-codex",
+      "source_type": "paper",
+      "url": "https://arxiv.org/pdf/2402.14207",
+      "url_normalized": "arxiv.org/abs/2402.14207",
+      "version_id": "v1",
+      "protocol_version": "2.0",
+      "analyzed_at": "2026-08-16",
+      "title": "STORM: tổng hợp đa góc nhìn",
+      "author": "Stanford",
+      "publisher": "arXiv",
+      "published_at": "2024-02-22",
+      "size": "18 trang",
+      "license": "CC-BY-4.0",
+      "decay_risk": "medium",
+      "archetype": null,
+      "one_liner": "Bản đọc thứ hai — nhấn phần giới hạn nhiều hơn bản gốc",
+      "concepts": [
+        "eval-harness"
+      ],
+      "concepts_proposed": [],
+      "tags": [
+        "llm",
+        "research"
+      ],
+      "credibility_max": "claimed",
+      "corroboration_factor": 1.0,
+      "independent_sources": 1,
+      "contradicted_by": [],
+      "skill_candidates": [],
+      "origin": "external",
+      "origin_tool": "codex",
+      "origin_protocol_version": null,
+      "conformance": "B",
+      "citations_sampled": 2,
+      "citations_verified": 2,
+      "unverifiable_citations": false,
+      "review_status": "approved",
+      "reviewed_by": "dung.dang",
+      "reject_reason": null,
+      "word_count": 1150,
+      "unresolved_count": 3,
+      "_derived_reading_minutes": 6,
+      "_derived_variants": [
+        "src_var001"
+      ]
+    },
+    {
+      "$case": "EDGE — video, có mốc thời gian làm locator, tiêu đề DÀI để test cắt dòng",
+      "id": "src_vid001",
+      "slug": "talk-context-management-production",
+      "source_type": "video",
+      "url": "https://youtube.com/watch?v=abc123",
+      "url_normalized": "youtube.com/watch?v=abc123",
+      "version_id": "abc123",
+      "protocol_version": "2.0",
+      "analyzed_at": "2026-08-14",
+      "title": "Quản lý ngữ cảnh trong hệ thống agent chạy production — những thứ tài liệu không nói",
+      "author": "Trần Thị B",
+      "publisher": "YouTube",
+      "published_at": "2026-05-20",
+      "size": "42 phút",
+      "license": null,
+      "decay_risk": "high",
+      "archetype": null,
+      "one_liner": "Talk kể chuyện vận hành thật: cắt gì khi tràn ngữ cảnh và vì sao nén thua cắt",
+      "concepts": [
+        "context-management",
+        "structured-output-recovery"
+      ],
+      "concepts_proposed": [],
+      "tags": [
+        "llm",
+        "agent",
+        "production"
+      ],
+      "credibility_max": "plausible",
+      "corroboration_factor": 1.6,
+      "independent_sources": 3,
+      "contradicted_by": [],
+      "skill_candidates": [
+        {
+          "capability": "context-truncation-strategy",
+          "verdict": "DEEPEN",
+          "target_skill": "agent-builder",
+          "credibility": "plausible",
+          "why_now": "Agent nội bộ đang cắt ngữ cảnh theo FIFO, mất phần system prompt khi hội thoại dài",
+          "score": {
+            "relevance": 5,
+            "frequency": 5,
+            "durability": 3,
+            "corroboration_factor": 1.6,
+            "cost": 2
+          },
+          "priority": 60,
+          "draft_trigger": "Dùng khi thiết kế chiến lược cắt ngữ cảnh cho agent hội thoại dài"
+        }
+      ],
+      "origin": "pipeline",
+      "origin_tool": null,
+      "origin_protocol_version": "2.0",
+      "conformance": "A",
+      "citations_sampled": 0,
+      "citations_verified": 0,
+      "unverifiable_citations": false,
+      "review_status": "approved",
+      "reviewed_by": "dung.dang",
+      "reject_reason": null,
+      "word_count": 1620,
+      "unresolved_count": 1,
+      "_derived_reading_minutes": 9
+    },
+    {
+      "$case": "EDGE — DRAFT: KHÔNG được lọt lên web. Test luật lọc (M3.2).",
+      "id": "src_draft01",
+      "slug": "docs-quartz-plugin-api",
+      "source_type": "docs",
+      "url": "https://quartz.jzhao.xyz/advanced/making-plugins",
+      "url_normalized": "quartz.jzhao.xyz/advanced/making-plugins",
+      "version_id": "2026-08-18",
+      "protocol_version": "2.0",
+      "analyzed_at": "2026-08-18",
+      "title": "Quartz plugin API",
+      "author": "Jacky Zhao",
+      "publisher": "Quartz docs",
+      "published_at": "2026-01-15",
+      "size": "3 trang",
+      "license": "MIT",
+      "decay_risk": "medium",
+      "archetype": null,
+      "one_liner": "Sáu loại plugin và điểm cắm của từng loại trong vòng đời build",
+      "concepts": [],
+      "concepts_proposed": [
+        "plugin-lifecycle"
+      ],
+      "tags": [
+        "ssg",
+        "web"
+      ],
+      "credibility_max": "verified",
+      "corroboration_factor": 1.0,
+      "independent_sources": 1,
+      "contradicted_by": [],
+      "skill_candidates": [],
+      "origin": "pipeline",
+      "origin_tool": null,
+      "origin_protocol_version": "2.0",
+      "conformance": "A",
+      "citations_sampled": 0,
+      "citations_verified": 0,
+      "unverifiable_citations": false,
+      "review_status": "draft",
+      "reviewed_by": null,
+      "reject_reason": null,
+      "word_count": 890,
+      "unresolved_count": 0,
+      "_derived_reading_minutes": 5
+    },
+    {
+      "$case": "EDGE — REJECTED: có reject_reason. Cũng KHÔNG lên web.",
+      "id": "src_rej001",
+      "slug": "announcement-v3-launch",
+      "source_type": "announcement",
+      "url": "https://example.com/blog/v3-launch",
+      "url_normalized": "example.com/blog/v3-launch",
+      "version_id": "2026-08-10",
+      "protocol_version": "2.0",
+      "analyzed_at": "2026-08-10",
+      "title": "Ra mắt v3",
+      "author": "Example Inc",
+      "publisher": "Example Blog",
+      "published_at": "2026-08-01",
+      "size": "600 từ",
+      "license": null,
+      "decay_risk": "high",
+      "archetype": null,
+      "one_liner": "Thông cáo ra mắt, phần lớn là hứa hẹn chưa ship",
+      "concepts": [],
+      "concepts_proposed": [],
+      "tags": [],
+      "credibility_max": "claimed",
+      "corroboration_factor": 1.0,
+      "independent_sources": 1,
+      "contradicted_by": [],
+      "skill_candidates": [],
+      "origin": "pipeline",
+      "origin_tool": null,
+      "origin_protocol_version": "2.0",
+      "conformance": "A",
+      "citations_sampled": 0,
+      "citations_verified": 0,
+      "unverifiable_citations": false,
+      "review_status": "rejected",
+      "reviewed_by": "dung.dang",
+      "reject_reason": "Không có mục nào qua được cổng 1 (không hiển nhiên) — toàn bộ là mô tả tính năng đã có trên trang sản phẩm",
+      "word_count": 420,
+      "unresolved_count": 0,
+      "_derived_reading_minutes": 3
+    }
+  ],
+  "concepts": [
+    {
+      "id": "idempotency",
+      "label_vi": "Tính lũy đẳng",
+      "aliases": [
+        "exactly-once",
+        "dedupe",
+        "chống trùng bản ghi",
+        "idempotency-key"
+      ],
+      "_derived_count": 1,
+      "group": "hệ thống và tích hợp"
+    },
+    {
+      "id": "walk-forward-validation",
+      "label_vi": "Kiểm định tiến dần theo thời gian",
+      "aliases": [
+        "rolling-origin",
+        "time-series-cv",
+        "walk-forward-cv"
+      ],
+      "_derived_count": 1,
+      "group": "dữ liệu và ML"
+    },
+    {
+      "id": "data-leakage",
+      "label_vi": "Rò rỉ dữ liệu",
+      "aliases": [
+        "target-leakage",
+        "lookahead-bias"
+      ],
+      "_derived_count": 1,
+      "group": "dữ liệu và ML"
+    },
+    {
+      "id": "context-management",
+      "label_vi": "Quản lý ngữ cảnh",
+      "aliases": [
+        "context-compaction",
+        "truncation-strategy"
+      ],
+      "_derived_count": 2,
+      "group": "AI agent và LLM"
+    },
+    {
+      "id": "staging-table-pattern",
+      "label_vi": "Mẫu bảng trung gian",
+      "aliases": [
+        "landing-table",
+        "erp-staging"
+      ],
+      "_derived_count": 1,
+      "group": "hệ thống và tích hợp"
+    },
+    {
+      "id": "eventual-consistency",
+      "label_vi": "Nhất quán cuối cùng",
+      "aliases": [
+        "read-your-writes"
+      ],
+      "_derived_count": 1,
+      "group": "hệ thống và tích hợp"
+    },
+    {
+      "id": "structured-output-recovery",
+      "label_vi": "Phục hồi output sai định dạng",
+      "aliases": [
+        "json-repair"
+      ],
+      "_derived_count": 1,
+      "group": "AI agent và LLM"
+    },
+    {
+      "id": "eval-harness",
+      "label_vi": "Bộ đo hồi quy",
+      "aliases": [
+        "regression-eval",
+        "golden-set"
+      ],
+      "_derived_count": 2,
+      "group": "AI agent và LLM"
+    },
+    {
+      "id": "retrieval-chunking",
+      "label_vi": "Cắt khối cho truy hồi",
+      "aliases": [
+        "ast-chunking"
+      ],
+      "_derived_count": 1,
+      "group": "AI agent và LLM"
+    }
+  ],
+  "concepts_proposed": [
+    {
+      "label": "retry-jitter",
+      "from": [
+        "src_repo01"
+      ]
+    },
+    {
+      "label": "prompt-caching",
+      "from": [
+        "src_ext001"
+      ]
+    },
+    {
+      "label": "plugin-lifecycle",
+      "from": [
+        "src_draft01"
+      ]
+    }
+  ],
+  "_expected_render": {
+    "$comment": "Prototype PHẢI cho ra đúng những số này. Đây là test của data contract.",
+    "total_records": 8,
+    "approved": 6,
+    "not_approved": 2,
+    "articles_on_site": 5,
+    "why_5_not_6": "src_var001 và src_var002 cùng url_normalized arxiv.org/abs/2402.14207 ⇒ gộp thành 1 bài 2 tab",
+    "featured_id": "src_good01",
+    "why_featured": "priority cao nhất trong 7 ngày = 65. src_repo01 chỉ 50. KHÔNG chọn theo analyzed_at — đó là luật của SCR-02.",
+    "warning_banner_on": [
+      "src_ext001"
+    ],
+    "external_badge_on": [
+      "src_ext001",
+      "src_var002"
+    ],
+    "counts_by_type": {
+      "repo": 1,
+      "paper": 2,
+      "video": 1,
+      "article": 1,
+      "docs": 0,
+      "announcement": 0
+    },
+    "_verified_by_machine": "2026-08-18 — script đếm khớp mọi số trên"
+  },
+  "superseded_by": "analyses.sample.v2.json"
+}

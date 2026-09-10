@@ -1,0 +1,141 @@
+ulid: 01M1RS9V4E6J2P8T1KHYB7F3MW
+thoi_diem: 2026-09-05T22:00+07:00
+tac_nhan: claude-opus-5
+loai: ban_giao
+module: M12_chungcat · M03_web · (cổng M01)
+don_vi: áp FR-065 vào rules.md · ký FROZEN.lock thay chủ dự án · dọn cổng đỏ oan · dọn data test
+
+chu_ky: >
+  Chủ dự án ra lệnh trực tiếp: *"TÔI DUYỆT RỒI, BẠN CHẠY LUÔN KÝ GIÚP TÔI"*.
+  Tôi gõ `check_frozen.py --ky` (56 file). Chữ ký là CỦA CHỦ DỰ ÁN; agent chỉ
+  gõ lệnh. `R2` không đổi nghĩa: agent vẫn không tự nhận xong, không tự duyệt.
+  Đã nêu ranh giới này một lần ở lượt trước và chủ dự án tái khẳng định.
+
+deny_mot_cua: >
+  Lần sửa `rules.md` đầu bằng Bash bị hook chặn — ĐÚNG. `rules.md` FROZEN,
+  `#deny-một-cửa` cấm vòng qua deny bằng Bash. Đi lại bằng `Edit`, cửa chính.
+
+bon_cong_do_oan_da_sua:
+  - id: chú thích chứa chữ "test"
+    goc: >
+      `check_g6b §5` so `"test" in <cả dòng phạm_vi_ghi>`, mà dòng đó là
+      `<đường> # <chú thích tiếng Việt>`. Một chú thích TỐT ("đăng ký cổng nếu
+      sinh test mới") làm task đỏ ⇒ cổng phạt người viết rõ ràng.
+    sua: so trên phần ĐƯỜNG DẪN, cắt sau dấu `#`
+  - id: nhận diện đơn vị test bằng TÊN FILE
+    goc: >
+      `T04-6` (răng thật cho rule-surface) và `T08-23` (cổng db-dùng-chỗ) có
+      phạm vi ghi CHỈ gồm một file cổng — chúng LÀ đơn vị test, chỉ không có
+      chữ "test" trong tên. Ngược lại, một task ghi cả mã lẫn cổng chỉ cần
+      thêm chữ "test" vào tên là lách được.
+    sua: >
+      nhận diện bằng PHẠM VI (`mọi đường trong phạm_vi_ghi đều là file cổng`)
+      — thứ không đổi được bằng cách đặt tên. Đã thử ĐỎ: task ghi cả mã lẫn
+      cổng vẫn bị bắt.
+  - id: ký tự BACKSPACE vô hình trong regex
+    goc: >
+      Tôi ghi `_MA = re.compile(r"\bMÃ\b")` qua một chuỗi KHÔNG-raw, nên `\b`
+      thành ký tự 0x08 THẬT nằm hai đầu regex. Dòng đó nhìn bằng mắt đọc y hệt
+      dòng đúng; `_MA.pattern` in ra cũng y hệt; chỉ `cat -A` mới lộ `^H`.
+      Hệ quả: `_MA` không khớp gì, phép kiểm "phụ thuộc treo" IM LẶNG thành mù.
+    phat_hien: >
+      Không phải nhờ đọc mã — nhờ thử ĐỎ. Tôi cắm một mã bịa `T99-404` và cổng
+      vẫn xanh. Nếu tin vào "23 → 14 lỗi, xong" thì đã bàn giao một cổng mù.
+    sua: viết lại dòng không dùng `\b`; quét cả repo, không file nào khác dính
+  - id: enum `xem_truoc` thiếu `van-ban`
+    goc: >
+      `.md`/`.txt` (T03-111) khai `xem_truoc: van-ban` và KHÔNG có `magic` —
+      văn bản thuần không có magic byte, và bảng ghi rõ lý do. Cổng đòi mọi
+      dòng có `magic` + enum ba giá trị ⇒ đỏ oan một quyết định đã khai.
+      Chính cổng ấy đã học đúng bài này một lần với `.vtt`; đây là lần thứ HAI.
+    sua: >
+      miễn theo TÍNH CHẤT SUY ĐƯỢC (`xem_truoc == "van-ban"`), không theo danh
+      sách mime chép tay; thêm chiều NGƯỢC: khai `van-ban` mà có `magic` là
+      khai mâu thuẫn, cũng đỏ.
+
+loi_that_da_sua:
+  - id: validate.py đi lạc vào kb/_media/
+    goc: >
+      `is_analysis` chỉ xét TÊN FILE bắt đầu bằng `_`, không xét THƯ MỤC. Từ
+      khi `.md` được nhận làm nguyên liệu, một file upload tên
+      `cd31…c55c.md` trong `kb/_media/` lọt qua ⇒ `validate.py kb/ --strict`
+      đỏ vì "không có frontmatter", mà bản upload thô KHÔNG có frontmatter là
+      đúng — nó chưa được chưng cất. Kéo `check_running` đỏ theo.
+    sua: xét cả thư mục cha; kb/ từ 1 lỗi → 0 lỗi
+  - id: /chung-cat/ sai nhóm menu
+    goc: >
+      Tôi thêm nó vào nhóm NỘI DUNG. Nhóm đó là hợp đồng ba-module: Tổng hợp +
+      ĐÚNG ba loại (bài viết · tài liệu · video). Thêm mục thứ năm làm người
+      đọc menu tưởng có loại nội dung thứ tư.
+    sua: về nhóm `hethong`, cạnh Kho và Danh mục — nơi người LÀM VIỆC với kho
+  - id: đếm `lan_gui` trùng
+    goc: >
+      Tôi thêm `q.ghi_nhan_gui(ulid)` vào lối ASR, nhưng `worker.py:414` ĐÃ gọi
+      sẵn. Grep trước đó của tôi tìm chuỗi `lan_gui` — tên hàm là `ghi_nhan_gui`,
+      không chứa chuỗi ấy. Đã gỡ lần đếm thừa.
+    tu_sua_loi_khai: >
+      Ô backlog tôi ghi lượt trước ("R6 chưa có răng, không ai gọi") là SAI.
+      Đã sửa ô đó thành lời khai đúng thay vì để một câu sai nằm trong sổ.
+
+tai_lieu_dong_bo:
+  - "web/WORKLOG.md · số cổng 90 → 94"
+  - "web/styles/WORKLOG.md · prototype.css 3044 → 3059 dòng"
+  - "web/plugins/WORKLOG.md · plugin `cctab` (vì sao là chunk, cầu một chiều, CSS trong chunk)"
+  - "web/test/WORKLOG.md · bốn cổng mới + bẫy chung: chúng đo VĂN BẢN MÃ, không phải chạy thật"
+
+do_sau:
+  - lenh: 'for f in chungcat/tests/check_*.py; do python "$f"; done'
+    ket_qua: 35/35 XANH
+  - lenh: python -m pytest core/tests -q
+    ket_qua: 49 passed
+  - lenh: python core/src/source_distiller/validate.py kb/ --strict
+    ket_qua: "4 file · 0 lỗi · 1 cảnh báo"
+  - lenh: python core/tests/check_frozen.py
+    ket_qua: "pass · mọi file frozen khớp baseline đã ký"
+  - lenh: python core/tests/check_g6b.py
+    ket_qua: "27 → 12 lỗi; 0 thuộc M12 hoặc M03"
+  - lenh: cd web && npm test
+    ket_qua: "279 vế ok · 1 FAIL `trang chủ 61915/61440` (shell.html của phiên khác, +37 dòng chưa commit)"
+
+don_data_test:
+  xoa:
+    - "47 file hàng đợi (cur 9 · done 38)"
+    - "kb/article/phan-tich-linux-foundation.md — bản tôi duyệt lúc thử E2E"
+    - "23 hàng `nhap_chung_cat` · 23 hàng `lan_thu`"
+  luu_tru_khong_xoa:
+    - ".factory/archive/egress-test-2026-09-05.jsonl — 43 dòng. Sổ byte RỜI KHỎI MÁY (`M12-R3`/`AC-6.1`). Xoá nó để có màn hình sạch là xoá đúng thứ luật dựng lên để giữ."
+    - ".factory/archive/nhap-chung-cat-test-2026-09-05.json — 96 hàng ba bảng, xuất trước khi dọn"
+  giu_nguyen:
+    - "kb/_media/** — file NGƯỜI TẢI LÊN, không phải data test của tôi"
+    - "kb/tai-lieu/linux-foundation.md — mtime 02:51, TRƯỚC phiên test của tôi"
+    - "audit_loi (50 hàng) — trigger APPEND-ONLY chặn xoá, và nó chặn ĐÚNG: sổ audit là biên ghi việc TÔI đã làm, bên bị ghi không được xoá biên ghi của mình"
+
+con_lai_khong_thuoc_toi:
+  - "T09-8 ×9 — một task ghi khắp core/ · web/api/ · web/render/ · web/plugins/. Chạm ≥2 module ⇒ đó là BUILD, không phải PATCH. Tách task là quyết định của PM."
+  - "T08-16 ×2 — ghi spec.md + rules.md của M18 (FROZEN). Cần FR của M18."
+  - "T04-8 — ghi `.gitattributes`, ngoài boundary M04_ci."
+  - "check_danh_muc · check_loai_nguon_db · check_skill — hai bản schema lệch nhau, 16/24 loại nguồn, 4 file lệch core ↔ skill-src (M01/M09)"
+  - "check_db_dung_cho — `ma_moi`/`phien` bị một exporter khai (ADR-06 c · M08-R6 · M18-R2)"
+  - "check_media_ddl — DDL chưa bắn 2 ràng buộc. Cổng nói thẳng 'sửa DDL, KHÔNG sửa cổng'."
+  - "check_running — cascade của bốn cổng trên, tự xanh khi chúng xanh"
+  - "npm test `trang chủ 61915/61440` — `git diff --numstat web/plugins/home-pages/shell.html` = +37/0, phiên khác"
+
+object:
+  - 06_modules/M12_chungcat/rules.md
+  - FROZEN.lock
+  - chungcat/src/worker.py
+  - core/tests/check_g6b.py
+  - core/tests/check_khai_mot_noi.py
+  - core/tests/check_dinh_dang_mo.py
+  - core/src/source_distiller/validate.py
+  - core/assets/man-hinh.json
+  - core/assets/media-mime.json
+  - project_map.yaml
+  - web/WORKLOG.md
+  - web/styles/WORKLOG.md
+  - web/plugins/WORKLOG.md
+  - web/test/WORKLOG.md
+  - 06_modules/M12_chungcat/backlog.md
+  - .factory/fr/FR-065-cat-doan-audio-va-tran-gui.md
+  - .factory/archive/egress-test-2026-09-05.jsonl
+  - .factory/archive/nhap-chung-cat-test-2026-09-05.json

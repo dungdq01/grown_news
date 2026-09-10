@@ -1,0 +1,18 @@
+#!/bin/sh
+# Chặn commit file .md trong kb/ không đạt format source-distiller.
+# Cài: git config core.hooksPath .githooks
+#
+# Chỉ chạy khi kb/ có thay đổi. Commit thuần web/ hoặc core/ không bị chậm.
+
+staged=$(git diff --cached --name-only --diff-filter=ACM | grep '^kb/.*\.md$')
+[ -z "$staged" ] && exit 0
+
+PY=${PYTHON:-python}
+echo "validate: $(echo "$staged" | wc -l) file trong kb/"
+"$PY" core/src/source_distiller/validate.py kb/ || {
+  echo ""
+  echo "Commit bị chặn. Sửa lỗi trên, hoặc chạy:"
+  echo "  $PY core/src/source_distiller/validate.py kb/ --fix   # sửa word_count"
+  echo "  git commit --no-verify                                # bỏ qua (không khuyến khích)"
+  exit 1
+}

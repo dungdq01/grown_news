@@ -1,0 +1,120 @@
+id: WL-01K9K7KINHSANG
+at: 2026-08-24
+by: claude
+buoc: s8 (M03_web) + s5 (tokens)
+loai: fix — kinh hien duoc o che do sang + tri bug chap chon EPERM
+fr: FR-027-he-kinh-tren-anh.md (them muc FR-027b)
+
+viec: >
+  Nguoi dung gui anh chup trang chu va noi: "Kết quả chưa apply full trang chủ
+  mới vào đâu". DUNG — toi lam ha tang nhung khong dung lai bo cuc, va co ly do
+  thu hai lam kinh khong thay duoc.
+
+# ── Nguoi dung dung o hai diem ────────────────────────────────────────────
+diem_1_bo_cuc: >
+  Toi lam token/anh/rang nhung KHONG dung lai bo cuc Trang chu. Anh chup van la
+  shell cu (thanh tren ngang · panel Noi bat phang · bar HTML), chi co anh nen
+  phia sau. Ba thu cau truc con thieu:
+    dieu huong  thanh tren ngang  ->  rail trai 78px co dinh
+    vung dau    panel phang       ->  #hero co perspective(1800px)
+    bieu do     bar HTML ngang    ->  #tower khoi 3D CSS
+  CHUA LAM trong luot nay — xem "no con lai".
+
+diem_2_kinh_khong_thay_o_che_do_sang:
+  nguyen_nhan: "alpha sang .9 = chi 10% anh xuyen qua. Mat doc ra 'tam trang', khong phai mat kinh."
+  vi_sao_toi_bo_sot: "FR-027 chi ha alpha ban TOI (.88 -> .62). Ban sang giu .9 vi do luc do cho thay no can .84+ de dat AA."
+  do_lai_ky_hon: |
+    Anh public/light/ dang dung, nen nhat nhat #6D6D6D:
+      alpha  nen tron   chu mo   do #C81E1E
+       .90   #F2F2F1     5.16      5.16    (ban truoc — 10% xuyen qua)
+       .80   #E7E8E7     5.16      4.67  <- CHON: 20% xuyen qua, ca bon du that
+       .78   #E5E6E5     5.06      4.58    do chi du 0.08 — sat mep
+       .74   #E1E1E1     4.84      4.39    do TRUOT
+       .70   #DDDDDD     4.66      4.22    do TRUOT
+  rang_buoc_binding_la_DO_khong_phai_chu_mo: >
+    Ban dau toi chon .70 va tinh ha `muted-foreground` — sai huong. Do #C81E1E
+    la MAU THUONG HIEU (ui_guide §1: "Đỏ #C81E1E là mực in"). Lam no toi di de
+    lay them 10% do trong la doi thu nguoi doc nhan ra to bao bang, de lay mot
+    hieu ung. Nen alpha dung o .8 va do giu nguyen.
+  ket_qua: "sang .9 -> .8 (20% anh xuyen qua thay vi 10%) · muted-foreground #65656C -> #5F5F66 (tra no cu, doc lap voi alpha)"
+
+# ── Phep kiem khoa CUNG mot con so, sua thanh so HAI NGUON ───────────────
+motion_polish_khoa_cung:
+  truoc: 'ok(audit.glass_alpha.light === 0.9 && /--background:rgba\(252,252,251,\.9\)/.test(tokens))'
+  hai_viec_sai_cung_luc:
+    - "chan mot thay doi HOP LE (ha .9 de kinh hien o che do sang)"
+    - >
+      KHONG bat duoc loi that: sua tokens roi quen sinh lai audit thi hai ben
+      lech nhau ma con so 0.9 van dung o ca hai
+  sua: >
+    So HAI NGUON KHOP NHAU cho ca hai che do, doc alpha tu tokens.css va tu
+    audit roi so. Them mot phep kiem `audit.failures === 0`. Gio audit duoc SINH
+    tu tokens nen lech chi xay ra khi quen chay lai — va do dung la thu phep
+    kiem nay bat.
+  cung_lop_loi_da_gap: "'dem mot ten xuat hien bao nhieu lan la phep kiem yeu' — khoa mot GIA TRI khi dieu can bao ve la SU KHOP"
+
+# ── Bug trong script audit toi tu bat (cai thu ba) ───────────────────────
+bug_closure_ro_ri:
+  hien_tuong: "audit bao 4 cap truot, nhung phep tinh tay cho PASS. Chenh lech do phoi ra loi."
+  do_cu_the: "nen sang audit tinh #C2C3C3, tinh tay ra #DDDDDD"
+  nguyen_nhan: >
+    `def gt` dinh nghia BEN TRONG vong lap thu nhat roi dung lai o vong thu HAI.
+    Closure van tro vao `than` cua lan lap CUOI (= khoi dark), nen vong hai tinh
+    CA HAI che do bang veil cua che do TOI.
+  chung_minh_bang_so: >
+    veil toi #060E14@.5 tren #6D6D6D -> 57.5, roi panel .7 -> 194 = #C2.
+    Dung con so audit in ra.
+  sua: "ham `gt(than, ten)` ra NGOAI vong lap, nhan `than` la tham so; vong 1 dung `g()` binding tuong minh."
+
+# ── Bug chap chon EPERM — TRI DUOC nho thong bao cai tien ────────────────
+bug_eperm:
+  bo_i: "luot truoc toi ghi 'mot luot test do khong tai hien duoc' va da them in nguyen van phan hoi"
+  lan_nay_no_tu_noi: |
+    EPERM: operation not permitted, rename
+      'bai-nhap.md.dang-ghi' -> 'bai-nhap.md'
+  nguyen_nhan: >
+    Cho toi TU TAO o FR-023: moi lan ghi xong `capNhatIndex()` spawn
+    `sinh_index.py`, va no `read_text()` MOI file .md (sinh_index.py:114). Lenh
+    ghi ke tiep rename de len dung file python dang doc ⇒ tren Windows la LOI
+    CUNG, khong phai canh bao.
+  vi_sao_chap_chon: "cua so trung nhau chi vai chuc ms — 1/5 luot"
+  sua: >
+    `doiTenBenBi()` — rename co thu lai 12 nhip x 20ms. Khong tuan tu hoa voi
+    index vi index mat ~430ms/luot, khoa chung nghia la moi lenh ghi cho nua
+    giay. Handle doc cua python chi giu vai chuc ms.
+  cho_dong_bo_khong_async: >
+    `Atomics.wait` tren SharedArrayBuffer — cach duy nhat ngu ma KHONG nhuong
+    event loop. Ham goi dang trong mutex `tuanTu()`; nhuong luot la mo cua cho
+    lenh ghi khac chen vao.
+  het_luot_van_khong_duoc_thi_NEM: "im lang bo qua la mat bai ma bao thanh cong"
+  kiem_chung: "chay lai 3 luot tron bo: 34/34 · 0 FAIL · 0 EPERM (truoc do 1/5 luot do)"
+
+cong_do_dung_sau_khi_sua:
+  hien_tuong: "check_index_dan_xuat do 2 phep kiem sau khi toi boc rename vao ham phu"
+  cong_do_DUNG: "gia dinh 'rename nam tai cho ghi' khong con — no go cung `renameSync(benCanh, dich)`"
+  sua_cong_khong_sua_code: >
+    Tinh chat can bao ve khong doi: moi cho DI CHUYEN file phai danh dau index
+    ban. Nen cong dem CHO DI CHUYEN (`doiTenBenBi(` hoac `renameSync(`), khong
+    dem mot cu phap. Va BO than ham `doiTenBenBi` truoc khi dem — do la CACH LAM,
+    khong phai mot cho di chuyen thu tu.
+  kiem_hai_chieu: "bo 1 banIndex() o phucHoi => do dung 1 phep kiem"
+
+evidence:
+  - "cd web && npm test => 34/34, chay 3 luot lien tiep deu 0 FAIL 0 EPERM"
+  - "npm run check => sach"
+  - "pytest core/tests -q => 30 passed"
+  - "13/13 cong check_* exit 0"
+  - "sinh_contrast_audit.py => 62 cap · 0 truot (glass_alpha light=0.8 dark=0.62)"
+  - "check_frozen: ky lai 27 file"
+
+no_con_lai:
+  - >
+    BO CUC Trang chu VAN CHUA dung lai — day la thu nguoi dung hoi. Con thieu:
+    rail trai 78px (thay thanh tren ngang, va no o NGOAI moi view nen doi la doi
+    khung ca 6 man) · #hero co perspective · #tower khoi 3D CSS · canvas hat ·
+    ba vong tu chuyen.
+  - >
+    four-screens.test.js khoa 4 vung + 4 layout family (brk-g/nw/kpi/grid) — hop
+    dong nay GIU duoc khi doi ngon ngu thi giac, da kiem.
+  - "Khong test nao canh thanh tren (`<header class=\"top\">`) — doi sang rail rui ro thap ve test, nhung anh huong ca 6 man."
+  - "FR-025 · FR-026 ve B — CHO NGUOI KY."

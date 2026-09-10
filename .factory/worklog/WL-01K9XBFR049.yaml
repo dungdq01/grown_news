@@ -1,0 +1,87 @@
+id: WL-01K9XBFR049
+at: 2026-09-02
+by: claude
+buoc: "FR-049 (a) thi cong + DONG. Rate limit hai chieu + rang cho entropy. Chu du an: 'mo ca 4, lan luot tuan tu a-b-c-d'"
+loai: T08-15 (CODE) + T08-15b (TEST); do TRUOC (R5)
+gate: FR-049 DA DONG; M18 promote 3 AC soft -> hard
+
+object:
+  - 07_plan/M08_api/tasks/T08-15-rate-limit-va-rang-entropy.md
+  - core/assets/nguong-loi.json        # MOI — bang khai nguong
+  - web/api/dungchung.mjs              # nguongLoi + loiChoThu + bang lan_thu
+  - web/api/loi-cua.mjs                # quaCong goi loiChoThu; 2 cua tieu ma truyen `ma`
+  - web/test/rate-limit.test.js        # MOI — W1..W6
+  - web/test/loi-cua-http.test.js      # +3 ca 429 qua HTTP that
+  - web/test/loi-cua.test.js           # sua phep do V3B
+  - 06_modules/M18_nguoidung/spec.md   # AC-7.1/7.2/7.3 soft -> hard
+  - web/package.json · web/test/WORKLOG.md · web/WORKLOG.md
+  - .factory/fr/FR-049-*.md            # -> DA DONG + §6
+
+evidence:
+  - "DO TRUOC: node test/rate-limit.test.js => TypeError M.nguongLoi is not a function"
+  - "W1..W6 xanh; W3b: doi nguong 10 -> 3 => diem chan doi tu lan 11 sang lan 4"
+  - "429 qua HTTP that: nhan o lan thu 7 (+4 request da xac thuc truoc = 11 > nguong 10)"
+  - "check_g6a: M18 18 hard / 0 soft (truoc: 15 hard / 3 soft)"
+  - "23/27 cong Python xanh (4 do co truoc) · pytest 42 · npm test 83 file exit 0"
+
+# ══ TRONG TAM FR KHONG PHAI CHO TOI TUONG LUC MO ═══════════════════
+hai_ve_da_dung_san: >
+  Do truoc khi viet: entropy DA la 256 bit (randomBytes(32)) va log that bai DA
+  co (loiGhiAudit ok:false o C4/C7) — ca hai den tu FR-047, KHONG CO Y.
+  Chi rate limit la chua co gi.
+  NHUNG 0 CONG NAO CANH hai ve do: doi randomBytes(32) -> Math.random() thi moi
+  test cu VAN XANH.
+  => Phan lon gia tri cua FR nay khong phai DUNG THEM, ma la DAT RANG cho hai
+  tinh chat DANG DUNG ma khong duoc bao ve.
+  MOT TINH CHAT DUNG TINH CO LA MOT TINH CHAT SE MAT TINH CO — va no mat im
+  lang, vi khong co gi bao.
+
+# ══ BA QUYET DINH THI CONG KHONG CO TRONG FR GOC ═══════════════════
+dem_SAU_khi_khoa_qua: >
+  Neu dem TRUOC khi kiem khoa dich vu thi mot nguoi la khong co khoa cung lam
+  can quota cua M15/M17 (x-forwarded-for do ho tu khai) — tuc mot cong CHONG DO
+  tro thanh mot cong GAY DoS NOI BO.
+  Ca 429 qua HTTP do dieu nay GIAN TIEP: no dat o CUOI file, sau 7 request 401
+  o dau. Neu thu tu nguoc lai thi 7 request khong-khoa do da du gan nguong 10,
+  va 429 se den SOM HON 7. Con so 7 la bang chung.
+
+429_khong_401: >
+  Hai ca khac nhau. Nguoi goi HOP LE can biet nen CHO, chu khong nen di doi khoa.
+  Day la cua cua MAY da xac thuc nen noi ro khong ro gi cho nguoi la.
+
+bang_lan_thu_luu_BAM_khong_luu_ma: >
+  Du de dem "cung mot ma bi thu bao nhieu lan" ma khong giu bi mat nao — ai doc
+  duoc DB cung khong lay duoc ma tu do. Day la M18-R2 ap cho mot bang ma M18-R2
+  chua biet la co.
+
+bo_dem_trong_DB_khong_trong_RAM: >
+  Hai ly do, ca hai do duoc:
+  - RAM mat khi restart => ke do chi can doi mot lan khoi dong lai.
+  - web/ chay MOT tien trinh hom nay, nhung ADR-05 mo duong cho nhieu — bo dem
+    RAM se dem RIENG tung tien trinh, tuc nguong THAT thanh N x so tien trinh
+    ma khong ai doi mot dong cau hinh nao.
+
+# ══ MOT CONG CUA TOI DO VI DO HINH DANG ════════════════════════════
+V3b_do_vi_tri_ky_tu: >
+  Cong V3b ("moi handler goi quaCong") do bang slice(i, i+400) + regex
+  `quaCong(req, res)`.
+  No DO ngay khi FR-049 doi hai handler thanh `quaCong(req, res, {ma})` va doc
+  body truoc do — TRONG KHI MA VAN DUNG: doc mot body CO TRAN khong phai cham
+  du lieu.
+  Cong dang do HINH DANG, khong do LUAT.
+  => Doi sang do bat bien THAT: quaCong dung TRUOC moi thao tac DU LIEU (loi*),
+     bo qua loiChoThu vi no nam TRONG quaCong.
+  Cong nay manh hon ban cu VA khong vo vi doi chu ky ham.
+
+bay_escaping_lan_thu_TU: >
+  Lai vap `\n` trong heredoc bien thanh newline that, lan thu TU trong phien.
+  Ba lan truoc da ghi, va toi VAN lam lai.
+  Luat cho lan sau, khong ngoai le: noi dung co `\n` hoac backtick => VIET RA
+  FILE bang Write roi ghep, KHONG nhoi vao heredoc.
+
+no_con_lai:
+  - "FR-050 (b) — cho chu du an chon 1/3 duong o §2c"
+  - "FR-051 (c) — cho chu du an dien 6 dau `?` trong ma tran §2"
+  - "FR-052 (d) — cho chu du an chon cach 1 (media thanh mang) hay cach 2 (bang hien_vat)"
+  - "Chuyen 22 rule sang bo ba lenh/do_khi/xanh_khi: sau a..d, theo tung module, can mot FR"
+  - "nguong-loi.json: ca ba so la PHONG DOAN, da khai 'CHUA KIEM CHUNG' — chinh sau khi co nguoi buoc kenh that"

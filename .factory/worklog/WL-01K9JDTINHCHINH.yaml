@@ -1,0 +1,112 @@
+id: WL-01K9JDTINHCHINH
+at: 2026-08-20
+by: claude
+buoc: s8 (M03_web + M04_ci)
+loai: fix — tinh chỉnh thị giác màn Danh mục
+fr: FR-021 (đã duyệt) — không mở FR mới, không sửa file frozen
+
+viec: >
+  Người dùng trên bản chạy thật: "có thể design màu sắc, size chữ và bố cục, các
+  button đẹp hơn xíu không? trông nó thực sự không chuyên nghiệp và gọn gàng mềm
+  mại tí nào cả". Gọi /design:shadcn-ui và /design:color-expert.
+
+hai_skill_duoc_goi_KHONG_dung_duoc:
+  what: >
+    Cả shadcn-ui và color-expert trong plugin này chỉ là MỤC CATALOGUE — nội dung
+    file là mô tả + link upstream ("install the upstream bundle into your active
+    agent's skills directory"), không có hướng dẫn thi hành.
+  lam_gi_thay_the: >
+    Dùng nguồn thật của dự án: contrast-audit.json (50 cặp, 50/50 pass WCAG AA),
+    tokens.css (113 token), TYPOGRAPHY.md. Và ĐO trên ảnh chụp thay vì đoán gu.
+  ghi_chu: >
+    prototype.css:110 đã ghi "spec shadcn/ui: h-9 px-4, text-sm font-medium,
+    rounded-md, focus ring 3px @ 50%, disabled opacity-50" — hệ nút của dự án
+    VỐN theo shadcn. Không cần skill để biết điều đó.
+
+nam_van_de_DO_DUOC_tu_anh_khong_phai_gu:
+  1_nut_pha_huy_noi_nhat_man_hinh:
+    do: "8 nút XOÁ nền đặc --destructive #B3261E dàn dọc trang"
+    vi_sao_sai: >
+      Nút PHÁ HUỶ nổi nhất là sai thứ tự ưu tiên thị giác — mắt bị kéo về thứ
+      hiếm dùng, còn "sửa" (việc thường làm) thì mờ hơn.
+    sua: "viền mảnh + chữ đỏ; chỉ đổ đỏ khi hover/focus. Ý định vẫn rõ, không tranh chú ý"
+  2_so_KPI_qua_to:
+    do: "--fs-hero 2.5rem = 40px cho ô rộng 7.5rem ⇒ 4 ô chiếm gần cả màn đầu"
+    sua: "--fs-h2 (1.5rem=24px) — bậc trong thang, KHÔNG gõ giá trị mới"
+  3_hang_roi_rac:
+    do: "gap 24px + viền mờ 40% ⇒ nhìn như danh sách rời, không thành bảng"
+    sua: "gap --s-sm, kẻ --line-2, sọc chẵn-lẻ rất nhạt (34% glass) để mắt lần theo hàng"
+  4_khong_phan_cap_chu:
+    do: "nhãn tiếng Việt và id cùng cỡ ⇒ mắt không biết đọc gì trước"
+    sua: "nhãn --fs-body + --w-head; id --fs-micro + nền --muted như thẻ code"
+  5_cot_so_lech:
+    do: "'0 bài' rộng 52px nhưng căn trái, không thành cột"
+    sua: "min-width 56px + text-align right + tabular-nums; hàng đang dùng thì số đậm"
+
+loi_TU_BAT_bang_TINH_TOAN_khong_bang_mat:
+  what: >
+    Bản đầu tôi viết `.rc-r .bt{opacity:.55}` cho hai nút mờ đi khi chưa hover.
+    Trông ổn. Nhưng tôi tự tính lại tỉ lệ tương phản SAU khi trộn với nền:
+      ink-2 #3A3A42 @ .55 → #919195 = 3.06:1   (cần 4.5)
+      đỏ    #C81E1E @ .55 → #DF8281 = 2.67:1   (cần 4.5)
+  vi_sao_quan_trong: >
+    contrast-audit.json đo 50 cặp màu ĐẶC và 50/50 pass. `opacity` trộn màu với
+    nền TRƯỚC khi mắt thấy ⇒ nó phá hợp đồng contrast SAU LƯNG bản audit.
+    Không test nào bắt: token-only chỉ soi px/rem, contrast-audit là JSON tĩnh
+    không biết CSS có opacity.
+  chon_.85_co_can_cu: >
+    Tính từng mức trên nền #FCFCFB: .55 → 2.67 (trượt) · .80 → 4.25 (trượt) ·
+    .85 → 4.58 (pass). .85 là mức THẤP NHẤT còn pass, không phải số chọn theo cảm giác.
+
+cong_may_moi_opacity_khong_pha_contrast:
+  lam_gi: "tính lại tỉ lệ SAU khi trộn, cho mọi luật opacity áp lên chữ"
+  ban_dau_cua_TEST_bao_sai_9_cho:
+    - "áp --destructive cho MỌI selector: `.bgn` là số đếm, `.more::after` là mũi
+       tên '→' — cả hai không bao giờ đỏ. Sửa: đọc `color:var(--x)` trong CHÍNH luật đó."
+    - "không xét cascade: `.bk-toc .n` khai opacity .65 ở :395 rồi opacity 1 ở
+       :1113 — bản sau thắng. Sửa: lấy bản CUỐI của mỗi selector."
+    - "bắt cả trạng thái ĐẦU của animation (.sky/.rise opacity 0, keyframe 50%)
+       — không ai đọc chữ ở đó. Miễn trừ, kèm lý do từng cái."
+  mien_tru_moi_cai_mot_ly_do:
+    - ".grain/.rz-  phần tử KHÔNG chứa chữ"
+    - ":disabled    WCAG 1.4.3 miễn trừ điều khiển vô hiệu hoá"
+    - "@keyframes/.sky/.rise/.bars  trạng thái giữa của chuyển động"
+    - ".cd.st-*     opacity trên CẢ THẺ nói 'nháp/đã loại' — thông tin trạng thái
+       từ FR-008, không phải chữ bị làm nhạt. Đổi là đổi ngữ nghĩa, cần FR."
+  kiem_hai_chieu: "hạ về .55 → exit 1 (báo đúng 2.72 và 3.06); phục hồi → exit 0"
+
+loi_thu_hai_test_cua_luot_truoc_bat_duoc_toi:
+  what: "man-danh-muc.test.js báo 'hex gõ tay: #B3261E #FCFCFB'"
+  that_ra: >
+    Hai hex đó nằm trong COMMENT tôi vừa viết để giải thích vì sao bỏ nút đỏ đặc.
+    Test đọc thô, không bỏ comment trước khi soi.
+  sua: "strip /* */ trước khi quét — hex trong comment không phải hex gõ tay"
+  y_nghia: "test của lượt trước bắt được lỗi của lượt này, đúng việc nó sinh ra để làm"
+
+verify:
+  loai: hard
+  ket_qua:
+    npm_run_check: sạch
+    web_test: 26/26 file, exit 0 (thêm opacity-khong-pha-contrast — 13 phép kiểm)
+    cong_may: 4/4 đã chạy (frozen · danh_muc · ci_teeth · running)
+    build: exit 0
+  kiem_bang_SO:
+    - "opacity .85: ink-2 6.98:1 · đỏ 4.94:1 — cả hai trên 4.5"
+    - "opacity .80 thì đỏ 4.48 ⇒ .85 là ngưỡng thấp nhất"
+  kiem_CSS_da_build:
+    - ".rc-r .bt.dstr{background:transparent;color:var(--destructive)"
+    - ".rc-r .bt{opacity:.85;transition:...}"
+    - "#dmkpi .v{font-size:var(--fs-h2)}"
+  frozen: "check_frozen exit 0 — không file frozen nào đổi"
+
+no:
+  - "Chỉ đổi CSS. Bố cục (3 tab, phân trang, popup) giữ nguyên như FR-021 —
+     người dùng nói 'tạm thời ổn' về phần đó."
+  - "Cổng opacity chỉ đo tone LIGHT (token :root đầu). Dark có bảng riêng
+     (--muted-foreground #9A9AA4 vs #6B6B74) và chưa được kiểm bằng máy —
+     contrast-audit có đo dark, nhưng cổng này chưa đọc khối đó."
+  - "Sọc chẵn-lẻ dùng color-mix 34% glass: nhạt tới mức có thể không thấy trên
+     một số ảnh nền. Chưa đo trên cả 4 ảnh nền như contrast-audit làm."
+  - "8 chỗ opacity CÓ SẴN trong file (bgn .7, more::after .7, cd.st-draft .72,
+     cd.st-rejected .5) — cổng miễn trừ chúng vì không mang màu đỏ hoặc là
+     trạng thái thẻ. Nếu sau này ai đặt chữ đỏ vào đó thì cổng không bắt."

@@ -1,0 +1,73 @@
+ulid: 01M1RP4T7B2H9K3F6WGXC5D0YE
+thoi_diem: 2026-09-05T21:05+07:00
+tac_nhan: claude-opus-5
+loai: ban_giao
+module: M12_chungcat
+don_vi: T12-22 · nguồn dài — cắt đoạn, gửi từng đoạn, gộp lại
+
+viec: >
+  `FR-065` lối A. Chủ dự án chốt: chunk + concat KHÔNG phải gửi đi gửi lại một
+  request, nên `M12-R6` không đụng tới. Thi công theo đúng ranh giới đó.
+
+r5_do_truoc:
+  - don_vi: T12-22
+    lenh: python chungcat/tests/check_cat_doan_audio.py
+    ket_qua: "ĐỎ — `asr_cua` chưa có `cat_doan`"
+    đỏ_do: claude-opus-5
+
+ranh_gioi_r6: >
+  `lan_gui` đếm số lần THỬ phiên âm một job — chia bao nhiêu đoạn cũng tính
+  MỘT. Mỗi đoạn vẫn một dòng `egress.jsonl` riêng có `sha256` riêng, nên số
+  byte rời máy vẫn đếm đúng từng byte (`AC-6.1` không đổi một chữ).
+  Đếm theo đoạn thì nguồn 60 phút tự chạm trần ngay lần thử ĐẦU, chưa hỏng lần
+  nào — tức `M12-R6` biến thành trần ĐỘ DÀI NGUỒN, thứ nó không được dựng lên
+  để chặn. Cổng `AC5` canh đúng chỗ này: `ghi_nhan_gui` không được xuất hiện
+  bên trong vòng lặp đoạn.
+
+hai_quyet_dinh:
+  - khong_chong_lan: >
+      Chồng lấn thì phần chồng được phiên âm hai lần và phải khử trùng. Khử
+      trùng trên văn bản model sinh là ĐOÁN, và đoán sai thì XOÁ chữ thật.
+      Không chồng lấn thì mất cùng lắm một từ vắt ngang ranh — mất ở chỗ đoán
+      trước được, và không bao giờ xoá nhầm chữ đã có.
+  - doi_moc: >
+      Mỗi đoạn về từ cửa với mốc đếm từ 0 của CHÍNH NÓ. Quên cộng offset thì
+      bản 25 phút có ba lần chạy lại từ 0 giây — file `.vtt` vẫn HỢP LỆ, vẫn
+      mở được, và sai hoàn toàn. Đây là vế cổng phải canh chặt nhất vì nó
+      không tự lộ ra.
+
+do_sau:
+  - lenh: python chungcat/tests/check_cat_doan_audio.py
+    ket_qua: 7/7 XANH
+  - lenh: python chungcat/tests/check_tran_thu_lai.py
+    ket_qua: "XANH — trần 2 lần gửi · 2 dòng log · `lan_gui` bền qua chạy lại"
+  - lenh: 'for f in chungcat/tests/check_*.py; do python "$f"; done'
+    ket_qua: 35/35 XANH
+  - lenh: python -m pytest core/tests -q
+    ket_qua: 49 passed
+  - lenh: python core/tests/check_g6b.py
+    ket_qua: "27 lỗi, T12-22 ok — 0 lỗi thuộc M12"
+
+chay_that:
+  nguon: "chungcat/hang-doi/cur/4fa1b5a6e43f462794c6944d4c972e06.audio.mp3 (1133s)"
+  ket_qua: >
+    2 đoạn × 10 phút → 196 cue, phủ 1152.9s/1133s, dòng thời gian TĂNG DẦN qua
+    ranh đoạn, kết thúc đúng câu cuối của nguồn ("Xin chào và chúc các bạn một
+    ngày cuối tuần vui vẻ."). Bỏ 1 cue thiếu mốc do model.
+
+con_no:
+  - >
+    `M12-R6` vẫn viết *"GỬI lần thứ 3"* — chữ chưa khớp cách đọc đã chốt. Hôm
+    nay không ai đỏ vì `vong.ghi_nhan_gui` CHƯA ĐƯỢC GỌI từ `worker`/`asr_cua`,
+    tức trần thử-lại đang không có răng trên đường transcript. Đã ghi ô backlog
+    M12; đấu bộ đếm vào phải làm CÙNG LƯỢT với chữ mới, không thì đấu xong là
+    đỏ oan mọi nguồn dài. Chữ đề nghị nằm trong `FR-065`; agent KHÔNG sửa
+    `rules.md` (FROZEN, và `R2` cấm agent ký thứ chấm mình).
+
+object:
+  - chungcat/src/asr_cua.py
+  - chungcat/tests/check_cat_doan_audio.py
+  - 07_plan/M12_chungcat/tasks/T12-22-cat-doan-audio-nguon-dai.md
+  - 07_plan/M12_chungcat/tasks/T12-8-test-cong-m12.md
+  - .factory/fr/FR-065-cat-doan-audio-va-tran-gui.md
+  - 06_modules/M12_chungcat/backlog.md

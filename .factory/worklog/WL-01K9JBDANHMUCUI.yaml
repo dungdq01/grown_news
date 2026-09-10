@@ -1,0 +1,175 @@
+id: WL-01K9JBDANHMUCUI
+at: 2026-08-20
+by: claude
+buoc: s8 (M03_web + M08_api) + s6 (M02_kb/rules.md — FROZEN)
+loai: fix (bug UI) + redesign + amend-frozen
+fr: FR-021-sua-xoa-nhan-co-dieu-kien.md (DUYỆT 2026-08-19)
+
+viec: >
+  Người dùng nêu 6 mục: (1-2) hai câu hỏi về CRUD và chỗ thao tác, (3) đổi tên màn
+  Khái niệm thành màn quản lý nhãn, (4) redesign theo khuôn màn khác, (5) bug UI
+  nhãn dài chiếm chỗ lưới bài, (6) nút tạo nhanh nhãn ở form viết bài.
+
+pham_vi_ghi:
+  - web/styles/prototype.css              # min-width:0 · .ch max-width · .f-them
+  - web/test/nhan-dai-khong-tran.test.js  # MỚI — cổng cho lớp lỗi im lặng
+  - web/plugins/home-pages/shell.html     # redesign màn + nút tạo nhanh
+  - web/plugins/home-pages/index.ts       # hangNhan() · dmkpi · tiêu đề "Danh mục"
+  - web/plugins/multiwindow/.../multiwindow.inline.ts  # 4 handler + i18n EN
+  - web/api/dungchung.mjs                 # suaDanhMuc · inDanhMuc
+  - web/api/danhmuc.mjs · router.mjs      # PATCH + DELETE
+  - web/test/danh-muc-them.test.js        # +18 phép kiểm (FR-021 + 2 bug tự bắt)
+  - web/package.json                      # nối test mới
+  - 06_modules/M02_kb/rules.md            # FROZEN — nắn vế 3 của M02-R3
+  - FROZEN.lock                           # ký lại SAU khi FR-021 duyệt
+
+muc_5_bug_UI_va_no_la_loi_CUA_TOI:
+  chan_doan_dung: >
+    KHÔNG phải thiếu `text-overflow` — nó có ở prototype.css:834 từ đầu. Gốc:
+    `.fl-b span` có `flex:1` + `white-space:nowrap` nhưng THIẾU `min-width:0`.
+  co_che: >
+    `overflow:hidden` cắt HÌNH VẼ, nhưng min-content contribution của flex item
+    thiếu `min-width:0` vẫn là TOÀN BỘ chuỗi nowrap. Grid item `min-width:auto`
+    không co nhỏ hơn min-content của nó ⇒ cột 190px CỐ ĐỊNH phình ~450px, lưới
+    `minmax(15rem,1fr)` từ 4 cột còn 2.
+  toi_kich_no: >
+    Lượt trước (WL-01K9J9XEMNHAN, A3) tôi đổi sidebar từ id thô (`agent-llm`) sang
+    label_vi. Bug nằm SẴN trong CSS; nhãn ngắn thì không lộ. Nhãn dài nhất 33 ký tự.
+  sua: >
+    Thêm `.fl-b span` và `.fw>*` vào danh sách min-width:0 đã có ở :41 — repo đã
+    có đúng cách sửa kèm comment, chỉ thiếu hai selector này. Chip `.ch` cùng lớp
+    lỗi: inline-flex không max-width ⇒ thêm `max-width:100%` + cắt ở `.ch b`.
+  prototype_css_khong_frozen: "kiểm FROZEN.lock: 0 hit. Chỉ 05_uiux/prototype/app-v20.html là hợp đồng."
+  test_moi_vi_sao_can: >
+    Lỗi này KHÔNG làm test nào đỏ, không type-check đỏ, không build đỏ. Chỉ hiện
+    khi có người nhìn màn hình ở đúng bề rộng. Kiểm hai chiều: bỏ fix → exit 1.
+  ban_dau_cua_TEST_bi_sai: >
+    Hàm `moiLuat()` bản đầu dùng regex "selector đứng ngay trước dấu {" nên bỏ sót
+    ca selector nằm GIỮA danh sách (`.cd,.fl-b span,.fw>*{...}`) — test báo 7 lỗi
+    trên CSS đã sửa đúng. Sửa: tách khối theo {} rồi so từng selector.
+
+muc_3_doi_ten_lam_NHE_hon_yeu_cau:
+  nguoi_dung_chon: '"Danh mục"'
+  do_duoc_ba_truc: >
+    Đổi CHỮ = 3 dòng, 0 test đỏ. Đổi view id = 1 test đỏ (buttons.test.js:72).
+    Đổi SLUG URL = 4 test đỏ + phá URL đã có.
+  quyet: >
+    Chỉ đổi CHỮ. index.ts:733 ghi rõ việc cho màn này URL riêng là một SỬA LỖI có
+    chủ đích (trước đó là view duy nhất không bookmark được) — đổi slug là phá lại
+    thứ vừa sửa, để lấy một cái tên mà người dùng nhìn thấy ở tab thôi.
+  no_tu_phat_hien: >
+    `pn.topics` THIẾU bản EN từ lượt tôi thêm mốc Chủ đề ⇒ đổi sang EN thì panel
+    đó giữ tiếng Việt (fallback mềm nên không vỡ, chỉ lệch im lặng). Thêm cùng
+    `pn.catalog`, `pn.addlabel`, `kho.rac` (khoá này cũng thiếu, không do tôi).
+
+muc_4_redesign_va_mot_lech_chuan_co_tu_truoc:
+  lech_do_duoc: >
+    v-concepts là màn DUY NHẤT (a) không panel nào có `.rise`, (b) nhồi BA panel
+    vào một `.two` — mà `.two` là grid `1fr 300px` nên panel thứ ba rơi xuống cột
+    1, bố cục lệch không cố ý. SCR-00-app-shell.md:119 quy định HAI cột.
+  khuon_moi: "panel mở đầu (i.dot + KPI) → .two ĐÚNG 2 panel → panel full-width → khu .api-only"
+  khong_them_class_moi: >
+    Hàng nhãn dùng lại `.rc`/`.rc-r` của thùng rác (css:1025) — đã có đúng hình
+    dạng `time` + `span{flex:1}` + `button`. Nút xoá dùng `.bt.dstr` — biến thể
+    "nguy hiểm" ĐÃ CÓ CSS (:135) và chưa dùng ở đâu. KPI dùng lại `oKpi()` của màn
+    Kho. markup-matches-css đòi mọi class mới có luật CSS; dùng lại là xanh miễn phí.
+  bay_api_only: >
+    `body.api-co .api-only{display:block}` — đặt lên một `.rc-r` (flex) sẽ vỡ hàng.
+    Nên `.api-only` ở trên NÚT, không trên hàng.
+  test_bat_dung_mot_lan: >
+    Chuyển `<form class="f-set">` sang `<form><fieldset class="f-set">` (sửa HTML
+    không hợp lệ: legend ngoài fieldset) làm mất class `api-only` khỏi thẻ form ⇒
+    four-screens.test.js:76 ĐỎ. Test đếm thẻ <form>, không đếm tổ tiên. Đúng răng.
+
+muc_4_PATCH_DELETE_FR021:
+  nan_lai_M02_R3: >
+    FR-019 viết "cấm cho sửa/xoá mục đã có" — chặn RỘNG hơn thứ rule bảo vệ. Cái
+    nó bảo vệ là `id`: validate.py:194-198 so `id`, KHÔNG so `label_vi`/`gom`.
+    Nhãn hiển thị không xuất hiện trong bất kỳ phép kiểm nào.
+  ranh_gioi_method: >
+    `PUT` = thay toàn bộ = đường đổi `id` ⇒ VẪN 404. `PATCH` = sửa một phần ⇒ mở.
+    Hai method na ná nhau, hệ quả khác hẳn — chi phí thật của FR này là người đọc
+    test phải hiểu vì sao.
+  rang:
+    - "id trong body PATCH → 400, kèm cách làm đúng (thêm mới + sửa bài + xoá cũ)"
+    - "PATCH không có trường sửa được → 422, không im lặng thành no-op"
+    - "DELETE nhãn đang dùng → 409 kèm số bài; server TỰ ĐẾM, không tin client"
+    - "aliases CHỈ THÊM — gỡ một alias là mất một đường tra cứu người khác đang dùng"
+    - "check_danh_muc.py sau mỗi ghi, rollback nếu đỏ; nhật ký ghi CẢ chiều xoá"
+
+hai_bug_TU_BAT_luc_kiem_tay_test_cu_khong_thay:
+  bug_1_dinh_dang:
+    what: >
+      `YAML.stringify` đổi `aliases: [a, b, c]` (flow, như file nguồn viết tay)
+      thành block list. Một lần PATCH sửa MỘT nhãn làm diff 78 thêm / 32 xoá.
+    vi_sao_test_cu_xanh: "nó kiểm NỘI DUNG (mục còn không, nhãn đúng chưa), không kiểm ĐỊNH DẠNG"
+    hau_qua: "nội dung đúng nhưng diff vô nghĩa, check_frozen thấy cả file đổi ⇒ không ai đọc được thực sự sửa gì"
+    sua: "hàm inDanhMuc() in flow style; vẫn dùng YAML.stringify cho từng GIÁ TRỊ để không tự escape"
+  bug_2_kho_rong_NGHIEM_TRONG_HON:
+    what: >
+      Gọi DELETE /api/concepts/idempotency trên kho THẬT: trả 200 và XOÁ THẬT.
+      `kb/` có 0 bài nên mọi nhãn đều "0 bài dùng" ⇒ xoá được hết.
+    vi_sao_test_cu_xanh: "kho TẠM có bài dùng nhãn đó nên nhánh 409 chạy đúng"
+    cung_lop_loi: >
+      Đúng họ với việc validate.py xanh trên kho 0 bài suốt từ FR-001 tới FR-015 —
+      kho rỗng làm mọi phép kiểm dựa trên nội dung kho mất nghĩa.
+    khac_phuc: "git checkout kb/concepts.yaml — về 22 mục, idempotency trở lại"
+    sua: >
+      Thêm rào: quetKho().length === 0 → 409 "kho chưa có bài nào, không đếm được
+      nhãn nào đang dùng". 0 bài dùng là HỆ QUẢ kho rỗng, không phải bằng chứng
+      nhãn vô dụng.
+    them_test: "dựng kho tạm RỖNG rồi DELETE → phải 409 và danh mục vẫn đủ 22 mục"
+
+muc_6_tao_nhanh_o_form_viet_bai:
+  concepts: "nút `+ khái niệm mới` KHÔNG có — đường đề xuất (#f-cptmoi) đã tồn tại và đúng"
+  category: >
+    nút `+ chủ đề mới` → POST /api/categories thật (category không có
+    `category_proposed` nên không có đường đề xuất), rồi napDanhMuc() lại và TỰ
+    TICK mục vừa tạo — người vừa gõ tên chủ đề thì gần như chắc muốn dùng nó.
+  sua_mot_cau_sai_trong_shell: >
+    Form ghi "concepts — đây là thứ tính hệ số kiểm chứng chéo". Tôi đã đo là SAI
+    (grep corroboration trong core/src, 05_intake, 06_skillgen, 07_curate → 0 hit).
+    Đổi thành "dùng để nhận ra hai nguồn nói cùng một điều".
+
+no_write_path_do_dung_va_toi_sua_theo_luat:
+  what: >
+    Tôi viết `fetch("/api/" + duong + "/" + id)` — ghép cả đường từ biến. Test đỏ.
+  vi_sao_test_dung: >
+    Nó đọc LITERAL ngay sau `fetch(` để biết đích thật; ghép chuỗi làm test mù.
+    Khuôn có sẵn trong repo: `fetch("/api/articles/" + duong)` — tiền tố literal.
+  sua: "hai nhánh literal (`/api/concepts/` và `/api/categories/`) thay vì một biểu thức"
+
+verify:
+  loai: hard
+  ket_qua:
+    npm_run_check: sạch
+    web_test: 24/24 file, exit 0 (thêm nhan-dai-khong-tran + 18 phép kiểm FR-021)
+    cong_may: 12/12
+    pytest: 30/30
+    build: exit 0
+  kiem_bang_SO_khong_bang_mat:
+    - "viewport 1440: .fw 1262px → .grid 1048px → 4 cột (trước: sidebar 450px → 3 cột)"
+    - "test hai chiều: bỏ min-width:0 → exit 1; phục hồi → exit 0"
+  kiem_tay_tren_trang_da_xay:
+    - "tab hiện 'Danh mục'; 5 panel, TẤT CẢ có .rise, đúng 1 .two"
+    - "KPI: 22 khái niệm / 6 chủ đề / 5 chờ / 13 xoá được"
+    - "hàng nhãn 0 bài → có nút [sửa] [xoá]; nhãn đang dùng → 'đang dùng — không xoá được'"
+    - "nút tạo nhanh + hàm taoNhanhChuDe đến được /nap/ và gn.js"
+  kiem_tay_tren_server_that:
+    - "PUT /api/concepts/:id → 404 · PATCH đổi id → 400 · DELETE nhãn đang dùng → 409"
+    - "sau mọi thao tác: kb/ về đúng 22 khái niệm + 6 chủ đề, git diff sạch"
+  frozen: "M02_kb/rules.md đổi ⇒ check_frozen ĐỎ đúng như phải; ký lại sau khi FR-021 duyệt"
+
+no:
+  - "Nút sửa dùng prompt() hai lần cho chủ đề (nhãn, rồi gom). Đủ dùng, chưa đẹp —
+     người dùng đã nói 'UI còn phải sửa nhiều'."
+  - "Xoá nhãn KHÔNG có thùng rác (khác bài — bài có _recycle/). Nhật ký là hồ sơ
+     duy nhất. Xoá sai thì phải thêm lại và đi lại đường bằng chứng ≥2 bài."
+  - "Sửa/xoá nhãn KHÔNG tự dựng lại site — trang tĩnh giữ nhãn cũ tới khi build.
+     Cùng hở đã biết với nút Duyệt và nút Thêm."
+  - "DELETE chủ đề gỡ enum ở CẢ hai bản schema, nhưng chỉ chạy khi KB_DIR = kb/
+     thật (409 nếu không) ⇒ không có test đường-thành-công tự động cho nhánh đó."
+  - "`more.concepts` trong từ điển EN là khoá MỒ CÔI (không markup nào dùng) —
+     nợ có sẵn, không phải của lượt này. Nêu chứ không xoá."
+  - "Hai lượt `npm test` đỏ vì có ~14 tiến trình server test còn sống tranh
+     validate.py và thư mục build. Lượt thứ ba exit 0. Không liên quan code."

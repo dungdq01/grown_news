@@ -1,0 +1,159 @@
+id: WL-01K9N6FR036B4
+at: 2026-08-27
+by: claude
+buoc: s8 — FR-036/B4 khớp nối export/import cho BYTE (ĐƠN VỊ QUYẾT ĐỊNH) + T04-5 đấu cổng
+loai: bàn giao đơn vị quyết định của nhánh B
+fr: FR-036-khung-than-bai-5-muc.md
+
+object:
+  task:
+    - 07_plan/M01_core/tasks/T01-12-khop-noi-byte.md         # code
+    - 07_plan/M01_core/tasks/T01-13-test-khop-noi-byte.md    # test
+    - 07_plan/M04_ci/tasks/T04-5-cong-byte-vao-ci.md         # đấu cổng
+  code:
+    - core/tools/xuat_kho.py       # ghi_bytes_ben_bi · khối hiện vật · bam_cay hash _media
+    - core/tools/dung_lai_db.py    # nạp _media · kiểm tên-là-sha256 · kiểm con trỏ treo · bam_noi_dung
+  cong:
+    - core/tests/check_media_dan_xuat.py    # MỚI — 22 phép kiểm, 6 mục
+  dau_cong:
+    - .github/workflows/ci.yml
+    - Makefile
+    - project_map.yaml             # v12 -> v13: `Makefile` vào be của M04_ci
+
+may_xanh:
+  - "core/tests/check_media_dan_xuat.py  ->  pass (22 phép kiểm)"
+  - "pytest core/tests -q  ->  42 passed"
+  - "cd web && npm test    ->  exit 0"
+  - "18/19 cổng check_*.py xanh"
+  - "xuat_kho.py --kiem  ->  pass, export tất định"
+  - >
+    KHO THẬT đi trọn vòng: `dung_lai_db` rồi `xuat_kho` cho
+    `ghi 0 · xoa mo coi 0` — mọi file export ĐÃ khớp từng byte với thứ DB dựng
+    lại sinh ra, và `bam_noi_dung` giữ nguyên `bc323472e968c469`.
+  - >
+    7/7 răng mới ĐỎ được khi phá, và hai file gốc khôi phục nguyên byte
+    (xuat_kho.py 21386b53be0654db · dung_lai_db.py e663a4dfb84faf2d)
+
+do_do:
+  - cong: core/tests/check_skill.py
+    do_do_boi: agent khác (core/skill-src/** + core/tools/dong_goi_skill.py)
+    quy_chu: không nằm trong tập file tôi đổi ở lượt này
+
+# ══ KẾT LUẬN CỦA ĐƠN VỊ QUYẾT ĐỊNH ══════════════════════════════════════════
+#
+# Plan khai: "Nếu khớp nối export/import cho byte không xanh được thì xét lại
+# 'lưu trong DB' TRƯỚC khi viết FE code."
+#
+# NÓ XANH. Byte đi trọn vòng DB → file → DB → file tới ĐIỂM BẤT ĐỘNG (hai cây
+# export cùng hash, kể cả `_media`). Quyết định "lưu hiện vật trong DB" ĐỨNG.
+# B5..B10 được phép đi tiếp.
+
+# ══ Vòng tròn đo bằng ĐIỂM BẤT ĐỘNG, không đo bằng bản dựng tay ══════════════
+#
+# Cách sai mà dễ viết: dựng DB bằng tay, export, nhập lại, rồi so `bam_noi_dung`
+# với DB tay. Sai vì bản dựng tay KHÔNG phải chân lý về định dạng export — thứ
+# tự khoá JSON, `normalize_yaml`, cách `md_cua` dump đều là quy ước của exporter.
+# Một lệch vô hại ở đó thành một màu đỏ oan, và cổng đỏ oan là cổng bị tắt.
+#
+# Cách đúng: DB(tay) → export1 → DB2 → export2, rồi đòi bam_cay(export1) ==
+# bam_cay(export2). Điểm bất động là tính chất THẬT mà round-trip phải có.
+
+# ══ Ba quyết định trong khối hiện vật ═══════════════════════════════════════
+#
+# 1 · TẬP THAM CHIẾU HỢP UNION BA BẢNG, một câu SQL `UNION ALL` trên
+#     `articles` + `article_versions` + `recycle`. Bỏ sót `recycle` thì MỖI
+#     DELETE phá byte vĩnh viễn, và `phucHoi()` sau đó VẪN BÁO THÀNH CÔNG — nó
+#     chạy lại validate, mà validate không bao giờ thấy blob. Cổng có một ca
+#     fixture cho TỪNG bảng một, và ca "bỏ recycle" là ca đầu tiên trong danh
+#     sách phá — nó ĐỎ.
+#
+# 2 · `duoi` tra từ frontmatter của bản ghi TRỎ TỚI nó, không từ bảng `media`.
+#     Bảng `media` cố ý không có cột metadata nào (một nơi khai). `.bin` là
+#     đường lui khi mime ngoài enum — chỉ xảy ra nếu ai đó sửa thẳng DB, và nó
+#     KHÔNG phá nhập lại: importer đọc mime từ `.md`, không đọc từ đuôi file.
+#
+# 3 · CHỈ export `la_dan_xuat = 0`. Bản chuyển đổi (cache PDF từ ppt/word, sau
+#     này) dựng lại được từ bản gốc, và commit nó là phồng git không lùi được.
+#     Cột đã khai từ B1 nên hôm nay chỉ là một vế WHERE.
+#
+# REAP LÀ REAP FILE, KHÔNG REAP DÒNG DB. `xuat_kho.py` khai "CHỈ SELECT" và
+# `check_export_dan_xuat.py` răng 2 grep đúng điều đó. Một DELETE trong exporter
+# để dọn blob bị bỏ dở là đổi một bảo đảm kiến trúc có răng lấy một tiện lợi.
+# Hệ quả phải nói ra: blob bị bỏ dở (người dùng mở form rồi thoát) NẰM LẠI
+# trong DB, không được export, không ai thấy. Không mất dữ liệu, nhưng tốn chỗ.
+# Ô backlog đã mở — GC bên DB là việc của một đơn vị khác.
+
+# ══ dung_lai_db: hai cách chết TO, và vì sao phải to ════════════════════════
+#
+# a · TÊN FILE PHẢI LÀ sha256 CỦA CHÍNH NỘI DUNG. Không kiểm thì một file bị
+#     đổi tên (hoặc sửa ruột) vào kho dưới một khoá NÓI DỐI, và từ đó mọi thứ
+#     tin vào "địa chỉ theo nội dung" đều sai: dedup gộp hai file khác nhau, và
+#     con trỏ của bài trỏ tìm một thứ không phải thứ nó khai.
+# b · CON TRỎ TREO ⇒ `sys.exit`. Dựng tiếp là dựng một DB thiếu dữ liệu MÀ
+#     KHÔNG AI BIẾT. Đây là kiểu thất bại phải ồn ào nhất trong cả module.
+#
+# `bam_noi_dung` thêm `("media","sha256","sha256")` — hash KHOÁ, không hash
+# byte, vì `sha256` LÀ hash của nội dung. Comment ghi rõ lý do trong code: nếu
+# không, sẽ có người "sửa" nó thành `byte` và tưởng mình làm nó chính xác hơn.
+
+# ══ Cổng bắt lỗi trong CHÍNH NÓ — hai lần ══════════════════════════════════
+#
+# 1 · Ca `xanh_khi` ("không bảng nào trỏ ⇒ byte bị reap") ban đầu TỰ VÔ HIỆU:
+#     tôi dựng DB không có tham chiếu rồi khẳng định `not f.exists()` — nhưng
+#     file chưa bao giờ tồn tại, nên nó đúng sẵn. Xanh mà không chứng minh gì.
+#     Sửa: export MỘT LẦN CÓ tham chiếu trước (kèm một phép kiểm "tiền đề" nói
+#     ra rằng file có thật), rồi DELETE tham chiếu và export lại.
+#     Lớp lỗi này repo đã ăn bốn lần ở chỗ khác — lần này nó ăn chính cổng mới.
+#
+# 2 · `.md` khai sha256 mà thiếu byte ⇒ tôi chỉ khẳng định `returncode != 0`.
+#     Và nó XANH trong lúc `dung_lai_db.py` có một SyntaxError — script không
+#     parse nổi cũng exit khác 0, và chuỗi "media" tôi tìm nằm ngay trong tên
+#     biến `MEDIA_DIR` của thông báo lỗi. Cổng xanh, code vỡ.
+#     Sửa: đòi ĐÚNG lời của guard ("con tro media TREO" · "NOI DOI"), và đòi
+#     phần đầu output KHÔNG chứa "Error". "Exit khác 0" một mình không bao giờ
+#     là bằng chứng.
+
+# ══ Kiểm hai chiều: 7 răng, và hai ca đặt SAI ══════════════════════════════
+#
+# Hai ca đầu tôi đặt sai và phải sửa CÁCH ĐO, không sửa code:
+#
+# · "bỏ kiểm con trỏ treo" — tôi tìm lời của GUARD trong output. Nhưng khi guard
+#   bị gỡ thì lời đó không thể xuất hiện; thứ phải xuất hiện là lời của CỔNG.
+#   Đây là lỗi tôi hay mắc: nhìn sai phía của phép kiểm.
+#
+# · "nạp dưới khoá client khai" (`f.stem` thay `that`) — cổng VẪN XANH, và đó
+#   ĐÚNG: khi guard "tên-là-sha256" còn sống thì `f.stem == that` theo CẤU TẠO,
+#   nên đổi một chỗ không đổi gì. Không phải lỗ của cổng; là ca phá đặt sai.
+#   Trạng thái nguy hiểm thật là MẤT CẢ HAI cùng lúc — phá ghép hai phép thay,
+#   và ca ghép đó ĐỎ.
+
+# ══ project_map v13 — bịt một chỗ bản đồ không đo được ══════════════════════
+#
+# `check_g6b` §2 chặn T04-5: *"ghi Makefile ngoài boundary M04_ci"*. Đúng, và
+# nó chỉ ra một khoảng trắng thật: `Makefile` KHÔNG thuộc module nào trong map,
+# nên trước nay không ai đo được ai sửa nó — và `T01-9` (đơn vị B1) đã sửa nó
+# mà KHÔNG khai trong `phạm_vi_ghi`.
+#
+# Sửa bằng cách khai chủ: `Makefile` vào `be` của M04_ci. Nó là bản
+# NGƯỜI-CHẠY-TAY của cùng danh sách cổng trong `ci.yml`; cùng một chủ thì hai
+# danh sách lệch nhau là việc của một người.
+#
+# Đo được luôn: `make check` gọi một TẬP CON — bốn cổng (`check_running`,
+# `check_worklog`, `check_skill`, `check_index_dan_xuat`) không có trong
+# Makefile. Cả bốn ĐỀU có trong `ci.yml`, nên đây là phân vai cố ý (local nhanh,
+# CI đầy đủ), không phải lỗ. Không mở ô backlog cho nó.
+#
+# `make` KHÔNG có trên máy này (`make: command not found`) — nên AC2 của T04-5
+# khai lệnh chạy được thay vì `make check`, và nói ra vì sao thay thế đó đủ.
+
+con_lai:
+  - >
+    B5 — route `POST /api/articles/media` (staging) + create. Bẫy đã biết:
+    `api-guard` răng 5 đòi literal `review_status: "approved"` chỉ ở `taoBai`,
+    nên handler mới PHẢI delegate, không được có literal riêng.
+  - >
+    B6..B10 — sáu đầu đề an toàn · FE nạp (tab thứ tư) · FE xem trước · tổng hợp
+    All (số đếm trên `tatCa`, chất lượng chỉ trên `phan-tich` — M09-R4) · tài liệu.
+  - >
+    GC bên DB cho blob bị bỏ dở: exporter reap FILE, không reap DÒNG. Ô backlog
+    ở 06_modules/M08_api/backlog.md.

@@ -1,0 +1,1363 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:01.250
+Personally
+
+00:00:01.250 --> 00:00:03.790
+I think that uh
+
+00:00:04.190 --> 00:00:10.390
+the best use of of AI is really as like a like a pair like someone you're pair programming with and not someone as not not not a tool to just replace the act of writing code
+
+00:00:10.870 --> 00:00:14.390
+or worse, outsourcing your thinking.
+
+00:00:15.630 --> 00:00:26.570
+And I think there's a tendency like, you know, because AI is so exciting, you want to put AI everywhere and be seen as someone who's very, you know, um, what do you call it? Like uh on the ball, I guess with with AI,
+
+00:00:27.270 --> 00:00:34.010
+uh that you feel this pressure of like, you know, I'm just kind of I got to increase my productivity, I got to ship like 100 PRs this week and
+
+00:00:34.190 --> 00:00:39.530
+barely understand what I'm doing and you know, vibe code my way to a million AR or whatever.
+
+00:00:41.250 --> 00:00:49.330
+Um, but I think, you know, uh one of the things that I've personally seen is that although when I use AI, I save some time, you know, writing the code,
+
+00:00:49.650 --> 00:00:53.690
+I actually find myself spending more time reviewing what the AI did and like correcting it.
+
+00:00:54.010 --> 00:00:59.030
+So, you know, like I've I've tried the the thing that a lot of people say like, you know, you uh instead of
+
+00:00:59.390 --> 00:01:06.890
+prompting an AI to just build the feature out right, you sort of get it to uh build a spec for you first, then you review that spec and then you do that whole thing then it's like
+
+00:01:07.210 --> 00:01:08.610
+Okay, so I assume you can see my screen.
+
+00:01:08.990 --> 00:01:09.870
+Yes. Yeah, we're good.
+
+00:01:10.390 --> 00:01:10.610
+Um
+
+00:01:10.830 --> 00:01:23.330
+So yeah, today, yeah, I think I think the big theme for me as I've been using agents to write code, and I'm sure a lot of you have had the same experience as well is how do you trust it?
+
+00:01:23.750 --> 00:01:32.510
+You know, especially if you are an engineer that's been writing code for a very long time, you have a lot of opinions and lessons that you've learned about doing good engineering.
+
+00:01:33.070 --> 00:01:45.150
+And when you see agents just, you know, winging it and, you know, guessing, hallucinating, uh, you know, confidently stating that they found the smoking gun uh for the hundredth time, uh, but it's actually not the real problem.
+
+00:01:45.630 --> 00:01:47.030
+You lose a lot of trust.
+
+00:01:47.410 --> 00:01:50.870
+And when you lose when you don't have much trust in your agents,
+
+00:01:51.950 --> 00:01:55.170
+I feel like you you really can't get the most out of them.
+
+00:01:55.890 --> 00:02:08.590
+And for me the parallel is like with management. Uh so if I'm a manager, an engineering manager of a team and I have a bunch of, you know, I have a team of engineers uh on my team
+
+00:02:08.910 --> 00:02:19.770
+and I don't trust them, then the mode of operation I'm going to be in is going to be like micromanagement, right? I'll have to spend a lot of time looking over my reports shoulders and
+
+00:02:20.170 --> 00:02:23.510
+checking that they're doing their work well, you know, that they're not shipping bugs to production.
+
+00:02:25.430 --> 00:02:32.010
+And so I drew this chart because uh it's not it's not a very scientific chart, but like this is how I imagine
+
+00:02:32.610 --> 00:02:36.490
+myself in my journey through using agents.
+
+00:02:37.010 --> 00:02:41.750
+So, you know, like fast forward or back forward, uh
+
+00:02:42.290 --> 00:02:49.310
+or fast back uh fast backwards like a year or so, when you know, nobody was or not many people were using agents to code.
+
+00:02:49.750 --> 00:02:58.690
+Uh, I think you uh you get into this mode where you are in very heavily in the loop with one or several, like a handful of agents.
+
+00:02:59.350 --> 00:03:06.290
+And you find yourself just constantly fig- you know, trying to understand what your agents are doing uh and you're very, very in loop.
+
+00:03:06.630 --> 00:03:10.570
+You're watching every single output. You are sitting there prompting,
+
+00:03:11.070 --> 00:03:15.950
+um, and you really can't parallelize beyond that because
+
+00:03:16.470 --> 00:03:18.810
+you don't again, you don't have that trust, right?
+
+00:03:18.810 --> 00:03:24.350
+You can't go to 100 agents, uh, like spawn 100 agents when you don't even trust the output of one agent.
+
+00:03:33.910 --> 00:03:38.470
+trust curve, and now I'm at the point where
+
+00:03:38.990 --> 00:03:46.790
+uh I actually have it sounds kind of scary to say this and it makes me sound like a slot fire this, but I I promise I'm not.
+
+00:03:46.910 --> 00:03:54.930
+But I actually have my agents now, um, auto merging PRs for me, uh, which is like a wild thing to say.
+
+00:03:55.390 --> 00:04:03.650
+But um, like I woke up today and there were like 20 PRs landed and I just reviewed them on main, like they were already landed.
+
+00:04:04.050 --> 00:04:04.970
+And they were good.
+
+00:04:05.550 --> 00:04:11.350
+Uh, so how did I get to that point is basically what I wanted to talk about today.
+
+00:04:11.690 --> 00:04:18.910
+Uh, and again, like yeah, feel free to jump in if you have questions, Colin. Um,
+
+00:04:19.570 --> 00:04:24.490
+but uh, oh yeah, of course I got to show this this chart.
+
+00:04:25.170 --> 00:04:32.710
+uh where uh, do do not trust someone requested to control my computer.
+
+00:04:33.230 --> 00:04:34.650
+Uh, probably won't do that.
+
+00:04:35.190 --> 00:04:41.330
+Uh, but yeah, so this chart I think I I'm sharing the chart not to kind of like flex,
+
+00:04:41.710 --> 00:04:46.050
+but to kind of show like the journey, like so you can see like the curve like it sort of like inversely matches
+
+00:04:46.630 --> 00:04:50.350
+the contributions I've been able to land at cursor.
+
+00:04:51.130 --> 00:04:54.670
+So I joined five months ago, and five months ago like I, you know, my first month I was like
+
+00:04:55.030 --> 00:04:58.590
+not very productive because I was you know, I was learning the code base.
+
+00:04:58.910 --> 00:05:00.990
+Didn't know what the heck was going on.
+
+00:05:01.810 --> 00:05:07.750
+And as I got more confident in in my agents, uh I've really been able to kind of ramp up my productivity.
+
+00:05:08.110 --> 00:05:14.930
+Uh and again, like yeah, like last month I shipped 1,000 PRs, which is ridiculous.
+
+00:05:15.430 --> 00:05:20.190
+Uh and then this month, we're only on the 12th, I'm already at like almost 800 PRs landed.
+
+00:05:20.910 --> 00:05:25.210
+Uh, so the the velocity is definitely high and you you I'm I'm sure a lot of you will definitely be questioning like how how much of this code is actually good.
+
+00:05:25.990 --> 00:05:28.710
+Um, and I think yeah, that's definitely fair the question.
+
+00:05:29.810 --> 00:05:33.190
+Um, but uh yeah, I think
+
+00:05:33.650 --> 00:05:40.590
+I think if you set up your agents well, you can definitely get to a very similar level.
+
+00:05:41.350 --> 00:05:44.270
+Um, and so I'm going to talk about how we do that.
+
+00:05:44.700 --> 00:05:46.940
+need to get set forward for being able to trust your agent.
+
+00:05:48.060 --> 00:05:48.460
+um
+
+00:05:49.760 --> 00:06:01.260
+I will I can share one example that we have uh within cursor uh oops. where let me open this.
+
+00:06:04.580 --> 00:06:07.600
+let's make this bigger. Uh we have full screen. There you go.
+
+00:06:09.400 --> 00:06:15.320
+Uh so for the for cursors agent window. Uh so this is actually an interesting story.
+
+00:06:15.320 --> 00:06:21.420
+Uh when I joined cursor 5 months ago, uh they're actually
+
+00:06:22.080 --> 00:06:25.480
+well I was supposed to join a different team. I was supposed to join like the cloud agents team.
+
+00:06:25.800 --> 00:06:29.740
+Uh but then since I have a lot of experience working on React
+
+00:06:30.180 --> 00:06:32.220
+and agent's window is a React application.
+
+00:06:32.600 --> 00:06:38.340
+Uh I was uh I was asked to basically help out with uh the
+
+00:06:39.160 --> 00:06:40.920
+agent window work.
+
+00:06:41.340 --> 00:06:43.000
+Uh but um
+
+00:06:44.220 --> 00:06:46.860
+there wasn't really a lot of like skills to help me.
+
+00:06:47.400 --> 00:06:51.160
+So I just found myself like okay, agent's going to launch in like a week.
+
+00:06:51.540 --> 00:06:54.220
+Right? We have a really tight deadline and um
+
+00:06:55.640 --> 00:07:00.860
+there was uh you know I was just sitting there like okay, I'm going to open up the performance the the chrome dev tools and just like take a trace.
+
+00:07:01.300 --> 00:07:04.200
+Look at it myself and try to make sense of this flame graph.
+
+00:07:04.620 --> 00:07:07.460
+And keep in mind, I was just like in my first week.
+
+00:07:07.740 --> 00:07:11.080
+No idea what I was looking at, no idea what you know, I mean I had some idea, but
+
+00:07:11.480 --> 00:07:13.920
+you know, the code base was completely fresh to me.
+
+00:07:14.620 --> 00:07:18.940
+Uh and I realized like my agent had no idea either.
+
+00:07:19.240 --> 00:07:21.820
+You know, like I would take a screenshot of the trace, I would send it to, and it would be like
+
+00:07:22.180 --> 00:07:29.020
+yeah, it kind of looks like this, you know, uh and it would like confidently state like it's this thing and then I try to fix that
+
+00:07:29.420 --> 00:07:31.400
+and turns out that's not the actual thing.
+
+00:07:32.880 --> 00:07:37.920
+So, this was a very very slow process. And if you've ever done any like performance work yourself or
+
+00:07:38.120 --> 00:07:46.020
+you know just even development with an agent where you don't have a verification skill, you are the verifier.
+
+00:07:46.480 --> 00:07:52.980
+All right? You you're the bottleneck. You you you tell your agent to do something, and then it goes off and writes some code.
+
+00:07:53.340 --> 00:07:57.360
+Then you open up your, you know, local dev build and then you start to say, oh, you know, it doesn't work.
+
+00:07:57.360 --> 00:08:02.220
+Then you got to copy paste screen you know screenshots or console errors or whatever.
+
+00:08:02.720 --> 00:08:08.180
+Uh and then your agent like slowly kind of like uh you know works with that and then tries to understand it and um
+
+00:08:09.700 --> 00:08:12.920
+fixes the thing. But then you're constantly just in the loop and and being a bottleneck.
+
+00:08:12.920 --> 00:08:14.580
+So there's really no way to parallelize.
+
+00:08:15.200 --> 00:08:20.720
+So the control glass skill is like one of the first skills I built uh for cursor.
+
+00:08:21.280 --> 00:08:28.980
+Uh and glass by the way is the code name for agent's window that we use internally, but it's just cursor, I guess.
+
+00:08:30.020 --> 00:08:37.500
+Um and so this skill uh is I guess the the the code itself is not super interesting.
+
+00:08:37.980 --> 00:08:40.020
+Your agent can very easily make one for you.
+
+00:08:40.400 --> 00:08:49.300
+Uh where if if you're building an electron app or a web app or even iOS uh applications, uh you can teach your agent how to use like the Chrome dev tools protocol
+
+00:08:49.820 --> 00:08:55.400
+or through uh Apple has some utilities as well for running the simulator and taking traces and controlling programmatic control
+
+00:08:56.440 --> 00:08:57.220
+as well.
+
+00:08:57.860 --> 00:09:00.160
+Uh so that's really useful.
+
+00:09:00.740 --> 00:09:08.360
+Uh but one thing I want to show you want to talk about is uh the this thing.
+
+00:09:09.180 --> 00:09:10.860
+Uh let me just read me.
+
+00:09:11.840 --> 00:09:18.200
+Uh so this skill comes with this very unique feature called or not feature, a unique file called a feature map.
+
+00:09:19.040 --> 00:09:28.500
+And so the story then is like I built this skill and so now the agent was able to uh actually run the agent window and take traces and whatnot.
+
+00:09:29.240 --> 00:09:32.960
+Uh but it had no idea what what the agent's window was.
+
+00:09:33.340 --> 00:09:42.220
+So um you know, like someone say, oh, the the left side bar is like laggy or something like that, or you know, the right side the the PR tab is not working.
+
+00:09:42.680 --> 00:09:46.280
+And the agent would just be like kind of flailing around. It would spend a lot of time trying to like look up the code and, you know, where is this feature?
+
+00:09:46.280 --> 00:09:48.020
+I've mean,
+
+00:09:48.120 --> 00:09:51.320
+uh if you search for Psa cursor on Google you'll you'll find it.
+
+00:09:51.750 --> 00:09:57.520
+Uh, but there is a create verification skill in that plugin where it actually helps you set up something like this for yourself.
+
+00:09:58.030 --> 00:10:05.620
+Um, including the feature map, so it will actually explore the code and build up this initial feature map that tells your agent how to get to all of the different features that you have.
+
+00:10:06.140 --> 00:10:14.860
+Uh and this is extremely powerful because now that you have these user reports that come in, uh you can actually map even like a vague report or even a screenshot.
+
+00:10:15.450 --> 00:10:24.900
+So we have this uh internally at cursor where uh we have a slack channel where, you know, lots of people giving us feedback on the agent's window and and what not.
+
+00:10:25.340 --> 00:10:27.880
+Uh and often times the report is very bad.
+
+00:10:27.880 --> 00:10:32.530
+Like very low quality like someone will just put very often we get like a screenshot and then someone just says question mark, question mark, question mark, right?
+
+00:10:32.530 --> 00:10:33.590
+Like what is this?
+
+00:10:34.060 --> 00:10:37.840
+And you know like without this our agents like I have no clue right?
+
+00:10:37.840 --> 00:10:47.400
+But with a feature map like this, it has a lot more context and understanding of how to actually navigate how to get to all the different features.
+
+00:10:47.920 --> 00:10:59.120
+Uh so that you know example like I guess like a sidebar, like what is the sidebar? Uh you know like all the different sub features that are present in it.
+
+00:10:59.460 --> 00:11:07.610
+Um, like from the user point of view, here's where how to get to it, all the different keyboard shortcuts, uh even like the the what do you call it, the Dom elements or yeah, like the attributes that you use for selecting things.
+
+00:11:07.610 --> 00:11:09.460
+through the CDP, uh are all there.
+
+00:11:10.100 --> 00:11:14.360
+So uh again yeah, this is like really, really powerful uh for for agents.
+
+00:11:14.630 --> 00:11:20.950
+Uh and P stack ships uh that create verification skill but also a maintain verification skill uh so you can keep this up to date.
+
+00:11:21.620 --> 00:11:28.670
+Cool, yeah, I was just going to ask how you created that. So you mind sharing a little bit more about um that that process in the context of P stack and maybe just what P stack is for the folks who are not familiar?
+
+00:11:29.630 --> 00:11:33.120
+Yeah, so P stack is pretty interesting because uh, well first of all, the name is kind of goofy.
+
+00:11:33.560 --> 00:11:39.420
+Like the P the P and P stack is like potato potato stack.
+
+00:11:39.420 --> 00:11:47.010
+because I um, so uh uh there is a pretty uh famous person Gary Tan, who is the CEO of Y Combinator,
+
+00:11:47.010 --> 00:11:51.250
+and he's come up with this plugin called G stack, uh Gary stack.
+
+00:11:51.250 --> 00:12:04.210
+And uh funnily enough, we share the last name, we have no relation. Uh, but I thought it would be funny to kind of, you know, poke fun at Gary and make P stack my version of of of of his plugin.
+
+00:12:04.760 --> 00:12:08.420
+Uh, but kind of just to tailor it to my own set of engineering practices.
+
+00:12:09.470 --> 00:12:13.540
+Uh, but I honestly I actually never set out to build P stack.
+
+00:12:13.740 --> 00:12:19.500
+Uh it just started with a bunch of skills, right? Like I started with that control glass skill, and then I started with another skill like called how,
+
+00:12:19.920 --> 00:12:23.930
+which I also noticed through like observing agents.
+
+00:12:24.700 --> 00:12:33.610
+Um, so like you know in the early days of me, you know trying to climb this ladder I was like super in the loop and I was basically nitpicking my agents to an extreme degree.
+
+00:12:33.820 --> 00:12:44.880
+I was like I would tell it um, you know this feature has stopped working, here's a bug report, like why isn't it working?
+
+00:12:47.170 --> 00:12:52.500
+And very often, the agent would just like confidently say like, oh it has to be this right? It has to be this thing.
+
+00:12:52.720 --> 00:13:00.550
+And I noticed like when I look at the actual tool calls, I noticed it wasn't actually reading the code that I thought should be effected.
+
+00:13:01.160 --> 00:13:07.550
+And that made me just extremely suspicious and at that point I was like I'm not going to I can't trust any this agent anymore because it's just it's just completely hallucinating.
+
+00:13:07.880 --> 00:13:19.320
+And I think I think it's very easy to just you know like build up that distrust and not and kind of feel helpless like you know you don't know how to help your agents succeed.
+
+00:13:19.840 --> 00:13:28.060
+But like again, I think the the the the management analogy is super helpful because like imagine if you were a manager of an engineering team and you had an engineer on your team who was a really good coder,
+
+00:13:28.270 --> 00:13:34.890
+no business context whatsoever, you know they they just you just hired them and they they on boarded, you know, like five seconds ago.
+
+00:13:35.350 --> 00:13:40.610
+Uh and so how do you actually teach that person to be effective?
+
+00:13:41.340 --> 00:13:43.770
+So how you do that is through a skill.
+
+00:13:44.080 --> 00:13:48.340
+Uh a skill being just you know just markdown, right?
+
+00:13:48.340 --> 00:13:54.240
+But you know, encode a lot of information instructions, a lot of uh you can really draw out a lot of
+
+00:13:54.240 --> 00:13:55.370
+c,
+
+00:13:55.970 --> 00:13:56.990
+you know, smarter.
+
+00:13:58.030 --> 00:14:00.150
+Um, so that's like a very interesting
+
+00:14:00.590 --> 00:14:02.290
+model there.
+
+00:14:02.290 --> 00:14:09.090
+But yeah, I built P sta very, very incrementally. Uh, so, uh, started with just really observing how agents, you know, all the fa different failure modes of of that agents were having.
+
+00:14:09.170 --> 00:14:10.830
+And every time I saw that, I just, okay, I'm just going to make that a skill.
+
+00:14:11.130 --> 00:14:15.890
+Right? Like stop hallucinating, actually go and search up, look up the code, use a lot of sub agents.
+
+00:14:15.890 --> 00:14:19.670
+Uh, and yeah, stop guessing.
+
+00:14:21.840 --> 00:14:23.800
+Yeah, that makes sense. One one kind of follow question here,
+
+00:14:23.800 --> 00:14:25.260
+both from myself and from a bunch of people in the chat.
+
+00:14:25.260 --> 00:14:25.780
+So,
+
+00:14:26.960 --> 00:14:35.980
+I guess it's two two parts. So one is like, how do you maintain these skills? So like the product changes over time, obviously there's a lot of people who are shipping against the code base. So how do these skills get maintained?
+
+00:14:35.980 --> 00:14:44.340
+Uh, and then second to that is like, how do you know when your verification is is good enough? Uh, like and, you know, you can trust that the verifications that you've built are going to, I guess you trust that the outputs when when they're done.
+
+00:14:47.280 --> 00:14:50.900
+Uh, yeah, maybe I'll talk about, um,
+
+00:14:50.900 --> 00:14:52.980
+I think I saw my really, maybe I'll start with this one first.
+
+00:14:53.740 --> 00:14:55.880
+So, like, how do I
+
+00:14:56.720 --> 00:14:57.900
+maintain these skills?
+
+00:14:59.920 --> 00:15:10.780
+So, um, if you're not familiar with this concept, and is essentially like a way to uh, well, the mental model I have is like it's like a unit test for an agent.
+
+00:15:11.320 --> 00:15:17.340
+Um, and uh, you can actually make your own eval.
+
+00:15:17.540 --> 00:15:21.060
+You don't need like a special framework for them. You can build you can you can build one,
+
+00:15:21.360 --> 00:15:25.280
+depending on like, you know, how scientific and how rigorous you want to be.
+
+00:15:26.060 --> 00:15:27.620
+Uh, my screen is red.
+
+00:15:28.580 --> 00:15:32.940
+Yeah, there's a little button, um, sorry, I'm like disabling the drawing or something. I can't see my screen.
+
+00:15:32.940 --> 00:15:34.340
+Yeah, sorry.
+
+00:15:34.340 --> 00:15:36.560
+If you guys get nt on the screen, that would be great, but there's a little button in the
+
+00:15:37.760 --> 00:15:38.980
+Yeah, the little drop down.
+
+00:15:40.600 --> 00:15:41.200
+Uh,
+
+00:15:41.800 --> 00:15:42.060
+clear.
+
+00:15:43.340 --> 00:15:43.580
+Yeah.
+
+00:15:44.360 --> 00:15:45.680
+Okay. You got it, perfect.
+
+00:15:46.800 --> 00:15:47.340
+Good.
+
+00:15:48.140 --> 00:15:52.080
+Yeah, so Evals are a way to unit test your skills basically.
+
+00:15:52.520 --> 00:15:59.920
+And actually, in P stack we ship uh under Potamomo, there's a playbook, if you search for it called E playbook.
+
+00:16:00.340 --> 00:16:03.800
+Um, and it's uh, uh it's like not it's actually pretty
+
+00:16:04.220 --> 00:16:07.260
+pretty rigorous, the way it's done.
+
+00:16:07.540 --> 00:16:14.460
+Uh, but um, essentially what I do is I spawn a lot of different sub agents.
+
+00:16:14.760 --> 00:16:21.520
+I have like my main coordinator agent uh come up with a rubric for uh what I want the skill to do.
+
+00:16:22.020 --> 00:16:32.560
+Um, and then it spawns all these sub agents and it's it creates individual directories for them, uh which are cleverly named to not let the sub agent know that it's being evaluated.
+
+00:16:32.860 --> 00:16:39.000
+Because uh agents can actually tell, and when they do, they change their behavior.
+
+00:16:39.500 --> 00:16:52.820
+Uh, but it does a bunch of stuff like that to um, essentially, yeah, like test whether or not the skill I'm making or changing is actually doing what I think it does.
+
+00:16:53.060 --> 00:16:59.320
+Um, and one of the really nice things about cursor is that we are we we support so many different models.
+
+00:16:59.700 --> 00:17:08.440
+So you can actually eval your skill across all sorts of different models, um, and you know, get a sense of how well it performs across
+
+00:17:08.760 --> 00:17:11.580
+that different matrix, um, especially for the models that you use.
+
+00:17:13.120 --> 00:17:18.720
+Uh, so I do this a lot, every time I I modify a skill, I will run one of these, uh like the eval playbook,
+
+00:17:18.980 --> 00:17:22.780
+uh and make sure that, you know, it's actually leading to a result I want.
+
+00:17:23.160 --> 00:17:32.660
+Uh, but I will say like maintaining skills is actually pretty hard. Uh, it requires I think a lot of taste and observation.
+
+00:17:33.080 --> 00:17:40.960
+So you kind of need to be very good at being a backseat driver, you know what I mean? Like if you do, if you've ever done pair programming, for example,
+
+00:17:41.220 --> 00:17:48.560
+uh and you watch a co-worker code and you're just like, you you could probably do this better, you know, you can do you know like why did you not do this, right?
+
+00:17:48.560 --> 00:17:51.640
+You you ask a lot of questions to your co-worker.
+
+00:17:51.640 --> 00:17:56.300
+And it's kind of a similar thing here, you like, you don't want to just be a passive observer of an agent, you want to be very
+
+00:17:56.680 --> 00:18:02.220
+in the driver's seat in the initial stages when you're building out your own set of skills.
+
+00:18:02.600 --> 00:18:07.460
+Uh, you know, obviously you can use something like P stock, but if you're building your own set of skills, it's very
+
+00:18:07.880 --> 00:18:13.280
+I think, you know, opening up the all the tool calls and like reading the code and
+
+00:18:14.080 --> 00:18:18.680
+reading all the the agent behavior and their thinking blocks is a really great way to
+
+00:18:19.020 --> 00:18:22.240
+see where they they fail, right?
+
+00:18:22.240 --> 00:18:27.180
+Like what what you know where are they being done and then you can go and build a skill for that.
+
+00:18:27.640 --> 00:18:32.700
+And then with verification how you trust it is, it's I think it's also a very similar iteration loop,
+
+00:18:33.080 --> 00:18:40.440
+uh where, you know, like I actually did the same process for verifying the verification skill,
+
+00:18:40.860 --> 00:18:44.680
+where I actually get um,
+
+00:18:45.920 --> 00:18:48.860
+so one thing that's interesting about Evals is that you can sort of hill climb them,
+
+00:18:49.280 --> 00:18:57.720
+meaning that uh your Eval can produce a score, right? A score that you can get your coordinator to produce, uh but also uh you can have a judge agent of a different model
+
+00:18:58.140 --> 00:19:04.080
+to uh kind of cross reference and make sure that the first model is not being biased,
+
+00:19:04.460 --> 00:19:06.660
+right? The model that's judging all of the sub agents that are running the thing.
+
+00:19:07.020 --> 00:19:09.920
+Uh, but you can also like hill climb. So meaning that you can you can use like slash loop
+
+00:19:10.260 --> 00:19:16.520
+in cursor and you can say, okay, keep looping on this eval, right? Until everything is 10 out of 10 as an example.
+
+00:19:17.060 --> 00:19:22.180
+Uh and I did the same the basically the same approach with the control scale and so I kind of it was very it was very hands off actually.
+
+00:19:22.500 --> 00:19:28.580
+Uh, so, you know, I uh I kind of built I built that skill that way like the CLI and that skill.
+
+00:19:28.900 --> 00:19:33.200
+Um, and over time it's gotten really good. Uh, but yeah, it was definitely not super smooth.
+
+00:19:33.620 --> 00:19:38.240
+At the beginning, it required a lot of iteration. And I think that
+
+00:19:38.290 --> 00:19:39.650
+cation skills.
+
+00:19:39.870 --> 00:19:40.450
+Yeah, just
+
+00:19:40.450 --> 00:19:41.970
+just one follow there I'm like, oh I have to go try to go one layer deeper.
+
+00:19:41.970 --> 00:19:48.950
+So, are you let's say we wanted to build um an eval or a skill for for something and we wanted to kind of get better on its own, which is what I think you're suggesting.
+
+00:19:48.950 --> 00:20:05.890
+Are you doing that in like a work tree? kind of isolated with like the sub agents and then the reviewer agent and and all that? Is it happening like in something like a cloud hosted environment? Like what's the the more the practical steps? If I wanted to go do this uh and like set up a verification system for something, what would I what would I do or where would I start?
+
+00:20:08.110 --> 00:20:12.030
+Uh, I think that the best place to start is local.
+
+00:20:12.530 --> 00:20:13.390
+because you can observe.
+
+00:20:14.410 --> 00:20:16.190
+You can definitely observe what your agents are doing.
+
+00:20:16.190 --> 00:20:19.770
+So, uh, if you're building a verification skill for yourself,
+
+00:20:19.950 --> 00:20:24.690
+uh I would definitely start local and just have your agent bring up the application,
+
+00:20:25.090 --> 00:20:29.830
+whether it's like a CLI or uh desktop app or whatever,
+
+00:20:30.150 --> 00:20:37.570
+and so you can actually observe, right? You can see how the agent is interacting with the the application.
+
+00:20:37.730 --> 00:20:43.750
+You can see it, you know, how it calls like the different APIs that that allow it to interact with the uh the application.
+
+00:20:45.070 --> 00:20:51.430
+Um, but uh for me personally, uh I have basically been kind of all in, mostly all in on cloud agents because they're extremely powerful.
+
+00:20:52.110 --> 00:20:56.650
+Uh and the really powerful thing about cursor is the the cloud agents actually,
+
+00:20:57.130 --> 00:21:01.430
+where if you spend a little bit of time setting up your environment,
+
+00:21:02.690 --> 00:21:10.090
+these control skills, these verification skills pay a huge amount of dividends because it's not just something that makes you as a single engineer better,
+
+00:21:10.410 --> 00:21:12.230
+it actually levels up your whole team.
+
+00:21:12.670 --> 00:21:19.230
+Uh and even your whole company because uh you can actually start thinking about cloud agents, you need to start thinking about automation that automatically
+
+00:21:20.050 --> 00:21:21.790
+do things like
+
+00:21:22.470 --> 00:21:26.290
+uh I'll buy I get I I kind of talk about this a bit later, but I'll just kind of
+
+00:21:26.850 --> 00:21:36.250
+get into it. Uh where where you know, for example, like I talk a lot about this agent we have called Benny, right? Who who uh you know, takes all of the
+
+00:21:36.870 --> 00:21:43.570
+bug reports that we get and it automatically goes off in the cloud, opens up a cloud uh it's you know, it's desktop.
+
+00:21:43.830 --> 00:21:50.030
+It runs cursor in its own computer and it uses the same control skills
+
+00:21:50.490 --> 00:21:54.450
+to interact with the application and try to reproduce the bug.
+
+00:21:54.810 --> 00:21:57.970
+Uh or the user report, right?
+
+00:21:57.970 --> 00:22:01.290
+And this is so so powerful because at once I can immediately I I get so much
+
+00:22:01.670 --> 00:22:04.070
+information from this automatically.
+
+00:22:04.450 --> 00:22:08.550
+Like here in this example, you can see that uh the Benny actually reproduced the bug.
+
+00:22:09.090 --> 00:22:12.090
+Uh, but it's already fixed on me.
+
+00:22:13.150 --> 00:22:18.250
+So it actually confirms that we fixed this problem already and all I need to do is just release another build of of cursor.
+
+00:22:18.570 --> 00:22:26.290
+Uh, so there's like huge information there that I didn't have to go off and sit with an agent, you know, and spend an hour trying to is this fixed? Is this not fixed?
+
+00:22:26.850 --> 00:22:29.370
+So you you you gain back so much time.
+
+00:22:29.730 --> 00:22:35.590
+Uh, but you know, everybody on my team benefits from this. Everybody in the company benefits from this.
+
+00:22:36.350 --> 00:22:47.410
+Uh, so definitely think that uh, you know, keeping these uh using cloud agents is super powerful. Uh, but yeah, it's like a journey. You have to trust it first, right? Before you you get to this point.
+
+00:22:47.710 --> 00:22:54.350
+And that's it goes back to what I was saying here where, you know, it's very hard to it's almost impossible and I would definitely encourage you not to try to jump from,
+
+00:22:54.770 --> 00:23:02.890
+you know, like if you're still in this zone, you don't want to jump to like I'm going to spawn 100 thousand or thousands of cloud agents right now because you're just going to waste a lot of tokens,
+
+00:23:03.310 --> 00:23:05.490
+um and and it's going to be extremely expensive.
+
+00:23:05.950 --> 00:23:16.330
+Yeah, so just to kind of recap so far, basically the if you wanted to go on the journey that you've kind of gone on, it would be to start with verification, um building some some skills and some some ways of determining that the agents are producing,
+
+00:23:16.710 --> 00:23:20.990
+at least like correct code, whether like you said, whether it's good code or not, that's maybe a separate question, but like it's it's technically solving the problem by
+
+00:23:21.370 --> 00:23:26.550
+looking at, you know, stack traces, looking at, you know, the the actual behavior in the app and so on.
+
+00:23:27.310 --> 00:23:32.570
+Um and then once we trust it locally, then we can start to think about scaling into the cloud and running more
+
+00:23:32.570 --> 00:23:34.050
+thing every single thing.
+
+00:23:34.330 --> 00:23:39.890
+I think there's really no shortcut for going from here to there, because this is really about your personal level of trust in agents,
+
+00:23:40.390 --> 00:23:43.830
+right? Um, obviously, you know, as a as an engineer, you don't want to just slop code into production.
+
+00:23:44.290 --> 00:23:46.850
+So, how do you actually build that that trust? Takes
+
+00:23:47.450 --> 00:23:50.190
+um, a lot of uh, I guess, taste and judgment.
+
+00:23:50.790 --> 00:23:56.950
+Um, but uh, you know, like I think plugins like P stack definitely kind of help you uh get up to speed much quicker.
+
+00:23:57.470 --> 00:24:03.590
+Uh, and so, I guess it's like if you trust me and you trust P stack, then in by extension, you can maybe trust your agents.
+
+00:24:03.930 --> 00:24:07.570
+But if you don't trust me and I I definitely would not encourage people to blindly trust me.
+
+00:24:08.870 --> 00:24:17.070
+Uh, uh, you know, if you build up your own set of skills that you can obviously, you know, take a look at P stack and kind of fork it, make it your own, improve the skills, definitely encourage that.
+
+00:24:17.570 --> 00:24:20.630
+Uh, but for me, it's really all about it just keeps coming back to trust.
+
+00:24:21.030 --> 00:24:26.210
+You know, every one of us here in this chat have a different standard for engineering, uh, and there are different things that
+
+00:24:26.510 --> 00:25:18.330
+are important for us in our code base. And uh, when you are able to encode all of that into skills and you can verify that your agents are actually doing them, that allows you to really kind of ascend this curve and um, uh, you know, start automating things. Uh, there's another piece I want to to talk about, um, if there's Yeah, go for it. I I'll I'll take a few questions as I go. Yeah, I think there's a third part to this, which I haven't talked about yet, which is kind of an interesting one, which is like refactoring and rewriting, like one of the uh, I guess most controversial, one of the most controversial topics in the industry, I think is like, should you rewrite your app or not? Um, because I think
+
+00:25:42.130 --> 00:25:49.350
+engineers are very prone to this where, especially when you join a company, you come in and you see like the code base and you're, man, this is shit.
+
+00:25:49.510 --> 00:25:50.530
+Like who wrote this code?
+
+00:25:51.030 --> 00:25:52.330
+You know, it's terrible. I want to rewrite the whole thing.
+
+00:25:52.850 --> 00:26:01.790
+There is a very common inclination and I think a lot of, you know, before agents, um, and I guess arguably even now, people will definitely discourage you from rewriting stuff.
+
+00:26:02.330 --> 00:26:05.490
+But I'm actually here to make a case for why you might want to consider it.
+
+00:26:06.830 --> 00:26:09.030
+Um, because
+
+00:26:10.510 --> 00:26:35.530
+I think it really depends. Uh, you know, uh, Brownfield applications I think are actually in a pretty good spot, especially if they're set up well already. Uh, and like recently I've been talking to some people, but uh, you know, I was just observing. I I just noticed this parallel, which is that a lot of big tech company problems are now everybody's problems.
+
+00:26:35.930 --> 00:27:06.850
+Um, and the big tech company problem, you know, like when I was working at meta, like we had this giant Mono Repo, we had like, I don't know, tens of thousands of engineers just, you know, like banging on their keyboards and and shipping code. And a lot of really great engineers at meta, uh, but uh, I will say like, you know, you'll be surprised that the code quality is actually not that good.
+
+00:27:06.850 --> 00:27:26.910
+Um, and so I often joke that like, you know, before AI sloth, we had human sloth. Um, and so, you know, I think a lot of big tech infra, like uh, like what meta has or Google, you know, you know, really big tech companies, are actually designed for that, where you you're sort of like, you're catering to the the, you know, like
+
+00:27:26.910 --> 00:27:46.990
+uh sounds this sounds a bad to say, but like the the least capable engineer on your team, right? You build you build frameworks, you build conventions, you build guard rails, you know, you restrict credentials so that, you know, your intern doesn't wipe your production database.
+
+00:27:48.010 --> 00:28:35.710
+Um, there's uh, you know, if you have that level of infra already, I think your agents can actually already do a very solid job, right? Because they have the the guard rails are already in place for agents to not cause havoc or not cause too much havoc uh in your code base. Um, and you can always add more, you know, guard rails. Uh, but I think like Greenfield applications, especially are you know like the brand new applications are like the biggest risk in my opinion, uh, and also the greatest opportunity, because you know, if you vibe code a project uh a prototype, uh, like we did for Grot, you know, Grot was spun up very, very very quickly.
+
+00:28:35.970 --> 00:28:51.990
+Uh and if you if you haven't heard of of Grot, it's like a new application we just launched yesterday. Uh, it's it's really cool. Uh, lets you orchestrate your create like individual agents that have their own identity and you can kind of orchestrate them. It's super cool, definitely check it out.
+
+00:28:52.690 --> 00:29:29.790
+Uh, but yeah, that's like a very, it was a very green field application, like most prototypes are. So it's like vibe coded very quickly. Humans were not reading the code at all. And uh, I had this tweet recently, uh, where I said something about organic architecture. Um, let me find it.
+
+00:29:30.510 --> 00:30:24.950
+Uh, but the idea is that uh, when you have a completely vibe coded application, you essentially have no guard rails whatsoever. So uh, your agents when you give them a task, they will just solve it in whatever method is the most convenient. And over time you get into this uh situation where you have a code base that is firely out of control because you don't understand it. Uh, your agents understand it, I guess in a way, but like they've built something that is, you know, optimized for short for shortcuts. Uh, and uh, you know, it will you will suffer you'll have a lot of of issues with that application.
+
+00:30:25.790 --> 00:31:04.550
+Uh, so I think starting your code base with uh, like very strong constraints is very much needed, uh, because like when you have a code base that you can trust, right? When you have guard rails that actually help you uh, help your agents right, good code,
+
+00:31:04.550 --> 00:31:06.030
+work into multiple PRs.
+
+00:31:06.030 --> 00:31:10.470
+Uh I do that mostly because uh
+
+00:31:10.930 --> 00:31:19.430
+I like I like the idea of I guess maybe this is not harder to do now as in the world of agents and you have like so many commits.
+
+00:31:19.890 --> 00:31:25.590
+I like the idea that you know the Git history is a very rich source of context uh and I like the
+
+00:31:25.920 --> 00:31:36.490
+I like each PR to sort of atomically describe what that small piece of thing is doing, which also makes it easier for me to revert changes and like figure out, you know, oh I shipped a bug and it's just it's here, right? It's not in this 40,000 line PR where who knows what landed in there.
+
+00:31:37.430 --> 00:31:40.090
+Uh but yeah, I don't have a hard cap on PR size.
+
+00:31:40.690 --> 00:31:50.790
+Cool. And then um yeah, also quick question on like CI. So again, you don't have to go into like uh the screen share like your CI does, but just generally, would you describe what the CI kind of looks like uh or how strict it is?
+
+00:31:52.490 --> 00:31:59.990
+Uh yeah, so uh well specifically for Rockbot, so Dune is a is the sort of cheeky code code name for the architecture that we've built for
+
+00:32:00.400 --> 00:32:04.390
+Rockbot. Um the CI looks pretty annoying
+
+00:32:04.700 --> 00:32:06.190
+because there's checks for everything.
+
+00:32:06.190 --> 00:32:12.890
+So, like literally I have uh uh well if you've written any React for example, you know you know that one of the biggest foot guns in React is use effect.
+
+00:32:13.290 --> 00:32:21.090
+Uh so in uh Dune and in Rockbot, we've banned use effect.
+
+00:32:21.390 --> 00:32:31.790
+So Dune is just you the the mental model of what Dune is, uh you can kind of think of it as like next JS for uh electron apps and it's designed for agents to write.
+
+00:32:32.190 --> 00:32:36.950
+Uh and it's like custom for, you know, our agent powered applications.
+
+00:32:37.590 --> 00:32:43.950
+Um, so the CI checks are very like specific to that like, you know, don't use use effect. It's it's it's banned, like CI will fail
+
+00:32:43.950 --> 00:32:48.290
+uh and yell at you, we have like some of the more interesting ones that people might raise eyebrows
+
+00:32:48.290 --> 00:32:53.190
+is like I actually ban code comments as well, uh which is very interesting.
+
+00:32:53.690 --> 00:33:02.390
+Um, but I've noticed that 99% of the time agents just write code comments that kind of describe some historical thing that is actually totally irrelevant to the code.
+
+00:33:03.090 --> 00:33:10.290
+Um, like it will often say like, you know, oh Lauren said you should never do this and it's now in in a code comment, like what? Like why that was I didn't say that as like a durable, you know, global rule.
+
+00:33:10.290 --> 00:33:12.990
+I just meant like your this PR sucks and you should change that part.
+
+00:33:13.990 --> 00:33:19.190
+Agents don't really understand us that well, surprisingly, uh and or they kind of assume too much and they kind of do things in like very stupid ways.
+
+00:33:19.190 --> 00:33:26.190
+So like yeah, we've banned everything, everything you can imagine like the agents are bad at, we ban.
+
+00:33:26.190 --> 00:33:34.890
+Uh so one example that we actually suffer a lot in the agents window is we have uh you know, if you use the agents window you've definitely seen performance issues and you know we're constantly trying to fix them.
+
+00:33:34.890 --> 00:33:40.590
+Uh but it's like a it's a never-ending struggle because there's so many pull requests that get merged.
+
+00:33:40.890 --> 00:33:47.290
+any one of them could just regress performance or stability or reliability.
+
+00:33:47.790 --> 00:33:53.890
+Uh you know, the agents window doesn't have this architecture yet. I plan to do bring this learning back there and kind of refactor everything there.
+
+00:33:54.390 --> 00:34:03.190
+Uh, but uh it just regresses super often, uh because uh there's just one example is like we have very poor um isolation between processes.
+
+00:34:03.190 --> 00:34:09.190
+So like on you know on on electron you have a renderer thread that renders your UI, but you also have like a main thread that you can run other code that you know doesn't need to block the renderer.
+
+00:34:09.890 --> 00:34:20.490
+Um, but we do a poor job of separating those things. And so often times you just accidentally have code that gets pulled into running on the renderer thread.
+
+00:34:20.490 --> 00:34:28.950
+Right. And then all of a sudden you're competing with the the renderer that you know that has a very if you want like 60 FPS, you have to every frame that gets drawn
+
+00:34:29.390 --> 00:34:31.790
+has to be done in 16 milliseconds.
+
+00:34:31.790 --> 00:34:35.390
+So very, very small, you know, deadline per frame.
+
+00:34:35.790 --> 00:34:38.890
+Uh if you want, you know, a very smooth product.
+
+00:34:38.890 --> 00:34:44.290
+Uh and when you start building bringing in accidentally bringing in, you know, things that are like very computationally heavy or they have a lot of IO,
+
+00:34:44.690 --> 00:34:47.390
+uh then you just get into like a lot of junk.
+
+00:34:47.390 --> 00:34:50.090
+And your your FPS really drops, you start
+
+00:34:50.390 --> 00:34:52.290
+uh, you know, losing frames, you get long tasks that
+
+00:34:52.690 --> 00:34:55.990
+take more than 16 milliseconds, then you just get this really choppy experience.
+
+00:34:56.990 --> 00:35:04.790
+So all of those patterns that we've learned basically building electron app, we've encoded into this framework, and it becomes like a hard failure.
+
+00:35:04.790 --> 00:35:13.190
+So I literally in in we literally have a directory called electron main, electron renderer, and we have uh import
+
+00:35:13.790 --> 00:35:25.190
+uh CI, I guess, where we actually check the dependency graph to make sure they're not accidentally importing code from one directory to another. Uh so that's enforced by CI,
+
+00:35:25.790 --> 00:35:33.990
+um as well as bug box uh which is our which cursor's um like code review tool that runs on CI.
+
+00:35:34.390 --> 00:35:36.790
+Uh, you know, in our agent MB, it's everywhere.
+
+00:35:36.790 --> 00:35:41.690
+Like so I I I I um I have this thing here where I I talk about like
+
+00:35:42.190 --> 00:35:47.990
+um, you know, like there are multiple layers, I think, for building a good code base.
+
+00:35:48.290 --> 00:35:51.290
+Uh obviously the code base is one where uh if you have an architecture like this
+
+00:35:51.690 --> 00:35:54.690
+where it's extremely strict, uh you know, the the
+
+00:35:55.290 --> 00:35:57.090
+the way to build features is very conventional.
+
+00:35:57.090 --> 00:36:01.390
+That's like the strongest strongest level of enforcement because agents just love to copy existing patterns.
+
+00:36:01.890 --> 00:36:08.890
+So, uh one example of this in robott is like we have this these concepts called like a feature and we have entry points and transcript cards.
+
+00:36:08.890 --> 00:36:12.290
+Like, you know, the cards that you see in the chat, these are all like
+
+00:36:13.090 --> 00:36:17.690
+like nouns, I guess, in in the framework. And so there's a very conventional way of creating them.
+
+00:36:17.690 --> 00:36:18.490
+And
+
+00:36:19.490 --> 00:36:19.990
+so like a feature is
+
+00:36:20.418 --> 00:36:21.478
+teacher
+
+00:36:21.628 --> 00:36:22.288
+and.
+
+00:36:22.288 --> 00:36:25.908
+I've just going to work in this directory and for 80% of the work it's mostly just very encapsulated there.
+
+00:36:26.818 --> 00:36:30.148
+But uh like it's like design again for you know, like the dumbest agent.
+
+00:36:30.148 --> 00:36:32.018
+Like you don't have to think, right?
+
+00:36:32.018 --> 00:36:38.278
+The the the one of the key principles I have for this framework is like the shortest the shortest path is the best path.
+
+00:36:39.338 --> 00:36:49.578
+So uh because that plays exactly to how agents love to write code so you like to take shortcuts really, you know, they'll find the quickest way to solve the problem.
+
+00:36:49.828 --> 00:36:52.528
+So why not make that the best way to solve the problem?
+
+00:36:53.148 --> 00:36:55.828
+Uh so uh I I probably won't get into all the specific details.
+
+00:36:56.318 --> 00:37:01.558
+Um and uh this framework's really more of a collection of ideas and principles rather than something that will open source.
+
+00:37:01.968 --> 00:37:04.908
+Uh you can you can you know screenshot this I guess if you want and.
+
+00:37:05.028 --> 00:37:10.148
+uh tell your agent to uh do some build build something like this for you too.
+
+00:37:11.518 --> 00:37:17.648
+Um yeah, but it's really all about the layers uh you know, like the the code base is one part with features uh and directory and you know, import
+
+00:37:18.728 --> 00:37:25.408
+uh blocking import dependencies uh that shouldn't be imported, uh but and and all enforces that and static analysis.
+
+00:37:25.408 --> 00:37:32.838
+So like uh there's CI checks, we have a lot of lints for bad patterns that uh we observe.
+
+00:37:33.168 --> 00:37:36.508
+uh compiler diagnostics.
+
+00:37:37.008 --> 00:37:43.178
+Uh there's also rules and bugbot which are um I think like three, four, five are more soft,
+
+00:37:43.468 --> 00:37:47.198
+right? These two actually make make CI rid, right?
+
+00:37:47.408 --> 00:37:52.538
+So that you know, there's a hard constraint where the agent can't just write crappy code.
+
+00:37:53.628 --> 00:37:57.428
+For rules and skills in bugbot,
+
+00:37:58.388 --> 00:38:02.718
+your agents can still forget, right? You can still or it may not
+
+00:38:03.018 --> 00:38:05.738
+always consistently apply them.
+
+00:38:06.108 --> 00:38:11.408
+So I like to layer them, but I don't I don't like to
+
+00:38:11.748 --> 00:38:17.148
+rely on them as the only source of enforcement because it's very very soft, right?
+
+00:38:17.498 --> 00:38:18.578
+hard and forced.
+
+00:38:19.088 --> 00:38:23.098
+Right? And this is why, you know, maybe uh the choice of text stack that you use is also very important.
+
+00:38:23.988 --> 00:38:29.498
+Um like I think for example Rust is sort of sneaking, you know, it's like getting super popular again
+
+00:38:29.868 --> 00:38:32.798
+uh because the compiler is so strict.
+
+00:38:33.078 --> 00:38:39.318
+Right? The compiler enforces so many different things, you know, there's a borrow checker that you have to appease.
+
+00:38:39.598 --> 00:38:43.838
+And as long as you make sure your agents are writing unsafe code blocks,
+
+00:38:44.388 --> 00:38:49.098
+uh you can more or less feel somewhat confident that if the code compiles, it probably works and it's good.
+
+00:38:49.698 --> 00:38:53.458
+Uh but it usually gives you that level of trust and confidence
+
+00:38:53.898 --> 00:39:01.718
+that you as a human engineer no longer need to go and check it yourself. You know, you you rely on code and
+
+00:39:02.338 --> 00:39:08.718
+static analysis to actually make that uh a lot smoother.
+
+00:39:09.238 --> 00:39:14.998
+Um and I I guess the worst part the worst place to be in is if
+
+00:39:15.288 --> 00:39:22.718
+you are stuck in code review land where you actually enforce all of the constraints, the invariants in your code base
+
+00:39:23.128 --> 00:39:27.538
+by literally the human person
+
+00:39:27.908 --> 00:39:30.858
+saying, you know, reading the code and like, okay, you should not do this.
+
+00:39:31.488 --> 00:39:32.248
+Right?
+
+00:39:33.128 --> 00:39:34.988
+Every time you have to do that, you should consider that as a code smell, like a anti pattern.
+
+00:39:35.548 --> 00:39:43.988
+And you should say, okay, instead of me commenting on the PR, how do I turn this into a hard rule?
+
+00:39:44.418 --> 00:39:48.288
+Right? How do I turn this into a lint rule? How do I turn this into a CI failure?
+
+00:39:48.578 --> 00:39:51.818
+Or how do I even categorically eliminate this problem?
+
+00:39:52.418 --> 00:39:53.798
+uh entirely?
+
+00:39:54.548 --> 00:39:56.338
+Uh I I can talk about another
+
+00:39:56.338 --> 00:39:58.608
+migration I've done, but I'll probably pause here.
+
+00:39:58.908 --> 00:39:59.408
+Sure.
+
+00:39:59.918 --> 00:40:07.298
+Yeah, I feel like that's that's where I am to be honest, is is what you're describing right now, which is that like I don't have all these rules.
+
+00:40:07.598 --> 00:40:10.978
+Uh so I have some things to go do after this session.
+
+00:40:11.338 --> 00:40:18.928
+In terms of being able to scale my agents, I'm I'm definitely on like the uh you know, maybe a couple of parallel ones locally staged, like two to three locally.
+
+00:40:19.248 --> 00:40:21.448
+And I'm sure most people here are on the same. So, uh
+
+00:40:21.788 --> 00:40:25.658
+yeah, I know we have a couple minutes left. Lauren, was there anything else that you wanted to to highlight?
+
+00:40:25.658 --> 00:40:30.658
+I obviously there's lots of questions so I can grab more, but I want to give you a few minutes if there's anything else you want to talk about.
+
+00:40:30.658 --> 00:40:32.398
+Well, I think I've been yapping for quite a lot, so I maybe let's just do questions.
+
+00:40:32.948 --> 00:40:34.488
+Okay, cool.
+
+00:40:34.788 --> 00:40:39.488
+One question I had uh a couple of uh came up a couple of times was just around like token usage.
+
+00:40:39.988 --> 00:40:46.478
+So the the question is like is is what you're describing a realistic thing for people who are on, you know, uh
+
+00:40:46.798 --> 00:40:53.588
+a normal set of token usage? They don't have, you know, basically unlimited tokens uh to work with.
+
+00:40:54.318 --> 00:40:55.608
+I think that's a really good point.
+
+00:40:55.608 --> 00:41:02.888
+I mean like obviously, you know, I work at a AI lab where we have unlimited tokens, so uh I definitely cannot
+
+00:41:04.498 --> 00:41:10.888
+say that, you know, this is something everyone should do in the exact same way that I did it.
+
+00:41:11.148 --> 00:41:14.488
+I think it's possible to get to this point without, you know, breaking the bank.
+
+00:41:15.548 --> 00:41:18.448
+But you know, if you're like an engineering leader or you know, you're you have a startup that you lead,
+
+00:41:19.048 --> 00:41:25.118
+um I think there may is a question of ROI, um and it's like uh
+
+00:41:25.888 --> 00:41:31.668
+yes, you spend a lot of money on tokens in the upfront stage.
+
+00:41:32.028 --> 00:41:35.808
+You know, like refactoring your code base is going to take a lot of tokens.
+
+00:41:36.188 --> 00:41:39.308
+Uh adding all these things uh is going to take a bunch of tokens.
+
+00:41:39.828 --> 00:41:45.668
+But if we're heading to a world where agents are writing all the code and, you know, you want to be very lean,
+
+00:41:45.878 --> 00:41:53.878
+right? You don't want to have to hire you don't want to be you don't want to become like meta, right? I mean like in terms of you don't want to become a 10,000 person engineering org because
+
+00:41:54.438 --> 00:41:58.868
+I mean that's a cool problem to have, but also, you know, you you have so much overhead.
+
+00:41:58.868 --> 00:42:02.988
+There's like planning, you know, like it's it's uh personally I I would uh
+
+00:42:03.938 --> 00:42:05.758
+it's not super fun.
+
+00:42:06.218 --> 00:42:11.478
+But um I think you want to stay very nimble, right? And you want to you want to be like agents are all about
+
+00:42:11.988 --> 00:42:15.308
+allowing you to do things that you couldn't do before.
+
+00:42:15.788 --> 00:42:18.908
+That's really to me like the value of agents.
+
+00:42:19.208 --> 00:42:23.068
+You know, it's not just storing tokens on every single little thing.
+
+00:42:23.478 --> 00:42:31.588
+But um to me like the thing I couldn't do before is like enforce this level of constraints in a code base by myself,
+
+00:42:32.178 --> 00:42:33.238
+right?
+
+00:42:33.238 --> 00:42:41.588
+Like I'm just a single person, you know, uh it would have taken me years to build this framework uh and do all the refactoring and
+
+00:42:42.598 --> 00:42:47.108
+test everything myself and verify, you know, like run imagine if there it was just me right now.
+
+00:42:47.108 --> 00:42:54.748
+You know, in in pre agent era, just like running, you know, by it would take me so long, right?
+
+00:42:54.978 --> 00:42:58.048
+And my salary is pretty high, right?
+
+00:42:58.048 --> 00:43:01.328
+Like so, you know, the the question I think engineering leader might have is just then,
+
+00:43:01.728 --> 00:43:07.558
+you know, like what is there's a trade off of do you hire someone to do this?
+
+00:43:08.018 --> 00:43:10.598
+Or do you spend the tokens to set up a code base so that even
+
+00:43:11.168 --> 00:43:18.078
+the the most naive, right, the dumbest agents can do a good job.
+
+00:43:18.418 --> 00:43:23.048
+And when you actually get to this point, like even agents that are not, you know, fable sized
+
+00:43:23.328 --> 00:43:26.988
+do an excellent job of writing code and this pays a lot of dividends
+
+00:43:26.988 --> 00:43:37.328
+as well for me personally where I've empowered not just myself, but again, like PMs, designers, engineers who are not familiar with to just contribute in a way that
+
+00:43:37.878 --> 00:43:38.988
+is sustainable.
+
+00:43:40.098 --> 00:43:42.438
+So I think yeah, it's definitely like a trade off for sure.
+
+00:43:42.788 --> 00:43:45.058
+You know, like nothing is like free for sure.
+
+00:43:45.448 --> 00:43:47.578
+Uh and tokens are pretty expensive.
+
+00:43:48.078 --> 00:43:52.178
+Uh but oh actually, uh I I don't know how many of you have seen this.
+
+00:43:52.178 --> 00:43:55.308
+But we actually announced Grock 4.6 today.
+
+00:43:55.648 --> 00:43:56.878
+So very exciting.
+
+00:43:57.138 --> 00:43:58.398
+Finally out.
+
+00:43:58.838 --> 00:44:03.848
+Um so yeah, graph 4.6 would be like a great there's very very smart.
+
+00:44:04.308 --> 00:44:08.608
+Uh it's really good on the on the benchmarks uh and it's the same the tokens
+
+00:44:09.238 --> 00:44:12.418
+well uh hopefully I'm not saying anything correctly, but uh I believe the cost
+
+00:44:12.818 --> 00:44:16.058
+per token is the same as 4.5.
+
+00:44:16.538 --> 00:44:20.958
+So you're actually getting more intelligence for the same cost.
+
+00:44:21.528 --> 00:44:29.578
+Uh I think this is an area that Cursor tries to Cursor and SpaceX AI try to really optimize for like that
+
+00:44:29.828 --> 00:44:30.308
+oto.
+
+00:44:30.308 --> 00:44:31.558
+origin health cursor.
+
+00:44:31.558 --> 00:44:32.537
+We had a origin health agent window, we had a CLI, we had an IDE.
+
+00:44:32.537 --> 00:44:34.047
+And these are really like power user tools, right?
+
+00:44:34.047 --> 00:44:39.697
+They they they're designed for developers, so it's very very developercentric, you can do knowledge work in them, but it like the UI is not really optimized for that.
+
+00:44:40.257 --> 00:44:44.857
+So, we actually didn't really have uh well I think like a lot of people, you know, GTM product, like they might have used cursor uh to do their work.
+
+00:44:44.857 --> 00:44:55.127
+But it definitely wasn't like a delightful experience with them.  Um I think now with Grobot, uh it's become Grobot is basically like the cursor moment for people who are not in tech, in my opinion.
+
+00:44:55.127 --> 00:45:04.927
+It's like it's like a very, very accessible way to use agents in a very comfortable, very familiar interface.
+
+00:45:04.927 --> 00:45:11.837
+It looks like Imessage um and it's very fun to, you know, you can give your agent a fun name.
+
+00:45:12.287 --> 00:45:19.647
+Uh you can have you can kind of do orchestration with in a very like natural way where you can sort of, you know, each agent is like a person and now you got a team of agents like working on one one agent per account that you manage as an example.
+
+00:45:20.107 --> 00:45:30.417
+Or if you're a PM, you have, you know, you can have an agent that summarizes all the work that Lauren did last night and then now you know what I did, right?  So I think our PMs are leveraging that a lot and they're shipping code, too.
+
+00:45:30.417 --> 00:45:43.497
+Uh so, you know, like often times they will just say, 'Oh, here's a bug, I fixed it, can you look at it?' And then I'll go review it and actually it's just perfect, I'm like, okay, stamp. Uh so, uh that I think that shows that you know that the the Dun architecture is holding up, right?
+
+00:45:43.497 --> 00:45:54.757
+The all the the really strict constraints allow people who are not experts in engineering to contribute at a high level.  Uh so, I feel like I'm already seeing that payoff a lot where uh you know, designers and PMs are just able to to to ship features directly.
+
+00:45:54.757 --> 00:46:06.398
+Um and that just makes the Gbot team super fast, right?  Where we can ship so quickly.  Um and we have a lot planned, so I'm very excited uh to, you know, uh to to ship more ship more stuff.
+
+00:46:06.682 --> 00:46:07.652
+Right? We're we can ship so quickly.
+
+00:46:07.652 --> 00:46:14.412
+Um and we have a lot to client so I'm very excited uh to you know, uh to to ship more ship more stuff.
+
+00:46:14.762 --> 00:46:16.182
+Shit wash, shit wash stuff.

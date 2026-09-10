@@ -1,0 +1,26 @@
+at: 2026-08-18T03:40Z
+agent: claude
+step: s5 / nhịp 2 — theme
+did: >
+  Người dùng nêu: 2 tone light + dark, chủ đạo đỏ và trắng. Còn lại dùng
+  skill design.
+
+  design-brief có từ vựng ĐÓNG cho palette (navy_and_white, monochrome_dark,
+  light_clean, earth_tones) — không có red. Nên dựng palette riêng bằng
+  phương pháp OKLCH + kiểm tương phản bằng máy, rồi đổ vào cấu trúc 9 mục
+  của design-brief. color-expert trong plugin chỉ là entry catalogue trỏ
+  upstream, không có reference material đi kèm.
+
+  Ba phát hiện từ đo thật, không phải phỏng đoán:
+  1. Đỏ light và dark PHẢI là hai hex khác nhau. #C81E1E đạt 5.74 trên trắng
+     nhưng 3.45 trên nền tối. #F87171 đạt 7.15 trên tối nhưng 2.77 trên trắng.
+  2. Dark cần HAI token đỏ: #F87171 cho chữ/link, #DC2626 cho nền nút — vì
+     chữ trắng trên #F87171 chỉ 2.77.
+  3. Cảnh báo phải tách khỏi đỏ thương hiệu bằng SẮC ĐỘ, không phải độ sáng.
+     Phép thử tương phản không đo được việc này nên thêm kiểm hue_gap >= 25 độ.
+     Lượt đầu chọn #92400E lệch 22.7 độ — TRƯỢT. Đổi sang #854D0E (31.8 độ).
+
+  Audit cuối: 26/26 cặp pass WCAG AA, 0 trượt.
+
+  Ra: DESIGN.md (9 mục) · tokens.css · brief-preview.html · contrast-audit.json
+object: 05_uiux/DESIGN.md 05_uiux/tokens.css 05_uiux/contracts/contrast-audit.json

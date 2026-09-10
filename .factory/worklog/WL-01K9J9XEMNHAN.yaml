@@ -1,0 +1,138 @@
+id: WL-01K9J9XEMNHAN
+at: 2026-08-19
+by: claude
+buoc: s8 (M03_web + M02_kb)
+loai: fix — man xem danh muc nhan
+fr: KHONG cần — không sửa file frozen nào, không mở đường ghi nào
+
+viec: >
+  Người dùng: "user muốn xem danh sách category / concept ở web và thêm ở đó
+  thôi, không phải lúc nào cũng có PC để chạy code hay mở source ra". GĐ A giải
+  phần XEM. Phần THÊM (GĐ B) cần FR-019, chưa làm — người dùng duyệt FR trước.
+
+pham_vi_ghi:
+  - web/plugins/home-pages/index.ts     # docDanhMucFile + 4 mốc + nhãn sidebar
+  - web/plugins/home-pages/shell.html   # 3 mốc mới, bỏ <b>2</b> gõ tay
+  - web/styles/prototype.css            # .chp / .ch (chip danh mục)
+  - core/tools/sinh_kb_mock.py          # copy CẢ HAI danh mục sang kb-mock/
+  - kb-mock/                            # sinh lại
+  # KHÔNG đụng: FROZEN.lock · settings.json · frontmatter.schema.json
+  # · no-write-path.test.js — đều thuộc GĐ B.
+
+tien_de_nguoi_dung_toi_phai_sua:
+  ho_noi: '"nếu .yaml khó khăn trong giao tiếp cho API/web thì sao không dùng .csv"'
+  do_duoc:
+    - "dungchung.mjs:95  YAML.stringify(fm) — hệ thống ĐÃ ghi YAML mỗi lần sửa bài"
+    - "gate.py:131,166   yaml.safe_dump — phía Python cũng vậy"
+    - "dungchung.mjs:47  mượn `yaml` của Quartz ⇒ 0 dependency mới"
+    - "articles.mjs:61   API trả JSON `{items:[{id,label_vi}]}`, KHÔNG trả YAML"
+  ket_luan: >
+    Web đã nhận JSON rồi. YAML chỉ là định dạng NGUỒN mà server parse. Đổi sang
+    CSV không làm bề mặt API đổi gì — chỉ đổi chỗ parse. Vấn đề thật là THIẾU
+    ENDPOINT GHI, không phải định dạng.
+  csv_se_mat:
+    - "`aliases` là list thật; một alias chứa dấu phẩy + tiếng Việt (concepts.yaml:28)"
+    - "23 dòng comment mang LUẬT VẬN HÀNH (42% categories.yaml) — CSV không có comment"
+    - "5 comment nhóm chia 22 concept thành 5 cụm — cấu trúc ngầm, không trang trí"
+    - "đổi tên file frozen ⇒ FR + sửa FROZEN.lock + ≥12 điểm hardcode"
+  nguoi_dung_chon: giữ YAML
+
+hai_phan_trong_yeu_cau_DA_CHAY_san:
+  - "gán nhãn có sẵn cho bài từ web: inline.ts:1316-1319 → PUT /api/articles → validate --strict"
+  - "đề xuất khái niệm MỚI từ web: ô #f-cptmoi → fm.concepts_proposed"
+  ghi_chu: >
+    Tôi tưởng phải xây mới cả hai. Đo ra thì chúng đã chạy — đúng cửa mà
+    concepts.yaml:3 chỉ định ("không tìm được mục phù hợp thì ghi vào
+    concepts_proposed"). Phần thiếu THẬT chỉ là màn xem.
+
+diem_dau_do_duoc_khong_phong_doan:
+  man_khai_niem_RONG_TRON: >
+    index.ts:512 `daDung = danhMuc.filter(dem > 0)` — chỉ hiện concept ĐÃ có bài
+    dùng. Kho thật 0/22 ⇒ màn /khai-niem/ không hiện mục nào. Người dùng không
+    xem được danh mục mà không mở file YAML. Đúng điều họ phàn nàn.
+  khong_man_nao_hien_CATEGORY: "index.ts:485-530 không có mốc nào cho category"
+  sidebar_hien_id_tho: "index.ts:336 `<span>${esc(k)}</span>` — `agent-llm`, không phải nhãn"
+
+lam_gi:
+  A1_chip_muc_chua_dung: >
+    Giữ nguyên lý lẽ cũ ("22 bar trong đó 12 bằng 0 là nhiễu") nhưng KHÔNG cắt
+    bỏ: mục chưa dùng xuống vùng chip `#cchua`. Chip là <span> chứ không
+    <button> — lọc theo nhãn 0 bài thì ra lưới rỗng, hình dạng phải nói đúng
+    việc nó làm được.
+  A2_moc_category: >
+    Mốc MỚI `#catlist` + `#catcount`. Mỗi mục hiện label_vi + id + số bài, `gom`
+    vào title. Mục đang có bài thêm class .ch-d (viền đậm) + số.
+  A3_sidebar_nhan_tiếng_Việt: >
+    `data-gt` GIỮ id (JS lọc so với data-cat/data-cpt trên thẻ — đổi nó là vỡ bộ
+    lọc). Chỉ đổi chữ hiển thị, id còn xem được ở title. Không có nhãn thì giữ
+    id (fail mềm).
+  mot_ham_cho_hai_file: >
+    docDanhMucFile(kho, ten) thay docDanhMuc hardcode "concepts.yaml". Viết bản
+    thứ hai là nhân bản nợ — đúng họ hai bản schema đã lệch hai lần.
+  don_no_kem: >
+    shell.html:169 gõ cứng `Ngưỡng gợi ý gộp: <b>2</b>` — bản copy THỨ HAI của
+    concept_merge_min (bản đầu tôi đã sửa ở worklog trước, ở index.ts). Giờ là
+    mốc `#pnguong` đọc từ thresholds.yaml. M07-R2: "sửa MỘT chỗ".
+
+loi_TU_TAO_RA_va_tu_bat:
+  what: >
+    Sau khi sửa, bản THẬT hiện "Agent và LLM" đúng, nhưng bản /mock/ vẫn hiện
+    `agent-llm` id thô.
+  goc: >
+    Là hệ quả trực tiếp của việc tôi tách hai kho ở worklog trước
+    (docDanhMucFile đọc vocab từ CHÍNH kho nó dùng). kb-mock/ không có
+    categories.yaml — sinh_kb_mock.py chỉ copy concepts.yaml.
+  sua_o_goc: >
+    sinh_kb_mock.py copy CẢ HAI file trong một vòng lặp, không thêm khối thứ hai
+    giống khối cũ. Sinh lại kho, build lại: cả hai bản hiện nhãn tiếng Việt.
+  bai_hoc: >
+    Tách hai kho là đúng, nhưng mỗi file vocab thêm vào kb/ từ nay phải nhớ
+    thêm vào generator. Vòng lặp theo tên file làm việc đó thành một chỗ.
+
+verify:
+  loai: hard
+  ket_qua:
+    npm_run_check: sạch
+    web_test: 18/18 pass, exit 0
+    cong_may: 8/8 đã chạy (frozen · kb_mock · danh_muc · g6a · ba · rule_surfaces · ci_teeth · running)
+    pytest: 30/30
+    build: exit 0
+  kiem_tay_tren_trang_da_xay:
+    - "kho THẬT (0 bài): 26 chip — 22 concept + 6 category (trước đây màn RỖNG)"
+    - "chip hiện `Rò rỉ dữ liệu` + `data-leakage`, `Agent và LLM` + `agent-llm`"
+    - "6 category có title = `gom` (agent, LLM, prompt, context ...)"
+    - "sidebar bản thật: <span>Agent và LLM</span>, data-gt=\"agent-llm\" GIỮ id"
+    - "sidebar bản mock: 5 nhãn tiếng Việt sau khi sinh lại kb-mock/"
+    - "ngưỡng trong câu giải thích đọc từ thresholds.yaml (mốc #pnguong)"
+  frozen: "check_frozen exit 0 — KHÔNG file frozen nào đổi"
+
+khong_giai_duoc_va_da_noi_thang:
+  what: >
+    Người dùng nói "không phải lúc nào cũng có PC". GĐ A KHÔNG giải điều đó —
+    server bind cứng 127.0.0.1 (M08-R1) nên vẫn phải ngồi trước máy đó.
+  vi_sao_khong_lam: >
+    Nghe ra LAN/Internet đụng M08-R1 + B-D3 ("web chạy local hoặc private") +
+    security_baseline §4 (rà toàn kho trước khi để ra ngoài) và §1 (không auth —
+    "localhost LÀ toàn bộ lớp bảo vệ"). Đó là FR-020 riêng, việc khác.
+  nguoi_dung_xac_nhan: >
+    Họ nói ý là "giao tiếp qua API web cho tiện" ⇒ GĐ A giải đúng phần đó: bấm
+    trên trình duyệt thay vì mở VS Code sửa YAML.
+
+no:
+  - "GĐ B (POST /api/concepts + /api/categories) CHƯA làm. Cần FR-019 —
+     FR-017/018 đã bị session song song dùng."
+  - "Rào chắn thật KHÔNG phải deny S1: security_baseline §5.1 ghi 21/21 file
+     trong deny list đã bị ghi qua Bash heredoc mà không bị chặn lần nào, kể cả
+     kb/concepts.yaml. Deny chỉ chặn tool Write của agent. Rào thật là M02-R3
+     (luật) + check_frozen (S3)."
+  - "M02-R3 viết vi phạm là 'concepts.yaml bị sửa BỞI MÁY, không qua người' —
+     người bấm nút không hiển nhiên là 'máy', và baseline §1 dùng đúng lập luận
+     đó cho nút Duyệt. Nhưng bề mặt khai của R3 là S1, mà S1 không cưỡng chế
+     được ⇒ FR-019 phải đổi bề mặt R3 sang S3+S2, không lách."
+  - "Giới hạn rủi ro 'tối đa một bài rác trong draft' (baseline:114) KHÔNG phủ
+     được việc ghi danh mục — nhãn rác là lỗi tách bộ lọc, không phải bài rác.
+     FR-019 cần câu giới hạn riêng."
+  - "Chip là <span> nên không bấm được. Nếu muốn bấm chip để lọc thì phải xử lý
+     ca 0 bài (hiện lưới rỗng + câu giải thích) — chưa làm."
+  - "Một lượt `npm test` đỏ vì ENOTEMPTY khi Quartz dọn web/test/_site/static
+     (file bị giữ trên Windows). Chạy lại là xanh — không liên quan thay đổi này."

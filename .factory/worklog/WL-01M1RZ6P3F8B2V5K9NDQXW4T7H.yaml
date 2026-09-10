@@ -1,0 +1,57 @@
+ulid: 01M1RZ6P3F8B2V5K9NDQXW4T7H
+thoi_diem: 2026-09-06T00:40+07:00
+tac_nhan: claude-opus-5
+loai: ban_giao
+module: M18_nguoidung + M08_api
+don_vi: T18-1 · tách giấy tờ M18 khỏi T08-16 theo FR-066
+
+viec: >
+  Hai lỗi boundary cuối của `check_g6b`: `T08-16` (đất M08) khai ghi
+  `spec.md` + `rules.md` của M18.
+
+khong_chon_hai_loi_de:
+  - >
+    KHÔNG nới boundary M08 để chứa đất M18 — M08 không sở hữu giấy tờ của M18,
+    và nới thì mọi task M08 sau này ghi được vào đó mà không ai hỏi.
+  - >
+    KHÔNG xoá dòng khai cho cổng im — việc ĐÃ ghi thật, nên xoá lời khai là sửa
+    BIÊN GHI cho vừa thước. Đúng thứ luật gốc cấm.
+  - >
+    Chọn: tách theo module CHỦ, đúng tiền lệ PM vừa dùng cho `T09-8` cùng ngày.
+
+trang_thai_fr066: >
+  Nội dung FR-066 ĐÃ ÁP TỪ TRƯỚC, không phải tôi vừa áp: `AC-6.1` mang dấu
+  *"ĐỔI NGHĨA 2026-09-02, FR-051"*, `M18-R3.why` ghi *"ĐỔI VAI 2026-09-02
+  (FR-051)"*, §10 có đủ §10.1–§10.9, `check_frozen` pass, `phan-quyen.test.js`
+  pass FR-051 Y1–Y7. Nên `T18-1` không sinh thay đổi mới — nó lập CHỦ QUYỀN cho
+  hai file đã sửa, và cho `FR-066` một đơn vị trỏ về.
+
+phat_hien_cong_mu:
+  goc: >
+    `check_g6b` W5 chỉ cộng lỗi khi `co_plan or xanh` — module chưa có task nào
+    thì mọi AC hard thiếu chỉ IN ra "(chưa có plan)" chứ không tính lỗi.
+  he_qua: >
+    M18 chưa từng có `07_plan/M18_nguoidung/` nên được miễn TOÀN BỘ. Spec của nó
+    khai 5 AC hard — `check_ma_moi` · `check_tai_khoan` · `check_phien` ·
+    `check_dinh_danh` · `check_thu_hoi` — và CẢ NĂM file không tồn tại.
+  so_lieu: >
+    G6B đi 2 → 5 lỗi sau thay đổi này. Con số XẤU đi trong khi bức tranh THẬT
+    hơn: hai lỗi cũ là sổ sách, năm lỗi mới là năm cổng không tồn tại trên một
+    module có spec đã đóng băng.
+  khong_tu_quyet: >
+    Không tự gỡ `T18-1` để đưa M18 về "chưa lập plan" — làm vậy là mua lại con
+    số 2 bằng cách bịt mắt cổng đúng chỗ nó vừa mở. Ghi ô backlog M18 và để PM
+    quyết: xếp lượt build M18, hay chấp nhận G6B đỏ tới lượt đó.
+
+do_sau:
+  - lenh: python core/tests/check_g6b.py
+    ket_qua: "T08-16 hết 2 lỗi boundary; xuất hiện 5 lỗi W5 của M18 (nợ có sẵn)"
+  - lenh: cd web && node test/phan-quyen.test.js
+    ket_qua: "pass · FR-051 Y1–Y7"
+  - lenh: python core/tests/check_frozen.py
+    ket_qua: "pass · mọi file frozen khớp baseline đã ký"
+
+object:
+  - 07_plan/M18_nguoidung/tasks/T18-1-ap-fr066-vai-va-ac61.md
+  - 07_plan/M08_api/tasks/T08-16-phan-quyen-hai-vai.md
+  - 06_modules/M18_nguoidung/backlog.md

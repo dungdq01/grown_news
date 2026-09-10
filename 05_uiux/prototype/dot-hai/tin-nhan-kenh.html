@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tin nhắn kênh — mock đợt hai</title>
+<link rel="stylesheet" href="../../tokens.css">
+<style>
+*{box-sizing:border-box;margin:0}
+html,body{height:100%}
+body{font:400 14px/1.55 Inter,"Segoe UI",system-ui,sans-serif;
+  background:var(--background,#fcf9f2);color:var(--foreground,var(--ink,#1c1917));display:flex}
+button{font:inherit;cursor:pointer}
+a{color:inherit}
+.sb{width:214px;flex:none;border-right:1px solid var(--border,#dbd3c0);
+  padding:14px 10px;display:flex;flex-direction:column;gap:3px;
+  background:var(--card,rgba(250,246,237,.72))}
+.sb .logo{width:34px;height:34px;border-radius:9px;background:var(--brand,#c81e1e);
+  color:#fff;font-weight:700;display:grid;place-items:center;margin-bottom:10px}
+.sb a{display:block;padding:6px 10px;border:1px solid transparent;border-radius:8px;
+  font-weight:600;text-decoration:none;position:relative}
+.sb a.on{border-color:color-mix(in srgb,var(--brand,#c81e1e) 55%,var(--border,#dbd3c0));
+  background:var(--accent,#f4ede1)}
+.sb .nhom{font-size:10px;letter-spacing:.08em;color:var(--ink-2,#78716c);margin:8px 0 2px;text-transform:uppercase}
+.sb .chu{margin-top:auto;font-size:11px;font-style:italic;color:var(--ink-2,#78716c)}
+.sb button{display:block;width:100%;text-align:left;padding:6px 10px;border:none;background:none;color:inherit}
+.badge{position:absolute;right:8px;top:6px;background:var(--brand,#c81e1e);color:#fff;
+  border-radius:99px;font-size:10px;font-weight:700;padding:0 6px}
+main{flex:1;overflow:auto;padding:20px 24px}
+.man{max-width:1120px;margin:0 auto}
+h1{font-size:14px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;margin-bottom:4px}
+.sub{font-style:italic;color:var(--ink-2,#78716c);margin-bottom:14px}
+.hang{display:flex;gap:14px;flex-wrap:wrap;align-items:flex-start}
+.cot1{flex:1 1 280px}.cot2{flex:2 1 460px}
+.panel{background:var(--card,rgba(250,246,237,.72));border:1px solid var(--border,#dbd3c0);
+  border-radius:12px;padding:14px;margin-bottom:14px}
+.panel h2{font-size:14px;font-weight:700;margin-bottom:8px}
+.bd{display:inline-block;padding:1px 8px;border-radius:99px;font-size:11px;font-weight:600}
+.bd-new{background:var(--muted,#f0eadc)}.bd-run{background:#fde68a}
+.bd-ok{background:#bbf7d0}.bd-loi{background:#fecaca}
+.gd{display:inline-flex;gap:3px;align-items:center}
+.gd i{width:24px;height:6px;border-radius:3px;background:var(--muted,#f0eadc)}
+.gd i.qua{background:var(--brand,#c81e1e);opacity:.55}
+.gd i.nay{background:var(--brand,#c81e1e)}
+.chip{display:inline-block;padding:2px 9px;border-radius:99px;font-size:12px;
+  border:1px solid var(--border,#dbd3c0);background:var(--secondary,#f0eadc);cursor:pointer}
+.chip.cit{border-color:color-mix(in srgb,var(--brand,#c81e1e) 45%,var(--border,#dbd3c0));font-weight:600}
+.chip.on{background:var(--brand,#c81e1e);color:#fff}
+.mono{font-family:Consolas,monospace;font-size:12px}
+.ghi{font-style:italic;color:var(--ink-2,#78716c);font-size:12px}
+table{border-collapse:collapse;width:100%;font-size:13px}
+td,th{padding:6px 8px;border-bottom:1px solid var(--border,#dbd3c0);text-align:left;vertical-align:top}
+th{font-weight:700;font-size:12px}
+tr.diem>td{background:var(--accent,#f4ede1)}
+mark{background:color-mix(in srgb,var(--brand,#c81e1e) 22%,transparent);border-radius:3px;padding:0 2px}
+.the{border:1px solid var(--border,#dbd3c0);border-radius:10px;padding:10px 12px;margin-bottom:10px;
+  background:var(--popover,var(--card,#faf6ed))}
+.the .dau{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.the .att{margin-top:5px;font-size:12px;color:var(--ink-2,#78716c)}
+.nl{display:flex;gap:8px;align-items:center;padding:6px 8px;border-radius:8px}
+.nl:hover{background:var(--accent,#f4ede1)}
+.nl input{accent-color:var(--brand,#c81e1e)}
+/* ── CỬA SỔ ĐỌC trung tâm: 2 vùng — nội dung + rail phải gập ── */
+.cso{border:1px solid color-mix(in srgb,var(--brand,#c81e1e) 55%,var(--edge,#dbd3c0));
+  border-radius:12px;background:var(--popover,var(--card,#fcf9f2));
+  box-shadow:0 18px 50px rgba(0,0,0,.18);overflow:hidden}
+.cso .tb{display:flex;align-items:center;gap:8px;padding:8px 12px;
+  border-bottom:1px solid var(--border,#dbd3c0);font-weight:700}
+.cso .tb .nut{margin-left:auto;display:flex;gap:6px;align-items:center}
+.cso .tb .nut .ovl{width:22px;height:22px;border-radius:6px;border:1px solid var(--border,#dbd3c0);background:none}
+.cso .body{display:flex;min-height:430px}
+.cso .noidung{flex:1;padding:14px 18px;overflow:auto;max-height:60vh}
+.cso .noidung h3{font-size:14px;font-weight:700;margin:14px 0 6px;scroll-margin-top:12px}
+.cso .noidung h3.diem{outline:2px solid var(--brand,#c81e1e);outline-offset:4px;border-radius:4px}
+.cso .noidung p{margin-bottom:8px}
+.rail{width:320px;flex:none;border-left:1px solid var(--border,#dbd3c0);display:flex;flex-direction:column}
+.rail.gap{display:none}
+.rail .tabs{display:flex;border-bottom:1px solid var(--border,#dbd3c0)}
+.rail .tabs button{flex:1;padding:7px;border:none;background:none;font-weight:700;font-size:12px;
+  letter-spacing:.05em;text-transform:uppercase;color:var(--ink-2,#78716c)}
+.rail .tabs button.on{color:var(--ink,#1c1917);box-shadow:inset 0 -2px var(--brand,#c81e1e)}
+.rail .ruot{flex:1;overflow:auto;padding:10px}
+.tile{display:flex;gap:8px;align-items:center;border:1px solid var(--border,#dbd3c0);
+  border-radius:10px;padding:9px 11px;margin-bottom:8px;background:var(--card,#faf6ed);width:100%;text-align:left}
+.tile b{font-size:13px}
+.tile .m{margin-left:auto;font-size:11px;color:var(--ink-2,#78716c);text-align:right}
+.tile[disabled]{opacity:.55;cursor:not-allowed}
+/* chat trong rail */
+.chat{display:flex;flex-direction:column;gap:8px}
+.msg{max-width:92%;padding:8px 10px;border-radius:10px;font-size:13px}
+.msg.q{align-self:flex-end;background:var(--accent,#f4ede1);border:1px solid var(--border,#dbd3c0)}
+.msg.a{align-self:flex-start;background:var(--card,#faf6ed);border:1px solid var(--border,#dbd3c0)}
+.msg.tc{align-self:flex-start;font-style:italic;border:1px solid var(--border,#dbd3c0);
+  background:var(--muted,#f0eadc);border-left:3px solid var(--brand,#c81e1e)}
+.blk{margin-bottom:6px}
+.blk.co{border:1px dashed var(--brand,#c81e1e);padding:5px 7px;border-radius:8px;font-style:italic;opacity:.92}
+.blk.co::before{content:"⚑ chưa xác minh";display:block;font-size:10px;font-weight:700;
+  color:var(--brand,#c81e1e);font-style:normal}
+.hanh-dong{font-size:12px;font-weight:600;font-style:normal;display:block;margin-top:4px}
+.chip-nc{display:inline-flex;gap:6px;align-items:center;border:1px dashed var(--brand,#c81e1e);
+  border-radius:8px;padding:3px 8px;font-size:12px;margin-bottom:6px;max-width:100%}
+.chip-nc span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+/* toolbar nổi khi bôi đen */
+.selbar{position:fixed;z-index:70;display:none;gap:6px;background:var(--popover,#fff);
+  border:1px solid var(--border,#dbd3c0);border-radius:10px;padding:5px 7px;
+  box-shadow:0 8px 26px rgba(0,0,0,.22)}
+.selbar.on{display:flex}
+/* toast + tray */
+.toast{position:fixed;right:20px;bottom:20px;z-index:80;background:var(--popover,#fff);
+  border:1px solid var(--border,#dbd3c0);border-left:3px solid var(--brand,#c81e1e);
+  border-radius:10px;padding:10px 14px;box-shadow:0 10px 30px rgba(0,0,0,.25);display:none;gap:10px;align-items:center}
+.toast.on{display:flex}
+.toast a{color:var(--brand,#c81e1e);font-weight:700;text-decoration:underline}
+/* diff */
+.diff del{background:#fecaca;text-decoration:line-through;border-radius:3px;padding:0 2px}
+.diff ins{background:#bbf7d0;text-decoration:none;border-radius:3px;padding:0 2px}
+/* hàng đợi duyệt 2 cột */
+.trai-item{border:1px solid var(--border,#dbd3c0);border-radius:10px;padding:9px 11px;margin-bottom:8px;cursor:pointer}
+.trai-item.on{border-color:color-mix(in srgb,var(--brand,#c81e1e) 55%,var(--border,#dbd3c0));background:var(--accent,#f4ede1)}
+/* popover hỏi trước */
+.md-hoi{position:fixed;inset:0;background:rgba(0,0,0,.4);display:none;place-items:center;z-index:90}
+.md-hoi.on{display:grid}
+.md-hoi .hop{background:var(--card,#faf6ed);border:1px solid var(--border,#dbd3c0);border-radius:12px;
+  padding:18px;max-width:min(540px,90vw)}
+.md-hoi .hop h3{font-size:14px;font-weight:700;margin-bottom:8px}
+.md-hoi .hop p{margin-bottom:10px}
+.tg{max-width:520px;margin:0 auto;background:#1e2a36;border-radius:14px;padding:14px;color:#e7edf3}
+.tg .tieu{font-weight:700;padding-bottom:8px;border-bottom:1px solid #31414f;margin-bottom:10px}
+.tg .m{max-width:86%;padding:8px 11px;border-radius:10px;margin-bottom:8px;font-size:13px;line-height:1.5}
+.tg .m.nguoi{margin-left:auto;background:#2b5278}
+.tg .m.bot{background:#182533}
+.tg .m .ai{font-size:11px;color:#8fa6b8;display:block;margin-bottom:2px}
+.tg .canh{font-size:11px;color:#8fa6b8;text-align:center;margin:12px 0 6px;font-style:italic}
+</style>
+</head>
+<body>
+<nav class="sb">
+  <div class="logo">G</div>
+  <a href="index.html">Tổng quan</a>
+  <div class="nhom">mặt [N] — len lỏi</div>
+  <a href="cua-so-doc.html">Cửa sổ đọc  ← trung tâm</a>
+  <a href="man-tai-lieu.html">Tài liệu</a>
+  <a href="man-tong-hop.html">Tổng hợp</a>
+  <a href="dashboard.html">Dashboard</a>
+  <div class="nhom">mặt [Q] — quản lý</div>
+  <a href="xuong.html">Xưởng (việc nền)<span class="badge" id="nav-badge">1</span></a>
+  <a href="hang-doi-duyet.html">Hàng đợi duyệt</a>
+  <a href="hoi-thoai.html">Hội thoại</a>
+  <a href="tin-nhan-kenh.html" class="on">Tin nhắn kênh</a>
+  <a href="cau-hinh.html">Cấu hình</a>
+  <button id="theme">◐ sáng/tối</button>
+  <div class="chu">s5 theo ma trận v2 + FR-046.<br>badge "1" = 1 việc cần xử lý.<br>Dữ liệu: contracts v2.</div>
+</nav>
+<main><div class="man">
+
+<h1>Tin nhắn kênh <span class="ghi">— giao diện ta KHÔNG sở hữu</span></h1>
+<p class="sub">ta chỉ quyết NỘI DUNG tin nhắn — năm cảnh dưới là năm luật. Trang quản lý kênh & tài khoản (FR-045) port sau cùng M17.</p>
+<div class="hang">
+  <div class="cot2"><div class="tg"><div class="tieu">Grown_news bot · Telegram</div><div id="hoi-thoai"></div></div></div>
+  <div class="cot1 panel"><h2>Adapter</h2><div id="ds-adapter"></div>
+    <h2 style="margin-top:12px">Định danh</h2><table id="bg-dd"></table></div>
+</div>
+
+</div></main>
+<div class="toast" id="toast"><span></span><a href="#"></a><button id="toast-dong" class="chip">×</button></div>
+<div class="md-hoi" id="md-hoi"><div class="hop"><h3></h3><p></p><div class="o"></div></div></div>
+<script>
+
+var DATA = {"chungcat": {"$comment": "v2 — khớp ui_flow M12 §2: job {ulid, giai_doan, lan_thu, model_chon, model_da_dung, ly_do_dung}. giai_doan enum: cho · dang-doc-nguon · dang-goi-model · dang-verify · xong · dung. ly_do_dung enum: het-tran-thu-lai · nguyen-lieu-sai · model-tu-choi (3 lý do = 3 hành động khác nhau của người).", "version": 2, "giai_doan_enum": ["cho", "dang-doc-nguon", "dang-goi-model", "dang-verify", "xong", "dung"], "jobs": [{"ulid": "01K9W2CHUNGCAT01", "loai": "chung-cat-mot-nguon", "nguon_slug": "xgboost-stap-by-step", "giai_doan": "xong", "lan_thu": 1, "model_chon": "claude-sonnet-5", "model_da_dung": "claude-sonnet-5", "ly_do_dung": null, "khang_dinh_bi_tia": {"so": 2, "ly_do": "trích không tìm thấy nguyên văn trong nguồn"}, "sha256_moi_lan": ["a3f1c2…9be0"], "chi_phi_usd": 0.064}, {"ulid": "01K9W2CHUNGCAT02", "loai": "chung-cat-mot-nguon", "nguon_slug": "thien-duong-chuot-tuong-lai-nhan-loai-giai-ma-loi-tien-tri-d", "giai_doan": "dang-goi-model", "lan_thu": 1, "model_chon": "claude-sonnet-5", "model_da_dung": null, "ly_do_dung": null, "khang_dinh_bi_tia": null, "sha256_moi_lan": ["77d0e8…41aa"], "chi_phi_usd": null}, {"ulid": "01K9W2CHUNGCAT03", "loai": "chung-cat-mot-nguon", "nguon_slug": "quartz-plugin-api", "giai_doan": "dung", "lan_thu": 2, "model_chon": "claude-sonnet-5", "model_da_dung": "claude-sonnet-5", "ly_do_dung": "het-tran-thu-lai", "khang_dinh_bi_tia": null, "sha256_moi_lan": ["cc01ab…7f52", "cc01ab…7f52"], "chi_phi_usd": 0.064, "$canh_a": "ui_flow §3a: KHÔNG hiện 'đang chạy' mãi — dừng là dừng, kèm lý do phân loại"}, {"ulid": "01K9W2CHUNGCAT04", "loai": "tong-hop-chu-de", "nguon": ["xgboost-stap-by-step", "thien-duong-chuot-tuong-lai-nhan-loai-giai-ma-loi-tien-tri-d"], "giai_doan": "xong", "lan_thu": 1, "model_chon": "claude-sonnet-5", "model_da_dung": "gemini-3.7-flash", "ly_do_dung": null, "khang_dinh_bi_tia": {"so": 1, "ly_do": "địa chỉ không mang tên nguồn"}, "sha256_moi_lan": ["19fe07…d3c4"], "chi_phi_usd": 0.036, "$canh_c": "ui_flow §3c: model THẬT SỰ dùng ≠ model chọn (dự phòng bắn) — web phải hiện model đã dùng"}, {"ulid": "01K9W2CHUNGCAT05", "loai": "chung-cat-mot-nguon", "nguon_slug": "storm-multi-perspective", "giai_doan": "cho", "lan_thu": 0, "model_chon": "claude-sonnet-5", "model_da_dung": null, "ly_do_dung": null, "khang_dinh_bi_tia": null, "sha256_moi_lan": [], "chi_phi_usd": null}], "ly_do_dung_enum": {"het-tran-thu-lai": "đã thử 2 lần đều lỗi — người quyết chạy lại hay bỏ", "nguyen-lieu-sai": "nguồn thiếu chữ (scan hỏng, trang trắng) — sửa nguyên liệu rồi nạp lại", "model-tu-choi": "model từ chối nội dung — đổi model trong bảng khai hoặc bỏ"}, "$checkpoint": "quyết 2026-09-02: M12 CÓ checkpoint theo giai đoạn — job dừng mang chay_lai_tu = giai đoạn hỏng; Chạy-lại mặc định từ đó (từ-đầu là lựa chọn phụ, vì mỗi lần từ-đầu = toàn văn rời máy nữa).", "log_mau": {"01K9W2CHUNGCAT03": [{"luc": "07:02:01", "giai_doan": "dang-doc-nguon", "chu": "đọc 41 trang, giữ số trang"}, {"luc": "07:02:04", "giai_doan": "dang-goi-model", "chu": "lần 1 · lỗi 529 quá tải — vết sha256 cc01ab…7f52"}, {"luc": "07:12:04", "giai_doan": "dang-goi-model", "chu": "lần 2 · lỗi 529 quá tải — vết sha256 cc01ab…7f52"}, {"luc": "07:12:05", "giai_doan": "dung", "chu": "hết trần thử lại · checkpoint còn: dang-doc-nguon"}], "01K9W2CHUNGCAT01": [{"luc": "08:10:01", "giai_doan": "dang-doc-nguon", "chu": "23 trang"}, {"luc": "08:10:05", "giai_doan": "dang-goi-model", "chu": "claude-sonnet-5 · 16480 vào / 3120 ra"}, {"luc": "08:11:40", "giai_doan": "dang-verify", "chu": "11 khẳng định · 9 đối chiếu được · tỉa 2"}, {"luc": "08:11:42", "giai_doan": "xong", "chu": "nháp vào Hàng đợi duyệt"}]}, "chay_lai_tu": {"01K9W2CHUNGCAT03": "dang-goi-model"}, "$nhap_db": "FR-046: nháp + bản-AI-gốc + revision sống trong DB; bài đã vào kho thì file kb/ vẫn là chân lý.", "nhap": [{"job_ulid": "01K9W2CHUNGCAT01", "title": "XGBoost từng bước — đọc lại bằng khai triển Taylor", "trang_thai": "da_sua", "sua_luc": "2026-09-02T08:40:00+07:00", "citations_sampled": 9, "citations_verified": 9, "khang_dinh_bi_tia": {"so": 2, "ly_do": "trích không tìm thấy nguyên văn trong nguồn"}, "ban_goc_ai": "Khai triển bậc hai giữ được thông tin độ cong, nên mỗi bước đi chuẩn hơn gradient thường.", "ban_hien_tai": "Khai triển bậc hai giữ thông tin độ cong của hàm mất mát, nên mỗi vòng boosting bước chuẩn hơn dùng riêng gradient bậc nhất."}, {"job_ulid": "01K9W2CHUNGCAT04", "title": "Học máy thực chiến — tổng hợp 2 nguồn", "trang_thai": "nhap", "sua_luc": null, "citations_sampled": 12, "citations_verified": 11, "khang_dinh_bi_tia": {"so": 1, "ly_do": "địa chỉ không mang tên nguồn"}, "ban_goc_ai": "Hai nguồn cùng chỉ ra: kiểm chứng phải giữ thứ tự thời gian khi dữ liệu là chuỗi. [xgboost-stap-by-step:p.7]", "ban_hien_tai": "Hai nguồn cùng chỉ ra: kiểm chứng phải giữ thứ tự thời gian khi dữ liệu là chuỗi. [xgboost-stap-by-step:p.7]"}, {"job_ulid": "01K9W2CHUNGCATX0", "title": "Universe 25 — đọc tách dữ liệu khỏi suy diễn", "trang_thai": "tra_lai", "sua_luc": "2026-09-01T22:10:00+07:00", "ly_do_tra": "mục 4 suy diễn vượt phạm vi nguồn — chưng lại với phạm vi hẹp hơn", "citations_sampled": 7, "citations_verified": 5, "khang_dinh_bi_tia": {"so": 3, "ly_do": "trích không tìm thấy nguyên văn"}, "ban_goc_ai": "Thí nghiệm chứng minh xã hội loài người sẽ sụp đổ theo cùng cách.", "ban_hien_tai": "Thí nghiệm chứng minh xã hội loài người sẽ sụp đổ theo cùng cách."}], "nhap_xem_truoc": {"ulid": "01K9W2CHUNGCAT01", "title": "XGBoost từng bước — đọc lại bằng khai triển Taylor", "citations_sampled": 9, "citations_verified": 9, "unverifiable_citations": false, "khang_dinh_bi_tia": {"so": 2, "ly_do": "trích không tìm thấy nguyên văn trong nguồn"}, "muc": [{"ten": "3.2 Vì sao bậc hai", "dia_chi": ["[xgboost-stap-by-step.pdf:p.7]", "[xgboost-stap-by-step.pdf:p.9]"]}], "$canh_b": "ui_flow §3b: người duyệt phải THẤY đã có gì bị tỉa — bài trông hoàn chỉnh mà không nói đã bị tỉa là nói dối"}}, "truyhoi": {"$comment": "v2 — ui_flow M13: so_ban_ghi_trong_pham_vi trả CÙNG kết quả (§2a, một lời gọi); bm25 giữ trong data nhưng UI KHÔNG hiện (§3 — số âm không nghĩa với người đọc); 0 kết quả phải nói 'không có trong kho' + được đếm (§2b, tín hiệu điểm rẽ hybrid).", "version": 2, "chunks": [{"id": 1, "file": "kb/docs/xgboost-taylor-bac-hai.md", "anchor": "vi-sao-bac-hai", "heading_path": "XGBoost Taylor bậc hai › 3.2 Vì sao bậc hai", "line_start": 84, "line_end": 121, "phan_loai": "tai-lieu", "loai_nguon": "pdf", "trang_thai": "approved", "concepts": ["gradient-boosting"]}, {"id": 2, "file": "kb/video/thien-duong-chuot-tuong-lai-nhan-loai-giai-ma-loi-tien-tri-d.md", "anchor": "loi-tien-tri", "heading_path": "Thiên đường chuột › 2. Lời tiên tri", "line_start": 40, "line_end": 66, "phan_loai": "video", "loai_nguon": "youtube", "trang_thai": "approved", "concepts": ["ai-x-risk"]}, {"id": 3, "file": "kb/tai-lieu/xgboost-stap-by-step.md", "anchor": "muc-tieu-huan-luyen", "heading_path": "XGBoost step by step › Mục tiêu huấn luyện", "line_start": 12, "line_end": 30, "phan_loai": "tai-lieu", "loai_nguon": "pdf", "trang_thai": "approved", "concepts": ["gradient-boosting"]}], "truy_van_mau": [{"q": "vì sao khai triển bậc hai", "pham_vi": {"phan_loai": "tai-lieu"}, "so_ban_ghi_trong_pham_vi": 2, "ket_qua": [{"chunk_id": 1, "bm25": -7.41, "snippet": "…khai triển «bậc hai» giữ được thông tin độ cong mà gradient bậc nhất bỏ mất…"}, {"chunk_id": 3, "bm25": -3.02, "snippet": "…hàm mất mát xấp xỉ «bậc hai» quanh dự đoán hiện tại…"}], "tong": 2}, {"q": "bac hai khong dau", "pham_vi": {}, "so_ban_ghi_trong_pham_vi": 3, "ket_qua": [{"chunk_id": 1, "bm25": -7.41, "snippet": "…khai triển «bậc hai»…"}], "tong": 1, "$edge": "một hàm chuẩn hoá cho cả kho lẫn câu hỏi: không dấu vẫn thấy"}, {"q": "記憶體 最佳化", "pham_vi": {}, "so_ban_ghi_trong_pham_vi": 3, "ket_qua": [], "tong": 0, "$edge": "không có trong kho — sự kiện 0-kết-quả được ĐẾM (tín hiệu điểm rẽ)"}, {"q": "retry vô hạn", "pham_vi": {"phan_loai": "video"}, "so_ban_ghi_trong_pham_vi": 1, "ket_qua": [], "tong": 0, "$edge": "0 kết quả TRONG PHẠM VI — gợi ý nới phạm vi, khác hẳn 0 trên toàn kho"}]}, "chatbot": {"$comment": "v2 — khớp spec M14 §2 nguyên văn: blocks[]{text, citations[]{doc_id, anchor, cited_text, start, end}, trang_thai: da-xac-minh|chua-xac-minh} + tu_choi{ly_do enum 3, dia_chi[slug#anchor]}. AC-3.1/3.2: không block nào bị bỏ im lặng — verify trượt thì gắn cờ, vẫn hiện. Kèm pham_vi.so_ban_ghi trả cùng.", "version": 2, "phien": [{"id": "ph-01", "nguoi_dung": "dung.dang", "kenh": "web"}, {"id": "ph-02", "nguoi_dung": "dong.nghiep-a", "kenh": "telegram"}], "lich_su_phien": [{"id": "ph-01", "nguoi_dung": "dung.dang", "kenh": "web", "so_luot": 4, "cap_nhat": "2026-09-02T09:10:00+07:00"}, {"id": "ph-02", "nguoi_dung": "dong.nghiep-a", "kenh": "telegram", "so_luot": 2, "cap_nhat": "2026-09-01T09:40:00+07:00"}, {"id": "ph-00", "nguoi_dung": "dung.dang", "kenh": "web", "so_luot": 9, "cap_nhat": "2026-08-31T21:00:00+07:00"}], "hoi_dap": [{"phien": "ph-01", "cau_hoi": "Vì sao XGBoost dùng khai triển Taylor bậc hai?", "pham_vi": {"facet": {"phan_loai": "tai-lieu"}, "so_ban_ghi": 2}, "blocks": [{"text": "XGBoost xấp xỉ hàm mất mát quanh dự đoán hiện tại bằng khai triển bậc hai để giữ thông tin độ cong.", "citations": [{"doc_id": "xgboost-taylor-bac-hai", "anchor": "vi-sao-bac-hai", "cited_text": "khai triển bậc hai giữ được thông tin độ cong", "start": 2101, "end": 2148}], "trang_thai": "da-xac-minh"}, {"text": "Nhờ đó mỗi vòng boosting giải được nghiệm đóng cho trọng số lá.", "citations": [{"doc_id": "xgboost-taylor-bac-hai", "anchor": "trong-so-la", "cited_text": "nghiệm đóng w* = -G/(H+lambda)", "start": 3300, "end": 3327}], "trang_thai": "da-xac-minh"}, {"text": "Cách này luôn nhanh hơn gradient bậc nhất ít nhất hai lần.", "citations": [], "trang_thai": "chua-xac-minh", "$edge": "AC-3.1: quote không tìm thấy trong nguồn — GẮN CỜ, vẫn hiện, KHÔNG bỏ im lặng; markup phải KHÁC block đã xác minh"}], "tu_choi": null}, {"phien": "ph-01", "cau_hoi": "Giá Bitcoin hôm nay bao nhiêu?", "pham_vi": {"facet": {}, "so_ban_ghi": 3}, "blocks": [], "tu_choi": {"ly_do": "khong-co-trong-kho", "dia_chi": []}, "$hanh_dong": "nạp nguồn về chủ đề đó"}, {"phien": "ph-01", "cau_hoi": "Walk-forward hay k-fold tốt hơn cho chuỗi thời gian?", "pham_vi": {"facet": {}, "so_ban_ghi": 3}, "blocks": [], "tu_choi": {"ly_do": "co-nhung-mau-thuan", "dia_chi": ["walk-forward-validation-k-fold#ket-luan", "storm-multi-perspective#danh-gia"]}, "$hanh_dong": "đọc HAI địa chỉ được trỏ, tự quyết"}, {"phien": "ph-02", "cau_hoi": "Cách nấu phở ngon?", "pham_vi": {"facet": {"phan_loai": "video"}, "so_ban_ghi": 1}, "blocks": [], "tu_choi": {"ly_do": "ngoai-pham-vi", "dia_chi": []}, "$hanh_dong": "mở rộng facet đang chọn"}]}, "kenh": {"$comment": "v2 — ui_flow M15: giao diện của M15 là TIN NHẮN, và tin nhắn là hợp đồng. Bốn cảnh §2 a-d, mỗi cảnh một hội thoại demo. Adapter chỉ GỌI RA.", "version": 2, "adapters": [{"kenh": "telegram", "trang_thai": "dang-poll", "offset": 88231407, "update_cuoi": "2026-09-01T09:41:22+07:00", "tran_file": "50 MB"}, {"kenh": "discord", "trang_thai": "tat", "offset": null, "update_cuoi": null, "tran_file": "10 MiB"}], "dinh_danh_kenh": [{"kenh": "telegram", "chat_id": "1290077431", "nguoi_dung": "dung.dang", "buoc_luc": "2026-08-31"}, {"kenh": "telegram", "chat_id": "8823140055", "nguoi_dung": "dong.nghiep-a", "buoc_luc": "2026-09-01"}], "hoi_thoai_mau": [{"canh": "a-chua-buoc", "tu": "5550001234 (chưa buộc)", "nguoi_gui": "https://spam.example/x", "bot_tra_loi": "Chat này chưa được buộc vào tài khoản nào. Nếu bạn được mời dùng, hãy nhắn mã mời nhận từ chủ hệ thống.", "$luat": "từ chối VÀ NÓI — nhưng không tiết lộ gì về kho; 0 bản ghi được tạo"}, {"canh": "b-validate-truot", "tu": "1290077431 (dung.dang)", "nguoi_gui": "bao-cao-noi-bo.pdf (3.1MB)", "bot_tra_loi": "Chưa nạp được — thiếu 2 trường bắt buộc: title, source_type. Gửi lại kèm một dòng: tiêu đề | loại nguồn.", "$luat": "trả NGUYÊN VĂN lỗi — 'có lỗi xảy ra' là xoá đúng thông tin người gửi cần"}, {"canh": "c-nap-xong-o-nhap", "tu": "8823140055 (dong.nghiep-a)", "nguoi_gui": "https://arxiv.org/abs/2410.99999", "bot_tra_loi": "Đã nhận: arxiv-2410-99999 — đang ở bản NHÁP, chưa lên kho. Chủ kho duyệt xong mới đọc được trên web.", "$luat": "nói rõ đang ở nháp — không thì người gửi tưởng xong và không ai quay lại duyệt"}, {"canh": "d-vuot-tran-noi-truoc", "tu": "1290077431 (dung.dang)", "nguoi_gui": "video-demo.mp4 (72MB) [Discord]", "bot_tra_loi": "File 72MB vượt trần Discord (10MiB). Kênh Telegram nhận tới 50MB — hoặc đưa link để hệ tự kéo.", "$luat": "nói TRƯỚC khi kênh tự trả lỗi — lỗi của Telegram/Discord không nói được câu gợi ý này"}, {"canh": "hoi-dap", "tu": "8823140055 (dong.nghiep-a)", "nguoi_gui": "walk-forward là gì?", "bot_tra_loi": "Walk-forward giữ thứ tự thời gian khi kiểm chứng… (2 nguồn kèm địa chỉ — cùng JSON với web, phiên ph-02)", "$luat": "cùng endpoint, cùng hợp đồng JSON với cửa sổ chat web"}]}, "artifact": {"$comment": "v2 — ui_flow M16: nút CHỈ trên bài approved (§1); job mất PHÚT, job_id bền (§2a); đường TTS cloud/local nói TRƯỚC (§2b); giới hạn engine nói TRƯỚC (§2c: PPTX của Marp là ẢNH); thất bại 3 loại (§2d); quay-ngược = metadata + sidecar (§3).", "version": 2, "bai": [{"slug": "xgboost-taylor-bac-hai", "trang_thai": "approved", "co_nut_artifact": true}, {"slug": "arxiv-2410-99999", "trang_thai": "draft", "co_nut_artifact": false, "$luat": "nút không hiện trên bài nháp — mời người dùng vào đường sẽ bị từ chối là lỗi"}], "canh_bao_truoc_khi_sinh": {"slide": "PPTX của Marp là ẢNH — không sửa được chữ. Cần sửa chữ thì chọn đường PowerPoint thật (chậm hơn).", "audio_cloud": "Giọng đám mây: TOÀN VĂN bài sẽ rời máy (có ghi vết sha256). Giọng tại chỗ: không byte nào rời máy, giọng máy hơn.", "video": "Việc tính bằng PHÚT — đóng tab được, việc vẫn chạy, mở lại thấy tiến độ."}, "that_bai_enum": {"het-quota-cloud": "hết hạn mức giọng đám mây tháng này — đổi sang giọng tại chỗ hoặc chờ", "engine-loi": "công cụ dựng lỗi — xem dòng lỗi nguyên văn, thường do dàn ý", "bai-khong-du-dieu-kien": "bài thiếu phần cần thiết (ví dụ không có mục nào) — sửa bài trước"}, "jobs": [{"job_id": "af-01", "bai_slug": "xgboost-taylor-bac-hai", "loai": "slide", "giai_doan": "xong", "thoi_gian_s": 41, "engine": {"outline": "claude-sonnet-5", "render": "marp-cli", "sha256": "f0a2c1…33b7"}, "files": [{"ten": "xgboost-taylor.pdf", "kb": 412, "quay_nguoc": "bấm trong PDF nhảy đúng trang nguồn"}, {"ten": "xgboost-taylor.pptx", "kb": 890, "quay_nguoc": "mỗi trang một liên kết về bài trong kho"}]}, {"job_id": "af-02", "bai_slug": "xgboost-taylor-bac-hai", "loai": "audio", "giai_doan": "xong", "thoi_gian_s": 220, "tts": {"duong": "local", "provider": "piper vi_VN", "ky_tu": 8940, "sha256": null}, "files": [{"ten": "xgboost-taylor.mp3", "kb": 6200, "quay_nguoc": "chương audio mang mốc + liên kết về bài"}], "sidecar": [{"t": "00:00", "url": "/bai/xgboost-taylor-bac-hai"}, {"t": "01:12", "url": "/bai/xgboost-taylor-bac-hai#vi-sao-bac-hai"}, {"t": "03:40", "url": "/bai/xgboost-taylor-bac-hai#trong-so-la"}]}, {"job_id": "af-03", "bai_slug": "thien-duong-chuot-tuong-lai-nhan-loai-giai-ma-loi-tien-tri-d", "loai": "video", "giai_doan": "dang-ghep-hinh-tieng", "thoi_gian_s": null, "tts": {"duong": "cloud", "provider": "azure vi-VN-HoaiMy", "ky_tu": 9350, "sha256": "8c1d90…e4f7"}, "files": [], "$edge": "job PHÚT — hiện bước, không hiện %; job_id bền qua đóng/mở tab"}, {"job_id": "af-04", "bai_slug": "quartz-plugin-api", "loai": "slide", "giai_doan": "dung", "that_bai": "engine-loi", "loi_nguyen_van": "marp exit 1 — heading cấp 4 vượt khung dàn ý", "files": []}, {"job_id": "af-05", "bai_slug": "xgboost-taylor-bac-hai", "loai": "audio", "giai_doan": "dung", "that_bai": "het-quota-cloud", "loi_nguyen_van": "quota giọng đám mây còn 0/500K ký tự tháng này", "files": [], "$edge": "3 loại thất bại = 3 hành động — không gộp thành 'có lỗi xảy ra'"}]}};
+var GIAI_DOAN = DATA.chungcat.giai_doan_enum;
+var GD_NHAN = {"cho":"chờ","dang-doc-nguon":"đang đọc nguồn","dang-goi-model":"đang gọi model",
+  "dang-verify":"đang đối chiếu","xong":"xong","dung":"dừng"};
+function veGd(gd){
+  var i = GIAI_DOAN.indexOf(gd);
+  var thanh = GIAI_DOAN.slice(0, 5).map(function(g, k){
+    return '<i class="'+(k < i ? "qua" : k === i ? "nay" : "")+'"></i>';
+  }).join("");
+  var mau = gd === "xong" ? "bd-ok" : gd === "dung" ? "bd-loi" : gd === "cho" ? "bd-new" : "bd-run";
+  return '<span class="bd '+mau+'">'+(GD_NHAN[gd]||gd)+'</span> <span class="gd" title="giai đoạn đếm được — không %">'+thanh+"</span>";
+}
+function toast(chu, href, nhanLink){
+  var t = document.getElementById("toast");
+  t.querySelector("span").textContent = chu;
+  var a = t.querySelector("a");
+  if (href){ a.style.display = ""; a.href = href; a.textContent = nhanLink || "Xem tiến độ"; }
+  else a.style.display = "none";
+  t.classList.add("on");
+}
+var tDong = document.getElementById("toast-dong");
+if (tDong) tDong.onclick = function(){ document.getElementById("toast").classList.remove("on"); };
+document.getElementById("theme").onclick = function(){
+  var r = document.documentElement;
+  r.dataset.theme = r.dataset.theme === "dark" ? "light" : "dark";
+};
+function hoiTruoc(tieuDe, noiDung, luaChon, xong){
+  var md = document.getElementById("md-hoi");
+  md.querySelector("h3").textContent = tieuDe;
+  md.querySelector("p").innerHTML = noiDung;
+  var o = md.querySelector(".o"); o.innerHTML = "";
+  luaChon.forEach(function(l){
+    var b = document.createElement("button"); b.className = "chip"; b.textContent = l;
+    b.style.margin = "0 8px 6px 0";
+    b.onclick = function(){ md.classList.remove("on"); if (l !== "thôi") xong(l); };
+    o.appendChild(b);
+  });
+  md.classList.add("on");
+}
+
+
+document.getElementById("hoi-thoai").innerHTML = DATA.kenh.hoi_thoai_mau.map(function(h){
+  return '<div class="canh">— '+h.canh+' —</div>'
+    + '<div class="m nguoi"><span class="ai">'+h.tu+"</span>"+h.nguoi_gui+"</div>"
+    + '<div class="m bot"><span class="ai">bot</span>'+h.bot_tra_loi+"</div>"
+    + '<div class="canh" style="text-align:left">luật: '+h["$luat"]+"</div>";
+}).join("");
+document.getElementById("ds-adapter").innerHTML = DATA.kenh.adapters.map(function(a){
+  return '<div class="the"><div class="dau"><span class="bd '+(a.trang_thai==="dang-poll"?"bd-ok":"bd-new")+'">'
+    + (a.trang_thai==="dang-poll"?"ĐANG POLL":"TẮT")+"</span><b>"+a.kenh+"</b>"
+    + '<span class="ghi">trần file '+a.tran_file+"</span></div></div>";
+}).join("");
+document.getElementById("bg-dd").innerHTML = "<tr><th>chat</th><th>tài khoản</th></tr>"
+  + DATA.kenh.dinh_danh_kenh.map(function(r){
+    return '<tr><td class="mono">'+r.chat_id+"</td><td><b>"+r.nguoi_dung+"</b></td></tr>";
+  }).join("");
+
+</script>
+</body>
+</html>

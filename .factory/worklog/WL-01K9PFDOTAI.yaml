@@ -1,0 +1,81 @@
+id: WL-01K9PFDOTAI
+at: 2026-08-29
+by: claude
+buoc: bộ đo TẢI — thứ khung Factory khai ở s9 mà dự án chưa cài
+loai: bàn giao (instrument mới, s9/G7)
+
+object:
+  task:
+    - 07_plan/M01_core/tasks/T01-37-bo-do-tai.md
+  code:
+    - core/tools/do_tai.py     # MỚI
+  doc:
+    - 09_deploy/workload_report.md      # SINH RA, không sửa tay
+    - 09_deploy/workload_baseline.json  # SINH RA
+
+may_xanh:
+  - "`python core/tools/do_tai.py` → quét N = 1, 50, 200, 800 · 0 lỗi"
+  - "tự kiểm vật liệu: trang lớn nhất 34 KB (N=1) → 70 KB (N=800)"
+
+cho_trong_khung_factory:
+  - >
+    s9 đòi `workload_report` có p95 · throughput · error rate — *"số đo, không
+    phải 'chạy ổn'"*. Dự án chưa có `09_deploy/`, và **không cái nào trong 77
+    cổng đo THỜI GIAN**. Mọi con số hiệu năng cho tới nay mô tả một hệ thống có
+    **1 bản ghi**
+  - >
+    `page-weight` đo BYTE ở 120 bản. Lịch sử plan ghi *"500 bản → 1217 KB →
+    trang không dùng được"* — phát hiện BẰNG TAY, và từ đó chưa ai đo lại
+
+quyet_dinh_trung_tam:
+  - >
+    **Số bất biến là ĐỘ DỐC, không phải mili giây.** Mili giây đổi theo máy,
+    theo tải nền, theo lần chạy; một ngưỡng ms sẽ đỏ oan cho tới khi có người
+    tắt nó (`#cổng-đỏ-oan`). `t(N) ~ N^k` thì không đổi theo máy
+  - >
+    **Tách đồng hồ theo PHA** — WO-033 vừa dạy: 205 ms nằm TRỌN trong `connect`,
+    và một con số tổng chỉ thẳng vào renderer. Tổng thời gian là con số KHÔNG
+    hành động được
+  - >
+    **Byte tất định, thời gian thì không** ⇒ chỉ byte và lỗi được làm cổng cứng;
+    thời gian chỉ có HÌNH DẠNG của nó được. Trộn hai loại vào một ngưỡng là cách
+    sinh cổng đỏ oan
+
+hai_lan_tu_bat_duoc:
+  - >
+    **Bản đầu XANH VÌ MÙ**: gieo .md nhưng quên dựng DB, nên server thấy kho
+    rỗng. Byte y hệt ở mọi mốc và **mọi độ dốc ra 0.00 "PHẲNG"** — một bảng rất
+    đẹp, không đo gì. Đúng lớp lỗi tôi vẫn bắt ở cổng người khác
+  - >
+    Rồi chính phép TỰ KIỂM cũng sai lần đầu: nó so `max` byte toàn bộ đường, mà
+    `gn.js` 98 KB át hết và không bao giờ đổi ⇒ luôn báo "không tăng". Sửa sang
+    so trên MÀN LIỆT KÊ
+  - >
+    **Nhãn đầu tiên nói dối**: `k` một mình giấu bội số, nên một đường 48 → 315
+    ms (×6.5) được dán *"PHẲNG"*. Đúng về toán, sai về nghĩa — người dùng sống
+    với mili giây, không sống với số mũ. Sửa: báo CẢ HAI, và bội số có quyền phủ
+    quyết nhãn
+
+hai_lo_no_tim_ra_NGAY_lan_chay_dau:
+  - >
+    **Chỉ `/tat-ca/` phân trang.** Byte của nó phẳng ở 70 KB qua mọi mốc; BẢY màn
+    còn lại phình 34 → **487 KB** ở N=800 (độ dốc byte 0.37). Ở 5000 bản là ~3 MB
+    mỗi trang
+  - >
+    **`api:index` tăng TUYẾN TÍNH hoàn hảo** (k byte = 1.00): 1 KB → **696 KB** ở
+    N=800. FE gọi nó lúc nạp trang. Đây đúng thứ plan đã ghi ở "sự thật 9" —
+    *"trả cả kho kèm cả thân bài"* — và chưa ai sửa
+  - >
+    Và một phân biệt mà chỉ bộ đo này thấy: `tat-ca` phân trang nên BYTE phẳng,
+    nhưng THỜI GIAN vẫn ×6.1. **Phân trang cắt byte, không cắt việc server làm.**
+    Hai con số đó tách nhau ra mới nói được điều đó
+
+đỏ_do: chưa quy được chủ  # chỗ trống của khung, có từ lúc áp khung
+
+do_do:
+  - cong: he-kinh.test.js
+    do_do_boi: ảnh 707 KB người dùng thêm — `python core/tools/toi_uu_anh_nen.py`
+  - cong: check_frozen.py
+    do_do_boi: chờ NGƯỜI ký sau khi FR-039 duyệt
+  - cong: check_danh_muc.py · check_skill.py · check_running.py
+    do_do_boi: agent khác · và hệ quả của hai cổng trên

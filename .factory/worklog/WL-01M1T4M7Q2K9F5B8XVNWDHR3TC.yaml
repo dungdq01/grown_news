@@ -1,0 +1,144 @@
+ulid: 01M1T4M7Q2K9F5B8XVNWDHR3TC
+thoi_diem: 2026-09-06T11:40+07:00
+tac_nhan: claude-opus-5
+loai: ban_giao
+module: M03_web · M08_api · M01_core
+don_vi: WO-062 hai bug UI · WO-063 cổng ký tự vô hình · T01-49 · T08-33 cửa xuất
+
+# ═══ WO-062 · hai bug chủ dự án bắt ═══════════════════════════════════
+wo_062:
+  bug_1_hang_nhap_khong_mo_duoc:
+    goc: >
+      Thẻ ở hàng đợi nháp mang `data-nhapmo`, còn phép mở cửa sổ nghe
+      `data-ccnhap` — HAI MỐC cho một việc, và mốc thứ hai không ai nối dây.
+      Bấm thẻ mở một panel trong trang thay vì cửa sổ đọc.
+    sua: "một mốc `data-ccnhap`; tiêu đề thẻ là SLUG NGUỒN, không phải ULID cắt 12 ký tự"
+  bug_2_result_view_do_chu_tho:
+    goc: >
+      Chủ dự án: *"format lại result view như các bài viết, hiển thị markdown
+      thế ai xem?"*. Người duyệt phải ĐỌC bản này để quyết, mà một khối
+      `# ## **` chưa dựng thì đọc bằng mắt rất mệt — và mệt thì duyệt qua loa.
+    kiem_truoc_khi_doi: >
+      Chú thích cũ ở đó nêu một ràng buộc THẬT: thân do MODEL sinh, `<script>`
+      phải hiện ra như CHỮ (`AC2`). Đã đọc `md()` trước khi dùng — `inline()`
+      chạy `esc()` TRƯỚC mọi phép dựng thẻ, nên `<script>` thành thực thể và
+      không bao giờ thành DOM. Đổi cách HIỆN, không đổi phép chặn.
+    hai_cho_khong_mot: >
+      Sửa lần đầu chỉ chữa `veCuaSoNhap` (cửa sổ nháp) mà quên `veKetQua`
+      (khung kết quả trong cửa sổ việc) — đúng khung trong ảnh chủ dự án gửi.
+  cau_ghi_de_mat_md:
+    goc: >
+      Có BA chỗ publish `__GN_MW__`: hai `??=` đầu file và một `=` (ghi đè,
+      chạy cuối). Tôi thêm `md` vào hai chỗ đầu mà quên chỗ thứ ba, nên cầu
+      CUỐI CÙNG ghi đè mất `md`; chunk gọi `mw().md` nhận `undefined` và rơi về
+      chữ thô. Bundle CÓ, trình duyệt KHÔNG — tôi đổ oan cho cache một lúc.
+    sua: "một hàm `_cau()`, ba nơi publish cùng gọi"
+
+# ═══ WO-063 · ba lần cùng một bẫy, và một cổng an ninh đã mù ══════════
+wo_063:
+  phat_hien: >
+    Viết `\b` qua một chuỗi KHÔNG-raw thì nó thành ký tự BACKSPACE (0x08) nằm
+    giữa regex. Viết `\25B8` (mũi tên ▸) trong chuỗi Python thì `\25` là escape
+    BÁT PHÂN ⇒ 0x15. Nhìn bằng mắt, dòng hỏng đọc Y HỆT dòng đúng.
+  bon_cho_dinh:
+    - "`check_g6b` — phép kiểm phụ thuộc treo IM LẶNG thành mù"
+    - "`no-write-path` — cổng AN NINH `mkdir|rm|unlink` MÙ HOÀN TOÀN sau khi tôi 'sửa' nó"
+    - "`tab-theo-doi-chung-cat` — phép kiểm animation-layout mù"
+    - "`cctab` CSS — mũi tên gấp/mở của ô chỉ dẫn thành ký tự điều khiển"
+  ca_dat_nhat: >
+    `no-write-path`: tôi sửa một cổng ĐỎ OAN và biến nó thành cổng MÙ, rồi báo
+    "đã sửa". Một cổng mù tệ hơn một cổng đỏ oan — đỏ oan thì người đi tìm, mù
+    thì không ai biết có gì để tìm. Đã thử ĐỎ lại: cắm một `mkdirSync` vào
+    `web/render/` ⇒ cổng bắt.
+  cong_moi: >
+    `T01-49` / `check_ky_tu_vo_hinh.py` — quét toàn repo, 0 ký tự điều khiển
+    ngoài `\t \n \f \r`. Nó bắt được ngay hai lần tôi tái phạm trong chính
+    phiên này (mũi tên `\25B8`, và `PK\x03\x04` trong một chú thích).
+
+# ═══ T08-33 · cửa xuất văn bản ═══════════════════════════════════════
+t08_33:
+  nguyen_tac: >
+    CHỈ xuất được dạng mà nội dung THẬT SỰ có. Nội dung ta giữ dưới dạng VĂN
+    BẢN xuất đa dạng được vì mọi dạng dựng từ CÙNG một chữ. File NHỊ PHÂN người
+    tải lên thì "tải xuống" nghĩa là TRẢ LẠI ĐÚNG BYTE ĐÃ NẠP.
+    Chuyển `pdf → docx` ở máy chủ là DỰNG LẠI một tài liệu mới mang tên tài
+    liệu cũ — mất bố cục, mất bảng, mất phông, và người nhận tưởng đó là bản
+    gốc. Nói dối bằng một cái nút.
+  pdf_di_duong_in: >
+    Không render PDF ở máy chủ: mọi thư viện PDF server kéo theo phông nhúng,
+    và tiếng Việt có dấu là chỗ chúng vỡ trước tiên. Trình duyệt đã có bộ dựng
+    PDF hoàn chỉnh, đúng phông hệ thống, 0 phụ thuộc.
+  giay_phep: >
+    `docx@9.7.1` MIT — KHAI vào `package.json` cạnh chỗ khai phiên bản, kèm
+    `$vi_sao` nhắc bài học PyMuPDF: một thư viện AGPL lọt vào vì không ai hỏi
+    giấy phép lúc thêm, và lúc phát hiện thì nó đã nằm trong đường chạy.
+  cach_do_docx: >
+    Không mở `.docx` bằng thư viện đọc — kiểm HÌNH DẠNG rẻ và đủ: bốn byte đầu
+    phải là `PK 03 04`, bên trong phải có `word/document.xml`. Một file "docx"
+    không phải zip thì Word từ chối mở.
+  srt_khac_vtt_ba_cho: >
+    Đánh SỐ cue · dấu PHẨY cho mili-giây · không dòng `WEBVTT`. Bỏ sót cái nào
+    thì trình phát nhận file mà KHÔNG hiện phụ đề — hỏng im lặng, nên cổng đo
+    từng vế.
+  boundary: >
+    `check_g6b` chặn hai đường (`web/package.json`, `core/assets/xuat-dang.json`)
+    — chính task nói *"nhắn chủ đất/FR một dòng nếu g6b chặn"*. Đã nới boundary
+    M08 theo đúng tiền lệ v28/v29 đã dùng cho M03, kèm lý do tại chỗ: bên CƯỠNG
+    CHẾ bảng khai là cửa API, và phụ thuộc npm phải khai ở chỗ npm đọc.
+
+do_sau:
+  - lenh: node web/test/xuat-van-ban.test.js
+    ket_qua: "XANH 22/22 vế"
+  - lenh: node web/test/viec-theo-loai.test.js
+    ket_qua: "XANH 14/14 vế"
+  - lenh: python core/tests/check_ky_tu_vo_hinh.py
+    ket_qua: "pass · 0 ký tự vô hình trong toàn repo"
+  - lenh: cd web && npm test
+    ket_qua: "3075 vế ok · 0 FAIL (api-guard xanh — 0 đường ghi mới)"
+  - lenh: python -m pytest core/tests -q
+    ket_qua: 49 passed
+  - lenh: 'for f in chungcat/tests/check_*.py; do python "$f"; done'
+    ket_qua: 37/37 XANH
+  - lenh: python core/tests/check_g6b.py
+    ket_qua: "T08-33 ok · T03-117 ok · 5 lỗi còn lại đều là nợ M18 có sẵn"
+
+chay_that:
+  - "chưng cất một video ⇒ nháp `c2817aee…`, nhãn `[aitalkshow]`/`[talkshow]` KẾ THỪA đúng, `nguon` + `chi_dan` đủ"
+  - "`GET /api/xuat-nhap/<ulid>?dang=md|txt|docx` ⇒ 200 · 7979/7790/11687 byte"
+  - "dấu đầu file: `BẢN NHÁP — chưa duyệt · nguồn video/… · 2026-09-06 · chỉ dẫn: …`"
+  - "bấm thẻ hàng đợi nháp ⇒ mở cửa sổ, thân dựng đủ 5 mục (52 phần tử h2/h3/p)"
+
+loi_cua_toi_trong_T12_24: >
+  `_doc_nguon` đọc `category` ở CẤP CAO NHẤT, mà cửa `/api/articles/<slug>` trả
+  `{frontmatter, body, etag}` — nhãn nằm trong `frontmatter`. Nhãn không bao giờ
+  được chép, im lặng.
+  Cổng `check_ke_thua_nhan` KHÔNG bắt được vì nó TIÊM `_doc_nguon` giả: nó kiểm
+  GIẢ ĐỊNH của tôi về hình dạng phản hồi, không kiểm hình dạng THẬT. Một phép mô
+  phỏng đặt đúng ở chỗ có lỗi thì nó mô phỏng luôn cả cái sai.
+  Đã sửa + thêm vế `AC1c` gọi `_doc_nguon` THẬT với phản hồi đúng khuôn cửa.
+
+cho_duyet: >
+  `T03-117` BƯỚC 2 CHƯA CODE — `AC0` cấm. Wireframe `SCR-19` đã vẽ đủ bốn ca
+  menu, kèm ba câu hỏi cần chủ dự án quyết.
+
+đỏ_do: claude-opus-5
+
+object:
+  - web/api/xuat-cua.mjs
+  - web/api/router.mjs
+  - web/package.json
+  - core/assets/xuat-dang.json
+  - core/tests/check_ky_tu_vo_hinh.py
+  - 07_plan/M01_core/tasks/T01-49-cong-ky-tu-vo-hinh.md
+  - 05_uiux/wireframes/SCR-19-tai-xuong-va-print.md
+  - web/plugins/multiwindow/src/scripts/multiwindow.inline.ts
+  - web/plugins/cctab/src/cctab.inline.ts
+  - web/plugins/chungcat/src/chungcat.inline.ts
+  - chungcat/src/worker.py
+  - chungcat/tests/check_ke_thua_nhan.py
+  - web/test/xuat-van-ban.test.js
+  - web/test/viec-theo-loai.test.js
+  - web/test/no-write-path.test.js
+  - web/test/tab-theo-doi-chung-cat.test.js
+  - web/test/_api.mjs
+  - project_map.yaml

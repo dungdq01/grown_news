@@ -1,0 +1,207 @@
+{
+  "$comment": "BẢNG mime ↔ phần mở rộng ↔ magic-byte cho kho hiện vật (FR-036/B1). Khai ở ĐÂY vì hai bên cần nó và họ phải đồng ý: `core/tools/xuat_kho.py` dùng `duoi` để đặt tên file export, `web/api/dungchung.mjs` dùng `mime` làm enum ĐÓNG cho content-type phục vụ lại. Hai bản gõ tay sẽ lệch, và lệch ở đây nghĩa là file export mang một phần mở rộng mà server phục vụ bằng content-type khác.",
+  "$comment_magic": "`magic` là byte MỞ ĐẦU phải khớp, viết dạng hex. Đây là LỚP THỨ SÁU của intake: năm lớp hiện có (bind 127.0.0.1 · trần kích cỡ · tên file whitelist · đích cố định · spawn cổng thật) KHÔNG lớp nào soi byte. Không có lớp này thì một file HTML-có-script dán nhãn `application/pdf` được phục vụ lại SAME-ORIGIN dưới content-type đó.",
+  "$comment_chip_loc": "FR-064 · `chip_loc: false` = CÓ mime (phục vụ, xem trước, magic) nhưng KHÔNG làm chip trong facet *loại nguồn*. Bảng này gánh HAI vai: vai RENDER (mime → content-type, xem trước) và vai CHIP LỌC (một nút trên MỌI trang). `.md`/`.txt` cần vai một — `$vi_sao` của T03-111 nói rõ mục đích là *xem được trong cửa sổ đọc* — không cần vai hai. Khác `chi_dan_xuat`: khoá đó hỏi *AI TẠO RA nó*, khoá này hỏi *NGƯỜI CÓ LỌC theo nó không*. Đo được: hai chip thêm vào đẩy HTML trang chủ lên 61981/61440.",
+  "$comment_nhom": "`nhom_thu_vien` nói dòng này thuộc loại thư viện nào; vắng khoá = `tai-lieu`. CẦN vì chip bộ lọc *định dạng tài liệu* và dòng chủ *định dạng nhận* đều DẪN XUẤT từ bảng này, nên năm dòng mp4/mp3 vừa thêm đã hiện thành “định dạng tài liệu” trên MỌI trang — đo được: trần HTML trang chủ vỡ ngay (62713/61440). Cùng bài học `chi_dan_xuat`: sửa bằng Ý NGHĨA, không bằng cách nới trần.",
+  "$comment_magic_bu": "`magic_bu` là ĐỘ LỆCH byte để bắt đầu so (mặc định 0). Cần vì ISO BMFF (mp4/m4a/mov) đặt `ftyp` ở byte 4: bốn byte đầu là độ dài box và nó thay đổi theo từng file, nên một magic TIỀN TỐ là bất khả thi — đây là sự thật về định dạng, không phải một lựa chọn thiết kế. BÊN ĐọC PHẢI TÔN TRỊNG: `web/api/dungchung.mjs` so từ 0 thì MỌI mp4 thật bị 422.",
+  "$comment_anh": "WO-071 · `anh` = ảnh hiện bằng `<img>`, và cửa phục vụ trả `inline`. Tách khỏi `phat` (`<video>`/`<audio>`) vì hai thẻ khác nhau và một `<video src=\"…jpg\">` là một khung đen. Cùng lý lẽ `phat`: `attachment` thì trình duyệt tải file về thay vì hiện, và thẻ 2 tầng câm.",
+  "$comment_phat": "WO-064 · `phat` = trình duyệt phát được bằng THẺ GỐC (`<video>`/`<audio>`), và cửa phục vụ trả `inline`. Năm dòng nhóm video từng khai `tai`, và đó KHÔNG phải lựa chọn sai lúc khai: `M11_video/spec` khi ấy nói video *không byte, không dòng media*, nên mp4 trong kho chỉ là ca biên của `tai-lieu`. `FR-075` (2026-09-09) biến nó thành đường CHÍNH ⇒ `tai` thành lạc hậu, và HAI chỗ dẫn xuất từ cột này (`articles.mjs` disposition · viewer của `multiwindow`) đều làm đúng việc của mình với một con số sai: người dùng thấy *Trình duyệt không mở được dạng này* cho một .mp4 phát được hai chục năm nay. KHÔNG mượn `iframe`: một mp4 trong iframe là một trang trong trang — không `controls` của ta, không `preload`, và `FR-039 §0` cấm đúng hình dạng đó. `<video>` là thẻ NỘI DUNG, nó không chạy script và `nosniff` vẫn đứng. `.vtt` GIỮ `tai` — nó là hiện vật dẫn xuất, nhà riêng ở tab Transcript.",
+  "$comment_mau": "SCR-25 · `mau` là TÊN TOKEN, không phải mã hex — giá trị sống đúng một chỗ ở `05_uiux/tokens.css`, và `token-only.test.js` canh chuyện đó. Cột này nuôi TẦNG NỀN của thẻ danh sách: pdf/docx/pptx/md/txt đều là `source_type: tai-lieu` nên nếu không có nó thì mọi tài liệu chung một màu và lưới thành mảng phẳng. Thiếu `mau` ⇒ FE rơi về `--ink-3`, KHÔNG đỏ: một dòng mime mới chưa kịp có màu vẫn phải render được. KHÔNG có cột `icon` đi kèm — tập icon là CHÍNH thư mục `public/icon/` (`XUAT-XU.md`: tên file = đúng giá trị của chip), nên một cột `icon` sẽ là bản thứ hai của danh sách file. Dòng nhóm `video` KHÔNG khai `mau`: chủ dự án chốt 2026-09-08 rằng youtube/tiktok/douyin/fb dùng chung `--c-video` và chỉ khác ICON.",
+  "$comment_ooxml": "pptx/docx đều là ZIP nên cùng magic `504b0304` — magic-byte phân biệt được ZIP với không-ZIP, KHÔNG phân biệt được pptx với docx. Đó là giới hạn thật, khai ra: nó chặn được file lạ đội lốt Office, không chặn được người dùng đổi tên .docx thành .pptx. Muốn chặn cái đó phải đọc `[Content_Types].xml` trong zip — quá tay cho v1.",
+  "loai": [
+    {
+      "mime": "application/pdf",
+      "duoi": ".pdf",
+      "mau": "--c-pdf",
+      "ten": "PDF",
+      "magic": "255044462d",
+      "$magic_la": "%PDF-",
+      "xem_truoc": "iframe"
+    },
+    {
+      "mime": "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+      "duoi": ".pptx",
+      "mau": "--c-pptx",
+      "ten": "PowerPoint",
+      "magic": "504b0304",
+      "$magic_la": "PK\\x03\\x04 (ZIP — OOXML)",
+      "xem_truoc": "the"
+    },
+    {
+      "mime": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      "duoi": ".docx",
+      "mau": "--c-docx",
+      "ten": "Word",
+      "magic": "504b0304",
+      "$magic_la": "PK\\x03\\x04 (ZIP — OOXML)",
+      "xem_truoc": "the"
+    },
+    {
+      "mime": "application/vnd.ms-powerpoint",
+      "duoi": ".ppt",
+      "mau": "--c-pptx",
+      "ten": "PowerPoint (cũ)",
+      "magic": "d0cf11e0a1b11ae1",
+      "$magic_la": "OLE compound file",
+      "xem_truoc": "the"
+    },
+    {
+      "mime": "application/msword",
+      "duoi": ".doc",
+      "mau": "--c-docx",
+      "ten": "Word (cũ)",
+      "magic": "d0cf11e0a1b11ae1",
+      "$magic_la": "OLE compound file",
+      "xem_truoc": "the"
+    },
+    {
+      "mime": "video/mp4",
+      "nhom_thu_vien": "video",
+      "duoi": ".mp4",
+      "ten": "MP4",
+      "magic": "66747970",
+      "magic_bu": 4,
+      "$magic_la": "`ftyp` ở OFFSET 4 — bốn byte đầu là ĐỘ DÀI box, thay đổi theo file",
+      "xem_truoc": "phat"
+    },
+    {
+      "mime": "video/webm",
+      "nhom_thu_vien": "video",
+      "duoi": ".webm",
+      "ten": "WebM",
+      "magic": "1a45dfa3",
+      "$magic_la": "EBML (Matroska/WebM)",
+      "xem_truoc": "phat"
+    },
+    {
+      "mime": "audio/mp4",
+      "nhom_thu_vien": "video",
+      "duoi": ".m4a",
+      "ten": "M4A",
+      "magic": "66747970",
+      "magic_bu": 4,
+      "$magic_la": "cùng hộp ISO BMFF với mp4 — magic KHÔNG phân biệt được m4a với mp4",
+      "xem_truoc": "phat"
+    },
+    {
+      "mime": "audio/mpeg",
+      "nhom_thu_vien": "video",
+      "duoi": ".mp3",
+      "ten": "MP3",
+      "magic": "494433",
+      "$magic_la": "`ID3` — GIỚI HẠN THẬT: mp3 KHÔNG có tag ID3 mở đầu bằng frame sync `fff*`, và dòng này từ chối nó. Khai ra thay vì bỏ magic: phần lớn mp3 tải về có ID3, và một lớp chặn được phần lớn tốt hơn không lớp nào. Ai gặp mp3 không tag thì đó là một ô backlog, không phải một lỗ.",
+      "xem_truoc": "phat"
+    },
+    {
+      "mime": "audio/wav",
+      "nhom_thu_vien": "video",
+      "duoi": ".wav",
+      "ten": "WAV",
+      "magic": "52494646",
+      "$magic_la": "`RIFF`",
+      "xem_truoc": "phat"
+    },
+    {
+      "mime": "text/vtt",
+      "duoi": ".vtt",
+      "ten": "Transcript WebVTT",
+      "magic": "5745425654",
+      "$magic_la": "WEBVTT",
+      "xem_truoc": "tai",
+      "$vi_sao": "FR-054 §1.2 · transcript vào kho làm HIỆN VẬT DẪN XUẤT của bản ghi video. Chọn `text/vtt` chứ KHÔNG `application/json`: `application/json` không có magic — `{` là một byte (`7b`) — nên nó sẽ là mục đầu tiên trong bảng này làm YẾU lớp thứ sáu của intake, lớp duy nhất soi byte. `WEBVTT` là magic THẬT, 6 byte, chuẩn W3C, và định dạng mang mốc thời gian trong chính nó — thứ `[t=03:15]` của dia-chi.json cần để phân giải.",
+      "$xem_truoc_vi_sao": "`tai` chứ không `iframe`: một .vtt mở trong iframe là một trang chữ thô không mốc bấm được. Màn đọc transcript là việc của FE (T03-108).",
+      "chi_dan_xuat": true,
+      "$chi_dan_xuat_la": "Loại này KHÔNG phải một thứ người nạp lên — nó là hiện vật DẪN XUẤT do máy sinh (FR-054). Nên nó không được vào bộ lọc 'loại nguồn' của màn tài liệu: một chip `vtt` ở đó là một chip không bao giờ khớp bản ghi nào, và nó chiếm byte tải-đầu của MỌI trang."
+    },
+    {
+      "mime": "image/jpeg",
+      "duoi": ".jpg",
+      "ten": "Ảnh JPEG",
+      "magic": "ffd8ff",
+      "$magic_la": "SOI + APPn — ba byte đầu của MỌI JPEG, khác nhau ở byte thứ tư theo biến thể (JFIF/Exif), nên magic dừng ở 3 byte chứ không 4.",
+      "xem_truoc": "anh",
+      "chi_dan_xuat": true,
+      "$vi_sao": "WO-071 · ẢNH BÌA do máy lấy về (`yt-dlp --write-thumbnail`), không phải thứ người nạp. Trước đợt này `image/*` KHÔNG có trong bảng, và hai thứ hỏng cùng lúc mà không ai báo: `luuHienVat` chỉ soi magic `if (loai)` nên mime lạ LỌT QUA lớp thứ sáu của intake — đúng lúc byte đến từ một CDN ngoài; và `hienVatPhucVu` trả `octet-stream` + `attachment` nên thẻ 2 tầng không hiện nổi ảnh. `chi_dan_xuat: true` giữ nó khỏi chip lọc *loại nguồn*: một chip `jpg` ở đó không bao giờ khớp bản ghi nào."
+    },
+    {
+      "mime": "image/png",
+      "duoi": ".png",
+      "ten": "Ảnh PNG",
+      "magic": "89504e47",
+      "$magic_la": "byte 0x89 rồi ba chữ PNG",
+      "xem_truoc": "anh",
+      "chi_dan_xuat": true
+    },
+    {
+      "mime": "text/markdown",
+      "duoi": ".md",
+      "mau": "--c-md",
+      "chip_loc": false,
+      "ten": "Markdown",
+      "xem_truoc": "van-ban",
+      "$vi_sao": "T03-111 · .md/.txt là NGUYÊN LIỆU chưng cất chính của người dùng — phải xem được ngay trong cửa sổ đọc. ĐÁNH ĐỔI KHAI THẲNG: văn bản thuần KHÔNG có magic byte, hai dòng này là ngoại lệ đầu tiên của lớp soi-byte (tiền lệ $vi_sao của text/vtt từng né application/json vì đúng lý do này). Bù lại: xem_truoc van-ban đổ chữ bằng textContent — nội dung không bao giờ thành DOM."
+    },
+    {
+      "mime": "text/plain",
+      "duoi": ".txt",
+      "mau": "--c-txt",
+      "chip_loc": false,
+      "ten": "Văn bản thuần",
+      "xem_truoc": "van-ban",
+      "$vi_sao": "Cùng ngoại lệ với `.md` ở trên: văn bản thuần KHÔNG có magic byte. `check_dinh_dang_mo` miễn `magic` theo tính chất suy được — `xem_truoc: van-ban` — chứ không theo danh sách mime chép tay, nên thêm một định dạng văn bản nữa không phải sửa cổng. Chiều ngược lại cũng bị canh: khai `van-ban` mà có `magic` là khai mâu thuẫn."
+    }
+  ],
+  "$comment_vai": "FR-039 · BANG NAY THOI LAM CONG NHAN. Nguoi dung chot nhan MOI dinh dang, chan theo tran dung luong. No KHONG bi xoa vi ba thu dan xuat tu no va ca ba se im lang hong: (1) `content-type` cua endpoint phuc vu — khong co bang thi phai sniff tu ten file, dung thu dau de `nosniff` ton tai de KHONG tin; (2) `inline`/`attachment` lay tu `xem_truoc` — mat no thi hoac moi thu inline (nguy) hoac moi thu attachment, va PDF HET xem truoc duoc, tuc xoa mot tinh nang khong ai xin xoa; (3) duoi file trong `filename=` va trong `_media/<sha>.<duoi>`. Dinh dang CO trong `loai`: giu mime that + `xem_truoc` + magic-byte. Dinh dang KHONG co: dung `mac_dinh` duoi day.",
+  "$comment_mac_dinh": "Dinh dang la — nhan vao, luu, phuc vu duoi octet-stream. `xem_truoc` la `tai` (KHONG phai `iframe`): `iframe` se thanh `content-disposition: inline` va mot file la render trong goc cua chinh trang, dung lo FR-039 §0 noi se KHONG mo. Voi loai la thi lop magic-byte KHONG TON TAI (khong co chu ky de so) — do la thu nguoi dung da doc va van chon.",
+  "mac_dinh": {
+    "mime": "application/octet-stream",
+    "duoi": ".bin",
+    "ten": "Tệp khác",
+    "xem_truoc": "tai"
+  },
+  "$comment_tran": "25 MB. Dưới xa SQLITE_MAX_LENGTH (~1 GB) và `node:sqlite` bind một Buffer thành BLOB trong một lần. `tuanTu()` đã tuần tự hoá mọi ghi nên đỉnh RAM chặn ở ~2× một file. Muốn video 200 MB thì câu trả lời là ĐĂNG KÝ URL, không phải nới trần. ⇒ SỬA 2026-09-04 (FR-054 §9 · chủ dự án ký): 25 MiB → 1 GiB (26214400 → 1073741824). Lý do: đường `sinh-transcript` phải ĐỌC được nguồn qua cửa media, và một video 30 phút vượt 25 MB dễ dàng. KHÔNG bỏ trần — trần là thứ duy nhất chặn một lần nạp nhầm, và trần THỜI LƯỢNG (M12-R9: 3600s) mới là cái chặn thật. ⚠️ `frontmatter.schema.json` (FROZEN) phải đổi CÙNG số — hai chỗ nói hai trần thì bên nghiêm hơn thắng một cách vô hình.",
+  "tran_byte": 1073741824,
+  "$comment_loai": "Hai loai nguon duoc phep dat ho_so thu-vien. Moi loai khac (paper/repo/article/docs/announcement) LA mot ban phan tich theo dinh nghia cua chinh loai no — thu vien giu tai lieu va video, khong giu paper. Lo nay do ca am check_ci_teeth bat duoc: ban dat chuan 202 tu dan them mot dong ho_so: thu-vien thi thoat CA BON cong hinh dang.",
+  "loai_thu_vien": [
+    "tai-lieu",
+    "video"
+  ],
+  "$comment_video": "Host được phép nhúng. `src` của iframe dựng từ host trong danh sách này CỘNG id khớp `id_mau` — KHÔNG BAO GIỜ từ `fm.url` thô (M09-R3). Người dùng ký cho HAI host cụ thể; `fm.url` là dữ liệu, và dựng src từ dữ liệu là để người nạp bài chọn máy chủ mà trình duyệt người đọc sẽ gọi.",
+  "$comment_nhung_fb": "`nhung` cua fb dai vi trinh nhung Facebook nhan mot URL DA MA HOA PHAN TRAM lam tham so `href`, nen id duoc noi vao duoi cua mot url long trong url. `show_text` phai dung TRUOC `href`: id LUON noi vao cuoi, nen bat ky tham so nao dat sau se roi vao trong gia tri `href`. `id_mau` chi chu SO — do la thu chan moi loi thoat, vi khong ky tu nao trong `[0-9]` mo duoc mot lop giai ma phan tram hay them duoc mot tham so (M09-R3).",
+  "$comment_mien": "`mien` la ten mien cua dang URL NGUOI DUNG DAN; `nhung` la mien NHUNG — hai thu khac nhau (youtube.com vs youtube-nocookie.com), nen khong suy ra duoc tu nhau. `id_tu` rut id khoi phan con lai cua `url_normalized` (dang ma normalize_url sinh: `youtube.com/watch?v=ID`, `tiktok.com/video/ID`). Thieu hai field nay thi FE phai go tay hai ten mien va hai cach rut id — tuc ban thu hai cua cung mot su that, va 'src dung tu whitelist' chi co nghia khi whitelist la MOT ban khai.",
+  "video_host": [
+    {
+      "nhan": "youtube",
+      "mien": "youtube.com",
+      "nhung": "https://www.youtube-nocookie.com/embed/",
+      "id_mau": "^[A-Za-z0-9_-]{11}$",
+      "id_tu": "[?&]v=([A-Za-z0-9_-]{11})"
+    },
+    {
+      "nhan": "tiktok",
+      "mien": "tiktok.com",
+      "nhung": "https://www.tiktok.com/embed/v2/",
+      "id_mau": "^[0-9]{5,24}$",
+      "id_tu": "/video/([0-9]{5,24})"
+    },
+    {
+      "nhan": "fb",
+      "mien": "facebook.com",
+      "nhung": "https://www.facebook.com/plugins/video.php?show_text=false&href=https%3A%2F%2Fwww.facebook.com%2Fwatch%2F%3Fv%3D",
+      "id_mau": "^[0-9]{6,24}$",
+      "id_tu": "(?:[?&]v=|/videos/(?:[^/?]+/)?|/reel/)([0-9]{6,24})"
+    },
+    {
+      "nhan": "douyin",
+      "mien": "douyin.com",
+      "nhung": null,
+      "id_mau": "^[0-9]{6,24}$",
+      "id_tu": "(?:/video/|/share/video/|[?&]modal_id=)([0-9]{6,24})",
+      "$vi_sao_nhung_null": "BA loi nhung, do het 2026-09-09 tren may that, ca ba DONG. Ghi day du de khong ai thu lai:  (1) `douyin.com/video/<id>` — CSP `frame-ancestors` chi cho `*.douyin.com` + cac mien bytedance. Trinh duyet CHAN framing tu moi noi khac.  (2) `iesdouyin.com/share/video/<id>` — cung the: `frame-ancestors *.douyin.com *.iesdouyin.com *.bytedance.net`.  (3) `open.douyin.com/player/video?vid=<id>` — khung nay nhung DUOC (khong co frame-ancestors), nhung chinh no goi `www.douyin.com/aweme/v1/web/aweme/detail/` va nhan 403: duong do doi `X-Bogus` + `_signature`, tuc doi tu cach open-platform. Do voi CA video khoa hoc (`/jingxuan/course`) LAN video thuong (`/jingxuan`) — khong phai chuyen noi dung tra phi.  Do (3) o tab TOP-LEVEL, khong co app cua ta trong duong di, nen day khong phai loi khung nhung cua minh.  `null` nghia la: KHONG hien nut nhung, hien LINK mo o nguon. Ngay nao co credential open-platform thi dien mot chuoi vao day, 0 dong ma doi.",
+      "$vi_sao_id_tu": "BA dang URL that, khong phai mot. Chu du an nap `?modal_id=` (ca `/jingxuan?modal_id=` lan `/jingxuan/course?modal_id=`) — dang `/video/` khai truoc do khong khop, nen `idVideo()` tra null va cua so hien TRANG TRON. Mot ve gieo URL tu nghi se xanh mai mai: URL trong ve phai chep nguyen van tu ban ghi that.",
+      "$vi_sao_403": "MAY CHU DOUYIN TU NOI RA, do 2026-09-09: than phan hoi 403 la `Blocked by ArgusSecurityPlugin Uifid Not Found`. Argus la he chong-bot cua ByteDance; UIFID la dinh danh THIET BI do `webmssdk.js` dut ra sau khi chay tron tren mot trang douyin.com. => KHONG phai auth dang nhap. Khong co tai khoan nao mo duoc cho nay. Bang chung phu: da mo www.douyin.com TRUOC de lay du 23 cookie bao mat (`x-web-secsdk-uid`, `__ac_signature`, `s_v_web_id`), roi mo player o TOP-LEVEL cung phien — VAN 403. Nen cung khong phai chuyen cookie ben thu ba hay iframe. Cookie chi co `UIFID_TEMP` (tam), khong co UIFID day du, va `msToken=` rong trong chinh URL bi chan; WebSocket cua `webmssdk.js` cung bat tay hong. Ket: SDK chung thuc thiet bi khong chay tron duoc ngoai moi truong cua ho, va do la Y DO THIET KE cua Argus."
+    }
+  ],
+  "tran_van_ban_byte": 524288,
+  "$vi_sao_tran_van_ban": "512 KB — trần FETCH để xem trước, không phải trần nạp: file chữ lớn hơn rơi về thẻ+tải, cửa sổ đọc không nuốt vài MB text vào DOM. CHƯA KIỂM CHỨNG trên file thật lớn."
+}

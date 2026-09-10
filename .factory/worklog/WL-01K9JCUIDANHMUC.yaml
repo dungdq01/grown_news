@@ -1,0 +1,161 @@
+id: WL-01K9JCUIDANHMUC
+at: 2026-08-20
+by: claude
+buoc: s8 (M03_web + M08_api + M04_ci)
+loai: fix (trả nợ) + redesign UI
+fr: FR-021-sua-xoa-nhan-co-dieu-kien.md (đã duyệt) — không mở FR mới
+
+viec: >
+  Người dùng: "Hoàn thiện các điểm còn nợ, sau đó làm phần UI nhé" + 3 yêu cầu UI
+  cho màn Danh mục: phân trang · 3 tab với nút tạo mới mở popup · thêm màu sắc.
+  Ba skill design được gọi (frontend-design, article-magazine, color-expert).
+
+pham_vi_ghi:
+  - web/api/dungchung.mjs                 # SCHEMA_DIR override · inDanhMuc giữ flow
+  - core/tests/check_danh_muc.py           # SCHEMA_DIR + KB_DIR override
+  - web/api/danhmuc.mjs                   # khoVaSchemaLech() · rào kho rỗng
+  - web/test/_api.mjs                      # dungSchema() · copy CẢ HAI danh mục
+  - web/test/danh-muc-them.test.js         # 22 → 53 phép kiểm
+  - web/plugins/home-pages/shell.html      # 3 tab + 2 <dialog>
+  - web/plugins/home-pages/index.ts        # màu hàng · 3 mốc số tab
+  - web/plugins/multiwindow/.../multiwindow.inline.ts  # tab · phân trang · popup
+  - web/styles/prototype.css               # ~78 dòng: .dm-* · .dlg · .rc-r màu
+  - web/test/man-danh-muc.test.js          # MỚI — 35 phép kiểm
+  - web/package.json · .github/workflows/ci.yml
+
+ba_skill_design_doc_gi_va_dung_gi:
+  frontend_design: >
+    ÁP DỤNG. Điểm chính lấy được: "nếu repo đã có design tokens/DESIGN.md thì
+    dùng làm nguồn chân lý" và "tránh AI default: gradient tím-xanh, glass card
+    mơ hồ, bo góc quá tay". Nên: 0 màu mới, 0 gradient, dùng lại .np-tabs/.rc-r/
+    .bt.dstr/.pgn đã có.
+  article_magazine: >
+    KHÔNG áp. Nó là mẫu bài viết magazine (hero text-5xl, một cột 700px, serif,
+    blockquote accent). Màn Danh mục là màn QUẢN LÝ DỮ LIỆU — áp mẫu đọc-dài vào
+    đó là chọn sai công cụ.
+  color_expert: >
+    KHÔNG có nội dung thi hành — file chỉ là mục catalogue trỏ upstream chưa cài.
+    Thay bằng nguồn thật của dự án: contrast-audit.json (50/50 pass WCAG AA).
+
+tra_no_1_test_duong_ghi_CHU_DE:
+  no_cu: >
+    "DELETE/POST chủ đề chỉ chạy khi KB_DIR = kb/ thật ⇒ KHÔNG có test
+    đường-thành-công, chỉ kiểm tay." (FR-021 tự khai là nợ)
+  vi_sao_truoc_day_khong_lam_duoc: >
+    Đường đó sửa `enum` trong hai bản schema ở repo. Test mà sửa schema thật là
+    tự tạo ra đúng thứ check_frozen sinh ra để bắt.
+  sua: >
+    Thêm `SCHEMA_DIR` (cùng khuôn KB_DIR/RECYCLE_DIR của FR-010) cho CẢ
+    dungchung.mjs VÀ check_danh_muc.py. Test copy hai schema sang thư mục tạm rồi
+    trỏ vào đó — kiểm đủ đường mà không đụng một byte của repo.
+    Mặc định KHÔNG đổi: make check và CI vẫn kiểm repo.
+  them_khoVaSchemaLech: >
+    Điều kiện thật là "kho và schema CÙNG PHÍA" (cùng repo, hoặc cùng tạm), không
+    phải "KB_DIR phải là kb/". Lệch phía ⇒ 409 với câu giải thích, thay vì ghi rồi
+    rollback rồi trả 500 mờ mịt.
+  ket_qua: "22 → 53 phép kiểm. POST/DELETE chủ đề giờ có test đường-thành-công đủ"
+
+tra_no_2_hai_bug_cua_luot_truoc:
+  bug_dinh_dang_YAML:
+    what: "YAML.stringify đổi `aliases: [a, b]` (flow) thành block list"
+    do_duoc: "một lần PATCH sửa MỘT nhãn làm diff 78 thêm / 32 xoá"
+    sua: >
+      Hàm inDanhMuc() in flow style; vẫn dùng YAML.stringify cho từng GIÁ TRỊ vô
+      hướng (không tự escape chuỗi — đó đúng là chỗ parser tự chế sai).
+  bug_kho_rong:
+    what: >
+      DELETE trên kho thật trả 200 và XOÁ THẬT `idempotency`. kb/ có 0 bài nên
+      MỌI nhãn đều "0 bài dùng".
+    khac_phuc: "git checkout kb/concepts.yaml"
+    sua: "quetKho().length === 0 → 409. 0 bài dùng là HỆ QUẢ kho rỗng, không phải bằng chứng"
+    cung_lop_loi: "validate.py xanh trên kho 0 bài suốt FR-001 → FR-015"
+  ca_hai_gio_co_cong: "khối 12 của danh-muc-them.test.js"
+
+tra_no_3_4_5:
+  prompt_thay_bang_popup: >
+    Ba prompt() đã xoá. suaNhanTuWeb (bản prompt) và themChuDeMoi (form cũ) là
+    code chết sau khi có popup — xoá cả hai, giữ lại comment về literal fetch
+    (kiến thức đáng giữ) bằng cách chuyển sang hàm mới.
+  nhac_dung_lai_site: >
+    5 chỗ tự viết câu riêng → dùng chung `NHAC_BUILD` đã có (":: trang tĩnh là
+    bản build — chạy npm run build"). Một câu, một chỗ sửa.
+  more_concepts_mo_coi: "xoá khỏi từ điển EN — grep shell.html = 0 chỗ dùng"
+
+UI_ba_yeu_cau:
+  1_phan_trang:
+    quyet: CLIENT-SIDE, 12 mục/trang
+    vi_sao_khong_dung_co_che_cu: >
+      Phân trang màn Tất cả là BUILD-TIME (sinh /tat-ca/2/ thành trang riêng).
+      Ở đây đổi tab không tải lại trang ⇒ trang riêng vô nghĩa. 22 mục thì DOM đã
+      có sẵn, ẩn/hiện hàng là đủ.
+    dung_lai: ".pgn CSS của màn Tất cả; chỉ thêm .dm-pgn button (là <button> chứ không <a>)"
+    12_vi_sao: "~14px/hàng + tiêu đề + tab ≈ một màn 900px không cuộn"
+  2_ba_tab_va_popup:
+    tab: "dùng lại khuôn .np-tabs của màn Nạp nguồn — không phát minh cơ chế thứ hai"
+    popup: >
+      <dialog> NATIVE + showModal(). Focus-trap, ESC, backdrop, inert cho phần
+      còn lại của trang — trình duyệt làm sẵn và đúng hơn mọi bản tự viết.
+      MỘT dialog cho CẢ HAI loại nhãn (hai form giống nhau 3/4; hai dialog thì
+      phải đồng bộ hai lần mỗi khi đổi). Ô `gom` ẩn khi tạo khái niệm.
+    loi_hien_TRONG_popup: >
+      Không phải toast rồi mất — người dùng còn đang gõ. Và dải cảnh báo nói
+      TRƯỚC điều kiện (ngưỡng M07 / schema FROZEN), không đợi 422 mới nói.
+  3_mau_sac:
+    nguyen_tac: "0 màu mới. Mọi màu từ contrast-audit.json (50/50 pass WCAG AA)"
+    ba_vai_ba_mau: "khái niệm --brand · chủ đề --ok · chờ --warn"
+    dung_lam_gi: >
+      VIỀN (border-top 3px trên tab, border-left 2-3px trên hàng) và nền nhạt.
+      KHÔNG làm màu chữ trên nền nhạt — chữ giữ --ink/--ink-2 đã đo.
+    nhan_dang_dung: ".r-dung viền dày hơn (3px) để tách khỏi nhãn rỗng"
+
+test_moi_35_phep_kiem:
+  vi_sao_can: >
+    Tab/phân trang/popup là JS trên trình duyệt. type-check xanh, build xanh, và
+    trang vẫn hỏng nếu mốc đổi tên hoặc handler không nối. Cùng lớp lỗi với bug
+    nhãn dài phình cột.
+  quet_TINH_khong_chay_trinh_duyet: >
+    Repo không có playwright/jsdom; thêm một phụ thuộc để kiểm ba mốc là không
+    tương xứng (security_baseline §7). Kiểm được tĩnh: mốc có mặt · handler đọc
+    đúng data-* · popup là <dialog> · form đều api-only · 0 hex gõ tay trong khối
+    màn Danh mục · ba tab dùng đúng ba token đã audit.
+  kiem_hai_chieu: "đổi `data-dmtab` thành `data-XXtab` → exit 1; phục hồi → exit 0"
+  loi_cua_TEST_tu_bat: >
+    Phép kiểm "tab đầu mang aria-selected=true" đỏ trên markup ĐÚNG — regex tôi
+    viết quét cả trang nên bắt lẫn aria-selected của tab màn Nạp. Sửa: đếm trên
+    chính các nút dm-tab.
+
+verify:
+  loai: hard
+  ket_qua:
+    npm_run_check: sạch
+    web_test: 25/25 file, exit 0 (thêm man-danh-muc.test.js — 35 phép kiểm)
+    danh_muc_them: 53 phép kiểm (từ 22)
+    cong_may: 5/5 đã chạy (frozen · danh_muc · ci_teeth · running · kb_mock)
+    pytest: 30/30
+    build: exit 0
+  kiem_tay_tren_trang_da_xay:
+    - "3 tab với số: 22 mục · 6 mảng · 5 chờ; hai panel hidden, một mở"
+    - "2 <dialog>: dlg-nhan (tạo) + dlg-sua (sửa)"
+    - "3 mốc phân trang pg-cpt/cat/cho; 12 hàng khái niệm = đúng ngưỡng"
+    - "hàng mang màu: 12 r-cpt · 5 r-cat r-dung · 1 r-cat"
+    - "bundle có moTabDm/veTrangDm/moPopupNhan/moPopupSua/DM_MOI_TRANG"
+  cong_moi_kiem_hai_chieu:
+    - "SCHEMA_DIR trỏ thư mục không tồn tại → check_danh_muc exit 1"
+    - "không đặt SCHEMA_DIR → exit 0 (mặc định không đổi)"
+  frozen: "check_frozen exit 0 — KHÔNG file frozen nào đổi trong lượt này"
+
+no:
+  - "Phân trang kiểm TĨNH (mốc + handler + ngưỡng), không kiểm hành vi bấm thật.
+     Muốn chắc phải có jsdom/playwright — một phụ thuộc mới, cần ghi lý do vào
+     decisions.md (§7). Chưa làm."
+  - "12 mục/trang là PHỎNG ĐOÁN từ chiều cao hàng, không đo trên màn thật. Sửa
+     một chỗ (DM_MOI_TRANG) nếu thấy sai."
+  - "Popup TẠO khái niệm vẫn đòi ≥ngưỡng bài đề xuất — nút mở popup không biết
+     điều đó, nên người dùng có thể gõ xong mới bị 422. Dải cảnh báo nói trước,
+     nhưng chưa vô hiệu hoá nút theo dữ liệu thật."
+  - "Sửa/xoá/thêm nhãn KHÔNG tự dựng lại site. NHAC_BUILD nhắc, nhưng vẫn phải
+     chạy `npm run build` tay. Cùng hở đã biết với nút Duyệt."
+  - "`.dlg` chưa có animation mở/đóng. `prefers-reduced-motion` cũng chưa cần vì
+     chưa có chuyển động nào."
+  - "Xoá nhãn vẫn KHÔNG có thùng rác (khác bài — bài có _recycle/).
+     kb/_nhat-ky-danh-muc.md là hồ sơ duy nhất."

@@ -1,0 +1,79 @@
+id: WL-01K9X6T046
+at: 2026-09-02
+by: claude
+buoc: "T04-6 — check_rule_surfaces quet MOI rules.md (PHAN B). Chu du an: 'lam luon di'"
+loai: don vi TEST; do TRUOC (R5); banh coc thay vi ngay co
+gate: khong ky gate
+
+object:
+  - 07_plan/M04_ci/tasks/T04-6-rang-that-cho-rule-surface.md
+  - core/tests/check_rule_surfaces.py
+  - 06_modules/M18_nguoidung/rules.md        # M18-R1 + M18-R3: S3 -> S4
+  - 06_modules/M18_nguoidung/backlog.md
+  - RUNNING.md
+
+evidence:
+  - "DO TRUOC: --tu-kiem bi NUOT IM LANG va van exit 0 (co chua ton tai)"
+  - "--tu-kiem sau khi viet: 6/6 ca dung (A do, B ok, C cho, D do, E cho, F ngoai pham vi)"
+  - "repo that lan 1: exit 1, DUNG 2 do — M18-R1 va M18-R3"
+  - "sau khi ha S4: exit 0"
+  - "o [ ] mo tren M18: 0"
+  - "pytest 42 passed; check_g6a/ba/map/mermaid/db_dung_cho/worklog xanh"
+
+# ══ VAN DE THIET KE: bat rang thang tay la mot NGAY CO ═══════════════
+vi_sao_banh_coc: >
+  39 rule co lenh khong chay + 22 rule khai S3 khong co `lenh:` = 61 do ngay lap
+  tuc, va cong nay nam trong dieu kien dong G6A. Mot cong do 61 cho ngay dau
+  KHONG PHAI mot cong — no la mot cong nguoi ta se TAT.
+  Va phan lon con so do khong phai noi doi: 35 lenh tro vao chungcat/tests,
+  cong/tests ... — sau dich vu CHUA DUNG. Do la LICH TRINH, khong phai loi khai
+  sai.
+  => banh coc: no cu duoc NEU TEN (danh sach GRANDFATHER 22 id, chi CO LAI duoc)
+     + le CHO cho thu muc chua dung; no MOI do ngay.
+     Khong co co phai nho lat (bai hoc S18).
+
+phan_loai_bang_CO_HOC_khong_bang_status: >
+  project_map.status KHONG dung duoc: M08_api khai `planned` nhung web/api/** da
+  chay that, con M12-M17 KHONG CO status.
+  => bien phan loai la "thu muc chua lenh co ton tai khong". Do truc tiep: sau
+  thu muc dich vu (chungcat truyhoi chatbot kenh artifact cong) DEU TON TAI
+  nhung moi cai chi co README.md va KHONG cai nao co tests/.
+
+# ══ CONG MOI BAT DUNG HAI RULE CUA TOI — va lo ra bien phan loai chua du
+du_doan_viet_truoc_khop: >
+  T04-6 khai truoc: "du doan 2 DO — M18-R1 va M18-R3, ca hai la cua toi. Neu so
+  thuc khac 2 thi ghi lai SO THUC, khong sua cho khop du doan."
+  Ket qua thuc: DUNG 2, dung hai rule do.
+
+bien_phan_loai_cua_toi_SAI_cho_ca_nay: >
+  "Thu muc co ton tai khong" la mot PROXY cho "thu duoc kiem da duoc dung chua".
+  Voi M12-M17 proxy do dung. Voi M18 no SAI: cong se song o core/tests/ (thu muc
+  day cong dang chay) nhung thu no kiem la BON BANG o web/ — chua ton tai.
+  Nen cong bao DO trong khi ban chat la CHO.
+  Toi da KHONG noi long cong de che cho, va cung KHONG sua repo cho khop cong.
+  Cach dung theo R3: ha M18-R1 va M18-R3 xuong S4.
+  "hard ma khong co lenh chay duoc => NO LA soft" — day khong phai noi long,
+  day la NOI THAT. Khai S3 trong luc do la de rules.md noi mot dieu khong dung
+  ve chinh no. Truong `lenh_khi_co_bang:` giu lenh du kien.
+
+# ══ TOI VI PHAM LUAT CUA CHINH MINH, HAI MUC SAU DO ═════════════════
+o_mo_roi_go_trong_cung_luot: >
+  Toi mo mot o [ ] trong M18/backlog.md cho viec "promote S4 -> S3 khi co bang".
+  Sai: header cua chinh file do noi backlog KHONG PHAI cho chua "thu chua xay",
+  va promote-khi-co-bang dung la thu chua xay.
+  Khong vo hai: s6 doi BACKLOG MODULE SACH de dong G6A, nen o do se chan G6A cua
+  M18 vi mot viec thuoc lich trinh cua FR-047.
+  Dang chu y hon: day CHINH LA luat toi vua viet ra o muc tren cua cung file do
+  (o SCR dat o M03, khong dat o M18, vi khong duoc de o cua nguoi khac chan G6A
+  cua minh) — va toi vi pham no HAI MUC SAU, trong cung mot file, cung mot luot.
+  Da chuyen sang van xuoi. o [ ] mo tren M18 = 0.
+
+do_do:
+  khong_co_do_moi: "check_rule_surfaces tu do 2 cho, ca hai quy ve TOI, da xu ly"
+  bon_do_con_lai: "check_danh_muc + check_skill (agent khac) · check_frozen (cho nguoi ky) · check_running (he qua) · check_g6b (T03-90, agent khac)"
+
+no_con_lai:
+  - "22 rule trong GRANDFATHER — danh sach chi CO LAI duoc, chua ai chuyen sang bo ba lenh/do_khi/xanh_khi"
+  - "35 rule le CHO — se do that khi sau thu muc dich vu co tests/"
+  - "M18-R1 + M18-R3 phai promote lai S3 khi FR-047 dung DDL"
+  - "FR-047 chua thi cong — DDL + bay cua. LAM TIEP NGAY."

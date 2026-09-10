@@ -1,0 +1,113 @@
+id: WL-01KA24CUA
+khi: 2026-09-04T16:00:00+07:00
+loai: ban_giao
+tac_nhan: claude-code
+viec: FR-059 áp đủ — CỬA là bảng khai, adapter theo PHƯƠNG NGỮ; + stream; + spec nhà→cửa
+module: M12_chungcat
+
+nguoi_quyet: |
+  Chủ dự án 2026-09-04:
+    1 "ta làm 1 adapter cho beeknoee, sau này có thể ta dùng của bên khác hay
+       API chính từ OpenAI, gemini... thì đều có thể dùng được (cần thiết kế
+       như vậy)"
+    2 "tôi ký FROZEN.lock / tôi đã note thêm api key vào rồi / qua cửa hay local
+       gì cũng được, nên làm cả 2 và ưu tiên call dịch vụ llm trước / ok"
+
+object:
+  - path: chungcat/assets/cua.json                   # MỚI — bảng khai CỬA
+  - path: chungcat/src/adapter/openai.py             # đổi tên từ beeknoee.py
+  - path: chungcat/src/adapter/hop_dong.py           # doc_cua · cua_cua · adapter_cua
+  - path: chungcat/src/egress.py                     # stream + khoá không vào log
+  - path: chungcat/tests/check_mot_cua_egress.py     # 6 vế mới
+  - path: 06_modules/M12_chungcat/spec.md            # AC-3.1 + §4.0b(b): nhà → CỬA
+  - path: .factory/fr/FR-054-duong-video-transcript-thanh-hien-vat.md   # uu_tien
+  - path: 07_plan/M12_chungcat/tasks/T12-16-asr-sinh-transcript.md
+  - base_sha: 8535a26
+
+do_do:
+  - lenh: 21 cổng chungcat/tests/*.py
+    ket_qua: 21/21 exit 0
+  - lenh: python -m pytest core/tests -q
+    ket_qua: 45 passed
+  - lenh: cd web && npm test
+    ket_qua: exit 0
+  - lenh: python core/tests/check_frozen.py
+    ket_qua: |
+      FAIL · 1 file lệch baseline — `06_modules/M12_chungcat/spec.md`.
+      ĐÚNG THIẾT KẾ: FR-059 đã mở, NGƯỜI ký `--ky`. Agent KHÔNG ký.
+  - lenh: chạy tay — dựng cửa từ bảng khai rồi gọi adapter với transport giả
+    ket_qua: |
+      cửa mặc định `beeknoee` → URL https://platform.beeknoee.com/v1/chat/completions
+        auth {Authorization: Bearer …} · stream true · hợp đồng {text, quotes}
+      cửa `openai` (gốc)   → host api.openai.com · biến khoá OPENAI_API_KEY
+        CÙNG file adapter, 0 dòng mã khác
+      cửa `google` (native) → phương ngữ `gemini` · chưa có file ⇒ chặn (b) từ chối
+      cửa lạ                → ném, KHÔNG rơi về mặc định
+
+do_do_boi: chua-quy-duoc-chu
+
+quyet_dinh:
+  - |
+      ADAPTER THEO PHƯƠNG NGỮ, KHÔNG THEO CỬA và cũng không theo NHÀ. `cua.json`
+      khai mỗi cửa kèm `phuong_ngu`; file adapter đặt tên theo phương ngữ.
+      ⇒ thêm một cửa nói tiếng OpenAI (gateway khác, hay API gốc OpenAI) =
+        1 dòng bảng khai + 0 FILE;
+      ⇒ thêm một phương ngữ mới (Gemini native `:generateContent`, khoá ở query,
+        thân `contents[]`) = 1 dòng + 1 file.
+      Đúng yêu cầu "sau này dùng bên khác hay API chính đều dùng được".
+  - |
+      `cua.json` TÁCH khỏi `model.json`. `model.json` trả lời "gọi model NÀO",
+      `cua.json` trả lời "gọi QUA ĐÂU". Gộp thì mỗi lần đổi cửa phải sửa 112
+      dòng model, và thêm một model phải chép lại cấu hình cửa.
+  - |
+      Bảng khai chứa TÊN BIẾN MÔI TRƯỜNG, không chứa khoá. Một khoá trong file
+      bảng khai là một khoá trong git, và `.gitignore` không cứu được thứ đã
+      commit một lần.
+  - |
+      Dòng `google` (native) CÓ TRONG BẢNG dù chưa có file adapter. Nó ở đó để
+      `phuong_ngu` là một cột THẬT chứ không phải trang trí: cửa đó chưa dùng
+      được, và phép chặn (b) từ chối kèm tên đọc được — đúng thiết kế.
+  - |
+      Cửa lạ ⇒ NÉM, không rơi về mặc định. Rơi im lặng nghĩa là gửi tài liệu tới
+      một nơi không ai khai. `kieu_auth` lạ cũng ném, không rơi về `bearer`:
+      gửi khoá theo cách cửa không nhận cho ra một 401 không ai đoán được vì sao.
+  - |
+      `cua=None` KHÔNG đi tiếp xuống adapter — `goi_qua_adapter` đọc bảng khai
+      khi không được truyền. Cùng lớp lỗi `tran=None` mà `AC-6.4` đã trả giá:
+      `None["bien_khoa"]` là `TypeError` GIỮA JOB.
+  - |
+      STREAM gom về CÙNG hình dạng `choices[0].message.content`. Nó đổi ĐƯỜNG
+      ỐNG, không đổi hợp đồng — `_boc` của adapter không phải biết mình đang đọc
+      stream hay không. Một hàm bóc rẽ hai nhánh là hai đường về cùng một hợp
+      đồng, và một trong hai sẽ mục.
+      `AC-6.1`/`AC-6.2` KHÔNG bị ảnh hưởng: log ghi TRƯỚC khi gửi, `sha256` băm
+      PAYLOAD GỬI ĐI. Cổng đo cả hai vế + "một lời gọi stream = ĐÚNG một dòng
+      log, không phải một dòng mỗi chunk".
+  - |
+      `headers` KHÔNG vào dòng log. `gui()` đổ mọi `kw` lạ vào log, và headers
+      chứa khoá API — một dòng `egress.jsonl` mang khoá là một khoá trong file
+      mà `ADR-06` không cho phép xuất, và log này CÓ đường ra (bản lùi). Cổng
+      đo bằng cách gieo một khoá thử rồi grep cả file.
+  - |
+      ASR: LÀM CẢ HAI LỐI, `dich_vu` ưu tiên 1. Nhưng chúng là HAI `loai` NGUỒN,
+      không phải hai nhánh trong `asr.py` — `T12-16` khai "asr.py KHÔNG import
+      egress, cổng canh bằng AST", còn lối `dich_vu` gửi audio RA NGOÀI. Gộp là
+      phá đúng cổng đang canh, và mất câu "lối này có tiêu egress không".
+  - |
+      KHOÁ CHƯA THẤY. Chủ dự án nói đã note API key, nhưng `BEEKNOEE_API_KEY`
+      không có trong env của shell này và không có file `.env` nào. ⇒ lời gọi
+      THẬT chưa chạy; mọi phép đo ở trên là transport giả + `/v1/models` (đường
+      mở, không cần khoá). Không hỏi khoá qua chat — dán khoá vào transcript là
+      một đường rò.
+
+keo_theo:
+  - |
+      NGƯỜI ký `FROZEN.lock`: `python core/tests/check_frozen.py --ky` sau khi
+      duyệt FR-059. Cổng đang ĐỎ đúng chỗ, và đó là dấu hiệu nó còn răng.
+  - |
+      Chưa gọi thật ⇒ ba thứ còn là GIẢ THUYẾT: `kieu_structured` theo nhà ·
+      `nguong_lech_schema` · hình dạng SSE của cửa. Đo được rồi thì sửa BẢNG,
+      không sửa mã.
+  - |
+      C4b sẵn sàng bắn: T12-14 (giấy + ký) → T12-15 → T12-13 → T12-16 →
+      T12-17 · song song T01-45 · T04-8 → cuối T03-108.

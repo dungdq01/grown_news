@@ -1,0 +1,90 @@
+id: WL-01K9X3ADR06XUAT
+at: 2026-09-02
+by: claude
+buoc: "ADR-06 muc (c) — du lieu goc trong DB moi VAN xuat ra file de backup, nhung chi BA trong nam bang"
+loai: quyet dinh kien truc (chu du an chot); lan thu hai trong cung phien, noi tiep ADR-06 (a)(b)
+gate: khong ky gate — day la ADR + rule, chua thi cong
+
+object:
+  - 04_system/adr.md                  # ADR-06 muc (c) + Doi thi viet lai
+  - 06_modules/M08_api/rules.md       # M08-R6 do_khi/xanh_khi/why + ve EXPORT
+  - 04_system/env_plan.md             # them khoi ADR-06 truoc muc "Cai KHONG dung"
+
+evidence:
+  - "check_g6a · check_ba · check_rule_surfaces · check_map · check_mermaid => xanh"
+  - "xuat_kho.py:227-235 — audit_log DA xuat ra kb/_audit.jsonl (do truc tiep, khong suy dien)"
+  - "M17 testcases.md:68 edge 2 — 'dong log KHONG chua ma da thu' (da co truoc, khong phai moi)"
+
+# ══ QUYET DINH ═══════════════════════════════════════════════════════════
+chi_dao_nguyen_van: >
+  "vay du lieu moi lam nhu du lieu cu di, site chinh .db con ta van xuat ra
+  duoc .md/.yaml de backup"
+  va truoc do: "cac phan ko nen thi xuat .txt logging -> co duoc ko"
+
+chot: >
+  BA bang xuat ra file (nguoi_dung · dinh_danh_kenh · nhap_chung_cat).
+  HAI bang KHONG xuat trang thai (ma_moi · phien) — dau vet cua chung song
+  trong audit_log duoi dang SU KIEN.
+
+tach_TRANG_THAI_voi_SU_KIEN: >
+  Day la vach chinh cua quyet dinh, va no tra loi dung cau hoi thu hai cua chu
+  du an ("xuat .txt logging co duoc ko").
+  TRANG THAI = "ma ABC123 con hieu luc toi 10:00" — khoi phuc no VO NGHIA (ma
+  het han roi) va NGUY HIEM (log khong het han, con ma thi co; chep ma vao log
+  la bien mot bi mat ngan han thanh mot bi mat vinh vien).
+  SU KIEN  = "14:03 tai khoan 3 dung mot ma moi — thanh cong" — day moi la thu
+  dang giu, va no DA duoc bat buoc tu truoc (FR-045 U4/U5 · M17 AC-3.3/AC-3.6).
+  => Cai chu du an muon KHONG phai mot co che moi. No da ton tai: audit_log ->
+  kb/_audit.jsonl. Viec cua ADR nay chi la NOI RO no phu cho hai bang khong xuat.
+
+TOI_DA_SAI_MOT_LAN_TRUOC_DO: >
+  O luot truoc toi viet trong ADR-06 phan "Vi": "xuat chung ra yaml de song sot
+  la SAI HANG" — noi ve CA NAM bang. Do la mot phep khai quat SAI: no dung voi
+  ma_moi va phien, va SAI voi ba bang con lai. Neu de nguyen, cau do se doc thanh
+  "du lieu goc khong duoc xuat ra file", tuc chan dung thu chu du an vua chot.
+  Da thu hep ve dung HAI bang, va tro sang muc (c).
+
+hai_he_qua_DA_GIAI:
+  backup: >
+    Luot truoc toi ghi "chua giai". Nay giai: ba bang dang cuu di dung duong
+    B-C1 (export -> git). Cau "backup rieng: van thua" o env_plan VAN DUNG,
+    nhung nay dung vi HAI ly do chu khong phai mot — kho dung lai duoc tu file,
+    VA ba bang goc cung xuat ra file. Mat mot trong hai ve thi cau do het dung.
+    Da them dung cau do vao env_plan chu khong chi sua chu.
+  gitignore: >
+    DB moi gitignore nhu _kho.sqlite; ba file export thi commit. Chinh la hinh
+    dang kb/ dang co. Khong con la mot lua chon phai quyet.
+
+hai_he_qua_MOI_—_chua_co_FR:
+  ca_nhan_vao_git: >
+    File export se chua chat_id + ten nguoi dung that. Trong git LOCAL thi khong
+    khac gi DB. Nhung `git push` len remote la CHUYEN DU LIEU CA NHAN RA NGOAI,
+    va B-E5 (ND 356/2025) ap vao — cung ho so DPIA ma M17 model_flow §6 da ghi
+    la chua ai lap.
+    Khong chan gi hom nay (repo chua push). Chan LAN PUSH DAU TIEN.
+    Ghi ra de lan do khong ai bam push ma khong biet minh dang bam gi.
+  vong_reap_cua_exporter: >
+    xuat_kho.py:141-146 xoa moi file khong co trong tap `can_co`. Ba bang moi
+    xuat ra file => chung PHAI nam trong tap do, khong thi moi lan xuat la moi
+    lan xoa sach ban backup vua ghi.
+    Day la DUNG rui ro S12 cua plan tach-ba-bang, tai xuat tren mot tap bang khac
+    — va lan do no da suyt xoa ca mot loai trong kho.
+    Cong bat buoc khi thi cong: xuat mot hang cua MOI bang roi doi file cua no
+    CON sau xuat() thu hai.
+
+rule_co_hai_chieu_bay_gio: >
+  M08-R6 truoc chi cam MOT chieu: du lieu goc khong duoc vao _kho.sqlite.
+  Nay them chieu thu hai: ba bang phai-xuat khong duoc song ma KHONG co duong
+  export. Mot bang goc khong export la mot bang mat khi o cung hong — va cai do
+  khong cong nao dang bat.
+  Lenh `check_db_dung_cho.py` VAN CHUA CAI. Ghi lai o day: rule co ba ve dung
+  hinh thuc nhung cho nao chua cai thi ve gate do KHONG TON TAI va khong ai bao.
+
+do_do:
+  khong_co_do_moi: "nam cong tren xanh; khong dong ma nao"
+
+no_con_lai:
+  - "check_db_dung_cho.py CHUA CAI — M08-R6 hien la van ban, chua co rang"
+  - "FR cho: du lieu ca nhan vao git truoc lan push dau tien"
+  - "FR cho: cong chong vong reap xoa file export cua ba bang moi"
+  - "FR-047 van CHUA thi cong — DDL nam bang + bay cua C1-C7"

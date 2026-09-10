@@ -1,0 +1,136 @@
+id: WL-01KA0U3VIECDUYET
+khi: 2026-09-04T13:05:00+07:00
+loai: ban_giao
+tac_nhan: claude-code
+viec: Ba việc chủ dự án duyệt 2026-09-04 — T12-12 (hai cmd chết + trần 32MB) · T04-7 (áp FR-058)
+module: M12_chungcat · M04_ci
+
+nguoi_quyet: |
+  Chủ dự án 2026-09-04: "1 - a" (tạo hai file cổng đúng tên, KHÔNG sửa spec
+  frozen) · "2 - ok" (số trần vào bảng khai + cổng đọc số thật) ·
+  "3 - duyệt đề xuất" (FR-058).
+
+object:
+  - path: 07_plan/M12_chungcat/tasks/T12-12-test-hai-cong-chet-va-tran-32mb.md
+  - path: 07_plan/M04_ci/tasks/T04-7-test-ap-fr058-vao-check-g6b.md
+  - path: .factory/fr/FR-058-chu-cho-artifact-he-thong.md   # ĐỀ XUẤT → ĐÃ DUYỆT
+  - path: chungcat/tests/check_chan_truoc_khi_goi.py        # MỚI — AC-4.5
+  - path: chungcat/tests/check_model_ngoai_bang.py          # MỚI — AC-4.6
+  - path: chungcat/tests/check_mot_cua_egress.py            # +4 vế AC-6.4
+  - path: chungcat/assets/nguong.json                       # + tran_payload_byte
+  - path: chungcat/src/bang_khai.py                         # + doc_tran_payload
+  - path: chungcat/src/adapter/hop_dong.py                  # + tran/allowlist/log
+  - path: chungcat/src/adapter/google.py                    # tran hết default None
+  - path: project_map.yaml                                  # FR-058 lớp A + mục he_thong
+  - path: core/tests/check_g6b.py                           # đọc he_thong + sys.executable
+  - base_sha: 8535a26                                       # chưa commit
+
+r5_do_truoc:
+  # Hai cổng MỚI: "đỏ trước" ở đây là chính `cmd` của spec KHÔNG CHẠY ĐƯỢC.
+  # Không có mã sản phẩm nào đi trước để phải đỏ — đơn vị việc LÀ cái cổng.
+  - luc: 2026-09-04T12:30:00+07:00
+    trang_thai: DO
+    lenh: python chungcat/tests/check_chan_truoc_khi_goi.py
+    ra: "No such file or directory — `cmd` của AC-4.5 (hard) không chạy được"
+  - luc: 2026-09-04T12:30:00+07:00
+    trang_thai: DO
+    lenh: python chungcat/tests/check_model_ngoai_bang.py
+    ra: "No such file or directory — `cmd` của AC-4.6 (hard) không chạy được"
+  - luc: 2026-09-04T12:52:00+07:00
+    trang_thai: DO
+    lenh: python chungcat/tests/check_chan_truoc_khi_goi.py   # bản đầu
+    ra: |
+      ĐỎ — 1 vế: (d) bảng khai CÓ một model khác khu vực gợi ý mặc định
+      (gợi ý mặc định ở `khong-xac-dinh`)
+    ghi_chu: |
+      Cổng ĐỎ OAN — xem `quyet_dinh` dưới. Đã sửa cách dựng ca, KHÔNG sửa dữ liệu.
+  - luc: 2026-09-04T13:00:00+07:00
+    trang_thai: XANH
+    lenh: cả 21 cổng chungcat/tests/*.py
+    ra: "21/21 exit 0 (19 cũ + 2 mới)"
+
+do_do:
+  - lenh: python core/tests/check_g6b.py
+    ket_qua: |
+      32 → 27 (FR-058 lớp A+B) → 26 (sửa `da_xanh`).
+      Hai dòng W5 của M12 biến mất (`check_chan_truoc_khi_goi` ·
+      `check_model_ngoai_bang` nay tồn tại và xanh).
+      `T08-16`/`T09-8` VẪN đỏ — đúng ý FR-058: chúng là lớp C.
+  - lenh: python -m pytest core/tests -q
+    ket_qua: 45 passed
+  - lenh: cd web && npm test
+    ket_qua: 2877 ok · 0 FAIL · exit 0
+
+do_do_boi: chua-quy-duoc-chu
+
+quyet_dinh:
+  - |
+      HAI CỔNG MỚI KHÔNG PHẢI PHÉP ĐỔI TÊN. Đọc kỹ spec thì phép đo cũ THIẾU VẾ:
+        · AC-4.5 đòi gieo BỐN ca §4.0b — cũ gieo HAI;
+        · AC-4.5 đòi 0 DÒNG `egress.jsonl` — cũ không đụng log. Vế này quan trọng
+          nhất: `da_goi == 0` chỉ nói transport chưa chạy; `egress.gui` ghi log
+          TRƯỚC khi gửi (AC-6.1), nên "chặn muộn" để lại một dòng có `sha256` của
+          dữ liệu kho dù không byte nào ra Internet.
+        · AC-4.6 đòi gọi THẲNG `:8790` — cũ gọi `dinh_tuyen.quyet_dinh()` TRONG
+          TIẾN TRÌNH, tức đo THƯ VIỆN chứ không đo CỬA. `do_POST` có thể quên gọi
+          nó hoặc nuốt exception mà phép đo cũ vẫn xanh.
+  - |
+      Cổng AC-4.6 đo cả hàng đợi, không chỉ mã HTTP: 4xx mà việc VẪN vào hàng đợi
+      nghĩa là chặn SAU chỗ cần chặn, và worker sẽ nhặt nó lên.
+  - |
+      Cổng AC-4.5 có vế ĐỐI CHỨNG (một lời gọi hợp lệ ghi ĐÚNG 1 dòng). Không có
+      nó thì "0 dòng" cũng đúng khi đường log chết hẳn — cổng không đỏ được.
+  - |
+      CA (d) DỰNG TỪ DÒNG BẢNG TẠM, không từ `model.json`. Đo được: cả BA dòng
+      mang `khu_vuc: khong-xac-dinh` ⇒ phép so `!=` không bao giờ đúng. Đó KHÔNG
+      phải lỗi của bảng — `T12-11` chốt "giữ `khong-xac-dinh` khi chưa xác minh
+      route gateway, KHÔNG điền đại một khu vực cho đẹp". Biến một lời khai trung
+      thực thành cổng đỏ là `#cổng-đỏ-oan`. Cổng đo NHÁNH MÃ; "bảng đã điền khu
+      vực thật chưa" là câu hỏi của T12-11, có ô backlog riêng.
+  - |
+      TRẦN 32MB vào `nguong.json`, KHÔNG vào `model.json`: trần thuộc CỬA EGRESS,
+      không thuộc một model — mọi lời gọi ra Internet đi qua nó, kể cả lối
+      `tai_ve` không gọi model. Để nó thành cột của model.json là bốn trần cho
+      một cửa, và mỗi nhà mới là một lần quên điền.
+  - |
+      `doc_tran_payload` KHÔNG có default. Một default là cách trần 32MB im lặng
+      thành số khác khi bảng khai mất khoá — vẫn chặn, vẫn xanh, chỉ chặn ở một
+      ngưỡng không ai khai. `KeyError` là câu trả lời đúng.
+  - |
+      `google.goi` bỏ `tran=None`: một default `None` đi thẳng vào `len(...) >
+      None` ⇒ `TypeError` GIỮA JOB, sau khi tài liệu đã đọc xong.
+  - |
+      `da_xanh` của `check_g6b` chạy `sys.executable` thay vì chữ `python`. Đo
+      được: `check_reject_reason.py` XANH dưới `.venv`, exit 1 với "Thiếu phụ
+      thuộc" qua `python` trần ⇒ W5 báo "chưa xanh" cho một cổng đang xanh. Cổng
+      đỏ vì SAI INTERPRETER dạy người đọc bỏ qua dòng W5 — mất đúng thứ W5 canh.
+  - |
+      FR-058 KHÔNG gộp cả 13 FAIL boundary vào một rổ: chúng là BA bài toán.
+      Lớp C (`T08-16`, `T09-8`) là BUILD khai sai thành PATCH — nới boundary cho
+      nó là gỡ đúng cái răng đang cắn. FR cố ý để chúng đỏ.
+
+ghi_them_sau_khi_chay_cong:
+  - |
+      Hai task file vừa tạo TỰ LÀM check_g6b đỏ thêm 4 dòng — đã sửa, ghi ra vì
+      cả bốn là lỗi thật của plan chứ không phải nhiễu:
+        · tên file không chứa "test" ⇒ R1 báo "chạm file test mà không phải đơn
+          vị test". Cả hai đơn vị SINH RA cổng, tức chúng LÀ đơn vị test ⇒ đổi tên
+          file (T12-12-test-… · T04-7-test-…), không nới luật.
+        · T04-7 khai ghi `project_map.yaml` ⇒ ngoài boundary M04_ci. ĐÚNG, và
+          KHÔNG sửa bằng cách thêm map vào `he_thong`: map là thứ KHAI RA mọi
+          boundary, cho một task ghi vào nó là để bên bị đo sửa chính cái thước,
+          ở tầng cao nhất. ⇒ Bump map là hành động của PM (s7), đúng tiền lệ
+          FR-056. Đã bỏ khỏi `phạm_vi_ghi`; thay đổi map ghi ở entry này.
+        · `phụ_thuộc: FR-058` ⇒ "không tồn tại": cổng chỉ phân giải ID TASK. Để
+          trống — FR đã duyệt nên không còn là việc phải chờ.
+  - |
+      check_g6b sau khi sửa: 26 lỗi, và cả T12-12 lẫn T04-7 sạch ở cả 5 mục.
+
+keo_theo:
+  - |
+      `chungcat/tests/**` là đất `T12-8` theo plan M12, mà `T12-12` chạm ba file
+      ở đó (hai file MỚI + `check_mot_cua_egress.py` của T12-8). `<scope-check>`
+      sẽ thấy hai task tranh cùng thư mục. Đã mở ô backlog M12 — NGƯỜI chọn ở G6C.
+  - |
+      `T08-16` · `T09-8` cần đổi đường (BUILD hoặc tách theo module chủ) — FR-058
+      §3 ghi rõ, chưa có đơn vị nhận.

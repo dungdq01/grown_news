@@ -1,0 +1,77 @@
+# Phụ thuộc của M12_chungcat — MỘT chỗ khai.
+#
+# VÌ SAO FILE NÀY TỒN TẠI
+# PM bắt được (giám sát 2026-09-03): ba gói mới (`rapidfuzz`, `pdfplumber`, và
+# `httpx` khi egress gọi thật) chỉ sống trong `.venv` của một máy. CI không cài
+# chúng ⇒ sáu cổng M12 sẽ đỏ vì `ImportError` ngay lần CI đầu — **đỏ sai lý do**,
+# đúng thứ `workflow §1a` cấm. Một phụ thuộc không có chỗ khai là một phụ thuộc
+# chỉ đúng trên máy người vừa cài nó.
+#
+# KHÔNG khai vào `core/pyproject.toml`: đó là đất của M01_core, và ghi vào đó là
+# ghi ngoài `phạm_vi_ghi` (R1).
+#
+# `chungcat` KHÔNG phải package cài được — nó là một dịch vụ chạy tại chỗ. File
+# này tồn tại để `pip install -e ./chungcat` gom đủ phụ thuộc, và để cổng có một
+# chỗ ĐỌC ĐƯỢC khi cần đối chiếu.
+
+[project]
+name = "grown-chungcat"
+version = "0.1.0"
+description = "M12_chungcat — nguyên liệu trong kho thành bản nháp (vùng THỢ)"
+requires-python = ">=3.13"        # ADR-02 + FR-005 — cùng bản pin với M01_core
+
+dependencies = [
+    # Định vị lại quote (AC-3.2). `partial_ratio_alignment` trả CẢ điểm lẫn vị
+    # trí nên nó cho luôn `neo` mà `V` cần, không phải chạy phép thứ hai.
+    "rapidfuzz>=3.14,<4",
+
+    # Đọc PDF THEO TRANG — số trang là CẤU TRÚC, không phải suy ra. MIT.
+    # KHÔNG dùng PyMuPDF (AGPL) hay nhóm PDF→Markdown (làm mất biên trang):
+    # xem `chungcat/assets/model.json` khoá `thu_vien_pdf`.
+    "pdfplumber>=0.11,<1",
+
+    # Transport của cửa egress duy nhất. Nạp LƯỜI trong `egress.py` để cổng
+    # chạy được mà không cần gói này — nhưng lời gọi THẬT thì cần.
+    "httpx>=0.27,<1",
+
+    # TikTok CHAN client khong gia dang TLS fingerprint trinh duyet. Do
+    # 2026-09-09 tren URL that: khong co goi nay thi `yt-dlp` tra
+    #   ERROR: [TikTok] <id>: Unexpected response from webpage request
+    # — mot cau KHONG noi thieu gi, chi bao "hay bao issue len GitHub", nen no
+    # dan nguoi doc di sai duong. Manh moi that nam o dong bi cat cut phia
+    # tren: "...rmation on installing the required dependencies".
+    # Co goi nay thi `--list-impersonate-targets` co Chrome-133 va anh bia
+    # TikTok lay ve binh thuong (nghiem thu: JPEG 4 761 B, the hien 540x960).
+    # KHAI o day chu khong cai tay trong .venv: may tiep theo se do y het voi
+    # cung mot cau loi dan sai duong.
+    "curl_cffi>=0.7",
+
+    # Đường VIDEO (`FR-054`) — tải AUDIO của một bản ghi video về Maildir của
+    # job. Unlicense. Cần cho CẢ HAI lối ASR: lối `dich_vu` phải có byte audio
+    # để GỬI, lối `ytdlp-asr-local` phải có byte để phiên âm tại chỗ.
+    # `worker._tai_audio` gọi nó qua `egress.gui()` (`M12-R3`), không tự mở
+    # socket — nên `tieu_egress: false` mà host vẫn qua allowlist (`AC-V4`).
+    "yt-dlp>=2024.1",
+]
+
+# ── ASR LOCAL · CHỌN, không mặc định ────────────────────────────────────────
+[project.optional-dependencies]
+asr = [
+    # Lối `ytdlp-asr-local` của `nguon-transcript.json` (`uu_tien: 3`).
+    # TÁCH khỏi `dependencies` vì nó kéo CTranslate2 + tải model ~500 MB lần
+    # chạy đầu — một người chỉ dùng lối `dich_vu` (uu_tien 1) không nên phải
+    # trả giá đó. `asr.py` ném `ThieuAsr` kèm câu `pip install` khi vắng.
+    "faster-whisper>=1.0",
+]
+
+# ⚠️ KHÔNG có nhóm `dev`: cổng của M12 là script
+# `python chungcat/tests/check_*.py`, không phải `pytest`. Thêm `pytest` vào đây
+# là mời một khung test thứ hai vào một module chưa cần nó.
+
+[tool.setuptools]
+packages = []                     # dịch vụ chạy tại chỗ, không phải package
+
+# ⚠️ CHƯA VÀO CI. `.github/workflows/ci.yml` hiện chỉ cài `./core[dev]`. Thêm
+# bước cài `./chungcat` là việc của M04_ci (đất `.github/**`) — ô backlog đã mở.
+# Tới lúc đó, sáu cổng M12 chưa chạy trên CI, và điều đó phải được KHAI chứ
+# không để người ký G6C tưởng chúng đang được canh.

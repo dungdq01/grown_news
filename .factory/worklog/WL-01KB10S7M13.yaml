@@ -1,0 +1,18 @@
+id: WL-01KB10S7M13
+luc: 2026-09-07T (phien PM)
+ai: claude (PM)
+viec: s7 plan M13 truy hoi — 9 don vi + rule.md muc 11 (THO goi THO, web wrapper)
+object:
+  - 07_plan/M13_truyhoi/tasks/ (T13-0..6)
+  - 07_plan/M08_api/tasks/T08-35-cua-kho-delta-va-proxy-tim.md
+  - 07_plan/M03_web/tasks/T03-125-ui-tim-toan-van.md
+  - .claude/rule.md (muc 11)
+noi_dung: |
+  Chot tu brainstorm cung chu du an: service rieng :8791 · dai Han = bang khai
+  M01 (FR-067 se mo o T13-0) · chuan_hoa moi ben mot ban + cong doi chieu ·
+  indexer doc qua API kho-delta (khong doc kb/ export — FR-034) · poke
+  fire-and-forget sau ghiSauValidate · UI lam luon voi 6 luat chong-sua-lai
+  rut tu M12. Thu tu ban: T13-0 (giay+FR) -> T13-1 (test do truoc) ->
+  T08-35 -> T13-2 -> T13-3 -> T13-4 -> T13-5 -> T13-6 -> T03-125 (wireframe
+  SCR-22 -> NGUOI duyet -> code). check_g6b: 9/9 don vi ok.
+  PLAN LA SOFT — cho chu du an duyet truoc khi ban dev.

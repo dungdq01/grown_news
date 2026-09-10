@@ -1,0 +1,23 @@
+{"stt": 1, "khi": "2026-08-29", "bang": "categories", "hanh_dong": "THEM", "doi_tuong": "aitalkshow", "chi_tiet": "{\"label_vi\":\"AI - talkshow\",\"gom\":\"talkshow\"}"}
+{"stt": 2, "khi": "2026-08-29", "bang": "concepts", "hanh_dong": "THEM", "doi_tuong": "talkshow", "chi_tiet": "{\"label_vi\":\"Talkshow\"}"}
+{"stt": 3, "khi": "2026-08-29", "bang": "categories", "hanh_dong": "SUA", "doi_tuong": "aitalkshow", "chi_tiet": "{\"da_sua\":[\"label_vi\",\"gom\"],\"them_alias\":[]}"}
+{"stt": 4, "khi": "2026-08-29", "bang": "categories", "hanh_dong": "THEM", "doi_tuong": "algorithm", "chi_tiet": "{\"label_vi\":\"Machine Learning\",\"gom\":\"thuật toán , đại số , giải tích , cấu trúc dữ liệu ...\"}"}
+{"stt": 5, "khi": "2026-08-29", "bang": "categories", "hanh_dong": "XOA", "doi_tuong": "algorithm"}
+{"stt": 6, "khi": "2026-08-29", "bang": "categories", "hanh_dong": "THEM", "doi_tuong": "ml", "chi_tiet": "{\"label_vi\":\"Machine Learning\",\"gom\":\"thuật toán , đại số , giải tích , cấu trúc dữ liệu ...\"}"}
+{"stt": 7, "khi": "2026-08-29", "bang": "concepts", "hanh_dong": "THEM", "doi_tuong": "algorithm", "chi_tiet": "{\"label_vi\":\"Algorithm\"}"}
+{"stt": 8, "khi": "2026-09-04", "bang": "categories", "hanh_dong": "THEM", "doi_tuong": "hcsy", "chi_tiet": "{\"label_vi\":\"computer system\",\"gom\":\"Hệ điều hành , phần cứng , phần mềm , CLI ...\"}"}
+{"stt": 9, "khi": "2026-09-05", "bang": "categories", "hanh_dong": "THEM", "doi_tuong": "skill", "chi_tiet": "{\"label_vi\":\"Skill Agent\",\"gom\":\"claude.md , agent.md , hook ....\"}"}
+{"stt": 10, "khi": "2026-09-05", "bang": "concepts", "hanh_dong": "THEM", "doi_tuong": "agent", "chi_tiet": "{\"label_vi\":\"Ứng dụng AI Agent\"}"}
+{"stt": 11, "khi": "2026-09-05", "bang": "concepts", "hanh_dong": "THEM", "doi_tuong": "hermes", "chi_tiet": "{\"label_vi\":\"Hermes Agent\"}"}
+{"stt": 12, "khi": "2026-09-07", "bang": "categories", "hanh_dong": "THEM", "doi_tuong": "business", "chi_tiet": "{\"label_vi\":\"Business Strategy\",\"gom\":\"Phân tích , chiến lược, vận hành , supply demand\"}"}
+{"stt": 13, "khi": "2026-09-07", "bang": "concepts", "hanh_dong": "THEM", "doi_tuong": "news", "chi_tiet": "{\"label_vi\":\"Tin tức\"}"}
+{"stt": 14, "khi": "2026-09-07", "bang": "categories", "hanh_dong": "THEM", "doi_tuong": "ops", "chi_tiet": "{\"label_vi\":\"devops\",\"gom\":\"devops , llmops/ mlops\"}"}
+{"stt": 15, "khi": "2026-09-07", "bang": "categories", "hanh_dong": "THEM", "doi_tuong": "db", "chi_tiet": "{\"label_vi\":\"database\",\"gom\":\"database và các kỹ thuật\"}"}
+{"stt": 16, "khi": "2026-09-07", "bang": "categories", "hanh_dong": "THEM", "doi_tuong": "dev", "chi_tiet": "{\"label_vi\":\"develop\",\"gom\":\"coding, BE ,FE , design, test ,...\"}"}
+{"stt": 17, "khi": "2026-09-07", "bang": "categories", "hanh_dong": "SUA", "doi_tuong": "ops", "chi_tiet": "{\"da_sua\":[\"label_vi\",\"gom\"],\"them_alias\":[]}"}
+{"stt": 18, "khi": "2026-09-07", "bang": "categories", "hanh_dong": "SUA", "doi_tuong": "db", "chi_tiet": "{\"da_sua\":[\"label_vi\",\"gom\"],\"them_alias\":[]}"}
+{"stt": 19, "khi": "2026-09-07", "bang": "categories", "hanh_dong": "SUA", "doi_tuong": "dev", "chi_tiet": "{\"da_sua\":[\"label_vi\",\"gom\"],\"them_alias\":[]}"}
+{"stt": 20, "khi": "2026-09-07", "bang": "categories", "hanh_dong": "THEM", "doi_tuong": "sa", "chi_tiet": "{\"label_vi\":\"Software Architecture\",\"gom\":\"system design , tech lead ,software\"}"}
+{"stt": 21, "khi": "2026-09-07", "bang": "categories", "hanh_dong": "THEM", "doi_tuong": "dl", "chi_tiet": "{\"label_vi\":\"deep learning\",\"gom\":\"mạng nơ-ron và kiến trúc\"}"}
+{"stt": 22, "khi": "2026-09-07", "bang": "categories", "hanh_dong": "SUA", "doi_tuong": "dl", "chi_tiet": "{\"da_sua\":[\"label_vi\",\"gom\"],\"them_alias\":[]}"}
+{"stt": 23, "khi": "2026-09-07", "bang": "categories", "hanh_dong": "THEM", "doi_tuong": "sba", "chi_tiet": "{\"label_vi\":\"Solution architecture\",\"gom\":\"AI platform/product\"}"}

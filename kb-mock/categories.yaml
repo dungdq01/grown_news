@@ -1,0 +1,51 @@
+# Danh mục CHỦ ĐỀ — bản đọc-được-cho-web của enum `category`.
+#
+# CHÂN LÝ là enum trong core/assets/frontmatter.schema.json (frozen).
+# File này PHẢI khớp enum đó — core/tests/check_danh_muc.py canh hai bên.
+# Sửa một bên mà quên bên kia thì cổng đỏ, không lệch im lặng được.
+#
+# Vì sao có file này: form tạo bài trên web cần nhãn để render. Trước đây
+# 6 giá trị được gõ tay trong shell.html — bản copy thứ ba của cùng một
+# sự thật, không ai canh. Giờ web đọc qua GET /api/categories.
+#
+# Thêm chủ đề mới: sửa enum trong schema (file frozen ⇒ cần FR) VÀ file này.
+# Đối lập với kb/concepts.yaml: đó là chân lý của chính nó; đây là bản dẫn xuất.
+#
+# Sáu mảng và ranh giới giữa chúng: FR-009-category-thay-tags.md
+
+# ĐÃ XOÁ SẠCH (FR-031) — người dùng nhập lại từng mục.
+# Phải khớp enum `category` trong CẢ HAI bản schema (đều rỗng) —
+# core/tests/check_danh_muc.py canh hai bên.
+- id: aitalkshow
+  label_vi: AI - talkshow
+  gom: talkshow / diễn đàn / present
+- id: ml
+  label_vi: Machine Learning
+  gom: thuật toán , đại số , giải tích , cấu trúc dữ liệu ...
+- id: hcsy
+  label_vi: computer system
+  gom: Hệ điều hành , phần cứng , phần mềm , CLI ...
+- id: skill
+  label_vi: Skill Agent
+  gom: claude.md , agent.md , hook ....
+- id: business
+  label_vi: Business Strategy
+  gom: Phân tích , chiến lược, vận hành , supply demand
+- id: ops
+  label_vi: Devops
+  gom: devops , llmops/ mlops
+- id: db
+  label_vi: Database
+  gom: database và các kỹ thuật
+- id: dev
+  label_vi: Develop
+  gom: coding, BE ,FE , design, test ,...
+- id: sa
+  label_vi: Software Architecture
+  gom: system design , tech lead ,software
+- id: dl
+  label_vi: Deep learning
+  gom: mạng nơ-ron và kiến trúc
+- id: sba
+  label_vi: Solution architecture
+  gom: AI platform/product

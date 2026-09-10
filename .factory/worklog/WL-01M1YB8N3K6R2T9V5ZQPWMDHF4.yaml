@@ -1,0 +1,102 @@
+ulid: 01M1YB8N3K6R2T9V5ZQPWMDHF4
+thoi_diem: 2026-09-07T14:05+07:00
+tac_nhan: claude-opus-5
+loai: ban_giao
+module: M03_web
+don_vi: T03-123 · cửa sổ chưng cất riêng, mở sau transcript · kèm wireframe SCR-22
+
+viec: >
+  Chủ dự án: *"Làm luôn task T03-123, sau đó tôi review 1 lượt sau. Nhớ ký note
+  của tôi nhé: UI và animation lúc transcript / chưng cất phải hiệu ứng 3D,
+  superpower…"*.
+
+r5_do_truoc:
+  - don_vi: T03-123
+    lenh: node web/test/chung-cat-sau-transcript.test.js
+    ket_qua: "ĐỎ 12 vế"
+    đỏ_do: claude-opus-5
+
+do_sau:
+  - lenh: node web/test/chung-cat-sau-transcript.test.js
+    ket_qua: pass — 13/13 vế
+  - lenh: cd web && npm test
+    ket_qua: exit 0 · 3247 vế ok · 0 FAIL
+  - lenh: python core/tests/check_g6b.py
+    ket_qua: 5 lỗi — TẤT CẢ M18, 0 lỗi M03
+
+hinh_dang:
+  nut_ba_trang_thai: >
+    `data-act="cc-rieng"` — act RIÊNG, KHÔNG mượn act của nút sinh-transcript
+    (nút ấy của video đang mở phiếu TRANSCRIPT theo `T03-108`, và mượn nó là
+    sửa một đường đã chốt).
+    Ba câu KHÁC nhau: *cần transcript trước* (mờ) · *đang sinh transcript…*
+    (mờ, vá sau khi hỏi hàng đợi) · *⚗ Chưng cất…* (sáng).
+  cua_so_thu_ba: >
+    Bấm ⇒ `hoi()` hỏi `chi_dan` ⇒ `POST /api/job` ⇒ mở cửa sổ `kieu:"chungcat"`
+    đặt CẠNH cửa sổ nguồn. Tiến trình + kết quả nằm TRONG cửa sổ ấy; xong thì
+    nó đổ CHÍNH bản nháp vào cùng chỗ kèm bộ nút duyệt.
+  chiu_mang_chop: "60 nhịp (~90s) mới bỏ cuộc — cùng khuôn `theoDoiBac` của `T03-121`"
+
+chay_that:
+  - "video CÓ transcript: nút «⚗ Chưng cất…» SÁNG"
+  - "video CHƯA có: nút «⚗ cần transcript trước», `disabled`"
+  - >
+    bấm ⇒ hộp thoại *Chưng cất từ transcript* ⇒ POST body
+    `{loai:"chung-cat-mot-nguon", slug:"video/cai-dat-…", chi_dan:"viết cho lập trình viên"}`
+  - "cửa sổ 2 → **3**, tiêu đề `CHƯNG CẤT · Cài Đặt và Thiết Lập Hermes trên VPS`"
+  - "POST bị CHẶN ở tầng `fetch` — chứng minh đủ đường mà KHÔNG tiêu tiền model"
+
+bon_lan_bi_cong_chan_va_KHONG_noi_cong:
+  - ten: "`gn.js` vỡ trần 90 byte (102490/102400)"
+    xu_ly: >
+      KHÔNG nới trần chung. Chuyển hàm vá `veNutChungCatRieng` sang CHUNK
+      `cctab` — nó chỉ chạy cho bản ghi video và nó gọi mạng, nên để trong
+      bundle chung là bắt mọi trang tải một thứ một loại màn dùng.
+      Sau: **101 932 / 102 400**.
+  - ten: "`chung-cat-ui`: chỉ MỘT chỗ dựng nút — thấy 2"
+    goc: >
+      Lần thứ NĂM trong phiên: cổng quét nguyên văn nguồn và đọc phải CHÚ
+      THÍCH của tôi — câu giải thích *vì sao không mượn `data-act="chung-cat"`*
+      chứa đúng chuỗi ấy.
+    xu_ly: "viết lại chú thích, không nới cổng"
+  - ten: "`viec-theo-loai`: tiêu đề không được gõ cứng 'Chưng cất'"
+    xu_ly: >
+      Cổng ĐÚNG — nhãn phải dẫn xuất từ loại việc. Đổi sang
+      `tenLoai(\"chung-cat-mot-nguon\")`, dùng lại bảng đã có. Sửa này làm mã
+      TỐT HƠN, không phải nhượng bộ.
+  - ten: "cổng của CHÍNH tôi đo nhầm file"
+    xu_ly: >
+      Chuỗi «đang sinh» theo hàm sang chunk; cổng vẫn soi `multiwindow`. Sửa
+      phép đo để nó soi CẢ HAI file thay vì đoán hàm nằm đâu.
+
+ky_note_cua_chu_du_an:
+  da_lam: >
+    Viết `05_uiux/wireframes/SCR-22-nhip-sinh.md` — chép NGUYÊN VĂN note vào
+    đầu file để nó không rơi, và trả lời câu khó nhất bằng số:
+  cau_kho_nhat: >
+    Dải tần số vẽ từ ĐÂU? FE **không có** byte audio — audio sống ở thợ và
+    không bao giờ tới trình duyệt (`M12-R1`). Không `AudioContext`, không FFT,
+    không phổ thật.
+  chon_loi_a: >
+    Dải lấy nhịp từ **cue thật** (số cue mới + số ký tự mới mỗi nhịp poll).
+    Lối (b) — dải ngẫu nhiên — đẹp hơn nhưng NÓI DỐI: một dải nhảy múa trong
+    lúc thợ đã chết là thứ tệ hơn không có dải. Chuyển động phải là một PHÉP
+    ĐO, không phải một lớp trang trí.
+  chung_cat_khac: >
+    Chưng cất KHÔNG có âm thanh ⇒ vòng xoay 3D, không dải tần số. Vẽ dải ở đây
+    là mượn hình của một việc khác — cùng lỗi «mượn màu của chiều phân loại
+    khác» mà `SCR-20` đã cấm. Và KHÔNG có thanh %: ta không biết model còn bao
+    lâu, bịa một con số là hứa thứ mình không đo được.
+  ngan_sach: "hiệu ứng đi HẲN vào chunk — `gn.js` chỉ còn 468 byte"
+
+chua_lam:
+  - "T03-124 bước 2 (mã hiệu ứng) — chờ chủ dự án duyệt `SCR-22`, `AC0`"
+  - "`FR-070` chờ duyệt (spec M12 frozen)"
+
+object:
+  - web/plugins/multiwindow/src/scripts/multiwindow.inline.ts
+  - web/plugins/cctab/src/cctab.inline.ts
+  - web/test/chung-cat-sau-transcript.test.js
+  - web/package.json
+  - 05_uiux/wireframes/SCR-22-nhip-sinh.md
+  - 07_plan/M03_web/tasks/T03-110b-test-tab-theo-doi.md

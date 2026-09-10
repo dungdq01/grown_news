@@ -1,0 +1,76 @@
+id: WL-01K9S2FR041KHO
+at: 2026-08-29
+by: claude
+buoc: s8 (M03_web T03-80 code + T03-81 test) — duong PATCH co FR cua /factory:go
+loai: redesign bieu do man /kho — moi cau hoi mot hinh dang + chuyen dong mot nhip
+wo: .factory/wo/WO-036-bieu-do-kho-cung-mot-form.md
+fr: .factory/fr/FR-041-kho-moi-cau-hoi-mot-hinh-dang.md (ui_frozen v1.17 -> v1.18)
+
+object:
+  - web/render/trang.mjs                          # 5 vung doi hinh
+  - web/plugins/home-motion/src/home-motion.inline.ts   # 4 ham ve + demSo nhan .dn-v
+  - web/styles/prototype.css                      # khoi FR-041 + don .kf-col/.kf-c mo coi
+  - web/test/kho-hinh-dang.test.js                # cong MOI
+  - web/test/{bon-trang-thai,bay-man,opacity-khong-pha-contrast}.test.js
+  - web/package.json                              # npm test + kho-hinh-dang
+  - web/{WORKLOG,test/WORKLOG,styles/WORKLOG}.md
+  - project_map.yaml                              # ui_frozen bump, doc lai ngay truoc khi sua
+  - .factory/wo/WO-036* · .factory/fr/FR-041*
+  - 07_plan/M03_web/tasks/T03-{80,81}*.md
+
+do_truoc_khi_sua: "man Kho: 7 bo du lieu / 3 hinh — bar ngang x3, thanh chia doan x3. FR-031 tu de 'ba goc nhin ba HINH DANG' ma khong cong nao canh => mon."
+
+ban_do_hinh_moi:
+  kpi2: "donut SVG (pathLength=100, dasharray %), tam = tong dem 0->n qua demSo"
+  bars2: "luoi o — 1 o = 1 bai, mau theo --c-<loai>, qua 120 o thi data-o khai 'moi o ~ N bai'"
+  bars3: "bac thang can giua — thu tu cua THANG DO (schema), rong mang ti le; bac 0 bai VAN dung (thang khong co lai theo du lieu)"
+  bars4: "vong doi — node theo TRANG_THAI tu schema, mui ten CSS pseudo; bon-trang-thai §4b van xanh vi giu vong lap TRANG_THAI"
+  kf-thang: "duong vung SVG ve dan (dashoffset); mot thang duy nhat => suy bien thanh cham, khong ve ho du lieu"
+  giu: "kf-nguon (thanh chia doan) · kf-uutien (bar) · khoi 3D — moi hinh con lai gio xuat hien dung MOT lan"
+
+chuyen_dong: >
+  MOT NHIP khi vao tam nhin, khong vong lap (ranh gioi FR-027i giu nguyen).
+  4 ham moi trong home-motion cam vao CHINH IntersectionObserver dang co;
+  reduced => dat thang gia tri cuoi; CSS reduced-motion TRA VE trang thai hien
+  du (opacity:1, dashoffset:0) — nguoi tat chuyen dong van thay du bieu do.
+
+# ══ PHAN DANG GIA NHAT ══════════════════════════════════════════════════
+kiem_hai_chieu_bat_duoc_CHINH_CONG:
+  ca: "go chot `if (reduced)` khoi veLuoiO => cong VAN XANH"
+  vi_sao: "phep kiem khop chu 'reduced' — ma COMMENT giai thich cung nhac chu do"
+  sua: "bo comment truoc khi soi + khop MA `if (reduced)`; go chot that => DO dung mot dong"
+  bai_hoc: "cung lop loi 'khop vao binh luan cua chinh minh' da ghi o WL-01K9KCGOPKHO — lan nay o phia TEST"
+
+phep_do_vong_lap_sai_tu_goc:
+  ban_dau: "dem so cho goi rAF/setInterval so voi bang so cung => tu do oan (rAF mot-nhip khong phai vong lap)"
+  sua: "do TINH LAP: moi setInterval phai co duong dung (dem clearInterval), khong rAF de quy (callback tu dat lai chinh no)"
+
+an_kieng_markup_47_byte_cuoi:
+  boi_canh: "shell lap o MOI trang => moi byte cua vung kho nhan voi so trang; trang chu tran 60KB, vuot 679B roi 26B"
+  bon_nhat: "mau + hinh hoc don vao CSS (geometry props cho circle, mau node theo [data-st]) · stagger theo NHOM thay tung o · mui ten vong doi bang pseudo thay 3 phan tu · the SVG rong tu dong (foreign content)"
+  ket_qua: "61909 -> 61466 -> qua tran (61440)"
+
+heredoc_lan_thu_TU: >
+  Patch chua regex `\\n` qua bash heredoc lai vo — lan thu tu trong du an.
+  Theo R4 da DOI CONG CU giua chung: cac patch sau viet bang Write ra file .py
+  roi chay, khong nhung chuoi escape qua heredoc nua. Cho da vo sua bang Edit.
+
+evidence:
+  - "node web/test/kho-hinh-dang.test.js => pass (8 hinh x1 · chot reduced doc tu MA · setInterval co duong dung · SVG khong hex)"
+  - "kiem hai chieu: bars3 tra ve tp-b => 2 FAIL · go chot reduced => 1 FAIL · hoan nguyen => pass"
+  - "77/78 test web xanh; do duy nhat: he-kinh (anh 708KB co tu 08-28 20:33, khong thuoc FR nay)"
+  - "22/26 cong Python xanh; 4 do la bo cu cua phien kia (schema frozen chua ky keo theo frozen/danh_muc/skill/running)"
+  - "check_g6b => 148 task · check_worklog => 4 file khop"
+  - "page-weight: trang chu 61466/61440 QUA sau 3 dot an kieng"
+
+khong_dung_vao:
+  - "du lieu, cach dem, nen dem (tatCa/appr/phanTich) — 0 doi"
+  - "moc id cac vung — giu nguyen => spec M03 (FROZEN) khong phai sua, KHONG ky lai FROZEN.lock"
+  - "kf-nguon · kf-uutien · khoi 3D · hang KPI · thung rac"
+  - "public/** — anh 708KB do nguoi khac them, khong chay toi_uu_anh_nen ho vi public/ dang co file do cua phien kia"
+
+no_con_lai:
+  - "NGUOI CHOT: mo /kho/ (F5) — donut quet cung + tam dem so · luoi o no so le · bac thang rong dan · vong doi nay node · duong vung ve dan; bat reduced-motion thi moi thu hien thang du"
+  - "anh alexander-slattery 708KB > tran 500KB — chay `python core/tools/toi_uu_anh_nen.py` (viec cua chu anh)"
+  - "kf-nguon/kf-uutien trong vong xoay pane: sparkline khong tu ve lai khi pane quay vong (mot-nhip la luat); neu nguoi dung muon ve lai moi luot pane thi mo WO rieng"
+  - "wireframe trong FR la ASCII — chua co ban click-thu; nguoi dung xem truc tiep tren /kho/"

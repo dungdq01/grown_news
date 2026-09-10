@@ -1,0 +1,13 @@
+at: 2026-08-18T02:20Z
+agent: claude
+step: s1-s3 / toàn dự án
+did: >
+  Chạy s1-s3 ở chế độ phục dựng + thẩm định (dự án đã có code).
+  s1: khảo 4 nhóm giải pháp qua 4 truy vấn WebSearch, mỗi fact có nguồn + ngày,
+  ba nhãn fact/suy luận/giả định. Kết luận: base khớp 4/5 khoảng trống, không
+  phần nào phát minh lại bánh xe.
+  s2: proposal — 6 scope-in, 8 scope-OUT, 4 nhóm metric có số và cách đo.
+  s3: BRD 13 ràng buộc (mỗi cái có chỗ tiêu thụ), PRD 7 mục U, spec 4 module.
+  Kiểm truy ngược bằng máy: 0 lỗi. Đã sửa 6 lỗi phát hiện ở lượt kiểm đầu —
+  B-D1 thiếu chỗ tiêu thụ, và 5 scope-in chưa có bảng truy về module.
+object: 01_research/ 02_proposal/ 03_docs/

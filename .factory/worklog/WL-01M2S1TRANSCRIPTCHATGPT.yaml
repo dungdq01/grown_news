@@ -1,0 +1,59 @@
+entry: ban-giao
+ulid: 01M2S1TRANSCRIPTCHATGPT
+ngay: 2026-09-09
+module: M12_chungcat
+buoc: s1-research
+tieu_de: >-
+  Khao chat luong transcript + chung cat so voi mau ChatGPT — ket luan: khoang
+  cach nam o hau xu ly va may in, khong nam o model
+
+object:
+  - 01_research/original_request.md          # §2026-09-09-b, nguyen van
+  - 01_research/m12-chat-luong-transcript-chung-cat.md
+  - 01_research/gap_analysis.md               # G-13 · G-14 · G-15 · G-16
+  - 01_research/research_summary.md           # §17
+doi_chung:
+  - transcript_exam_review.pdf   # 6 trang, chu du an dua
+  - tom_tat_buoi_on_thi.pdf      # 4 trang, chu du an dua
+  - _recycle/video/thay-on-bai-thi-final.1.md   # CUNG video, da co trong kho
+
+do_duoc_tren_may:
+  - "ASR = Gemini qua cua, chunk 300 s; prompt chi doi JSON {tu,den,text}"
+  - "VTT that: 213 cue / ~13 phut => 1-9 s/cue; tab Transcript hien moi cue mot dong"
+  - "xuat: .vtt/.txt/.docx — .txt chi lot moc gio; KHONG PDF; KHONG header"
+  - "may: KHONG pandoc/TeX/LibreOffice/weasyprint; co npm docx, pypdfium2"
+  - "faster-whisper CHUA cai; 56 nhan CPU, 0 GPU"
+  - "_PROMPT chung cat: 5 muc co dinh + [slug:p.N] + verify fuzzy 88; FE md() render duoc bang"
+  - "MCP: .claude/settings*.json mcpServers = [] — chua cau hinh gi"
+
+nguon_ngoai:
+  - https://huggingface.co/openai/whisper-large-v3-turbo        # 32->4 lop, 809M, MIT, WER 7.83
+  - https://github.com/SYSTRAN/faster-whisper                      # Silero VAD, word_timestamps, batched
+  - https://slhck.info/software/2025/10/25/typst-pdf-generation-xelatex-alternative.html  # 27x xelatex
+  - https://typst.app/docs/reference/text/text/                    # font nhung: NCM, Libertinus, DejaVu
+  - https://github.com/vivekVells/mcp-pandoc                       # PDF can TeX Live
+  - https://github.com/sham-devs/mcp-md-pdf                        # PDF can LibreOffice/Word
+
+ket_luan: |
+  Bon viec dau KHONG ton mot loi goi model: gop cue -> doan ~30 s · header
+  metadata · bang khai khuon theo the loai · Typst lam may in. Viec thu nam
+  (faster-whisper local) mua do tin cay — loi `uu_tien 3` da KHAI va `asr.py`
+  da viet, nhung WORKER CHUA NOI: `_chon_loi` luon tra `cua-asr`, `worker.py`
+  khong `import asr`. Ban dau toi viet "chi chua cai goi" — SAI, da sua ca bon
+  file sau khi grep. MCP khong phai cau tra loi cho runtime: ba server khao duoc deu boc
+  TeX Live/LibreOffice; `subprocess` trong THO la dung khuon du an (ffmpeg, yt-dlp).
+
+gia_dinh_chua_do:
+  - toc do faster-whisper INT8 tren 56 nhan CPU
+  - Typst/New Computer Modern phu dau tieng Viet
+  - WER Gemini vs Whisper tren CUNG audio thay-on-bai-thi-final
+ghi_chu_ba_gia_dinh: |
+  Ba phep do nay la viec s2/PM nen cho lam TRUOC khi chot huong ASR. Mau ChatGPT
+  la moc so; video da nam trong kho nen so duoc tren cung nguon.
+
+khong_lam:
+  - bo `[slug:p.N]` de giong mau — la M12-R2
+  - them MCP server vao runtime
+  - doi dinh dang luu khoi .vtt (research §15 da chot: gop la ban XUAT, cue la GOC)
+
+dong_g1: chua — cho chu du an duyet summary §17

@@ -1,0 +1,27 @@
+[project]
+name = "source-distiller-core"
+version = "2.0.0"
+description = "Sinh và kiểm file .md cho kho kb/"
+requires-python = ">=3.13"   # ADR-02 + FR-005
+dependencies = [
+    "pyyaml>=6.0",
+    "pypdf>=6.0",      # C1 — [slug:p.N] kiem N <= so trang THAT
+    "jsonschema>=4.0",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=7.0"]
+
+[project.scripts]
+kb-validate = "source_distiller.validate:main"
+
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]

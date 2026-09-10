@@ -1,0 +1,160 @@
+# yaml-language-server: $schema=./_quartz/quartz/plugins/quartz-plugins.schema.json
+#
+# M03_web — nối 05_uiux/ với kb/. KHÔNG thiết kế lại: hợp đồng UI frozen ở G5.
+# Màu và chữ lấy từ 05_uiux/tokens.css (113 token) qua custom.scss.
+configuration:
+  pageTitle: Grown news
+  pageTitleSuffix: ""
+  enableSPA: true          # F1 dựa vào: SPA giữ DOM state ⇒ multi-window sống
+  enablePopovers: true
+  analytics:
+    provider: null         # công cụ cá nhân, không đo ai cả
+  locale: vi-VN
+  baseUrl: localhost:8080  # BRD B-D3 — private, không deploy công khai
+  ignorePatterns:
+    - private
+    - templates
+    - .obsidian
+  theme:
+    fontOrigin: local      # tự chứa, không gọi Google Fonts
+    cdnCaching: false
+    typography:
+      header: Inter
+      body: Inter
+      code: JetBrains Mono
+    colors:
+      # Lấy đúng giá trị từ 05_uiux/tokens.css. KHÔNG gõ lại số mới (M03-R4) —
+      # đây là ánh xạ tên Quartz sang token đã frozen.
+      lightMode:
+        light: "#faf9f7"
+        lightgray: "#e7e3dd"
+        gray: "#9c968c"
+        darkgray: "#4a453e"
+        dark: "#1c1a17"
+        secondary: "#c81e1e"      # --brand đỏ light
+        tertiary: "#854d0e"       # --warning, tách khỏi đỏ bằng hue 31.8°
+        highlight: "rgba(200, 30, 30, 0.08)"
+        textHighlight: "#fde68a88"
+      darkMode:
+        light: "#16150f"
+        lightgray: "#2a2823"
+        gray: "#6b665d"
+        darkgray: "#cfc9bf"
+        dark: "#f5f2ec"
+        secondary: "#f87171"      # --brand đỏ dark — hex KHÁC light, 7.15 vs 2.77
+        tertiary: "#d9a441"
+        highlight: "rgba(248, 113, 113, 0.10)"
+        textHighlight: "#b45c0088"
+
+plugins:
+  # ── ba luật tòa soạn Quartz không cho sẵn ──
+  # Đường local giải theo CWD của lệnh build (web/_quartz/), không theo vị trí
+  # file config. Lượt đầu tôi viết ./plugins/... và Quartz tìm ở
+  # web/_quartz/plugins/ — không có. Plugin sống ở web/plugins/.
+  - source: ../plugins/approved-only
+    enabled: true
+  - source: ../plugins/merge-by-source
+    enabled: true
+  - source: ../plugins/home-pages
+    enabled: true
+  - source: ../plugins/backdrop-assets
+    enabled: true
+  - source: ../plugins/backdrop
+    enabled: true
+    layout: { position: afterBody, priority: 5 }
+  - source: ../plugins/multiwindow
+    enabled: true
+    layout: { position: afterBody, priority: 90 }
+
+  # ── plugin cộng đồng ──
+  # Dùng dạng npm scope "@quartz-community/..." như quartz.config.default.yaml.
+  # Lượt đầu tôi viết github:quartz-community/... — cùng tổ chức nhưng KHÁC nguồn:
+  # bản GitHub là mã nguồn chưa build (syntax-highlighting thiếu file .js), và
+  # quartz-fonts không có repo cùng tên (404).
+  # Frontmatter phải được transformer parse TRƯỚC khi filter chạy.
+  # Lượt đầu tôi bỏ hai plugin này ⇒ vfile.data.frontmatter là undefined ⇒
+  # approved-only loại 14/14 file. Filter chạy đúng, dữ liệu vào rỗng.
+  - source: "@quartz-community/obsidian-flavored-markdown"
+    enabled: true
+    options: { enableInHtmlEmbed: false, enableCheckbox: true }
+    order: 30
+  - source: "@quartz-community/note-properties"
+    enabled: true
+    options:
+      includeAll: false
+      includedProperties: [description, tags]
+      excludedProperties: []
+      hidePropertiesView: true
+    order: 5
+
+  - source: "@quartz-community/syntax-highlighting"
+    enabled: true
+    options:
+      theme: { light: github-light, dark: github-dark }
+      keepBackground: false
+    order: 20
+  - source: "@quartz-community/github-flavored-markdown"
+    enabled: true
+    order: 40
+  - source: "@quartz-community/table-of-contents"
+    enabled: true
+    order: 50
+    layout: { position: right, priority: 30 }
+  - source: "@quartz-community/crawl-links"
+    enabled: true
+    options: { markdownLinkResolution: shortest }
+    order: 60
+  - source: "@quartz-community/description"
+    enabled: true
+    order: 70
+  - source: "@quartz-community/quartz-fonts"
+    enabled: true
+  - source: "@quartz-community/content-index"
+    enabled: true
+    options: { enableSiteMap: true, enableRSS: true }
+  # GIỮ: cửa sổ đọc fetch("/" + slug) rồi lấy <article> từ trang này.
+  # Tắt nó là mọi cửa sổ đọc rỗng — xem multiwindow.inline.ts hàm tai().
+  - source: "@quartz-community/content-page"
+    enabled: true
+
+  # ── TẮT: trùng vai với màn /tat-ca/, và dùng giao diện Quartz mặc định ──
+  # folder-page sinh /paper/ /video/ /repo/ /article/; tag-page sinh /tags/**.
+  # Cả hai là "danh sách bài theo một chiều" — đúng việc màn /tat-ca/ đã làm,
+  # nhưng render bằng layout Quartz (sidebar explorer, không nền ảnh, không
+  # dùng prototype.css) nên site có HAI giao diện chồng nhau. Người dùng gặp
+  # /paper/ và hỏi "endpoint kia là sao" — đó là dấu hiệu đủ.
+  # Bật lại thì phải viết layout riêng cho chúng, không phải chỉ đổi enabled.
+  - source: "@quartz-community/folder-page"
+    enabled: false
+  - source: "@quartz-community/tag-page"
+    enabled: false
+  - source: "@quartz-community/article-title"
+    enabled: true
+    layout: { position: beforeBody, priority: 10 }
+  - source: "@quartz-community/content-meta"
+    enabled: true
+    layout: { position: beforeBody, priority: 20 }
+  - source: "@quartz-community/page-title"
+    enabled: true
+    layout: { position: left, priority: 10 }
+  - source: "@quartz-community/darkmode"
+    enabled: true
+    layout: { position: left, priority: 30, group: toolbar }
+  - source: "@quartz-community/search"
+    enabled: true
+    layout: { position: left, priority: 20, group: toolbar, groupOptions: { grow: true } }
+  - source: "@quartz-community/explorer"
+    enabled: true
+    layout: { position: left, priority: 50 }
+
+  # ── tắt: không hợp một kho tri thức cá nhân ──
+  - source: "@quartz-community/graph"
+    enabled: false            # đồ thị liên kết — kb/ nối nhau bằng concept, không bằng wikilink
+  - source: "@quartz-community/comments"
+    enabled: false            # một người dùng
+  - source: "@quartz-community/og-image"
+    enabled: false            # private, không ai share
+
+layout:
+  groups:
+    toolbar: { priority: 35, direction: row, gap: 0.5rem }

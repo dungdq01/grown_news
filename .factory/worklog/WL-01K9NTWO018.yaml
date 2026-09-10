@@ -1,0 +1,123 @@
+id: WL-01K9NTWO018
+at: 2026-08-28
+by: claude
+buoc: WO-018 (ô mô tả · nút nạp chết · chữ nói dối) + WO-019 phần nội dung
+loai: bàn giao WO-018 · WO-019 làm MỘT PHẦN
+wo: WO-018-o-mo-ta-va-nut-nap-chet.md · WO-019-loai-nguon-vao-db-va-thiet-ke-lai.md
+
+object:
+  wo:
+    - .factory/wo/WO-018-o-mo-ta-va-nut-nap-chet.md
+    - .factory/wo/WO-019-loai-nguon-vao-db-va-thiet-ke-lai.md   # CÒN MỞ
+  task:
+    - 07_plan/M03_web/tasks/T03-49-test-o-mo-ta-va-nut-nap.md   # test
+    - 07_plan/M03_web/tasks/T03-50-o-mo-ta-va-nut-nap.md        # code
+  code:
+    - web/render/shell.html · web/plugins/home-pages/shell.html
+    - web/render/trang.mjs
+    - web/styles/prototype.css
+    - web/plugins/multiwindow/src/scripts/multiwindow.inline.ts
+  test:
+    - web/test/mo-ta-va-nut-nap.test.js   # MỚI — 6 mục
+    - web/test/bon-chieu-facet.test.js    # §8 đổi hướng theo đính chính
+
+may_xanh:
+  - "cd web && node test/mo-ta-va-nut-nap.test.js  ->  pass (6 mục)"
+  - "cd web && node test/bon-chieu-facet.test.js  ->  pass"
+  - "quét từng file: 67/68 xanh (chỉ `he-kinh` — ảnh của người dùng)"
+  - "gn.css 96364 / 102400 — dư 6036 · gn.js 102235 / 102400 — dư 165"
+  - >
+    trình duyệt, `/video/nap/`: ô **Mô tả** (textarea, h=111, "tối đa 400 từ") ·
+    Chủ đề 3 ô · Khái niệm 6 ô — cả ba HIỆN SẴN khi mở màn
+  - >
+    trình duyệt, dải lối video nói `youtube · tiktok` — khớp whitelist
+  - >
+    trình duyệt, `/video/nap/` header: summary "Đăng ký video", mở ra
+    "đang mở: đăng ký video" + "+ viết bài" + "+ nạp tài liệu"
+  - >
+    trình duyệt, `/khai-niem/` tab **Loại nguồn**: "14 loại nguồn · 3 phân loại";
+    Bài viết → repo·paper·article·docs·announcement · Tài liệu → PDF·PowerPoint·
+    Word·PowerPoint (cũ)·Word (cũ)·Tệp khác · Video → youtube·tiktok·tải lên
+
+ba_dieu_da_chua:
+  - >
+    Ô MÔ TẢ → THÂN BÀI. Trước đó hai đường gửi `body: motCau`, tức thân bài LẶP
+    LẠI câu tóm tắt — bản ghi tự nói hai lần, và người dùng không có chỗ mô tả.
+    Một hàm `thanTu()` cho cả hai đường; rỗng thì trả về câu tóm tắt (đường lùi)
+  - >
+    Ô CHỦ ĐỀ + KHÁI NIỆM RA KHỎI KHỐI ẨN. Chúng có từ WO-016 nhưng nằm trong
+    `#tv-meta`/`#vd-meta` mang `hidden` — có trong DOM mà người mở màn không thấy.
+    Cả hai là BẮT BUỘC (cổng module chặn) nên chúng phải hiện ngay
+  - >
+    NÚT NẠP KHÔNG CÒN CHẾT. Màn nạp cũng khai `module`, nên phép tìm "màn nạp của
+    module này" giải ra CHÍNH nó ⇒ nút trỏ vào trang đang đứng. Nay màn nạp mời
+    các lối KHÁC và nói ra lối đang mở
+
+mot_dong_chu_cua_toi_noi_doi:
+  - >
+    Dải lối video ghi `youtube · tiktok · douyin · bilibili`, dải tài liệu ghi
+    `pdf · docs · ppt · bảng tính`. Whitelist có HAI host; bảng định dạng có
+    `pdf pptx docx ppt doc` — không có `docs`, không có bảng tính nào. Dán link
+    douyin thì 422, mà màn đọc như nó được nhận
+  - >
+    Chữa bằng DẪN XUẤT: hai dòng đó thành mốc, SSR đổ từ `media-mime.json`. Và
+    trần số từ đổ từ `khung-than-bai.json` — màn nói ra giới hạn TRƯỚC, không để
+    422 nói hộ sau khi người dùng gõ xong
+
+dinh_chinh_cua_nguoi_dung:
+  - >
+    *"thứ chúng ta cần là danh sách LOẠI NGUỒN, chứ ko phải phân loại: loại nguồn
+    là tập hợp con của phân loại, và ta cần QUẢN LÝ danh sách LOẠI NGUỒN đó →
+    loại nguồn nào ứng với phân loại nào"*. Lượt trước tôi đổi tên tab thành
+    "Phân loại" — lệch hướng. Panel quản lý LOẠI NGUỒN; phân loại là NHÓM CHA
+  - >
+    Nội dung cũng sai và đã sửa: panel đọc `m.loai` của `loai-nguon.json`, tức tên
+    BẢNG (`tai-lieu`, `video`). Với bài viết thì `source_type` CHÍNH LÀ loại nguồn
+    nên nó đúng tình cờ. Nay dùng lại `nguonCua()` — MỘT phép suy đã có từ WO-014
+
+kiem_hai_chieu:
+  - "R5 ĐỎ TRƯỚC có thật: mo-ta-va-nut-nap 20 lỗi lượt đầu"
+
+tu_bat_duoc:
+  - >
+    LÁT CẮT CỦA TÔI NUỐT KHỐI KHÁC. Khi viết lại panel loại nguồn, lát cắt đi từ
+    `nguonlist` tới hết dòng `nguoncount` — và khối đổ bốn mốc của WO-018 nằm
+    GIỮA hai mốc đó, nên nó bị xoá. Cổng `mo-ta-va-nut-nap` §4 bắt được ("0 nơi
+    phát"). Cùng lớp lỗi đã trúng với `apSap` ở WO-014
+  - >
+    CỔNG XANH RỖNG: §3 cắt `slice(0, indexOf("<main"))` vì tôi tưởng nút nạp ở
+    header — đo ra nút ở vị trí 2541 còn `<main>` ở 2050. Lát cắt tìm 0 nút, nên
+    "không nút nào trỏ vào chính nó" đúng VÔ CĂN CỨ
+  - >
+    CỔNG ĐO HÌNH THỨC hai lần: đòi thân hàm chứa chuỗi `tv-mo` (bản cài đặt tốt
+    hơn dùng helper chung nên không chứa), và đọc dòng liệt kê bằng mẫu `<span>`
+    trơn (mốc SSR có thuộc tính nên khớp 0)
+  - >
+    Escaping #33-34: so-chuỗi trên dòng có dấu thoát lồng nhau lệch một dấu gạch
+    chéo ⇒ phép thay bị BỎ QUA im lặng, hai lượt liền. Đường đi được: sửa theo
+    CHỈ SỐ DÒNG, không so chuỗi dài
+
+con_lai_cua_WO019:
+  - >
+    **Loại nguồn CHƯA vào bảng DB.** Nội dung nay ĐÚNG và DẪN XUẤT (panel không
+    gõ tay gì), nhưng master vẫn là `media-mime.json` + `loai-nguon.json`, không
+    phải một bảng như `concepts`/`categories`. Đây là yêu cầu tường minh của
+    người dùng và nó CÒN MỞ
+  - >
+    Kèm theo: đường THÊM/SỬA/XOÁ một loại nguồn (bộ `data-suanhan` đã tổng quát,
+    chỉ route ghim cặp `concepts|categories`)
+  - >
+    Thêm host `fb` + `douyin`: mỗi host cần `nhung` + `id_mau` + `id_tu` (M09-R3
+    — `src` iframe chỉ dựng từ whitelist + regex id). Thêm tên mà thiếu ba trường
+    đó là mở đúng lỗ M09-R3 chặn
+  - >
+    Thiết kế lại về THỊ GIÁC (màu theo module, thang chữ, trạng thái rỗng): lượt
+    này chỉ sửa CẤU TRÚC (nhóm có số đếm, thụt 32px, nội dung đúng)
+
+do_do:
+  - cong: he-kinh.test.js
+    do_do_boi: ảnh 724 KB người dùng thêm — `python core/tools/toi_uu_anh_nen.py`
+  - cong: check_frozen.py
+    do_do_boi: chờ NGƯỜI ký sau khi FR-039 duyệt
+  - cong: check_danh_muc.py · check_skill.py · check_running.py
+    do_do_boi: agent khác (bản schema thứ hai) · và hệ quả của hai cổng trên

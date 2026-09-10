@@ -1,0 +1,86 @@
+- generic [active] [ref=f5e1]:
+  - link "Bỏ qua điều hướng" [ref=f5e5] [cursor=pointer]:
+    - /url: "#main"
+  - banner [ref=f5e6]:
+    - heading [level=1] [ref=f5e7] [cursor=pointer]:
+      - link "G Grown _ news" [ref=f5e8]:
+        - /url: /
+        - text: G Grown
+        - generic: _
+        - text: news
+    - navigation "Điều hướng chính" [ref=f5e9]:
+      - group "Nội dung" [ref=f5e10]:
+        - button "Tổng hợp" [ref=f5e11] [cursor=pointer]
+        - button "Bài viết" [ref=f5e12] [cursor=pointer]
+        - button "Tài liệu" [ref=f5e13] [cursor=pointer]
+        - button "Video" [ref=f5e14] [cursor=pointer]
+      - group "Hệ thống" [ref=f5e15]:
+        - button "Dashboard" [ref=f5e16] [cursor=pointer]
+        - button "Kho" [ref=f5e17] [cursor=pointer]
+        - button "Danh mục" [ref=f5e18] [cursor=pointer]
+    - generic [ref=f5e19]:
+      - generic [ref=f5e20]:
+        - link "real" [ref=f5e21] [cursor=pointer]:
+          - /url: /
+        - link "mock" [ref=f5e22] [cursor=pointer]:
+          - /url: /mock/
+      - button "đổi ngôn ngữ" [ref=f5e23] [cursor=pointer]: VI
+      - button "đổi tone" [ref=f5e24] [cursor=pointer]: ☀
+      - button "đổi ảnh nền" [ref=f5e25] [cursor=pointer]: ◑
+      - button "tạm dừng đổi ảnh" [ref=f5e26] [cursor=pointer]: ❙❙
+  - main [ref=f5e27]:
+    - generic [ref=f5e28]:
+      - generic [ref=f5e29]:
+        - searchbox "Tìm trong kho" [ref=f5e31]
+        - generic [ref=f5e32]:
+          - generic [ref=f5e33]: 1 bài · 1 bản ghi
+          - button "+ nạp tài liệu" [ref=f5e35] [cursor=pointer]
+      - text: → → → →
+      - generic [ref=f5e37]:
+        - generic [ref=f5e38]:
+          - heading "Video" [level=2] [ref=f5e39]
+          - group "Sắp xếp" [ref=f5e40]:
+            - button "ưu tiên" [pressed] [ref=f5e41] [cursor=pointer]
+            - button "mới nhất" [ref=f5e42] [cursor=pointer]
+            - button "cũ nhất" [ref=f5e43] [cursor=pointer]
+          - generic [ref=f5e44]: 1 bản
+        - generic [ref=f5e45]:
+          - generic [ref=f5e46]: tự động
+          - generic [ref=f5e52]:
+            - generic [ref=f5e53]:
+              - generic [ref=f5e54]: loại nguồn
+              - generic [ref=f5e55]: "1"
+            - generic [ref=f5e56]:
+              - generic [ref=f5e57]: đã duyệt
+              - generic [ref=f5e58]: "1"
+            - generic [ref=f5e59]:
+              - generic [ref=f5e60]: còn nháp
+              - generic [ref=f5e61]: "0"
+        - generic [ref=f5e62]:
+          - complementary "Lọc video" [ref=f5e63]:
+            - button "tất cả 1" [pressed] [ref=f5e64] [cursor=pointer]:
+              - generic [ref=f5e65]: tất cả
+              - generic [ref=f5e66]: "1"
+            - generic [ref=f5e67]:
+              - generic [ref=f5e68]: loại nguồn
+              - button "youtube 1" [ref=f5e69] [cursor=pointer]:
+                - generic [ref=f5e70]: youtube
+                - generic [ref=f5e71]: "1"
+            - generic [ref=f5e72]:
+              - generic [ref=f5e73]: chủ đề
+              - button "AI - talkshow 1" [ref=f5e74] [cursor=pointer]:
+                - generic [ref=f5e75]: AI - talkshow
+                - generic [ref=f5e76]: "1"
+            - generic [ref=f5e77]:
+              - generic [ref=f5e78]: khái niệm
+              - button "Talkshow 1" [ref=f5e79] [cursor=pointer]:
+                - generic [ref=f5e80]: Talkshow
+                - generic [ref=f5e81]: "1"
+          - 'button "video Thiên Đường Chuột & Tương Lai Nhân Loại: Giải Mã Lời Tiên Tri Đáng Sợ Từ Elon Musk — plausible aitalkshow" [ref=f5e83] [cursor=pointer]':
+            - generic [ref=f5e84]: video
+            - 'heading "Thiên Đường Chuột & Tương Lai Nhân Loại: Giải Mã Lời Tiên Tri Đáng Sợ Từ Elon Musk" [level=4] [ref=f5e86]'
+            - generic [ref=f5e87]:
+              - generic [ref=f5e88]: —
+              - text: plausible
+            - generic [ref=f5e89]: aitalkshow
+      - text: "3"

@@ -1,0 +1,103 @@
+id: WL-01KA5S1M13NEN
+khi: 2026-09-07
+loai: ban_giao
+tac_nhan: claude-opus-5
+vai: s1 bo sung — khao DO (spec + ma), khong khao ngoai
+gate: G1 (bo sung) — dau vao cho FR/ADR truoc s7 M13
+module: M13_truyhoi (chinh) · anh huong M14 · M12 · M03 · M01 · ADR-05
+
+viec: >
+  Chi dao "M13 la dich vu, la core cho dich vu sau, web call API, moi module la mot
+  service — brainstorming ky tat ca module con lai de clear M13" + /factory:s1-research.
+  Da chep nguyen van vao original_request.md (L1). Ra: 01_research/m13-truy-hoi-dich-vu-nen.md
+  + research_summary §15 (con tro cho s2).
+
+cach_lam: >
+  Doc TU SPEC va MA, moi menh de mang nhan fact/suy luan/gia dinh. Khong sua artifact
+  FROZEN nao (M13 spec/rules · truyhoi.sample.v2 · ADR-05). 07_plan/M13_truyhoi/ CHUA
+  ton tai — s7 chua bat dau, nen day la luc re nhat de chot.
+
+chin_ket_luan_do_duoc:
+  - "G3/G5/G6A deu khai M13 co MOT khach: M14 (spec_overview:469 'khach hang duy nhat';
+     model_flow §3 ve ❌ web→M13). Menh de 'nen + web goi' la DOI PHAM VI G3 ⇒ can FR."
+  - "Khach duy nhat do la THO→THO (8788→8791) — ADR-05 luat 2 cam bang chu in ('khong ai
+     goi thang :8791'), va KHONG cong nao canh: check_ba.py khong cuong che Z8,
+     core/tests grep 8791|Z8 ⇒ 0. M12 AC-1.4 CAM THO→THO bang cong that; M13 khong noi;
+     M14 gia dinh duoc. Ba module mot vung, ba luat, khong may nao do."
+  - "Hop dong API o BA cho, BA hinh dang: model_flow {cau_hoi,pham_vi,k}→{doan[],so_ban_ghi}
+     · G5 truyhoi.sample.v2 {q,pham_vi}→{ket_qua[{chunk_id,bm25,snippet}],tong} · M14 doi
+     doc_id+anchor. M13 spec/model_flow/data_flow: 0 lan chu 'doc_id'. nguon[] (AC-5.3
+     bat buoc) KHONG co trong request cua ca model_flow lan G5. chunk_id = rowid ⇒ khong
+     on dinh qua re-index."
+  - "file#anchor KHONG la mot dang trong dia-chi.json (5 dang: slug · slug:p.N · slug:t= ·
+     file:A-B · §). C3 chua sinh id: md() phat <h2> tran; site/index.html 15 h2/h3, 3 id
+     deu la id hop thoai. ⇒ M14 'anchor phan giai qua dia-chi.json' — khong phan giai duoc."
+  - "M13 chi index than. Tai lieu than ≤400 tu; PDF KHONG duoc trich text o dau
+     (chungcat/src 0 lan dung pdfplumber du khai dep :31; _doc_nguon tra than voi neo
+     :p.1 gia); transcript .vtt CO trong media (la_dan_xuat=1, kieu_moc) nhung M13
+     spec/data_flow 0 lan nhac media. ⇒ 2/3 loai noi dung vo hinh voi RAG."
+  - "dich-vu.json truyhoi.can_key_model: true vs M13-R5 '0 loi goi mang' — bang khai lech."
+  - "HAI def chuan_hoa() cung ten mot repo: chungcat/src/verify.py:55 (NFKC·ligature·gach
+     noi·casefold) ≠ M13 §3 (NFC·lower·đ→d·chen cach Han). M13-R1 se do o dong import dau."
+  - "PRD U6 hua full-text tren tit/one_liner/than tu dot MOT; spec_overview:316-317 gan
+     M02+M03; gap G-8 do FE search = includes() tren DOM; #q hom nay van la loc the (TIM +
+     apLoc). ⇒ 'web goi M13 de tim' la TRA NO U6, khong phai scope moi."
+  - "Kho 0 bai chu Han (kb/** han=0); golden set doi 4 ca Trung ⇒ AC-6.1 chi xanh bang
+     fixture bia. G-8 da noi: 'truy hoi tren 3 ban ghi la xay mot phep do khong co gi de do'."
+
+sua_hieu_lam_cua_chinh_toi:
+  - "Toi noi 'chua co contract sample cho M13' — SAI: 05_uiux/contracts/truyhoi.sample.v1/v2
+     TON TAI va FROZEN. Da sua trong file."
+  - "Toi nghi loai_nguon 'pdf'/'youtube' trong sample la bia — SAI: bang loai_nguon trong
+     kho co 14 hang (repo…announcement→bai-viet · pdf/pptx/docx/ppt/doc/bin→tai-lieu ·
+     youtube/tiktok/tai-len→video). Sample HOP LE."
+  - "Toi hedge 'dia-chi.json frozen?' — do: grep FROZEN.lock ⇒ 0, KHONG frozen. Da sua
+     thanh fact; van de FR vi no la bang khai B-A5 ba module cung doc."
+
+chin_gia_dinh_phai_chot_G1_G9: >
+  G1 THO→THO (ADR — quyet ca kien truc; toi nghieng (b): cho, co luat + khoa rieng
+  chieu + allowlist cap (tu,toi) trong dich-vu.json + cong Z9) · G2 ai giai bot→doc_id
+  (M14 giai, M13 nhan nguon[]) · G3 dia chi tra ve (CA HAI file#anchor + file:A-B, them
+  dang #anchor vao dia-chi.json) · G4 index hien vat (CO: M13 doc .vtt qua API; M12 sinh
+  text PDF thanh hien vat la_dan_xuat text/plain — M13 khong tu trich) · G5 doi ten
+  chuan_hoa ban M13 · G6 bang khai dai Han o core/assets/ · G7 can_key_model=false +
+  cong · G8 nap ≥2 bai phon the TRUOC s8 · G9 MOT hop dong API, truyhoi.sample.v3.
+  Chi tiet + 'chot sai mat gi' o raw §8.
+
+thu_tu_de_nghi: >
+  viec re khong frozen (G5·G6·G7) → ADR G1 (mo khoa moi thu) → FR M13 (G2·G3·G4·G9) +
+  FR M01 (dia-chi.json #anchor) → du lieu G8 → s7 M13 → task M03 C3 + M08 tong quat
+  gocTho(ten) (song song s8 M13) → FR M12 sinh text PDF (sau khi M13 chay 1 duong).
+
+object:
+  - path: 01_research/m13-truy-hoi-dich-vu-nen.md
+    ghi_chu: "MOI — 10 muc + nguon; 386 dong (wc -l, khong dem tay)"
+  - path: 01_research/research_summary.md
+    ghi_chu: "+§15 (append-only, con tro cho s2)"
+  - path: 01_research/original_request.md
+    ghi_chu: "+muc 2026-09-07, chep nguyen van L1"
+
+do_do:
+  - lenh: "check_g6a · check_map · check_ba · check_mermaid · check_frozen"
+    ket_qua: "5/5 XANH"
+  - lenh: "check_rule_surfaces"
+    ket_qua: "DO — M18-R5/M18-R6 tro web/test/cai-dat.test.js THIEU (file bi xoa, ghi o
+      WL-01KA40); 0 rule nao tro 01_research/ ⇒ KHONG lien quan luot nay"
+do_do_boi: "chua-quy-duoc-chu (giu nguyen ket luan WL-01KA40)"
+
+khong_lam:
+  - "KHONG sua spec/rules/model_flow M13 (FROZEN) — moi de xuat la dau vao FR."
+  - "KHONG sua ADR-05 — G1 la quyet dinh cua chu du an."
+  - "KHONG sua dich-vu.json (can_key_model) du khong frozen — no la bang khai ADR-05 dan
+     xuat Z1/Z3/Z6; sua mot cot ma khong qua quyet dinh la cach hai bo tu vung lech."
+  - "KHONG mo o backlog trong 06_modules/M13_truyhoi/ — spec noi 'M13 chua co ma nen
+     chua co no'; cac phat hien la NO CUA HOP DONG (G3/G4/G5), dia chi dung la FR."
+  - "KHONG tao 07_plan/M13_truyhoi/ — s7 chi nen chay sau G1 + FR."
+  - "KHONG commit, KHONG push."
+
+cho_NGUOI_quyet:
+  - "G1 truoc het: THO goi THO — cam / cho co luat / de nguyen. Toi nghieng 'cho co luat'."
+  - "Duyet mo FR M13 (hop dong API mot hinh dang · doc_id · nguon[] · doc hien vat) va FR
+     M01 (dang #anchor)."
+  - "G4: chap nhan RAG mu tai lieu/video o dot nay, hay bat M12 sinh text PDF + M13 doc .vtt?"
+  - "G8: ai nap ≥2 bai tieng Trung phon the truoc s8?"

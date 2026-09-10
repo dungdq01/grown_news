@@ -1,0 +1,80 @@
+id: WL-01K9T1RESEARCH
+at: 2026-08-30
+by: claude
+buoc: s1-research — hai khao sat moi + phu luc cho ban quet cu
+loai: nghien cuu (khong dong ma san pham) + mot cong cu quan sat
+duong: PATCH nguong RUT GON — "chi doi chu, khong doi hanh vi" => sua + verify +
+  worklog, bo buoc 1 (WO) va 4 (task file). `01_research/` khong frozen, khong
+  cham module nao.
+
+object:
+  - 01_research/kenh-chat-va-business-agent.md   # MOI — Zalo/OA/FB/Telegram + LLM
+  - 01_research/notebooklm-tinh-tuy.md           # MOI — chat tinh tuy NotebookLM
+  - 01_research/llm-features-scan.md             # them §8 phu luc CO NGAY; danh dau so lac hau
+  - core/tools/xem_agent.py                      # MOI — doc transcript workflow/subagent
+
+# ══ PHAN DANG GIA NHAT ═════════════════════════════════════════════════
+hai_lo_TU_KHAI_trong_duong_ray_chong_bia: >
+  Do duoc hom nay, va no dao thu tu uu tien cua ca ban quet 08-29:
+    1. `validate.py:58` LOCATOR_RE = ngoac vuong chua 2-80 ky tu BAT KY. Trong
+       kb/docs/xgboost-taylor-bac-hai.md, ca `[2, 1, 0.5, -0.5, -1, -2]` (mang
+       so) lan `[ l(y)+g*f(x) ]` (cong thuc) deu QUA cong §7.
+    2. `citations_sampled` / `citations_verified` doc thang tu frontmatter —
+       KHONG dong nao trong repo tinh chung. `05_intake/gate.py:75` con phat san
+       template "tu mo link".
+  => Mot agent ghi sampled:5/verified:5 roi rai `[§II.4]` la qua SACH toan bo bo
+  may chong bia. CLAUDE.md cam dung dieu nay: "so phai do may tong hop tu nguon
+  (#tu-khai)".
+  He qua: MOI tinh nang LLM nhan RUI RO len truoc khi va hai lo nay, va nhan GIA
+  TRI len sau khi va. Khong phai "them tinh nang AI nao" ma "vá cai gi truoc".
+
+toi_TU_pham_dung_loi_vua_di_to: >
+  Toi ghi "kho 5 ban ghi" trong notebooklm-tinh-tuy.md vi dem `find kb -name
+  "*.md"`. Hai file trong so do — kb/README.md va kb/_nhat-ky-danh-muc.md —
+  khong co frontmatter, khong phai ban ghi. `select count(*) from ban_ghi` = 3.
+  Dem tay roi chep so, dung §8.1 vua to. Da sua ca ba file.
+
+khong_viet_lai_khao_sat_de_ngay: >
+  llm-features-scan.md la artifact s1 DE NGAY 29/08. Viet lai noi dung 30/08 vao
+  §1-§7 la lam sai bien ghi — file se tu nhan la khao sat 29/08 nhung chua phat
+  hien hom sau. Chon: danh dau con so lac hau NGAY TAI CHO (giu phep do cu, them
+  ngoac cap nhat) + phu luc §8 CO NGAY o cuoi + tro con tro sang hai tai lieu
+  moi. Luat du an: "khong chep noi dung artifact sang cho khac — tro con tro".
+
+workflow_106_agent_la_mot_loi_thiet_ke: >
+  Lan chay /deep-research mac dinh: 106 agent, 3.45M token subagent, 28 chet vi
+  het han muc, bo tong hop chet theo. Lan chay TU VIET gon: 14 agent, 562k token,
+  0 loi, ve dich sach.
+  Doi lai: ti le xac minh tut — 3/30 claim qua phan bien (toi cat con 1 phieu cho
+  5 claim thay vi 3 phieu cho tat ca). Da ghi nhan dung nhu the trong tai lieu,
+  khong de nguoi doc tuong moi cau deu da kiem.
+  Huong dan cua Workflow tool khai "medium: duoi 15 agent" — ban mac dinh vuot
+  gap 7 lan va khong ai bao.
+
+cong_cu_quan_sat_vi_bao_cao_khong_kiem_duoc_la_LOI_KHAI: >
+  Workflow/subagent chay an nhung ghi HET ra dia: agent-<id>.jsonl moi agent +
+  journal.jsonl. `core/tools/xem_agent.py` doc chung.
+  No cho thay thu ban tom tat khong bao gio noi: mot agent Fetch bi WebFetch tra
+  ve ban TOM LUOC thay vi nguyen van, nen no tu goi lai lan hai voi prompt ep
+  "Reproduce, word for word, every sentence containing a number" — roi moi lay
+  duoc "up to 50 sources (for Free users)".
+
+evidence:
+  - "python -c 'from validate import LOCATOR_RE' => khop ca cong thuc lan mang so"
+  - "grep citations_verified core/src web/api 05_intake => chi co fm.get(), khong co phep tinh"
+  - "sqlite3 kb/_kho.sqlite 'select count(*) from ban_ghi' => 3"
+  - "pytest core/tests => 42 passed"
+  - "22/26 cong Python xanh (dem lai 08-31; con so 18/22 toi ghi truoc do la SO CU chua dem lai)"
+
+do_do:
+  check_danh_muc + check_skill: "agent khac — hai ban schema core/skill-src lech core/assets"
+  check_frozen: "cho NGUOI ky"
+  check_running: "he qua cua hai muc tren"
+  # check_worklog da XANH tro lai — so dong prototype.css khop tai lieu, chu no da sua
+
+no_con_lai:
+  - "NGUOI QUYET: co lam F1 (cu phap dia chi + phep phan giai) khong? No sua validate.py; di tru chi 1 ban ghi phan-tich (2 ban kia la thu-vien, mien cong locator)"
+  - "NGUOI QUYET: cu phap locator chuan la gi? Hom nay moi bai mot kieu: [§II.4] · [nguon.md:1-2] · [Reading]"
+  - "Lo 'gui RA' trong security_baseline.md VAN chua va — chan moi thu co model"
+  - "xem_agent.py chua khai trong project_map.yaml — cong cu quan sat, chua phai don vi viec"
+  - "phan Telegram/FB/phap ly (~50 claim) chua qua phan bien — resumeFromRunId wf_c6d5f107-e18 dung lai cache 78 agent"

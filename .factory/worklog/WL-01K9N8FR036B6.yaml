@@ -1,0 +1,113 @@
+id: WL-01K9N8FR036B6
+at: 2026-08-27
+by: claude
+buoc: s8 — FR-036/B6 đường phục vụ byte + sáu đầu đề an toàn
+loai: bàn giao B6
+fr: FR-036-khung-than-bai-5-muc.md
+
+object:
+  task:
+    - 07_plan/M08_api/tasks/T08-8-phuc-vu-hien-vat.md            # code
+    - 07_plan/M03_web/tasks/T03-12-test-dau-de-hien-vat.md       # test
+  code:
+    - web/api/dungchung.mjs   # hienVatPhucVu — tra mime tu union BA bang
+    - web/api/articles.mjs    # phucVuHienVat — sáu đầu đề + nhánh 304
+    - web/api/router.mjs      # GET .../media/<sha256> · 405 kèm Allow
+  test:
+    - web/test/media-dau-de.test.js   # MỚI — 28 phép kiểm, 5 mục
+    - web/package.json
+    - web/test/WORKLOG.md
+    - web/WORKLOG.md                  # ô "| Test | 48 |"
+  keo_theo:
+    - 06_modules/M03_web/backlog.md   # check_worklog so số bằng substring
+  plan:
+    - "C:/Users/Admin/.claude/plans/c-c-users-admin-downloads-grown-news-up-bright-newt.md"
+
+may_xanh:
+  - "cd web && node test/media-dau-de.test.js  ->  pass (28 phép kiểm)"
+  - "cd web && npm test  ->  exit 0 (48 file)"
+  - "pytest core/tests -q  ->  42 passed · 18/19 cổng check_*.py xanh"
+  - >
+    10/10 đầu đề/luật mới ĐỎ được khi phá, ba file gốc khôi phục nguyên byte
+    (articles 858f7110916aade3 · dungchung b7975f1d3a287d15 · router e2ec53c71ee0d09c)
+
+do_do:
+  - cong: core/tests/check_skill.py
+    do_do_boi: agent khác
+    quy_chu: không nằm trong tập file tôi đổi ở lượt này
+
+# ══ Cổng đo ĐẦU ĐỀ, không đo mã nguồn ══════════════════════════════════════
+#
+# Một `res.writeHead` đúng trong code mà không tới được trình duyệt là một đầu đề
+# KHÔNG TỒN TẠI. Repo này đã trúng đúng lớp lỗi đó: `PRAGMA foreign_keys = ON`
+# khai trong header DDL suốt mấy tháng mà không cơ chế nào bật — vô hại chỉ vì
+# DDL không có FK nào. Nên cổng dùng `http.request` lấy `res.headers` NGUYÊN VĂN,
+# không qua lớp gói của `fetch`.
+#
+# BẢNG KHAI LÁI PHÉP KIỂM: `content-type` và `content-disposition` so với
+# `media-mime.json` (`xem_truoc: "iframe"` ⇒ inline, `"the"` ⇒ attachment), KHÔNG
+# so với chuỗi gõ tay trong test. Đổi bảng thì phép kiểm đổi theo.
+
+# ══ Ba thứ plan không nói, mà thiếu là hỏng thật ════════════════════════════
+#
+# 1 · 405 KÈM `Allow`. `DELETE /api/articles/media/<sha>` để mặc sẽ rơi xuống
+#     cổng cấu trúc `:type/:slug` và nhận `400 "type phải thuộc: …"` — câu trả
+#     lời NÓI SAI CHỖ: nó bảo đường dẫn sai trong khi thứ sai là METHOD, và
+#     người gọi đọc rồi đi sửa URL. 405 thiếu `Allow` cũng là 405 không nói được
+#     phải làm gì tiếp (RFC 9110 §15.5.6).
+#
+# 2 · NHÁNH 304. Plan khai `etag` nhưng không khai nhánh nào dùng nó. Một etag
+#     không có 304 là etag trang trí — và cả session này đã gọi tên đúng lớp lỗi
+#     đó ba lần. Ca âm kèm theo: `If-None-Match` KHÔNG khớp phải ra 200 CÓ thân.
+#
+# 3 · BLOB MỒ CÔI ⇒ 404. Byte đang staging (vừa nạp, chưa bấm Ghi) là HỢP LỆ
+#     trong kho nhưng KHÔNG phải nội dung công khai. Phục vụ nó là biến cửa nạp
+#     thành chỗ chứa file ai cũng đọc được, chỉ cần biết sha256.
+#     `hienVatPhucVu` dùng CÙNG union ba bảng mà exporter dùng cho luật mồ côi
+#     (M09-R1) — một phép tính, hai người gọi.
+
+# ══ Vì sao CSP ở HEADER, không ở attribute ═════════════════════════════════
+#
+# `sandbox` attribute trên iframe mà không kèm `allow-scripts` làm HỎNG viewer
+# PDF của Chromium (nó là một extension chạy script). Cùng một chữ `sandbox`,
+# hai chỗ đặt, hai hệ quả khác nhau — và chỗ đúng là header của TÀI NGUYÊN, vì
+# ràng buộc thuộc về byte chứ không thuộc về khung nhìn.
+#
+# `filename=` dùng ĐUÔI từ bảng khai + 12 ký tự đầu của sha256, KHÔNG dùng
+# `ten_goc` thô: tên gốc là chuỗi của người gửi, và một `filename=` mang dấu
+# ngoặc kép hay newline là đường tách đầu đề. Tên đọc được vẫn còn trong
+# frontmatter để FE hiện.
+#
+# KHÔNG hứa `accept-ranges`: Range không cài ở v1, và hứa mà không cài là hứa dối.
+
+# ══ Hai lần cổng của tôi đo sai, và cả hai đều là bài học lặp lại ═══════════
+#
+# 1 · `id` của fixture phải khớp `^src_[a-z0-9]{6,}$`. Bản đầu sinh `src_tlpdf`
+#     (5 ký tự) nên bị schema chặn, trong khi `src_tlpptx` (6) đi qua — HAI CA
+#     GIỐNG NHAU mà một đỏ một xanh, và nó đẩy tôi đi tìm bug ở đường phục vụ
+#     trong khi lỗi nằm ở fixture. PAD, đừng cắt.
+#
+# 2 · `if-none-match: undefined` làm `setHeader` NÉM, giết cả file test trước khi
+#     in được dòng nào về bốn phép kiểm còn lại. Cùng bài học với `nap()` ở
+#     `thu-vien.test.js`, lần thứ ba trong nhánh B: phép kiểm phải SỐNG SÓT qua
+#     đúng thứ nó đang chấm.
+
+# ══ Kéo theo: một cổng báo đúng vì MAY ═════════════════════════════════════
+#
+# `check_worklog.py:108` kiểm số liệu bằng `doc in o` — tìm chuỗi con trong CẢ
+# file. Đo được: sau B3/B5 số test thật là 47 và cổng XANH, nhưng
+# `web/WORKLOG.md` khai 46; chuỗi "47" chỉ tình cờ nằm ở chỗ khác. Sang 48 mới
+# hết trùng và cổng mới đỏ.
+#
+# Tức cổng đó im lặng suốt một đơn vị việc. KHÔNG sửa tại chỗ: nó là cổng của
+# đơn vị khác, và sửa một cổng trong lượt nó đang chấm mình là đúng thứ luật gốc
+# cấm. Ô backlog mở ở `06_modules/M03_web/backlog.md`.
+
+con_lai:
+  - >
+    B7 — FE nạp: tab thứ tư + form thư viện; `data.mjs` mang `ho_so` + `media`
+    vào `Ban` ở CẢ `banTuDb` VÀ `docTuDia`. NHỚ: FE phải tự kiểm `file.size`
+    trước khi POST — 413 không tới được client giữa lúc upload (WL-01K9N7FR036B5).
+  - "B8 — FE xem trước: iframe PDF · video click-to-load · thẻ ppt/word + tải về"
+  - "B9 — tổng hợp All: số đếm trên `tatCa`, chất lượng chỉ trên `phan-tich` (M09-R4)"
+  - "B10 — tài liệu + hồ sơ quyết định"

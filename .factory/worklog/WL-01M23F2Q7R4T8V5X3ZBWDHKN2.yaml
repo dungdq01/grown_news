@@ -1,0 +1,74 @@
+ulid: 01M23F2Q7R4T8V5X3ZBWDHKN2
+thoi_diem: 2026-09-09
+tac_nhan: claude-fable-5-1 (dev)
+loai: ban_giao
+module: M12_chungcat · M03_web (tab)
+don_vi: WO-065 (vá lỗi ghi log) · WO-066 (A/B/C) · WO-067 (đường chạy lại)
+chi_dao: '"bạn chọn hướng an toàn và xử lý cho tôi nhanh đi"'
+
+viec: >
+  Ba lần trong một buổi chủ dự án hỏi "sao vẫn chờ". Việc đã HỎNG từ lâu; màn
+  đọc `giai_doan`, và `except Exception` đặt lại `cho`. Cộng: phanh ASR bị coi
+  "không phân loại"; một phản hồi quên mốc thời gian giết cả job.
+
+quyet_dinh_thay_nguoi:  # theo chỉ đạo, không hỏi lại
+  A: "thêm `hong` vào GIAI_DOAN; `danh_hong()` ghi giai_doan_hong + loi; lease KHÔNG nhặt lại hong; chay_lai xoá vết"
+  B: "PhienAmCut ⇒ ViecHong('dang-goi-model') tại chỗ gọi"
+  C: "đoạn không tiến ⇒ gửi lại đúng MỘT lần rồi mới phanh (không bịa mốc, không bỏ đoạn)"
+  FE: "hong ⇒ nhãn 'hỏng', vạch đỏ, hiện loi + chặng hỏng, thôi poll"
+  khong_chon: "bịa mốc cho cue thiếu mốc · bỏ qua đoạn · đổi model (tốn tiền, quyết định của người)"
+
+object:
+  - .factory/wo/WO-066-viec-hong-mang-nhan-cho.md
+  - chungcat/src/vong.py            # GIAI_DOAN+hong · danh_hong · chay_lai pop · lease skip hong · dong_viec "xong" bằng TÊN
+  - chungcat/src/worker.py          # danh_hong ở 2 nhánh · PhienAmCut→ViecHong · ghi() đúng chữ ký (WO-065)
+  - chungcat/src/asr_cua.py         # thử lại MỘT lần đoạn không tiến
+  - web/plugins/cctab/src/cctab.inline.ts   # hong: 7 chỗ
+  - chungcat/tests/check_hong_khong_mang_nhan_cho.py   # cổng MỚI, 12 vế, CHẠY thật
+  - chungcat/tests/check_transcript_dung_byte_kho.py   # +vế 6 CHẠY thật nhánh file
+  - chungcat/tests/check_worker_mot_vong.py            # vế hợp đồng cũ → mới
+  - 07_plan/M12_chungcat/tasks/T12-28-…md              # nhận 2 cổng
+
+r5_do_truoc: >
+  check_hong_khong_mang_nhan_cho: viết trước, đỏ ở vế 0 (không có `hong`).
+  check_transcript_dung_byte_kho vế 6: đỏ với chính bug ghi() sai arity.
+
+bay_tu_dat:
+  - >
+    Nối `hong` vào CUỐI tuple ⇒ `dong_viec` dùng `GIAI_DOAN[-1]` làm "xong" ⇒
+    mọi việc THÀNH CÔNG bị đánh hong, loi rỗng. Hai cổng cũ đỏ ĐÚNG. Sửa bằng
+    tên. Một vị trí không phải một ý nghĩa.
+  - >
+    `nhat_ky.ghi(loai, **truong)` một positional; tôi truyền hai ⇒ TypeError ở
+    RÀNG BUỘC THAM SỐ, trước `try` trong thân — lời hứa "không ném" của ghi()
+    không che được lớp này. Cổng chỉ đo phép CHỌN lối nên không bắt được; thêm
+    vế CHẠY nhánh với LÕI giả.
+  - >
+    Tôi nói "28 phút audio rời máy không để lại dòng egress" — SAI. Egress có
+    đủ dòng `loi_dung: cua-asr`; grep của tôi tìm ulid mà dòng egress không
+    mang ulid. M12-R3 nguyên vẹn. Đính chính trong WO-066.
+
+đỏ_do: >
+  Hai cổng cũ đỏ do CHÍNH thay đổi này (GIAI_DOAN[-1]) — quy chủ bằng repro
+  trực tiếp một việc thành công ⇒ hong/loi=None. Không đỏ nào của người khác.
+
+wo_067_chay_lai_khong_co_duong: >
+  Chủ dự án dán câu lỗi 502 kèm chính câu tôi viết trên màn: "chạy lại tiếp từ
+  chỗ hỏng". Đo: THỢ chỉ có POST /job, LÕI không proxy POST /viec, FE 0 nút,
+  `vong.chay_lai` có sẵn mà không ai gọi. Và có đường thì `phien_am` cũng chạy
+  từ 0 (da_co=[]), tức lần gửi THỨ HAI — cũng là lần cuối — tiêu vào việc làm
+  lại 13 phút đã đúng. Cộng: `chay_lai` không xoá lease, PID worker cũ còn
+  sống ⇒ không ai nhặt trong 30 phút.
+  Đã làm: THỢ `POST /viec/<ulid>/lai` (chỉ nhận `hong`, 409 khác) · `chay_lai`
+  xoá lease · `phien_am(bat_dau)` + worker đọc file tiến độ ghép cue cũ · LÕI
+  `cuaChayLaiViec` + router · FE nút "↻ Chạy lại từ chỗ hỏng (gửi n/2)" ·
+  `no-write-path` khai `viec` như một QUYẾT ĐỊNH kèm lý do.
+  KHÔNG tự thử lại 502 trong job: lần gửi thứ hai là của NGƯỜI quyết.
+  object: .factory/wo/WO-067-chay-lai-viec-hong-khong-co-duong.md ·
+  chungcat/src/{api,vong,asr_cua,worker}.py · web/api/{tho-cua,router}.mjs ·
+  web/plugins/cctab/src/cctab.inline.ts · web/test/no-write-path.test.js ·
+  chungcat/tests/check_hong_khong_mang_nhan_cho.py §D (9 vế; D5 CHẠY phien_am(bat_dau=200))
+
+con_lai:
+  - "C thật sự chặn nếu cửa QUÊN MỐC hai lần liên tiếp trên cùng đoạn ⇒ vẫn phanh; lúc đó là chuyện model/cửa, cần người chọn"
+  - "NGƯỜI: FR-075 §2 sửa M11 spec:11 + ký FROZEN.lock (vẫn chờ từ lượt trước)"

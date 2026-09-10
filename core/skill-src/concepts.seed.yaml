@@ -1,0 +1,80 @@
+# Danh mục khái niệm kiểm soát — seed ban đầu
+# Luật: LLM chỉ được chọn id từ danh sách này cho trường `concepts`.
+# Không tìm được mục phù hợp thì ghi vào `concepts_proposed`, chờ người duyệt.
+# Duyệt lô theo tuần: thêm mục mới, hoặc map thành alias của mục đã có.
+
+# --- dữ liệu và ML ---
+- id: walk-forward-validation
+  label_vi: Kiểm định tiến dần theo thời gian
+  aliases: [rolling-origin, time-series-cv, walk-forward-cv]
+- id: data-leakage
+  label_vi: Rò rỉ dữ liệu
+  aliases: [target-leakage, lookahead-bias, train-test-contamination]
+- id: intermittent-demand
+  label_vi: Nhu cầu gián đoạn
+  aliases: [sparse-demand, croston, lumpy-demand]
+- id: feature-store
+  label_vi: Kho đặc trưng
+  aliases: [feature-registry, online-offline-parity]
+- id: model-drift
+  label_vi: Trôi mô hình
+  aliases: [concept-drift, data-drift, performance-decay]
+- id: hierarchical-forecast-reconciliation
+  label_vi: Hòa giải dự báo phân cấp
+  aliases: [bottom-up, top-down, mint-reconciliation]
+
+# --- hệ thống và tích hợp ---
+- id: idempotency
+  label_vi: Tính lũy đẳng
+  aliases: [exactly-once, dedupe, chống trùng bản ghi, idempotency-key]
+- id: backpressure
+  label_vi: Áp lực ngược
+  aliases: [flow-control, rate-limiting, queue-saturation]
+- id: eventual-consistency
+  label_vi: Nhất quán cuối cùng
+  aliases: [read-your-writes, replication-lag]
+- id: staging-table-pattern
+  label_vi: Mẫu bảng trung gian
+  aliases: [landing-table, erp-staging, batch-ingest]
+- id: circuit-breaker
+  label_vi: Ngắt mạch
+  aliases: [bulkhead, fail-fast, retry-budget]
+- id: schema-evolution
+  label_vi: Tiến hóa lược đồ
+  aliases: [backward-compatibility, contract-versioning]
+
+# --- AI agent và LLM ---
+- id: context-management
+  label_vi: Quản lý ngữ cảnh
+  aliases: [context-compaction, truncation-strategy, context-window-budget]
+- id: tool-schema-design
+  label_vi: Thiết kế lược đồ tool
+  aliases: [function-calling, tool-definition, parameter-validation]
+- id: structured-output-recovery
+  label_vi: Phục hồi output sai định dạng
+  aliases: [json-repair, constrained-decoding, retry-on-parse-error]
+- id: eval-harness
+  label_vi: Bộ đo hồi quy
+  aliases: [regression-eval, golden-set, llm-as-judge]
+- id: prompt-versioning
+  label_vi: Quản lý phiên bản prompt
+  aliases: [prompt-registry, prompt-ab-test]
+- id: retrieval-chunking
+  label_vi: Cắt khối cho truy hồi
+  aliases: [ast-chunking, semantic-chunking, chunk-overlap]
+
+# --- tài liệu và OCR ---
+- id: schema-from-data
+  label_vi: Sinh lược đồ từ dữ liệu thật
+  aliases: [data-first-schema, discovered-schema]
+- id: layout-aware-extraction
+  label_vi: Trích xuất theo bố cục
+  aliases: [table-detection, region-ocr, document-layout]
+
+# --- kỹ thuật phân tích ---
+- id: import-graph-ranking
+  label_vi: Xếp hạng theo đồ thị import
+  aliases: [repo-map, pagerank-on-imports, dependency-centrality]
+- id: measurement-conditions
+  label_vi: Điều kiện đo
+  aliases: [benchmark-conditions, baseline-disclosure]

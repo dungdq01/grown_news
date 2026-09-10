@@ -1,0 +1,128 @@
+ulid: 01M1VG3T7P5NB2K8R4XQMWDZ61
+thoi_diem: 2026-09-07T03:10+07:00
+tac_nhan: claude-opus-5
+loai: ban_giao
+module: M12_chungcat + M03_web + M08_api
+don_vi: T12-27 · tiến độ tải video · kèm SÁU lỗi lộ ra khi chạy thật
+
+viec: >
+  Chủ dự án báo tải 360p không thành công và đòi THẤY tiến trình. Chạy thật
+  moi ra sáu lỗi, trong đó BỐN là của chính tôi và ba trong bốn cùng một họ:
+  bịa một thứ rồi tin vào nó.
+
+r5_do_truoc:
+  - don_vi: T12-27
+    lenh: python chungcat/tests/check_tien_do_tai_video.py
+    ket_qua: "ĐỎ 5 vế"
+    đỏ_do: claude-opus-5
+  - do_tren_may: >
+      Hai job `tai-video` đọng ở `cho`; log thợ:
+      `ValueError: giai đoạn lạ: tai`.
+    đỏ_do: claude-opus-5
+
+do_sau:
+  - lenh: python chungcat/tests/check_tien_do_tai_video.py
+    ket_qua: pass — 13/13 vế
+  - lenh: 'for f in chungcat/tests/check_*.py; do python "$f"; done'
+    ket_qua: 39/39 XANH
+  - lenh: cd web && npm test
+    ket_qua: exit 0 · 3183 vế ok · 0 FAIL
+  - lenh: python -m pytest core/tests -q
+    ket_qua: 49 passed
+
+sau_loi:
+  - ten: "giai đoạn `tai` KHÔNG có trong `GIAI_DOAN`"
+    cua: toi
+    do: "`dat_giai_doan` ném `ValueError`, job chết ở nhịp đầu, mọi cổng vẫn xanh"
+    sua: >
+      Dùng `dang-doc-nguon` — từ vựng ĐÃ KHAI. Tải một video LÀ đọc nguồn;
+      thêm nấc thứ sáu chỉ để một loại việc dùng là bắt mọi bên đọc pipeline
+      học thêm một chữ. Thêm vế cổng đối chiếu mọi chuỗi giai đoạn với
+      `vong.GIAI_DOAN`.
+
+  - ten: "khuôn tên file khai `{26}` (ULID) trong khi id thật là 32 hex"
+    cua: toi
+    do: >
+      `viec_id` là `uuid.uuid4().hex` (`api.py:280`). Cửa `/api/tai-video/<id>`
+      trả **422 cho MỌI file có thật**, và `don_xuat_tam` chưa bao giờ xoá
+      được gì.
+    vi_sao_cong_khong_bat: >
+      Fixture của CHÍNH TÔI dùng một ULID giả 26 ký tự — vừa khít khuôn sai.
+      Mô phỏng đặt sai chỗ thì nó chứng minh cái sai. Nay fixture gọi
+      `uuid4().hex` THẬT, và có vế đối chiếu khuôn của worker với khuôn của
+      cửa web.
+
+  - ten: "FE gửi SLUG TRẦN cho job `tai-video`"
+    cua: toi
+    do: "worker gọi `/api/articles/<slug>` ⇒ 404. Lần THỨ BA cùng lỗi tiền tố loại trong đợt này."
+
+  - ten: "`ban.tai_video` và `ban.ban_chung_cat` — HAI trường tôi tự nghĩ ra"
+    cua: toi
+    do: >
+      Không bản ghi nào có chúng. Hậu quả: bậc đã tải xong không bao giờ sáng,
+      và menu báo *chưa sinh* cho một video ĐÃ CÓ ba bản chưng cất — đúng cái
+      chủ dự án chụp ảnh hỏi.
+    sua: >
+      Đọc SỰ THẬT ở nơi nó sống: bậc đã tải tra hàng đợi việc
+      (`tai-video` + `xong` + `ket_qua.tep_tam`); bản chưng cất tra CHỈ MỤC
+      NGƯỢC (`b.nguon` chứa slug gốc). Cả hai là lời gọi mạng nên dựng rỗng
+      trước, vá sau.
+
+  - ten: "`veNutBanChungCat` bóc sai phong bì `/api/index`"
+    cua: co_san
+    do: >
+      Nó đọc `j.bans || j.items || j` trong khi cửa trả
+      `{total, articles:[{bans:[…]}]}`. Cả ba nhánh trượt, `.filter` chạy trên
+      một OBJECT ⇒ ném ⇒ `catch` NUỐT ⇒ im lặng trả rỗng. Nghĩa là nút ⚗
+      **chưa bao giờ hiện**, và không ai biết vì lỗi bị nuốt.
+    sua: "một hàm `banChungCatCua(slug)` dùng `nap()` — đúng một chỗ biết hình dạng chỉ mục"
+
+  - ten: "một `throw` trong cửa mới GIẾT CẢ TIẾN TRÌNH WEB"
+    cua: toi
+    do: >
+      Thiếu import `basename` ⇒ `ReferenceError` trong handler `async` ⇒
+      unhandled rejection ⇒ Node thoát ⇒ TOÀN BỘ site sập vì một cửa tải.
+    sua: "bọc `cuaTaiVideo` trong try/catch, trả 500 — một cửa hỏng không được kéo theo mọi cửa khác"
+
+tien_do_dat_dung_cho:
+  chu_du_an_bac_lan_mot: >
+    Tôi làm thanh tiến độ ở TAB VIỆC. Chủ dự án bác: *"tôi bảo phải hiện tiến
+    trình download cơ mà… tôi vừa bấm tải 480p và sao tôi biết nó đang tải và
+    được bao nhiêu %?"*.
+  bai_hoc: >
+    Phần THỢ đúng (thợ có phát tiến độ), phần ĐẶT sai: nó bắt người rời menu,
+    mở tab Việc, tìm đúng dòng. Tiến độ phải ở nơi người ĐANG NHÌN — nút họ
+    vừa bấm — không ở nơi hệ thống thấy tiện.
+  hinh_dang_cuoi: >
+    Nút bậc → thanh tiến độ tại chỗ (nền chạy + `%` + tốc độ, `title` mang cỡ
+    và ETA) → đường tải. Ba trạng thái, MỘT chỗ.
+  chiu_dung_mang_chop: >
+    60 nhịp im lặng (~90s) mới bỏ cuộc. Một lần mạng chớp không được phép xoá
+    một tiến độ đang đúng.
+
+chay_that:
+  - "job 360p: `xong` · file 35 999 267 B · `ftyp` magic hợp lệ"
+  - "cửa `/api/tai-video/<id>`: 200 · `video/mp4` · tên `thien-duong-…-360p.mp4`"
+  - "tiến độ qua API: `69.2% của 45.17MiB · 38.79MiB/s`"
+  - >
+    tiến độ TRÊN MÀN (bấm 1080p thật): `1080p · 32% · 6.68MiB/s` → 68% →
+    biến thành `A:1080p` + toast *Đã tải xong bản 1080p*
+  - "menu video `hermes`: BẢN CHƯNG CẤT hiện đủ md/txt/docx/in — bug ảnh chụp đã hết"
+
+nợ:
+  - >
+    `%TEMP%/gn-xuat-tam` đang giữ **6 file · 659 MB** từ các lần thử của tôi.
+    Chúng NGOÀI repo và tự dọn sau 72h (`tran_xuat_tam_gio`), nhưng chủ dự án
+    nên biết con số ấy.
+  - "`POST /api/job` vẫn nhận thân rỗng `{}` và trả 201 — ô nợ M08 đã mở."
+
+object:
+  - chungcat/src/vong.py
+  - chungcat/src/worker.py
+  - chungcat/src/tai_nguon.py
+  - chungcat/src/api.py
+  - chungcat/tests/check_tien_do_tai_video.py
+  - chungcat/tests/check_tai_video_chat_luong.py
+  - web/api/tho-cua.mjs
+  - web/plugins/multiwindow/src/scripts/multiwindow.inline.ts
+  - web/plugins/cctab/src/cctab.inline.ts

@@ -1,0 +1,80 @@
+id: WL-01K9H1FR008
+at: 2026-08-19
+by: claude
+buoc: s8 (M03_web)
+loai: fix + amend-frozen
+
+viec: >
+  Bốn việc người dùng nêu: nút nạp nguồn chưa nối · bố cục panel rỗng ·
+  chưa có mode mock/real · chữ chưa đồng bộ. Kèm FR-008 vì đụng ui_frozen.
+
+fr: FR-008-bo-cuc-trang-chu-v2.md
+
+pham_vi_ghi:
+  - web/plugins/home-pages/index.ts
+  - web/plugins/home-pages/shell.html
+  - web/styles/prototype.css
+  - web/plugins/multiwindow/src/scripts/multiwindow.inline.ts
+  - web/link-plugins.mjs
+  - web/test/markup-matches-css.test.js
+  - web/package.json
+  - 05_uiux/TYPOGRAPHY.md
+  - 05_uiux/wireframes/SCR-02-trang-chu.md
+  - project_map.yaml
+  - .factory/fr/FR-008-bo-cuc-trang-chu-v2.md
+
+vat_the:
+  loi_ha_tang:
+    what: link-plugins.mjs chết ở EPERM khi gặp WORKLOG.md trong plugins/
+    hau_qua: >
+      Junction chỉ dùng được cho thư mục. Script chết TRƯỚC bước biên dịch
+      *.inline.ts → .js, nên mọi sửa .ts không vào bundle. Im lặng vì esbuild
+      chạy logLevel:"silent" và script chết trước đó.
+    sua: bỏ qua mọi thứ không phải thư mục (statSync().isDirectory())
+    muc_do: nghiêm trọng nhất phiên — làm mọi phép kiểm "đã sửa" thành vô nghĩa
+
+  bo_cuc:
+    L1: mốc rỗng chiếm chiều cao đầy ⇒ panel cao 130px trống trơn
+    L2: .two align-items:start ⇒ hai cột lệch đáy
+    L3: .pn-h align-items:baseline ⇒ nhãn có/không .dot lệch nhau
+    sua: khối "BỐ CỤC v1.1" ở cuối prototype.css + data-mount trên 11 mốc
+    ghi_chu: >
+      Đo trước khi sửa: 41 selector khai trùng ở cấp cao nhất, nhưng
+      0 luật chết hoàn toàn ⇒ KHÔNG xoá gì. Base+override đang hợp tác;
+      neo luật mới ở cuối file là phép cộng, không phá cascade.
+
+  chu:
+    do_duoc: 0 font-size ngoài token · 0 weight lạ · 12/12 nhãn HOA mono+--tr-lb
+    truoc: .bt và .tb gõ tay .04em (--tr-lb = .06em) · .tb2 th thiếu mono
+    typography_md: sửa cho khớp code — tít cửa sổ h2 24, mục h3 20
+
+  mock_real:
+    cach: >
+      Build HAI bản: / (đọc kb/) và /mock/ (đọc contract v3). Nút là LINK
+      chuyển trang, không phải toggle JS — dữ liệu chọn lúc BUILD nên một nút
+      không đổi được nguồn của trang đã tải.
+    canh_bao: bản /mock/ có dải .mockbar khó bỏ qua; bản real không có
+
+  nap_nguon:
+    man: /nap/ — hướng dẫn, KHÔNG phải tải lên (M03-R2)
+    template: /mau-nap-nguon.md đọc thẳng từ core/skill-src/mau-dat-chuan.md
+    bo: ba nút Duyệt/Loại/Để sau ở màn Chờ duyệt — hứa việc web không làm được
+
+verify:
+  loai: hard
+  lenh:
+    - "cd web && npm run check"            # type-check sạch
+    - "cd web && npm test"                 # 11/11 (thêm markup-matches-css)
+    - "python core/tests/check_frozen.py"  # + 8 cổng khác, 9/9 OK
+  ket_qua: xanh
+  test_moi: >
+    web/test/markup-matches-css.test.js — kiểm class markup có luật CSS, và
+    mỗi điểm neo khớp ĐÚNG MỘT lần. Chính test này bắt được class "meta"
+    không có luật mà tôi bỏ sót.
+
+no:
+  - "chen() nhận goiY tuỳ chọn; mốc không truyền thì rỗng ⇒ CSS ẩn panel.
+     Đúng cho vùng không có gì để nói, nhưng chưa có test phân biệt
+     'cố ý ẩn' với 'quên truyền gợi ý'."
+  - "pytest không chạy trên Python hiện hành (thiếu module) — gap-python
+     đã ghi trong project_map, không liên quan thay đổi này."

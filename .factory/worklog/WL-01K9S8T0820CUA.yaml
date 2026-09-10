@@ -1,0 +1,58 @@
+ulid: 01K9S8T0820CUA
+khi: 2026-09-03T17:55+07:00
+tac_nhan: agent-thi-cong (Claude, phiên 6c7880c5)
+loai: ban-giao
+module: M08_api
+don_vi: T08-20 — hai cửa LÕI để FE gọi được THỢ
+
+viec: |
+  Mở `GET /api/model` + `POST /api/job` ở `web`, để trình duyệt gọi được dịch vụ
+  chưng cất MÀ KHÔNG cầm khoá dịch vụ. Trước lượt này FE không có đường nào tới
+  `:8790` — bốn task UI (T03-92/93/94/95) đứng chờ đúng chỗ này.
+
+  Ba quyết định đọc được trong mã, không nằm trong đầu ai:
+  1 · số cổng THỢ đọc từ `core/assets/dich-vu.json`, không gõ `8790` lần thứ hai.
+  2 · `dich` (đích egress) bị lọc LẠI ở cửa LÕI — THỢ đã lọc ở đầu kia, cửa này
+      không tin đầu kia đã lọc. Hai lớp cho một luật, lớp thứ hai rẻ.
+  3 · thiếu phiên ⇒ VẪN tạo việc với `nguoi_dung_id` null + một dòng `audit_log`
+      nói việc KHÔNG CÓ CHỦ. KHÔNG rơi về "người dùng mặc định" — cái đó mới là
+      fail-open mà `FR-047 §2.1 L2` cấm. Khi đăng nhập web có: đổi thành DENY.
+
+object:
+  - web/api/tho-cua.mjs                     # mới, 161 dòng
+  - web/api/router.mjs                      # +2 route, +1 import
+  - web/package.json                        # +1 đăng ký cổng
+  - web/test/loi-tho-cua.test.js            # cổng, ĐỎ TRƯỚC (10 lỗi 404) → XANH
+  - 07_plan/M08_api/tasks/T08-20-cua-tho-cho-fe.md
+  - web/styles/prototype.css                # viết sát lần BA, lấy lại 261 byte
+  - web/render/trang.mjs · web/render/shell.html · web/plugins/home-pages/shell.html
+  - web/plugins/multiwindow/src/scripts/multiwindow.inline.ts  # tách cụm nút ra
+  - 07_plan/M03_web/tasks/T03-92-cong-chua-dung.test.js        # cổng T03-92 dời ra
+
+bang_chung:
+  - "node web/test/loi-tho-cua.test.js → pass (cổng ĐỎ trước: 10 lỗi, 404)"
+  - "node web/test/api-guard.test.js → pass"
+  - "node web/test/markup-matches-css.test.js → pass"
+  - "node web/test/page-weight.test.js → pass · gn.css 102361/102400 byte"
+  - "node web/test/nut-song.test.js → 1 lỗi, đỏ_do: T08-17b"
+
+do_do: T08-17b (KHÔNG phải lượt này)
+do_do_chi_tiet: |
+  `cd web && npm test` còn MỘT đỏ: `nut-song.test.js` báo *"KHÔNG được gọi:
+  cai-dat.test.js"*. Quy chủ bằng lệnh, không bằng phỏng đoán:
+    git status → `?? web/test/cai-dat.test.js`
+    mtime      → 2026-09-03 02:57 (phiên này bắt đầu sau đó)
+    header file → "T08-17b — bảng `cai_dat` … ĐƠN VỊ TEST, viết TRƯỚC code (R5)"
+  Đó là cổng đỏ-trước của T08-17b, đúng luật R5, và nó làm cổng "mọi file test
+  đều được npm test gọi" đỏ. Hai luật của dự án chỏi nhau — ô nợ M08 mô tả.
+  Lượt này KHÔNG sửa file của người khác và KHÔNG đăng ký hộ.
+
+keo_theo:
+  - "06_modules/M08_api/backlog.md — 2 ô: luật chỏi luật · package.json vào khuôn task"
+  - "06_modules/M03_web/backlog.md — 3 ô: cổng chung-cat-ui đo sai hợp đồng ·
+     gn.css còn 39 byte · markup-matches-css không quét trang.mjs"
+
+chua_xong: |
+  Gate G6C do NGƯỜI ký. Chưa commit, chưa PR, chưa gọi factory-reviewer.
+  T03-92 là đơn vị kế: cụm nút + nhánh xử lý + popover VÀO CÙNG MỘT LẦN
+  (cụm nút đã tách sẵn ở `07_plan/M03_web/tasks/`, kèm lý do trong mã).

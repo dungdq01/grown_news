@@ -1,0 +1,101 @@
+entry: ban-giao
+ulid: 01KB4CREVIEWM13
+ngay: 2026-09-10
+module: M13_truyhoi · M01_core · M08_api · M04_ci · M03_web
+don_vi: [T01-52, T01-51, T08-35, T13-1, T13-2, T13-3, T13-4, T13-5, T13-6, T13-7, T04-9, T03-125]
+tieu_de: >-
+  PM REVIEW nhanh m13 (16 commit, dev M13) — do lai bang may, khong tin loi khai. Ket luan:
+  R1 sach, 20 cong M13 19 xanh + 1 do dung ly do, cong khung pass. Nam quyet dinh PM.
+
+object:
+  - 07_plan/M01_core/tasks/T01-52-test-dia-chi-anchor.md        # noi pham vi +check_khai_mot_noi.py (§dai-han)
+  - 07_plan/M08_api/tasks/T08-35-cua-kho-delta-va-proxy-tim.md  # AC3 poke HOAN; tro T03-150
+  - 07_plan/M03_web/tasks/T03-150-test-kho-delta.md             # MOI — don vi test doi cong vao web/test (ban dau T08-39, doi module — xem loi_cua_toi)
+  - 07_plan/M13_truyhoi/tasks/T13-1-test-unit.md                # 19 -> 20 cong (dem sot check_nghe_loopback)
+  - 07_plan/M03_web/tasks/T03-125-ui-tim-toan-van.md            # SCR-22 -> SCR-27 (SCR-22 da bi lay)
+  - 06_modules/M13_truyhoi/backlog.md                           # +o poke chua co hop dong
+  - .factory/worklog/WL-01KB4CREVIEWM13.yaml
+
+do_bang_may_trong_gn_m13: |
+  git log main..m13                 16 commit (bf5e33f T01-52 ... beda474). Merge-base 6ffa918.
+  git diff main..m13 --name-only    moi file trong pham_vi_ghi cua task tuong ung + worklog.
+                                    .claude/rule.md · memory/decisions.md · BAN-GIAO-DEV xuat hien
+                                    vi m13 THIEU 399292e/5313bbb cua main (chieu nguoc), KHONG phai
+                                    dev sua — kiem: diff BAN-GIAO-DEV = 4 dong TOI them o 399292e.
+  R1                                SACH. check_khai_mot_noi.py · web/test/** · web/package.json
+                                    KHONG bi cham — dev dung dung ve chua co trong pham vi.
+  19 file 'M' chua commit           TOAN BO la EOL (git diff --ignore-all-space --numstat rong),
+                                    gom truyhoi.sample.v3.json (FROZEN) — noi dung KHONG doi.
+  check_frozen                      pass 57 (EOL churn chi o working copy, dev khong ky lai — dung)
+  check_g6a                         M13 6/6 · 6 rule · 23 hard/1 soft
+  check_rule_surfaces               OK 25->31 · CHO 53->47 · DO 0 — SAU rule M13 thoat CHO
+  check_ba · check_map · khai_mot_noi   exit 0
+  check_g6b                         321 task · 34 loi · 0 loi mang ma M13/T01-5[1-9]/T08-35/T04-9/T03-14[89]/T03-125
+  pytest core (venv 3.14)           6 failed / 43 passed — BANG baseline WO-094 (6ffa918), khong doi
+  20 cong truyhoi/tests             18 XANH · check_doi_chieu_chuan_hoa exit 3 khi chay python he
+                                    (thieu rapidfuzz — dung khuon _nap exit 3 = thieu goi, khong phai do),
+                                    XANH voi ../Grown_news/.venv (3.14) · check_golden_du_ca DO 1 ve:
+                                    ":8787 tra /api/kho-delta 404" — LOI that dang chay ma main cu.
+                                    Do la dieu kien dong T13-6, dung nhu dev bao.
+  T08-35 AC3 poke                   grep reindex-poke web/api ⇒ 0; cong in SKIP kem ly do (dong 24-25, 180-181).
+  SCR-22                            da ton tai (SCR-22-nhip-sinh.md, team M12); SCR max = 26.
+
+nam_quyet_dinh_PM: |
+  1 T01-52 NOI pham vi: +core/tests/check_khai_mot_noi.py de viet §dai-han H1·H2·H4 (FR-077 §2).
+    Vi sao day la quyen s7, khong phai "noi len": T01-52 la don vi TEST cua M01, cong nay la
+    cong test cua M01, va T01-51 AC1 dang tro no — khong co §4 thi AC1 XANH RONG. Luot hai
+    cua cung don vi, cung nguoi.
+  2 T03-150 MOI (don vi test, M03): git mv T08-35-kho-delta.test.js -> web/test/ + dang ky npm test.
+    Rule 8 doi doi cung luot voi ma; check_g6b §5 doi don vi test rieng — hai luat gap nhau
+    o mot don vi 2 file.
+  3 T08-35 AC3 (poke /reindex-poke) HOAN: endpoint KHONG co trong spec/model_flow M13 da ky
+    (T08-35 viet 09-07 truoc FR-072). Them endpoint la FR. M13 re-index tang dan khi duoc goi
+    (T13-2 AC5) du cho dot nay; poke la toi uu do tuoi, khong phai hop dong. O backlog M13 mo,
+    gop FR ke tiep cung o AC-2.2.
+  4 T13-1: 19 -> 20 cong. Ban 09-09 cua toi dem sot check_nghe_loopback (T13-4 AC2). Dev dem
+    dung, task sai — sua task.
+  5 T03-125: SCR-22 -> SCR-27 (max 26). Dev DUNG dung: khong tu doi so wireframe trong task.
+    Ban nhap SCR-27 o scratchpad cua dev — dua vao 05_uiux/wireframes/ roi NGUOI duyet.
+
+con_mo_sau_review: |
+  - T01-51 AC1 (check_khai_mot_noi §dai-han) — luot hai T01-52 (quyet 1)
+  - T03-150 — moi
+  - T13-6 dong khi: merge m13 -> main + restart :8787 + chay check_golden_du_ca tren kho that
+  - AC-6.3 ve zh: cho >=2 bai tieng Trung (viec cua nguoi)
+  - T13-5 ve space: cho T01-90 (PM-Space) ap FR-080
+  - T03-125: SCR-27 cho NGUOI duyet
+  - m13 THIEU 2 commit cua main (399292e · 5313bbb) ⇒ rebase len main truoc khi xin merge
+
+khong_push_duoc: |
+  Chu du an: "tao branch moi -> push". git remote -v RONG (do lai 2026-09-10) ⇒ khong co dau
+  de push. Nhanh m13 DA LA nhanh cua module (rule 17) — khong tao nhanh thu hai. Can chu du
+  an: `git remote add origin <url>`; roi `git push -u origin m13` tu ../gn-m13. Toi khong tu
+  them remote — khong co URL, ha tang cua chu du an.
+
+đỏ_do: >
+  check_golden_du_ca: LOI that :8787 chay ma main chua co /api/kho-delta — chu: trang thai
+  deploy, khong phai ma m13; lat xanh sau merge + restart. pytest 6 failed: WO-094 (6ffa918,
+  team M12). api-guard 1 FAIL: WO-074 (b7f6ba9). 34 loi g6b: task module khac. Khong loi
+  nao thuoc dev M13.
+
+loi_cua_toi: |
+  Ban dau dat don vi test la T08-39 (M08). check_g6b §2 bat ngay: web/test/kho-delta.test.js
+  NGOAI boundary M08_api — web/test/** la fe: web/** cua M03. Tien le da co ba lan (T08-27 ·
+  T08-29 · T08-30 deu ghi 'cong KHONG khai o M08, don vi TEST o M03'), toi khong doc truoc
+  khi tao. Sua bang git mv -> T03-150, giu noi dung. Cong lam dung viec cua no; toi ghi ra
+  vi day la lan thu hai trong ngay mot dieu toi viet cho nguoi khac (neo T01-5, ID trung
+  T04-10) lai sai o chinh cho toi vua canh bao.
+
+ghi_nhan: |
+  Dev lam dung SAU cho ma nguoi khac hay lam sai: dung o ve chua co pham vi thay vi noi len ·
+  SKIP kem ly do thay vi xanh rong · khong ky lai FROZEN khi thay 19 file lech chi vi EOL ·
+  20 cong mot commit (bay rule_surfaces) · R5 do-truoc-xanh-sau cung entry · quy chu do cua
+  nguoi khac bang commit SHA. Hai commit message mat chu trong backtick (e4f86ae, beda474) —
+  cung loi toi da mac (WL-01KB46G6BCRASH), noi dung du o worklog.
+
+khong_lam:
+  - "KHONG merge m13 vao main — nhip ⑤ (factory-reviewer) chua chay; va merge la vai khac, sau CI."
+  - "KHONG git remote add — khong co URL."
+  - "KHONG sua truyhoi/** hay web/api/** — ma cua dev."
+  - "KHONG ky lai FROZEN.lock trong gn-m13 — 19 file lech la EOL working copy, khong phai thay doi."
+  - "KHONG bump project_map (M13 status planned -> as-built la viec luc G6C; PM-Space giu but) — ghi 'can bump: M13 status' o day."

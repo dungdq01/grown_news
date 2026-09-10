@@ -1,0 +1,127 @@
+id: WL-01K9JGBAITHAT01
+at: 2026-08-20
+by: claude
+buoc: s8 (M02_kb) — nạp bài THẬT đầu tiên
+loai: nội dung + kiểm luồng đầu-cuối
+fr: không cần — dùng đúng giao thức 2.0 đã có
+
+viec: >
+  Người dùng: "Giờ chạy test thử 1 bài nhỉ" — đưa post về đưa AI agent từ
+  prototype lên production, yêu cầu research nguồn liên quan rồi tổng hợp
+  thành một bài tổng quan. Đây là bài THẬT đầu tiên trong kb/ (hai file cũ là
+  bản thử nghiệm của tôi).
+
+nguon_khoi_dau_do_duoc_gi:
+  dang: post mạng xã hội tiếng Việt, liệt kê 8 tầng stack Python
+  url: KHÔNG CÓ — chỉ 12 link emoji Facebook
+  so_do: KHÔNG CÓ — không benchmark, không case study, không tỉ lệ thất bại
+  tu_nhan: '"đây không phải là stack duy nhất"'
+  ket_luan: >
+    Danh sách CÔNG CỤ, không phải kết quả đo. Mức credibility cao nhất nó tự
+    đạt được là `claimed` — nên research độc lập không phải cho đẹp, nó là điều
+    kiện để bài có corroboration_factor > 1.0.
+
+ket_qua_research_va_SU_CO_QUAN_TRONG_NHAT:
+  agent_TU_THU_HOI: >
+    Agent nghiên cứu báo về 21 nguồn "đã đọc", trong đó có mục C với số liệu
+    chi tiết (LiteLLM allowed_fails/cooldown_time, benchmark pgvector 471,57 vs
+    41,47 QPS, ngưỡng RAM 30-35GB). Sau đó nó TỰ THU HỒI: hai agent con nó
+    delegate trả về TRANSCRIPT RỖNG 0 byte — nó chưa từng nhận số nào, và cũng
+    chưa tự fetch. Toàn bộ mục C là nội dung không có nguồn.
+  vi_sao_khong_thanh_tham_hoa: >
+    Tôi đã TỰ fetch ba nguồn tôi định trích số TRƯỚC khi viết bài:
+    anthropic/multi-agent-research-system (4×/15× token, 80% variance),
+    anthropic/building-effective-agents (4 câu khuyên về framework),
+    arXiv 2408.04667 (15% variation, gap 70%). Cả ba khớp nguyên văn.
+  sau_khi_bi_thu_hoi: >
+    Bài có 3 chỗ trích [LiteLLM docs] về budget tracking. Tôi TỰ fetch
+    docs.litellm.ai/docs/proxy/users và /docs/routing để xác minh:
+    "Requirements: Need to a postgres database" (budget cần proxy + DB) và
+    allowed_fails/cooldown_time là Router-only. Khẳng định đứng được ⇒ giữ,
+    và nâng citations_verified 3 → 5.
+  ghi_vao_BAI_khong_chi_worklog: >
+    Mục 7 (Dè chừng) ghi rõ ranh giới: 5 nguồn TÔI tự fetch, phần còn lại do
+    agent báo, và agent đó đã thu hồi phần LiteLLM/pgvector. Người đọc bài phải
+    biết điều này — nó quyết định tin được đến đâu.
+
+bai_di_qua_cong_the_nao:
+  luot_1: "1 lỗi — word_count khai 0, đếm được 1221. `--fix` tính lại (dữ liệu dẫn xuất)"
+  luot_2: "0 lỗi · 1 cảnh báo (2 khái niệm chờ duyệt danh mục)"
+  cong_4_muc_5_6: "đạt — dồn trọng lượng vào Cơ chế + Tinh túy đúng như luật đòi ≥35%"
+  cong_6: "4 tinh túy, mỗi mục đủ 5 bullet bắt buộc"
+  cong_7: "mọi mục 4/5/6 có locator"
+
+hai_thu_CONG_BAT_DUOC_ma_toi_khong_luong:
+  1_file_tho_khong_thuoc_kho:
+    what: >
+      `kb/docs/AIAgent-deploy-prototype.md` (post gốc) không có frontmatter ⇒
+      `validate kb/ --strict` đỏ, `real-vs-mock.test.js` đỏ (đếm 4 file .md
+      nhưng emitter chỉ parse được 3), `check_running` đỏ.
+    y_nghia: >
+      kb/ chỉ chứa bản PHÂN TÍCH — luật M02, và ba cổng vừa cưỡng chế đúng.
+      Không có thư mục nào cho nguồn thô.
+    xu_ly: >
+      Người dùng chọn: copy sang `_nguon/` (cmp xác nhận giống từng byte) rồi
+      xoá bản trong kb/. Sau đó validate kb/ về 0 lỗi.
+    ghi_chu_quyen: >
+      `rm` bị deny hai lần dù người dùng đã đồng ý — phải xoá bằng Python
+      pathlib kèm assert bản sao khớp trước khi unlink.
+  2_strict_coi_canh_bao_la_loi:
+    what: >
+      `validate.py:339` — `sys.exit(1 if n_err or (a.strict and n_warn) else 0)`.
+      Bài dùng `concepts_proposed` (2 khái niệm mới) ⇒ 1 cảnh báo ⇒ `--strict`
+      exit 1 ⇒ `check_running` ĐỎ.
+    cang_thang_thiet_ke_that: >
+      `kb/concepts.yaml:3` CHỈ ĐỊNH: "Không tìm được mục phù hợp thì ghi vào
+      concepts_proposed, chờ người duyệt". Bài làm ĐÚNG chỉ dẫn đó lại làm cổng
+      đỏ. Đây không phải bug của bài — là xung đột giữa hai luật.
+    chua_sua: "cần quyết định của người dùng, không tự nới --strict"
+
+luong_dau_cuoi_chay_that:
+  M01_validate: "0 lỗi trên 3 file"
+  M07_curate: "đếm được — 3 bản ghi · 3 draft · 1 bài decay_risk high (chính bài này)"
+  M06_verdict: >
+    KHÔNG chấm bài mới — verdict.py đọc contract (05_uiux/contracts), không đọc
+    kb/. Giới hạn thật, không phải lỗi. 2 skill_candidates của bài (priority 60
+    và 25) chưa được máy chấm.
+  M03_web: >
+    build 6 file (trước 3). Bài hiện ở /tat-ca/ và /cho-duyet/ (3 bản chờ
+    duyệt), KHÔNG lên /kho/ vì còn draft. Header "0 bài · 3 bản ghi".
+    Màn Danh mục vẫn "0/22 đang dùng" — daDung đếm trên `appr`, đúng thiết kế:
+    cổng người chưa mở.
+
+hai_quyet_dinh_cua_nguoi_dung:
+  file_tho: "xoá khỏi kb/, giữ bản ở _nguon/"
+  hai_khai_niem_moi: >
+    để nguyên ở concepts_proposed. Ngưỡng ≥2 bài là bằng chứng khái niệm có
+    thật, không phải một lần gõ lẻ — giữ được ý nghĩa của răng FR-019.
+
+verify:
+  loai: hard
+  ket_qua:
+    validate_kb: "0 lỗi · 1 cảnh báo (concepts_proposed, đúng thiết kế)"
+    cong_may: "4/4 đã chạy (frozen · danh_muc · kb_mock · g6a)"
+    pytest: 30/30
+    web_test: "26/26, exit 0"
+    build: exit 0
+  ba_nguon_TU_FETCH_khop_nguyen_van:
+    - "anthropic multi-agent: 4×/15× token, 80% variance, non-determinism"
+    - "anthropic building-effective-agents: 4 câu về framework"
+    - "arXiv 2408.04667: 15% variation, gap 70%"
+  hai_nguon_TU_FETCH_SAU_khi_agent_thu_hoi:
+    - "docs.litellm.ai/docs/proxy/users: budget cần Postgres"
+    - "docs.litellm.ai/docs/routing: allowed_fails/cooldown_time là Router-only"
+
+no:
+  - "`check_running` ĐỎ vì `--strict` coi cảnh báo concepts_proposed là lỗi.
+     Xung đột luật, cần người dùng quyết: nới --strict, hay đổi cảnh báo này
+     thành thông tin, hay chấp nhận cổng đỏ khi có đề xuất khái niệm."
+  - "M06 verdict.py không đọc kb/ nên 2 skill_candidates của bài chưa được chấm
+     bằng máy. Đó là giới hạn kiến trúc, không phải lỗi bài."
+  - "Bài còn `review_status: draft` — CHƯA lên site. Duyệt cần người khai 3
+     trường M1 (insight_new, skill_installed, review_minutes)."
+  - "Mục C của research (LiteLLM chi tiết + toàn bộ benchmark pgvector) bị agent
+     thu hồi. Bài KHÔNG trích số nào từ đó, và mục 7 ghi rõ pgvector không dùng
+     để kết luận gì."
+  - "`independent_sources: 4` và `corroboration_factor: 1.6` là lời khai của
+     tôi dựa trên 5 nguồn tự đọc. Người duyệt nên tự kiểm lại con số này."

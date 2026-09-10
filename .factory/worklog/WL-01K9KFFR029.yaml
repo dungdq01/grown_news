@@ -1,0 +1,121 @@
+id: WL-01K9KFFR029
+at: 2026-08-25
+by: claude
+buoc: s8 (M03_web) — chu giao dien
+loai: bo van giai thich kien truc khoi man hinh + dung cong canh
+fr: FR-029-quy-uoc-chu-giao-dien.md
+
+viec: >
+  Nguoi dung: "truy tim tat ca comment hay text guide tren web de xoa di, thieu
+  chuyen nghiep qua" (kem 4 anh), roi: "tim duoc thi xoa di, hoac de text nhung
+  naming convension vao".
+
+bon_anh_la_TRIEU_CHUNG_khong_phai_benh: >
+  Benh: repo viet tai lieu RAT tot cho nguoi sua code, roi de van tai lieu tran
+  ra man hinh nguoi dung. Moi cau deu DUNG TUNG CHU va VO DUNG voi nguoi doc bao.
+  Sua tay mot luot thi lan sau lai co cau moi => quy uoc phai thanh CONG.
+
+phat_hien_truoc_khi_sua: >
+  Nhom 2 (5 dai "may da lam gi") DA duoc AI kia don sang `title=` trong FR-027j
+  — cung mot yeu cau, ho lam truoc mot nhip. Neu khong khao sat ma lao vao sua
+  thi da lam lai viec cua ho. Da bao cao lai cho nguoi dung roi moi hoi pham vi.
+
+hai_cau_hoi_da_chot:
+  pham_vi: "CA HAI nhom — sach het (ke ca 5 dai, tuc lat FR-027f/j)"
+  ba_doan_tab_Nap_nguon: "XOA HET"
+
+# ══ PHAN DANG GIA NHAT: mot regex an mat 177 dong cua DONG NGHIEP ═══════════
+su_co_nghiem_trong:
+  toi_da_lam_gi: >
+    Dung regex `/\*\*[\s\S]*?FR-027j[\s\S]*?\*/\nconst chuTran = ...` de xoa mot
+    helper mo coi. `[\s\S]*?` khong-tham VAN bat dau tu `/**` DAU TIEN cua file,
+    nen no nuot tron 177 dong dau index.ts: GOC, SEP, NGUONG, esc, mang,
+    docTuDia, tg, chen, bar.
+  vi_sao_nguy_hiem_hon_binh_thuong: >
+    index.ts dang mang thay doi CHUA COMMIT cua AI kia (FR-027f/j/k). `git
+    checkout` se xoa luon viec cua ho => khong dung duoc duong lui thong thuong.
+  cach_khoi_phuc:
+    1: "ghep lai khoi tu HEAD theo DONG (khong theo chuoi — chuoi da that bai 3 lan vi indent doi)"
+    2: "build => 'bar' declared twice => xoa ban trung do minh ghep vao"
+    3: "build => 'chuTran is not defined' => dung lai (con mot cho dung o oKpi)"
+    4: "build => 'TRANG_THAI is not defined' => DUNG LAI TU TEST: bon-trang-thai §4b khai ro no phai doc `properties.review_status.enum` cua schema"
+    5: "test layout do => NGUONG thieu `feat`/`phu`/`cot3D`; suy nguoc tu assertion (3 the + 3 dot) => feat 3, phu 2, noiBat 5"
+  dieu_cuu_toi: >
+    TEST LA DAC TA. Ba thu mat (TRANG_THAI, NGUONG.feat/phu/cot3D) deu dung lai
+    duoc CHINH XAC vi co phep kiem noi ro chung phai la gi va lay tu dau. Neu bo
+    test viet "kiem tra bieu do dung" thi da mat that.
+  bai_hoc_ghi_ten: >
+    KHONG dung regex `[\s\S]*?` de xoa MOT khoi trong file lon — no neo tu dau
+    file. Muon xoa mot khoi thi cat theo DONG voi hai neo TRUOC va SAU, hoac
+    doc file roi Edit chuoi chinh xac.
+  da_bao_cao: "co — noi thang trong phan tra loi, khong giau"
+
+cong_moi_chu_giao_dien:
+  muc_1: "quet MOI trang da build — 15 trang, bo comment/script/tooltip/khoi lenh"
+  muc_2: "soi ma FE theo DONG"
+  muc_3: "tooltip <= 220 ky tu — mien tru `title=` chi dung vung neu no van NGAN"
+  muc_4: "chieu nguoc: khoi lenh copy phai CON — don nham la gay luong dan link"
+
+ba_lan_toi_viet_SAI_muc_2:
+  lan_1:
+    lam: "tach chuoi khoi bundle bang regex 3 kieu nhay"
+    sai: "khong lex noi JS bang regex — mot `\"` trong chuoi nhay don ('[data-f=\"insight_new\"]') mo ra chuoi gia roi nuot luon phan MA phia sau"
+    trieu_chung: "cong chi thang vao `body.insight_new = ...`, mot dong GAN khong bao gio len man"
+  lan_2:
+    lam: "loc dong 'trong nhu chu' bang /[<>]/"
+    sai: "`=>` cua arrow function va `<HTMLInputElement>` cua generic deu khop => moi dong ma thanh 'chu'"
+    sua: "doi sang THE HTML that: `</?[a-z][a-z0-9-]*[\\s/>]`"
+  lan_3:
+    lam: "boc truy cap thuoc tinh bang `\\.[a-z_]\\w*`"
+    sai: "`concepts.yaml` trong nhu mot truy cap thuoc tinh => cau 'Khong doc duoc .../concepts.yaml' LOT LUOI"
+    sua: "chua phan mo rong file: `(?!(?:yaml|json|md|py|sqlite)\\b)`"
+    phat_hien_bang: "soi tay, khong phai bang test — nen ghi ra day"
+  lop_loi_chung: "phep kiem BAO DONG GIA thi se bi tat. Tha bo sot co khai con hon to oan."
+
+test_doi_chieu_CO_CHU_DICH:
+  cac-man-con-lai:
+    truoc: "nam DAI phai co nam CAU KHAC nhau (mot cau dung chung o 5 man la nhan quang cao)"
+    sau: "dai KHONG con cau nao — `daiMay` chi nhan mang so; khong loi goi nao truyen chuoi"
+    giu_lai_phan_con_gia_tri: >
+      Phep kiem cu buoc con so tren man den tu NGUON THAT (`validate.py` dem
+      lai 9 cong). Gio doi huong: canh chung KHONG con tren man, va canh o CA
+      HAI file — "don xong" ma tuan sau ai do go lai "9 cong" thi khong ai biet.
+  cau_M1_khong_mat_ma_DOI_CHO: >
+    "May khong duoc dien ho ba truong M1" la cau quan trong nhat trong app.
+    No roi khoi mot DAI TRANG TRI dau man, va phep kiem doi sang cho CO RANG
+    HON: phieu duyet phai hoi du ba o va KHONG tick san o nao. Do moi la B-B1;
+    mot cau chu tren man chi la loi hua.
+
+evidence:
+  - "node web/test/chu-giao-dien.test.js => pass (15 trang + ma FE + tooltip + chieu nguoc)"
+  - "quet cuoi: 0 mau bi cam tren MOI trang da build, ke ca /mock/"
+  - "npm run build => Emitted 72 files"
+  - "chay DOC LAP tung file test => 0 file do"
+  - "khoi phuc index.ts: 3 symbol dung lai tu dac ta cua test, build 72 file nhu truoc su co"
+
+files:
+  - "web/plugins/home-pages/shell.html (xoa 3 .np-lead + .f-duong; viet lai 5 .note, 5 .api-thieu, phu de 3 tab, 3 tooltip vach)"
+  - "web/plugins/home-pages/index.ts (daiMay bo tham so cau; tp-t bo `kb/`; dai canh bao file hong; 2 cau 'Khong doc duoc *.yaml'; KHOI PHUC 177 dong + dung lai TRANG_THAI, NGUONG.feat/phu/cot3D)"
+  - "web/plugins/multiwindow/src/scripts/multiwindow.inline.ts (6 chuoi hien thi; xoa veDuongGhi mo coi)"
+  - "web/styles/prototype.css (xoa .np-lead + .f-duong — mo coi do thay doi nay tao ra)"
+  - "web/test/chu-giao-dien.test.js (MOI)"
+  - "web/test/cac-man-con-lai.test.js (doi chieu 3 khoi, CO CHU DICH theo AC cua FR-029)"
+  - ".factory/fr/FR-029-quy-uoc-chu-giao-dien.md"
+
+khong_dung_vao:
+  - "web/api/** · kb/** · schema · core/** — 0 dong"
+  - "hai khoi lenh copy o man Nap nguon — mien tru 2, co phep kiem canh chieu nguoc"
+  - "comment trong ma nguon — chung la thu lam repo nay doc duoc"
+  - "FR-027j (title= cho chu thich NGAN) van con hieu luc o hang KPI"
+
+no_con_lai:
+  - "NGUOI CHOT: mo lai 4 man trong anh — khong con duong dan/ten truong/ma noi bo nao"
+  - >
+    Muc 2 cua cong la HEURISTIC (chi xet dong co dau tieng Viet hoac the HTML VA
+    co nhay). Cau thuan ASCII khong dau se lot. Da khai o FR-029; luoi chinh van
+    la muc 1 — quet trang DA BUILD.
+  - >
+    AI KIA dang sua shell.html/prototype.css/index.ts CUNG LUC. Da doc lai file
+    ngay truoc moi sua; markup-matches-css co lan do vi `pt3` cua ho chua co CSS
+    roi tu xanh khi ho ghi CSS. KHONG go thay doi dang do cua ho.
+  - "kiem lai giup toi: 177 dong khoi phuc co dung y ban dau cua ho khong (ho biet ro hon)"

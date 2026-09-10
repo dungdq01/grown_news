@@ -1,0 +1,97 @@
+id: WL-01K9J5FR016
+at: 2026-08-19
+by: claude
+buoc: s8 (M03_web) — rà bản chạy thật
+loai: sửa lỗi + amend UI contract
+fr: FR-016-doc-duoc-va-tach-khoi.md
+
+viec: >
+  Người dùng rà `127.0.0.1:8787` và nêu 6 điểm: panel dính nhau (trang chủ + màn
+  Kho), chữ mờ/conflict màu (nêu 2 lần), số thống kê không màu, màn Nạp nguồn
+  chật và không mô tả trường, và luồng Sửa bài bị lỗi.
+
+pham_vi_ghi:
+  - web/styles/prototype.css
+  - web/plugins/home-pages/shell.html
+  - web/plugins/home-pages/index.ts
+  - web/plugins/multiwindow/src/scripts/multiwindow.inline.ts
+  - web/test/page-weight.test.js        # nới ngưỡng CÓ CHỦ ĐÍCH
+  - web/plugins/WORKLOG.md · web/WORKLOG.md · web/styles/WORKLOG.md
+  - project_map.yaml (ui_frozen v1.4) · .factory/fr/FR-016
+
+bug_that_1_mat_du_lieu_khi_sua:
+  trieu_chung: "sửa bài trên web → 422, người dùng thấy 'đang lỗi'"
+  nguyen_nhan: >
+    guiForm() dựng lại frontmatter TỪ SỐ 0 từ 12 ô của form. Frontmatter thật có
+    tới 40 trường — citations_sampled/verified, ingested_at, url_normalized,
+    skill_candidates, 3 trường M1... Mọi trường ngoài form bị XOÁ khi PUT.
+    Bài origin=external mất citations_* ⇒ schema chặn ⇒ 422. Không chỉ là lỗi
+    hiển thị: nếu schema không chặn thì đó là mất dữ liệu im lặng.
+  sua: "FM_GOC giữ frontmatter gốc; form chỉ ĐÈ ô nó có (Object.assign)"
+  tai_hien_va_kiem_chung: >
+    Dựng kho tạm + server cổng 8801, PUT theo cách CŨ (12 trường) ⇒
+    422 "'citations_sampled' is a required property" — đúng giả thuyết.
+    PUT theo cách MỚI (giữ gốc + đè) ⇒ 200, one_liner mới nằm trong .md.
+
+bug_that_2_cua_so_che_form:
+  nguyen_nhan: "cửa sổ đọc nổi trên mọi thứ, không đóng khi doiView('nap')"
+  sua: "dong(id) TRƯỚC khi chuyển màn — nội dung đã nằm trong form rồi"
+
+bug_that_3_mau_chu:
+  nguyen_nhan: >
+    LỖI CỦA CHÍNH FR-011: 7 chỗ viết `color:var(--muted)`. `--muted` là token
+    NỀN (#F1F1EE) chứ không phải màu chữ — nhãn form gần như trắng trên trắng.
+    Đây là phần "conflict màu" nặng nhất trong ảnh chụp.
+  sua: "7 chỗ → --ink-2. Cộng 43 chỗ --ink-3 → --ink-2 cho chữ phụ nói chung."
+  vi_sao_khong_doi_gia_tri_token: >
+    contrast-audit.json là hợp đồng frozen, và script đo 50 cặp × 4 ảnh nền
+    KHÔNG có trong repo (FR-014 khai điều này). Đổi số màu là tự bịa một bằng
+    chứng không kiểm được. --ink-2 (#3A3A42, 10.98:1) và --ink-3 (#6B6B74,
+    5.14:1) ĐỀU đã nằm trong 50 cặp đã validate ⇒ chuyển giữa hai cặp đã
+    validate, chọn cặp tốt hơn. Audit vẫn đúng nguyên văn.
+  giu_lai: "::placeholder vẫn --ink-3 — gợi ý thì nên mờ hơn nội dung"
+
+layout:
+  dinh_khoi: >
+    `.pn` cách nhau --s-2xl nhưng `.two > .pn` bị đặt margin-bottom:0 (L2 —
+    thẳng đáy) và `.two` KHÔNG có margin nào ⇒ panel kế dán vào đáy. Màn Kho
+    tệ hơn vì cột phải lệch xuống --s-lg (FR-014) nên chạm hẳn panel dưới.
+    Sửa: .two{margin-bottom:--s-2xl}, màn rộng cộng thêm --s-lg bù phần lệch.
+  mau_so_kpi: >
+    4 ô KPI trả lời 4 câu khác nhau mà cùng màu đen. Gán class trạng thái:
+    ok/warn/bad/tong. Số 0 KHÔNG tô màu trạng thái (.kp.trong) — "0 bài bị
+    loại" tô đỏ là báo động giả.
+
+man_nap_nguon: >
+  3 cột → 3 TAB. Lý do: form viết bài có 14 trường + textarea 14 dòng, nhét
+  vào 1/3 bề ngang thì không dùng được; và ba lối là ba LOẠI HÀNG, mỗi lần chỉ
+  làm một. Mỗi trường form giờ có mô tả (bắt buộc/tuỳ chọn, dùng để làm gì),
+  mỗi <option> nói nghĩa của giá trị. Tab mang màu riêng lấy từ bảng màu loại
+  nguồn đang có — không sinh màu mới.
+
+dat_ten_nut: >
+  Người dùng hỏi "nút 'thôi' là gì?" — câu hỏi đó chính là lỗi. Viết quy ước
+  6 luật vào web/plugins/WORKLOG.md §"Đặt tên nút". Sửa 3 nhãn: thôi → Đóng
+  (kèm chú thích "bỏ thay đổi chưa lưu, không xoá gì trong kho") · "ghi vào
+  kho (draft)" → "Ghi vào kho" / "Lưu thay đổi" theo chế độ · thêm nút Mở form.
+
+page_weight_noi_nguong_co_chu_dich:
+  do_duoc: "trang chủ 43 KB > ngưỡng 40 sau khi shell mang thêm SCR-04"
+  sua_that_truoc: >
+    Cắt comment HTML lúc phát (index.ts): 18 khối = 2.3 KB × MỌI trang. Comment
+    viết cho người sửa file, không cho trình duyệt. Sau khi cắt: đúng 40 KB.
+  vi_sao_van_noi_len_48: >
+    Đứng sát mép thì mỗi câu mô tả thêm vào là một lần đỏ vì nhiễu, và lần sau
+    ai đó sẽ nới ngưỡng cẩu thả. Lỗi mà test này sinh ra để bắt là CSS/JS bị
+    nhúng lại — hồi đó 86 KB/trang. 48 vẫn cách xa mức đó.
+
+evidence:
+  - cd web && npm test                  # 22/22 xanh
+  - node web/test/page-weight.test.js   # trang chủ 40 KB (ngưỡng 48)
+  - python core/tests/check_worklog.py  # số liệu 3 file khớp thực tế
+  - "tay: PUT cách cũ ⇒ 422 citations_sampled; PUT cách mới ⇒ 200 + .md đổi"
+
+no_con_lai:
+  - Chưa xem lại màn Nạp nguồn ở bề ngang <1080px trên máy thật (CSS đã có
+    nhánh 1 cột, chưa mắt thấy)
+  - FR-016 trạng thái MỞ — chờ người ký

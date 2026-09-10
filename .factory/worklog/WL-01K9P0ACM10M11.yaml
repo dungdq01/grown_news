@@ -1,0 +1,84 @@
+id: WL-01K9P0ACM10M11
+at: 2026-08-29
+by: claude
+buoc: M10_tailieu + M11_video — viết hai cổng mà spec khai từ C0 nhưng chưa ai sinh
+loai: bàn giao (nợ C9 — hợp đồng s6 chưa có bề mặt)
+
+object:
+  task:
+    - 07_plan/M03_web/tasks/T03-55-test-man-video.md
+    - 07_plan/M03_web/tasks/T03-56-test-man-tai-lieu.md
+  test:
+    - web/test/man-video.test.js       # MỚI — 5 mục, AC-2.2.1/2.2.2/2.3.1/2.3.2
+    - web/test/man-tai-lieu.test.js    # MỚI — 5 mục, AC-2.2.1/2.2.2/2.3.1
+    - web/package.json                 # đăng ký cả hai vào `npm test`
+  doc:
+    - web/test/WORKLOG.md
+    - web/WORKLOG.md
+
+may_xanh:
+  - "cd web && node test/man-video.test.js     -> pass (21 mục)"
+  - "cd web && node test/man-tai-lieu.test.js  -> pass (24 mục)"
+  - >
+    `check_g6b`: `M10_tailieu` và `M11_video` từ **FAIL … KHÔNG ai sinh** về
+    **ok** — đây là bằng chứng ngoài lời tôi khai
+  - "quét web 72/73 xanh (chỉ `he-kinh`) · pytest 42 · 21/25 cổng Python"
+
+lo_da_ton_tai_tu_C0:
+  - >
+    Hai spec khai **BẢY** AC bằng `cmd: node test/man-video.test.js` /
+    `man-tai-lieu.test.js` từ lúc FR-038 mở module — và hai file đó CHƯA TỪNG
+    TỒN TẠI. Bảy dòng hợp đồng trỏ vào hư không
+  - >
+    `check_g6b` CÓ nhìn thấy: nó in `KHÔNG ai sinh: 1` / `: 2`. Nhưng dòng đó
+    **cảnh báo chứ không đỏ**, nên suốt nhiều đơn vị việc không ai phải dừng. Một
+    cổng cảnh báo là cổng đọc-thì-biết, và người ta chỉ đọc khi đã nghi
+  - >
+    Hai spec FROZEN ⇒ đường tắt "sửa spec cho trỏ sang cổng đã có" không mở. Viết
+    đúng hai cổng chúng khai
+
+ve_nang_khong_ai_do:
+  - >
+    Mở màn `/video/` phải **0 request ra ngoài** (M09-R3). Không cổng nào trong
+    71 file đo nó: `no-leak.test.js` — cái tên gần nhất — đo LISTENER rò, không
+    đo REQUEST. Nhúng video là lần đầu sản phẩm gọi ra mạng ngoài; một màn danh
+    sách tự gọi youtube là gửi IP người đọc cho bên thứ ba mà không ai bấm gì
+  - >
+    Đo được: 0 iframe, 0 `src`/`href` tuyệt đối ra ngoài ⇒ cổng XANH ngay. Nên nó
+    tự chứng minh ĐỎ ĐƯỢC — chèn một iframe youtube vào bản sao HTML rồi đòi cả
+    hai vế bắt. Trong dự án này đã HAI LẦN một cổng xanh vì phép cắt sai chỗ
+
+khong_do_lai_thu_da_co_cong:
+  - >
+    `o-media-sua.test.js` §3 đã đo vế KẾT QUẢ của M10 AC-2.2.2 (`sha256` không
+    đổi qua PUT). `man-tai-lieu` đo vế CƠ CHẾ mà spec nêu đích danh: *"và điều đó
+    đúng vì form CÓ ô `media`, không vì `FM_GOC` giữ hộ"*. Chép phép đo cũ sang
+    là hai bản của một sự thật, tức hai chỗ để lệch
+
+tu_bat_duoc:
+  - >
+    SUÝT SỬA MÀN THAY VÌ SỬA PHÉP ĐO. §4 của `man-video` đo ô chủ đề bằng tiền tố
+    id `nv-` tôi tự nghĩ ra; nó FAIL trong khi ô CÓ THẬT (id là `vd-`). Tin phép
+    đo thì việc tiếp theo là đi thêm một ô đã có. Cả hai cổng nay đo hai vế độc
+    lập — CHỮ người đọc thấy, và MỘT Ô tồn tại cho chiều đó
+  - >
+    Mỗi cổng mang bằng chứng phép đo KHÔNG MÙ: `man-tai-lieu` đòi khối `v-all`
+    có nhiều hơn một loại. Ba mục "màn chỉ hiện tài liệu" vẫn xanh nếu tôi cắt
+    nhầm vào một khối khác cũng chỉ chứa thẻ tài liệu
+  - >
+    Neo vá bằng chuỗi CÓ DẤU đi qua heredoc của bash và không khớp — lớp lỗi
+    escaping đã tái đi tái lại. Đổi sang neo ASCII thuần + ghi script ra file
+
+con_lai:
+  - "wireframe bốn màn mới · `memory/decisions.md` · `FROZEN.lock` ký lại (C9)"
+  - "tám cổng Python vắng CI — ô backlog M01_core, chờ người quyết"
+
+đỏ_do: chưa quy được chủ  # bảy AC vô bề mặt tích tụ từ C0 (FR-038)
+
+do_do:
+  - cong: he-kinh.test.js
+    do_do_boi: ảnh 708 KB người dùng thêm — `python core/tools/toi_uu_anh_nen.py`
+  - cong: check_frozen.py
+    do_do_boi: chờ NGƯỜI ký sau khi FR-039 duyệt
+  - cong: check_danh_muc.py · check_skill.py · check_running.py
+    do_do_boi: agent khác · và hệ quả của hai cổng trên

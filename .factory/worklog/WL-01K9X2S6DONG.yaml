@@ -1,0 +1,146 @@
+id: WL-01K9X2S6DONG
+at: 2026-09-02
+by: claude
+buoc: "dong s6 — them testcases.md + workflow.md + backlog.md cho SAU module dot hai"
+loai: s6; chay PHEP THU cua chinh s6 tren 123 AC
+gate: G6A du 9 artifact cho M12..M17
+
+object:
+  - 06_modules/M12_chungcat/{testcases,workflow,backlog}.md
+  - 06_modules/M13_truyhoi/{testcases,workflow,backlog}.md
+  - 06_modules/M14_chatbot/{testcases,workflow,backlog}.md
+  - 06_modules/M15_kenh/{testcases,workflow,backlog}.md
+  - 06_modules/M16_artifact/{testcases,workflow,backlog}.md
+  - 06_modules/M17_cong/{testcases,workflow,backlog}.md
+  - 06_modules/M03_web/backlog.md      # +1 o keo theo (C3 sinh id tren heading)
+  - 06_modules/M12_chungcat/spec.md    # AC-3.1 AC-6.1 sua
+  - 06_modules/M13_truyhoi/spec.md     # AC-2.2 sua
+  - 06_modules/M14_chatbot/spec.md     # AC-8.1 AC-4.3 sua
+  - 06_modules/M15_kenh/spec.md        # AC-2.4 AC-5.2 sua
+  - 06_modules/M16_artifact/spec.md    # AC-4.1 AC-2.2 sua
+  - 06_modules/M17_cong/spec.md        # AC-3.4 sua
+  - .factory/fr/FR-047-bay-cua-cho-may-o-loi.md   # DA DUYET 2026-09-02
+
+evidence:
+  - "9 artifact x 6 module = 54/54"
+  - "o backlog mo: 0 tren ca sau module"
+  - "check_g6a · check_ba · check_rule_surfaces · check_map · check_mermaid => xanh"
+  - "pytest core/tests -q => 42 passed"
+  - "123 AC qua phep thu; 11 AC mo ho; da sua het 11"
+
+# ══ KET QUA PHEP THU CUA s6 ════════════════════════════════════════════
+tong_ket: >
+  s6 noi: "viet khong noi testcase cho mot AC => AC do mo ho => DUNG, sua AC".
+  Do la phep kiem RE NHAT tren 123 AC, va no CHUA CHAY LAN NAO truoc hom nay.
+  Ket qua: 112/123 viet duoc ngay, 11 AC mo ho — 9%. Da sua het 11.
+
+muoi_mot_AC_mo_ho:
+  M12_AC-3.1: >
+    "0 dong o LOI" ma khong dinh nghia LOI gom file nao. Khong chot thi cong hoac
+    DO OAN (dung mot file phu) hoac KHONG DO DUOC (dinh nghia LOI rong toi muc moi
+    thay doi deu nam ngoai). => LOI = chungcat/src/** TRU adapter/**.
+  M12_AC-6.1: >
+    "log truoc khi gui" ma khong noi DO BANG GI. Do "dong log co ton tai" thi mot
+    cai dat log-SAU-khi-gui VAN XANH o ca thanh cong; con so timestamp cua ta voi
+    cua request la so HAI DONG HO khac nhau. => do bang `seq` do TA cap, log mang
+    seq va payload gui di cung mang seq do.
+  M13_AC-2.2: >
+    "anchor khop tung ky tu voi anchor renderer M03 sinh" — nhung M03 CHUA SINH
+    ANCHOR NAO. Do: grep anchor trong web/render/ + web/plugins/ => 0; <h2>/<h3>
+    trong site da build KHONG co id. Khong co gi de so.
+    Nang hon: ca so do dia chi file#anchor CHUA CO NGUOI TIEU THU — M13 se sinh
+    anchor tro vao HTML khong co id tuong ung, va chatbot se trich dan nhung dia
+    chi BAM VAO KHONG TOI DAU. => AC do thu ton tai hom nay (anchor_py <-> slugGoiY);
+    ve con lai thanh o [ ] o backlog M03 (viec cua C3).
+  M14_AC-8.1: >
+    Khai "nhan `bot` HOAC `nguon[]`" ma bo ngo ca CO CA HAI. Viet testcase buoc toi
+    BIA mot luat uu tien — dung thu s6 cam. => khai tuong minh: nguon[] thang, VA
+    ghi log khi hai thu cung co (hai thu cung co la dau hieu nguoi goi dang nham).
+  M14_AC-4.3: >
+    "moi lan ban duoc log" doc duoc thanh "chi lan thanh cong". Ca dat nhat la model
+    DINH khai co-nhung-mau-thuan nhung BI BO vi thieu hai dia chi. Khong log ca do
+    thi ba thang sau dem duoc "so lan tu choi" ma KHONG dem duoc "so lan model dinh
+    lam dung" — va con so thu hai moi noi len nhanh nay co bi lam dung khong.
+    => log HAI ca, phan biet duoc.
+  M15_AC-2.4: >
+    M8.2 "<= 20% cong kenh thu nhat" khong noi TONG GOM GI. Gom ca ha tang dung
+    chung => mau so phinh, ti le LUON DAT, cong KHONG DO DUOC. Chi tinh adapter =>
+    mau so nho, mot Discord binh thuong CUNG VUOT, cong DO OAN.
+    => DONG CUNG mau so tai thoi diem chi co Telegram, va cong in CA HAI so.
+  M15_AC-5.2: >
+    "tin nhan MAT, va dieu do duoc ghi log" doc duoc thanh phai DEM DUOC so tin.
+    Telegram giu update 24h va API KHONG noi "ban mat N tin". Viet testcase buoc toi
+    bia mot phep dem khong co nguon. => khai thu BIET DUOC: khoang thoi gian offline,
+    va neu >24h thi noi update trong khoang do CO THE da mat.
+  M16_AC-4.1: >
+    "artifact mang >=1 dia chi phan giai duoc ve bai nguon" — nhung bang media co
+    dung BA cot (sha256, byte, la_dan_xuat), KHONG cot nao tro ve slug. Nen ca
+    "liet ke artifact cua bai X" — thu UI can — KHONG viet noi testcase.
+    => tach HAI TANG: tang FILE (metadata) la AC cua M16, kiem duoc ngay; tang KHO
+    (truy van duoc) la FR toi M09. Gop hai tang vao mot AC la hua mot thu M16
+    KHONG THE lam mot minh.
+  M16_AC-2.2: >
+    "khong xoa byte" chi cam XOA. Nhung sinh lai cung loai artifact cho cung bai
+    GHI DE ban cu thi pha byte y het, va KHONG CO `unlink` nao de grep.
+    => cam ca xoa lan ghi de, va phep do la TRANG THAI truoc/sau (moi sha256 cu giu
+    nguyen, so file chi TANG), khong phai mot phep quet ma.
+  M17_AC-3.4: >
+    "rate limit ... nguong doc tu cau hinh" do bang "grep mot so go cung => do" chi
+    dung voi duong TU VIET. spec §0 khai ngon ngu cong/ CHUA CHON (Caddy · nginx ·
+    tu viet) — voi Caddy thi so trong cau hinh CHINH LA cach no hoat dong, nen cong
+    se DO OAN. => do HANH VI: ban N+1 request, doi cai thu N+1 bi chan; doi nguong
+    roi ban lai => diem chan doi theo.
+  M12_AC-1.4_va_1.5_them_moi: >
+    Khong phai AC mo ho — la AC THIEU, phat hien khi doc lai sau khao sat dot nam.
+    Bon dich vu THO cung nam tren 127.0.0.1, nen AC-1.2 (bind loopback) KHONG noi
+    duoc AI GOI. Payload job mang `nguon: [slug...]` do nguoi goi neu — dung hinh
+    dang CVE-2026-44560. => them AC-1.4 (chi loi goi tu LOI) + AC-1.5 (nguoi_dung_id
+    do LOI gan) + M12-R7.
+
+BA_LOP_LOI_LAP_LAI: >
+  Muoi mot AC mo ho roi vao dung BA lop, va lop nao cung la mot cach cong CHET IM LANG:
+  1. KHONG DINH NGHIA DON VI DO  (M12-3.1 "loi" · M15-2.4 "tong") — cong hoac do oan
+     hoac khong do duoc, tuy nguoi cai dat hieu the nao.
+  2. DO MOT THU KHONG TON TAI  (M13-2.2 anchor cua M03 · M15-5.2 so tin mat ·
+     M16-4.1 truy van tang kho) — testcase phai BIA ra nguon so lieu.
+  3. THIEU MOT NUA CUA PHEP DO  (M12-6.1 thu tu · M14-8.1 ca "ca hai" ·
+     M14-4.3 ca bi bo · M16-2.2 ghi de · M17-3.4 ba duong ngon ngu) — AC dung ve y
+     nhung bo mot duong pha.
+
+phep_thu_nay_dang_gia_bao_nhieu: >
+  11/123 = 9% AC mo ho. Neu khong chay phep thu, ca 11 se di vao s8 va thanh 11 cong
+  hoac DO OAN hoac XANH RONG. Mot cong xanh rong te hon khong co cong: no lam nguoi
+  ta tin.
+  Va hai trong 11 khong phai loi cau chu — chung lo ra thu THIEU HAN o cho khac:
+  M13-2.2 lo ra "so do dia chi file#anchor chua co nguoi tieu thu";
+  M16-4.1 lo ra "bang media khong lien ket duoc voi bai nao".
+  Ca hai la lo KIEN TRUC, va chung chi lo ra khi co ai do co viet mot testcase.
+
+o_dat_o_module_KHAC_—_va_vi_sao: >
+  Hai no khong dat o module phat hien:
+  - C3 sinh `id` tren heading  => o [ ] o 06_modules/M03_web/backlog.md
+  - bang media khong tro ve slug => se la o o M09 khi FR mo (chua mo)
+  Ly do: s6 doi "backlog module sach" de dong G6A. Mot o cua module KHAC nam trong
+  backlog cua toi thi no chan G6A cua toi vi mot quyet dinh khong phai cua toi.
+  Nen: o dat o noi CONG VIEC song; noi phat hien chi giu van xuoi + con tro.
+
+do_do:
+  check_danh_muc + check_skill: "FR-039 cua toi; cho sua o core/skill-src (agent khac so huu)"
+  check_frozen: "cho NGUOI ky"
+  check_running: "he qua hai muc tren"
+  check_g6b + check_khai_mot_noi + check_worklog: "AGENT KHAC — UI frame dot hai"
+
+no_con_lai:
+  - "s6 DONG cho sau module dot hai (M12..M17)."
+  # M01..M11 thieu testcases.md + workflow.md: CHU DU AN DA QUYET 2026-09-02 —
+  # "M1 va M11 co ban chung ta hoan thien roi, gio tap trung vao M12-M17 thoi".
+  # => KHONG phai no. Muoi mot module do da THI CONG va dang chay; hai artifact
+  # thieu la khoang trong GIAY TO, khong phai khoang trong chuc nang. Viet
+  # testcase nguoc cho ma da chay la mo ta cai da co, khong phai phep thu —
+  # dung gia tri cua phep thu s6 nam o cho no chay TRUOC khi co ma.
+  # Ghi ra day de lan sau khong ai doc "6/17 module co testcases.md" roi tuong
+  # do la mot no bi bo quen.
+  - "FR moi CHUA mo: rate limit + entropy >=128 bit + log that bai cua M17 (lo trong FR-045 da duyet). FR-047 §4 co y KHONG gop — gop la giau mot lo an ninh trong mot FR ve hop dong."
+  - "FR moi CHUA mo: bang media can cot tro ve slug (M09 so huu) — chan tang kho cua M16 AC-4.1."
+  - "FR-047 da duyet nhung CHUA thi cong: bay cua o M08. Ba module (M12 M15 M17) khong chia task duoc truoc do."
+  - "CI buoc :43 van do — T02-4 (di tru kb/) chua chay. Khong lien quan s6."

@@ -1,0 +1,105 @@
+id: WL-01K9J1FILTER
+at: 2026-08-19
+by: claude
+buoc: s8 (M03_web)
+loai: feature
+plan: upgrade.md muc 1
+
+viec: >
+  Sidebar lọc màn Tất cả (hai tầng) + nối màn Khái niệm với dữ liệu thật.
+  Bước 1/6 của plan nâng cấp theo upgrade.md.
+
+pham_vi_ghi:
+  - web/plugins/home-pages/index.ts
+  - web/plugins/home-pages/shell.html
+  - web/styles/prototype.css
+  - web/plugins/multiwindow/src/scripts/multiwindow.inline.ts
+  - web/test/filter-counts.test.js
+  - web/package.json
+
+phan_tich_truoc_khi_lam: >
+  upgrade.md muc 1 yêu cầu "thêm category để phân loại". Đo trên 13 bản ghi
+  sample TRƯỚC khi code:
+
+    source_type  enum đóng 6 giá trị     phủ 13/13   dạng nguồn
+    concepts     danh mục kiểm soát 22   phủ  8/13   chủ đề kỹ thuật
+    tags         tự do, không ràng buộc  phủ 12/13   từ khoá bề mặt
+
+  Ba số liệu quyết định KHÔNG thêm trường mới:
+    1. Không tag nào trùng tên concept nào ⇒ hai chiều đã phân vai sạch
+    2. 7/12 tag chỉ xuất hiện 1 lần ⇒ từ khoá, không phải danh mục để lọc
+    3. Thêm `category` là chiều thứ tư cho cùng việc, và đụng schema FROZEN
+
+  ⇒ Vấn đề thật không phải thiếu trường mà là EMITTER CHƯA ĐỌC chúng.
+  Khớp PRD U6 (prd.md:142): "lọc theo concepts — chính xác vì danh mục được
+  kiểm soát, không cần embedding".
+
+vat_the:
+  loi_parser_phat_hien_som:
+    what: >
+      docTuDia thử JSON.parse từng dòng rồi fallback về chuỗi. YAML flow style
+      hợp lệ `[a, b]` KHÔNG phải JSON hợp lệ (thiếu ngoặc kép) nên nó ngã và
+      trả về CHUỖI "[a, b]".
+    bang_chung: mau-dat-chuan.md:11 viết đúng dạng đó
+    hau_qua_neu_bo_qua: >
+      Filter rỗng với MỌI file thật, còn sample (JSON) vẫn chạy đúng ⇒ lỗi chỉ
+      lộ khi nạp bài thật, tức muộn nhất có thể.
+    sua: hàm mang() chịu cả JSON array và YAML flow style
+
+  loi_dem_lech_tap:
+    what: sidebar đếm concepts trên `appr` nhưng lưới hiện `tatCa`
+    bang_chung: >
+      eventual-consistency — nhãn 1, lọc ra 2 thẻ (1 approved + 1 draft).
+      Test filter-counts.test.js bắt được, không phải mắt người.
+    sua: sidebar đếm trên cùng tập với lưới (tatCa)
+    ghi_chu: >
+      Màn Khái niệm CỐ Ý vẫn dùng `appr` — nó trả lời "danh mục dùng tốt chưa",
+      chỉ bài đã duyệt mới lên web và mới vào hệ số kiểm chứng chéo.
+      Hai màn hai câu hỏi khác nhau, không phải bất nhất.
+
+  moc_cb:
+    what: mốc data-mount DUY NHẤT chưa bao giờ được fill (shell.html:139)
+    truoc: >
+      Số "11 khái niệm" và 3 mục retry-jitter/prompt-caching/plugin-lifecycle
+      là chữ gõ tay trong shell. Panel trái rỗng vĩnh viễn.
+    sau: >
+      Đọc kb/concepts.yaml (22 mục, CHỈ ĐỌC — frozen + deny S1), đếm mỗi
+      concept được bao nhiêu bài approved dùng, vẽ bằng bar() đã có.
+      Cột phải gom concepts_proposed + số lần, đánh dấu mục >=2 (ngưỡng M07).
+    them: v-concepts giờ có URL riêng /khai-niem/ — trước là view duy nhất không có
+
+  bo_ba_select_gia:
+    what: 3 <select> ở màn Tất cả không có mã xử lý nào
+    sua: thay bằng sidebar filter thật
+    no: >
+      CSS .tools (prototype.css:238-256) giờ thành mồ côi — không markup nào
+      dùng. KHÔNG xoá (CLAUDE.md §3: dead code có sẵn thì báo, không tự xoá).
+
+quyet_dinh_ky_thuat:
+  loc_client_side: >
+    Lọc bằng class .off trên thẻ, KHÔNG build lại trang. Site tĩnh nên mọi thẻ
+    đã có trong DOM. Hai tầng CỘNG DỒN (AND) giữa tầng, HOẶC (OR) trong tầng.
+  thu_tu_delegation: >
+    Nút lọc bắt TRƯỚC [data-open]. .fl-b không có data-open, nhưng để sau thì
+    một nút lọc lồng trong thẻ .cd sẽ mở cửa sổ thay vì lọc.
+  tags_khong_vao_sidebar: hiện trên thẻ (.tgs) để đọc, không để lọc
+
+verify:
+  loai: hard
+  lenh:
+    - "cd web && npm run check"          # type-check sạch
+    - "cd web && npm test"               # 14/14 (thêm filter-counts)
+    - "python core/tests/check_frozen.py"  # + 8 cổng khác, 9/9 OK
+  ket_qua: xanh
+  test_moi: >
+    web/test/filter-counts.test.js — số trên nhãn PHẢI khớp số thẻ (6 nút loại
+    + 10 nút khái niệm), parser đọc được mảng, #cb đã nối. Chính test này bắt
+    được lỗi đếm lệch tập.
+  kiem_tay: >
+    Bản mock: 6 nút loại nguồn, 10 nút khái niệm, 13 thẻ, 8/13 thẻ có concepts
+    thật, 10/22 concept đang dùng, retry-jitter 2× đạt ngưỡng gộp.
+
+no:
+  - "Lọc chưa lưu vào URL — bấm lọc rồi F5 là mất. Chưa cần vì site một người
+     dùng, nhưng là chỗ mở nếu muốn chia sẻ link đã lọc."
+  - "CSS .tools mồ côi, chưa xoá (không thuộc phạm vi việc này)."

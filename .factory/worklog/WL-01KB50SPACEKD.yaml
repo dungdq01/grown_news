@@ -1,0 +1,45 @@
+id: WL-01KB50SPACEKD
+luc: 2026-09-09 (PM-Space)
+ai: claude (PM-Space)
+viec: ky ADR-09 + FR-080 (chu du an uy quyen) · dung 2 worktree · mo T04-90 + space-plan
+object:
+  - 04_system/adr.md#ADR-09              # DA DUYET
+  - .factory/fr/FR-080-view-ban-ghi-mang-cot-space.md   # DA DUYET
+  - 07_plan/M04_ci/tasks/T04-90-check-scope-hai-nhanh.md  # g6b ok
+  - 07_plan/space-plan.md                # con tro, khong chep task
+  - git worktree: ../gn-m13 (m13) · ../gn-space (space)
+noi_dung: |
+  Nap checklist song-song §0-§5. Ba chan cua §0: (0.2) worktree DA DUNG — 3
+  cai, `git worktree list` = 3. (0.3) hai chu ky DA CO. (0.1) check_scope
+  CHUA CO ⇒ T04-90 mo cho dev M04, CHAN CUNG truoc khi hai nhanh go ma.
+  FROZEN.lock treo (§2.4) da duoc xu o commit 8ccc653 — khong con no.
+  Dai ID Space: T##-90+ (rule 13), FR-081+. But project_map: PM-Space giu
+  toi khi ADR-09 ap xong. Ba canh xuyen nhanh ghi trong space-plan.
+  CHO: chu du an giao T04-90 cho dev M04 (hoac PM-Space tu viet neu duoc phep
+  — cong nay la thuoc do cua CA HAI nhanh nen nguoi viet khong nen la mot PM).
+ban_giao_dev: |
+  2026-09-10 — PLAN SPACE XONG, 9 don vi check_g6b ok, 0 loi thuoc nhanh Space.
+  Thu tu ban: T04-90 -> T01-90 (+NGUOI ky lock) -> T04-91 -> T03-193/T08-90
+  -> T01-91/T01-92 -> T03-192/T03-190 (wireframe SCR-24 cho duyet) /T03-191.
+  FR-080 DA DUYET (view ban_ghi + cot space) · FR-081 DA DUYET 2026-09-10
+  (bot = mot nut tren cay, ap khi M14 vao s6, PM-M13 review).
+  Kiem dinh chat luong: 4 lo tu tim tu va (phu_thuoc T04-91, hai don vi TEST
+  thieu chu, con tro cong sai, 4 cap tranh xuyen nhanh) + 2 lo boundary
+  check_g6b bat (T02-90 -> T01-92, T08-91 -> T03-193).
+  CHO: dev nhan viec; chu du an duyet SCR-24 khi toi buoc 6.
+tu_bao_vi_pham_rule_17: |
+  2026-09-10 — PM-Space TU BAO: doc rule 17 moi chot, kiem lai 4 commit cua minh
+  o `main` va XAC NHAN DA GOM commit cua nguoi khac HAI LAN, dung thu rule 17
+  sinh ra de chan:
+    · 7a870f8 — gom T03-141..147 (7 task cua nhanh M03/M13, khong phai Space)
+    · a38310a — gom FR-061a · WO-082..087 · 3 worklog cua nguoi khac
+  Nguyen nhan: dung `git add -A 07_plan/` va `git add -A .factory/` tren cay
+  `main` dung cho — dung "quet ca ban" nhu rule 17 mo ta. Va sai them mot lop:
+  PM-Space le ra lam trong ../gn-space (rule 17 + checklist §0.2) nhung da lam
+  thang tren main tu dau.
+  KHONG tu sua lich su (revert/rebase tren main la rui ro hon cai loi) — bao
+  NGUOI, de chu du an quyet. Tu gio:
+    (1) moi thao tac Space chuyen sang worktree ../gn-space, nhanh `space`;
+    (2) CAM `git add -A` — chi `git add <duong cu the>` tung file cua minh;
+    (3) truoc moi commit chay `git status --short` va doc tung dong.
+  object: 7a870f8 · a38310a · rule.md muc 17

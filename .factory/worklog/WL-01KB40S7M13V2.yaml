@@ -1,0 +1,53 @@
+id: WL-01KB40S7M13V2
+luc: 2026-09-09 (phien PM M13)
+ai: claude-fable-5-1 (PM M13)
+viec: s7 plan M13 SUA sau duyet — ap FR-072/073 vao plan, tach bang khai ve M01, them chunk hien vat + CI
+gate: G6B (soft) — chu du an DUYET 2026-09-09 ("1 duyet"; "2. tieng Trung phon the / gian the deu duoc")
+object:
+  - 07_plan/M13_truyhoi/tasks/T13-0-hop-dong-va-bang-khai.md   # viet lai: don vi GIAY ap FR-072 + FR-073 + khoa `space`
+  - 07_plan/M13_truyhoi/tasks/T13-1-test-unit.md                # 15 -> 18 cong; golden.yaml ve day (R1)
+  - 07_plan/M13_truyhoi/tasks/T13-2-indexer-chunk-anchor.md     # +pyproject.toml, dedup -1/-2, AC6 dia_chi
+  - 07_plan/M13_truyhoi/tasks/T13-3-chuan-hoa-ba-thu-tieng.md   # ten ham chuan_hoa_tim, doc dai-han.json
+  - 07_plan/M13_truyhoi/tasks/T13-4-service-query-rank.md       # /tim -> POST /truy-hoi; AC6 _tu_ai() goi_duoc/aud 403
+  - 07_plan/M13_truyhoi/tasks/T13-5-facet-tap-nguon.md          # tap_nguon -> nguon (null tuong minh, thieu => 400); pham_vi TANG + space
+  - 07_plan/M13_truyhoi/tasks/T13-6-golden-va-tin-hieu.md       # ve zh soft co ly do; bo golden.yaml khoi pham_vi
+  - 07_plan/M13_truyhoi/tasks/T13-7-chunk-hien-vat-van-ban.md   # MOI — .vtt cue / .srt / .md qua cua xuat (FR-072 §1.3)
+  - 07_plan/M01_core/tasks/T01-51-bang-khai-cho-m13.md          # MOI — dai-han.json (FR-077) · dia-chi `file-anchor` · dich-vu goi_duoc
+  - 07_plan/M01_core/tasks/T01-52-test-dia-chi-anchor.md        # MOI — don vi test cho A1/A2/A4 (R1)
+  - 07_plan/M04_ci/tasks/T04-9-cong-truyhoi-vao-ci.md           # MOI — CI chay truyhoi/tests
+  - 07_plan/M08_api/tasks/T08-35-cua-kho-delta-va-proxy-tim.md  # +gocTho(ten), proxy mang x-aud + khoa chieu
+noi_dung: |
+  Vi sao sua: plan 09-07 viet TRUOC khi FR-072 duyet cung ngay, nen 7 task khai
+  hop dong cu (/tim · tap_nguon · khong co goi_duoc/aud · khong doc hien vat).
+  Loi do duoc: T13-0 cu tro `FR-067-dai-han-bang-khai.md` nhung FR-067 that la
+  "nguon thanh truong nhan dien" (so trung) => mo FR-077 o T01-51. T13-0 cu ghi
+  core/assets/** (dat M01) => tach T01-51 theo boundary chu (lop loi v15 map).
+  Chot PM (co nguon, khong hoi lai): goi_duoc=[web,chatbot] (FR-072 §1.2) ·
+  doc_id=slug + pham_vi danh khoa `space` (khao Space §6, R1 chua tra loi) ·
+  ten ham chuan_hoa_tim (research §8 G5) · dai-han.json o core/assets (G6) ·
+  AC-6.1 ve zh soft kem ly do toi khi co >=2 bai Trung (phon/gian deu duoc —
+  chu du an 09-09; dev chon video, nap qua M12 sinh-transcript).
+  Thu tu ban: T13-0 ∥ (T01-52 -> T01-51) -> NGUOI ky FROZEN -> T13-1 -> T08-35
+  -> T13-2 -> T13-3 -> T13-4 -> T13-5 -> T13-7 -> T13-6 -> T04-9 -> T03-125.
+  Keo theo bao team khac (khong sua o day): M14/model_flow §2 ten truong (o
+  backlog M13 mo khi T13-0 ap) · M12 backlog:631 dai Han hai ban (dong bang
+  FR-077) · M12 no text PDF (FR-072 §5).
+do_do:
+  - lenh: python core/tests/check_g6b.py
+    ket_qua: |
+      12 don vi cua plan M13 (T13-0..7 · T01-51/52 · T04-9 · T08-35): ok ca ba muc
+      (khai du · boundary · hard co cmd). Tong cong van exit 1 — 11 loi.
+      Truoc sua (git stash): exit 1. Sua cua toi dong 3 loi tu tao ra trong luot
+      (VONG T01-51<->T13-0 do dong `phụ_thuộc` chua ma; T01-51 va T13-6 cham
+      file test ma khong phai don vi test).
+đỏ_do: >
+  11 loi con lai KHONG thuoc luot nay — T01-50 (M01, project_map ngoai boundary +
+  check_map.py) · T03-129/130/131 (M03, cham test + chungcat/src) · T08-36/38
+  (M08, server.mjs + core/assets) · T12-31 (M12, check_sinh_thumbnail). Deu la
+  task da commit cua team khac (git log b7ab3f8..ebdd2f4); ghi de PM cac module
+  do biet, khong sua ho.
+khong_lam:
+  - "KHONG ap FR-072/073 vao spec (FROZEN) — la T13-0, dev lam, NGUOI ky."
+  - "KHONG sua dich-vu.json / dia-chi.json — la T01-51."
+  - "KHONG sua project_map — M13 depends_on [M08_api] van dung (doc dai-han/dia-chi la doc FILE, khong phai loi goi)."
+  - "KHONG commit, KHONG push — chu du an quyet."

@@ -1,0 +1,96 @@
+id: WL-01KA38KHOATACVU
+khi: 2026-09-04T19:50:00+07:00
+loai: ban_giao
+tac_nhan: claude-code
+viec: Gói mới — sửa khoá 1-dòng (ô env-name) · lọc tac_vu · giảm béo an-toàn cho T03-110
+module: M12_chungcat · M03_web
+
+nguoi_quyet: |
+  Chủ dự án 2026-09-04: "đã có thêm task mới cùng gói: sửa khoá 1-dòng
+  (ô env-name) → lọc tac_vu → T03-110/110b. Sau khi xong task này lập tức làm
+  ngay task mới."
+
+object:
+  - path: chungcat/src/api.py                        # co_khoa_cua() + lọc /model
+  - path: chungcat/src/worker.py                     # cùng chỗ khai tên biến
+  - path: chungcat/assets/model.json                 # +tac_vu_model, 2 bảng khai
+  - path: chungcat/tools/dong_bo_model.py            # phân loại tac_vu
+  - path: chungcat/tests/check_bang_khai_model.py    # +9 vế
+  - path: chungcat/tests/check_chi_loi_goi_tu_loi.py # fixture dùng tên biến thật
+  - path: web/styles/prototype.css                   # bỏ 4 re-declare y hệt
+  - path: .gitignore                                 # chungcat/hang-doi/
+  - base_sha: 8535a26
+
+do_do:
+  - lenh: 29 cổng chungcat/tests/*.py
+    ket_qua: 29/29 exit 0
+  - lenh: cd web && npm test
+    ket_qua: exit 0
+  - lenh: chạy thật — RESTART :8790 rồi POST /job với `.env` hiện có
+    ket_qua: |
+      {"viec_id": "92e48ab5853f4ff980cd8aadda4d23d3",
+       "model": "gemini-2.5-flash-lite", "khu_vuc": "khong-xac-dinh"}
+      ⇒ TICK đúng điều kiện ô backlog đặt ra. Trước sửa, phép chặn (c) của
+      §4.0b từ chối chính người ĐÃ đặt khoá đúng.
+  - lenh: chạy thật — GET /api/model sau khi lọc
+    ket_qua: |
+      bày 100 model · phi-văn-bản còn bày 0
+      (bảng vẫn GIỮ 112 dòng: van-ban 100 · anh 6 · asr 5 · cong-cu 1)
+  - lenh: node web/test/page-weight.test.js
+    ket_qua: "tải đầu /chung-cat/nhap/ 280385/280576 — còn 191 byte (từ 30)"
+
+do_do_boi: chua-quy-duoc-chu
+
+quyet_dinh:
+  - |
+      TÊN BIẾN KHOÁ về `cua.json` cột `bien_khoa` — chỗ mà `FR-059` đã dựng cho
+      adapter. Không tạo hằng thứ ba: `api.py::co_khoa_cua()` và `worker.py` đọc
+      CÙNG một chỗ. `CHUNGCAT_KHOA_MODEL` (biến chưa bao giờ tồn tại) gỡ khỏi mã.
+  - |
+      LỌC Ở CỬA, KHÔNG XOÁ DÒNG. Catalog đầy đủ có ích cho `sinh-transcript`:
+      `whisper-*` và `gpt-4o-transcribe` là ứng viên lối `dich_vu` của FR-054.
+      Nên đồng bộ PHÂN LOẠI (`tac_vu_model` theo `$tac_vu_theo_mau`), và
+      `GET /model` lọc theo `$tac_vu_cho_chung_cat`. Thêm `asr` cho bộ chọn
+      transcript sau này = thêm MỘT CHUỖI vào mảng, 0 dòng mã.
+  - |
+      Mặc định phân loại là `van-ban`: không mẫu nào khớp thì nó là model chữ.
+      Chiều ngược (mặc định "không rõ" rồi bắt khai từng dòng) làm 100 dòng
+      phải gõ tay một cột mà 100 dòng đó đều giống nhau.
+  - |
+      MỘT BẪY TÔI TỰ ĐẶT RỒI ĐẠP VÀO: cổng đầu quét `CHUNGCAT_KHOA_MODEL` trên
+      CẢ CHÚ THÍCH, nên nó ĐỎ vì `api.py` giải thích ngay tại chỗ vì sao tên cũ
+      sai. Sửa để đo MÃ (bỏ docstring + phần sau `#`). Đây là lần thứ ba lớp lỗi
+      này xuất hiện trong dự án (`nap-video.test.js`, `check_mot_hop_dong`) —
+      một cổng đọc chính câu giải thích rồi tố nó là cổng dạy người ta đừng
+      viết lý do.
+  - |
+      `chungcat/hang-doi/` vào `.gitignore`. Đo được: hai lần `POST /job` chạy
+      thật để lại BỐN file job trong repo. `WO-039` đã trả giá cho lớp này —
+      một hàng đợi trong repo làm `git status` bẩn, và công cụ quy chủ mù đi
+      đúng lúc cần nó nhất.
+  - |
+      GIẢM BÉO chỉ lấy phần KHÔNG RỦI RO: bốn rule là RE-DECLARE Y HỆT bản
+      trước (`.br` · `.nw a:last-child` · `.nw a:hover h4` · `.rise.in`) — bỏ
+      chúng không đổi một pixel nào, và suite chứng minh. Được **162 byte**;
+      tải đầu `/chung-cat/nhap/` từ 30 → **191 byte** trống.
+      KHÔNG gộp 100+ selector trùng còn lại: chúng là override HỢP TÁC (chính
+      file đã ghi *"41 selector trùng nhưng 0 luật chết"*), và gộp chúng đòi
+      đọc cascade từng ca. Đó là một đơn vị việc riêng.
+      ⚠️ Một phép thử tôi hoãn lại đúng lúc: bản đầu của script xoá theo OFFSET
+      byte, và regex `[^{}]+\\{[^}]*\\}` khớp từ giữa một CHÚ THÍCH có `{}` —
+      nó sắp xoá `[data-mount]:empty{display:none}` và một `transition-delay`.
+      Assert chặn trước khi ghi. Đổi sang xoá theo DÒNG + so nguyên văn.
+
+keo_theo:
+  - |
+      T03-110 (tab theo dõi chưng cất) CHƯA làm, và lý do là SỐ ĐO chứ không
+      phải thiếu thời gian: tải đầu `/chung-cat/nhap/` còn **191 byte**, mà
+      task khai một pipeline stepper + pulse + slide-in + shimmer +
+      `prefers-reduced-motion` — riêng CSS tối thiểu cho stepper ước ~600-900
+      byte. Chính task đó chốt *"trần gn KHÔNG nới — thiếu chỗ thì mở đơn vị
+      giảm-béo, KHÔNG cắt luật reduced"*.
+      ⇒ NGƯỜI chọn: (a) một đơn vị giảm-béo `gn.css` thật (gộp 100+ selector
+      trùng, đọc cascade từng ca) · (b) FR nới trần cho trang `/chung-cat/**` ·
+      (c) đưa tab vào CHUNK riêng của màn — nhưng tab sống trong CỬA SỔ ĐỌC
+      (mọi trang), nên (c) không cứu được trang `/chung-cat/**`.
+      Tôi DỪNG trước khi bắt đầu, thay vì cắt vế reduced-motion cho vừa.

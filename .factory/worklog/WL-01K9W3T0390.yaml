@@ -1,0 +1,103 @@
+id: WL-01K9W3T0390
+at: 2026-09-01
+by: claude
+buoc: "T03-90 — man 'Dot hai' (mock M12-M16) TRONG chinh web app"
+loai: code M03 + bang khai man; mock overview, GO khi s6 dot hai dong
+task: [T03-90-man-dot-hai-mock.md]
+
+object:
+  - core/assets/man-hinh.json              # +man dot-hai vi_tri 8 (menu, hethong, cat_khi_khac), nap don 9/10/11
+  - web/render/shell.html                  # +nut rail data-nav=dothai + view v-dothai (5 panel, than rong cho chen)
+  - web/plugins/home-pages/shell.html      # copy byte-identical
+  - web/render/trang.mjs                   # +DOT2 (doc 5 contracts luc import) + trangDotHai() + nhanh renderTrang
+  - web/styles/prototype.css               # +khoi .dh-* toi gian + icon mask tab dothai
+  - web/plugins/multiwindow/src/scripts/multiwindow.inline.ts   # +i18n nav.dothai
+  - web/test/nap-ba-khung.test.js          # sua proxy MAN_NAP (ly do trong file)
+  - web/test/mo-ta-va-nut-nap.test.js      # cung proxy
+  - 05_uiux/screen_inventory.md            # ghi ro mock hai muc: /dot-hai/ la ban chinh, app-v21 la nhap s5
+  - 07_plan/M03_web/tasks/T03-90-man-dot-hai-mock.md
+
+pham_vi_ngoai_fe_da_khai_truoc: >
+  core/assets/man-hinh.json nam NGOAI boundary fe cua M03 (map v17/v18) —
+  da khai tuong minh trong task TRUOC khi cham, kem ly do: day la BANG KHAI MAN
+  ma server/trang.mjs/build-fe deu dan xuat; them man la dung ngu phap cua bang.
+  NO: map nen khai chu cho core/assets/man-hinh.json (hien khong ai so huu).
+
+# ══ PHAN DANG GIA NHAT ═════════════════════════════════════════════════
+proxy_cat_khi_khac_vo_khi_co_man_thu_tu: >
+  Hai cong (nap-ba-khung, mo-ta-va-nut-nap) dinh nghia "man nap" bang proxy
+  `filter(m => m.cat_khi_khac)` — dung khi CHI man nap bi cat. Man dot-hai
+  (menu:true, khong module) cung cat de giu page-weight => proxy dem 4 "duong
+  nap", doi /dot-hai/ co loi nap + panel dong/mo. Sua theo NGHIA:
+  `cat_khi_khac && module`. Bai hoc: proxy theo CO thay vi theo NGHIA vo ngay
+  khi truong hop thu tu xuat hien — cung lop voi bay-man/NHOM_TINH truoc day.
+
+bon_cong_khac_bat_toi_dung_luat:
+  - "khong-slice-so-cung: toi viet .slice(0,6)/.slice(-6) — sua bang cach dung nua truoc dau '…' co san trong sha mau, khong can so"
+  - "chu-giao-dien (FR-029): chu hien ra khong duoc chua _inbox/ => 'vao hang cho duyet'... nhung 'cho duyet' cung CAM (FR-033) => chot 'dung o nhap'. Hai cong noi tiep nhau bat hai lan — dung nhu thiet ke"
+  - "gn.css tran 100KB: khoi .dh dau ~1.4KB > ngan sach 762B con lai. Cat den muc toi gian (badge <b> khoi can font-style/weight, bo ellipsis/align/flex-none, icon svg ngan) => 102252/102400, con 148B du phong"
+  - "trang.mjs khong duoc doc slice so cung ⇒ dung j.id nguyen ven"
+
+evidence:
+  - "npm test (sau 3 vong sua): exit 0 — toan bo cong web xanh (task nen bw8yacy2l)"
+  - "cmp hai shell => identical"
+  - "do truoc khi sua: baseline gn.css khong .dh = 101638 => ngan sach 762B; sau cat = 102252"
+  - "ssr-routes TU phu /dot-hai/ + /mock/dot-hai/ vi route dan xuat tu man-hinh.json"
+
+no_con_lai:
+  - "man /dot-hai/ la OVERVIEW — tuong tac chi tiet (chat, cua so doc anchor) van o app-v21; hoan thien vao web sau khi s6 dot hai dong"
+  - "gn.css con 148B du phong — nguoi them CSS tiep theo se dung tran ngay; ung vien giam beo la buoc minify co source map (FR rieng)"
+  - "man-hinh.json chua co chu trong map"
+
+luot_2_prototype_truoc_port:
+  chi_dao: "2026-09-01 (lan hai): 'dung HTML prototype that tot roi moi import vao /web' — thu tu dao lai so voi luot 1"
+  object_them:
+    - 05_uiux/prototype/sinh_dot_hai.py      # MOI — generator bo dot-hai/ tu contracts
+    - 05_uiux/prototype/dot-hai/             # MOI — 6 file: index + m12..m16, ~166KB tong
+    - 05_uiux/screen_inventory.md            # trinh tu chot 3 tang; app-v21 SUPERSEDED
+  hinh_dang: >
+    Moi module MOT file detail + mot tong quan, cung giao dien app (tokens that
+    qua ../../tokens.css, rail trai, panel, cua so doc vien brand). Du tuong
+    tac: chung cat animation new->processing->done, tra cuu + facet + mo cua so
+    dung anchor, chat 2 phien + citation hover cited_text + 3 kieu tu choi +
+    gate gan co + xem JSON, ma moi modal, sidecar bam duoc. Moi man 4 state.
+  web_da_scaffold_giu_nguyen: >
+    /dot-hai/ + 5 route detail trong web (luot 1) GIU — la cho port vao sau khi
+    nguoi duyet prototype. Suite web van xanh (exit 0). Con mot viec do dang
+    luot 1 chua kiem xong: JS client tren man detail web co ghi de URL ve
+    /dot-hai/ khong — kiem khi port that, khong chan gi bay gio.
+  evidence:
+    - "sinh_dot_hai.py => 6 file, moi file 25-30KB"
+    - "Playwright http 8799: m14 — 4 msg, 4 chip citation, cua so doc mo dung anchor, mark cited_text = 1"
+    - "screenshot m12 da xem: hang doi day du attempt + sha256 + failed 2/2 + nut tong hop"
+    - "server tam 8799 da tat · 2 screenshot tam da xoa"
+
+luot_3_s6_bac_hinh_cu_va_go_web:
+  chi_dao: >
+    (a) "chua on dau, ko ra the thong gi ca — review s6 de sua s5" roi
+    (b) "xoa /mock/dot-hai/ o web di — sau se apply tung module vao lan luot".
+  s6_noi_gi: >
+    Z7 (ADR-05 + chi dao 08-31): M12-M16 CHI la backend — KHONG module nao co
+    man rieng. UI dot hai = phan GHEP vao man DA CO (nut Chung cat o
+    /tai-lieu/, Tong hop chu de o /tong-hop/, khoi viec o dashboard, nut
+    artifact trong cua so doc) + dung MOT man moi (cua so chat) + tin nhan
+    kenh (giao dien ta khong so huu). Prototype cu (moi module mot man) sai
+    HINH tu goc — dung nhu nguoi dung noi "khong ra the thong".
+  da_lam:
+    - "contracts bump v2 (v1 giu): job {ulid, giai_doan enum 6, lan_thu, model_chon vs model_da_dung, ly_do_dung enum 3, khang_dinh_bi_tia} · chatbot blocks co trang_thai da-xac-minh|chua-xac-minh + pham_vi.so_ban_ghi tra CUNG · kenh thanh 5 hoi thoai = 5 luat noi dung tin · artifact: canh_bao_truoc_khi_sinh + that_bai enum 3 + co_nut_artifact chi tren approved"
+    - "sinh_dot_hai.py viet lai: 7 trang theo MAN THAT (index · man-tai-lieu · man-tong-hop · dashboard · cua-so-chat · cua-so-doc · tin-nhan-kenh); xoa bo m1x-*.html cu"
+    - "GO SACH /dot-hai/ khoi web — 5 lop: man-hinh.json (10 man, nap ve 8/9/10) · shell x2 (nut + 6 view) · trang.mjs (DOT2 + 7 builder + 6 nhanh) · prototype.css (1115 bytes — tran gn.css tho ra ~1.8KB) · i18n nav.dothai"
+    - "hai test giu filter MAN_NAP (cat_khi_khac && module) — bay proxy se quay lai khi apply tung module; loi chu sua thanh generic"
+  bon_luat_hien_thi_tu_s6_da_vao_prototype: >
+    (1) giai doan dem duoc, khong % — % la so bia; (2) dung la dung, kem ly do
+    phan loai (3 ly do = 3 hanh dong); (3) khong bo im lang — chua-xac-minh gan
+    co van hien, da tia gi phai noi; (4) noi TRUOC khi ton tien/ton phut/lo du
+    lieu (PPTX la anh, cloud TTS = toan van roi may, viec tinh bang phut).
+  evidence:
+    - "web sau go: grep dot-hai/dothai/dh- => 0 o ca 4 file · npm test suite exit 0"
+    - "prototype moi: Playwright — chat: pham vi '3 ban ghi (toan kho)' hien, 3 block trong do 1 gan co (.blk.co), tu choi mau-thuan keo hanh-dong '-> doc HAI dia chi', cua so doc mo + mark cited_text"
+    - "man-tai-lieu: bam Chung cat -> job chay qua giai_doan (thanh 5 nac), job dung het-tran-thu-lai hien do + ly do, model du phong noi ro (gemini thay sonnet), ban nhap hien 'da tia 2 khang dinh'"
+    - "screenshot man Tai lieu da xem — dung y do"
+  no_con_lai:
+    - "NGUOI duyet prototype/dot-hai/ -> frozen G5 dot hai -> apply TUNG module vao web lan luot (moi lan mot don vi viec, nut vao man-hinh.json CUNG LUC voi lan dung that — bai hoc S18/C5)"
+    - "task file T03-90 giu lam ho so; phan web cua no da revert theo chi dao"

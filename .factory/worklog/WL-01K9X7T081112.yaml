@@ -1,0 +1,83 @@
+id: WL-01K9X7T081112
+at: 2026-09-02
+by: claude
+buoc: "FR-048 duyet; T08-11 DDL nam bang + T08-12 nam cua C3-C7. Chu du an: 'lam luon di'"
+loai: don vi CODE (T08-11, T08-12) + don vi TEST (T08-12b); do TRUOC (R5)
+gate: khong ky gate
+
+object:
+  - .factory/fr/FR-048-chu-cho-tai-khoan-va-cho-cho-bai-hoc.md   # -> DA DUYET
+  - 07_plan/M08_api/tasks/T08-11-ddl-db-loi.md
+  - 07_plan/M08_api/tasks/T08-12-nam-cua-tai-khoan.md
+  - web/api/loi.schema.sql          # MOI — DDL nam bang
+  - web/api/loidb.mjs               # MOI — bang khai, KHONG cam SQL
+  - web/api/loi-cua.mjs             # MOI — 5 handler, KHONG cam SQL
+  - web/api/dungchung.mjs           # dungLoiDb + 15 thao tac co ten
+  - web/api/router.mjs              # dau 5 route
+  - web/test/loi-cua.test.js        # MOI — cong V2..V8
+  - web/package.json                # +1 test vao npm test
+  - .gitignore                      # web/_loi.sqlite
+
+evidence:
+  - "DO TRUOC: node test/loi-cua.test.js => TypeError loiTaoNguoiDung is not a function"
+  - "sau khi viet: 22/22 ca xanh (V2 V3 V4 V4b V5 V6 V6b V7 V8 + AC-1.3 + AC-1.2)"
+  - "smoke DDL: 9/9 ca — het_han NOT NULL, UNIQUE(kenh,chat_id), trigger ban_goc_ai, CHECK trang_thai"
+  - "M18-R1 do truc tiep: changes() lan 1 = 1, lan 2 = 0"
+  - "AC-3.1: grep 'INSERT INTO dinh_danh_kenh' web/api/ => 1 (sau khi sua binh luan)"
+  - "api-guard xanh · duong-api-khop-route xanh"
+
+# ══ BA LAN MA CUA TOI SAI, CONG/TAI LIEU BAT DUOC ═══════════════════
+sai_1_cache_handle: >
+  Ban dau loidb.mjs giu mot bien `_db` cache. dungchung.mjs:208-210 DA GHI bai
+  hoc nguoc lai: "MO-DUNG-DONG moi luot, khong giu handle" — giu handle thi
+  EBUSY khi test don kho tam (Windows, loi cung) va handle tro inode cu
+  (FR-023 GD 3). Da go TRUOC khi chay lan nao.
+
+sai_2_SQL_ngoai_dungchung: >
+  Ban dau loidb.mjs cam DatabaseSync => api-guard.test.js rang 2 DO
+  ("moi mutation o dungchung.mjs").
+  Cong dung, ma toi sai. Cau tra loi KHONG phai noi danh sach mien tru: bat bien
+  "SQL o mot cho" la thu lam cau hoi *ai ghi duoc vao dau* tra loi duoc bang mot
+  lan doc file. MOT DB THU HAI KHONG TU NO LA LY DO CHO MOT CUA SQL THU HAI —
+  neu ngay nao la, do la mot FR.
+  => dungLoiDb + 15 thao tac CO TEN vao dungchung.mjs; loidb.mjs con hang khai;
+     loi-cua.mjs goi TEN, khong cam db tho.
+  LOI ICH KEO THEO: rang buoc do ep dung thu M18 AC-3.1 doi — "dung MOT cho
+  INSERT vao bang dinh danh" — thanh CAU TRUC thay vi ky luat. Dem duoc bang grep.
+
+sai_3_binh_luan_pha_phep_dem: >
+  AC-3.1 dem ra 2 thay vi 1. Cho thu hai KHONG phai ma — la BINH LUAN cua chinh
+  toi co chua literal "INSERT INTO dinh_danh_kenh" de giai thich chokepoint.
+  Dung loi cac-man-con-lai.test.js:117 da vap ("thu pha phep cat la mot binh
+  luan cua toi co chua literal do").
+  Da viet lai binh luan de KHONG chua cau lenh ra chu, va ghi ngay tai cho vi sao.
+
+# ══ CONG check_db_dung_cho TU DO — va do la no LAM DUNG VIEC ════════
+cong_moi_do_vi_DDL_vua_ra_doi: >
+  Truoc T08-11, ve 3 cua check_db_dung_cho in 5 dong "BO QUA — bang chua ton
+  tai". Nay bang CO THAT, nen ve do thanh phep kiem THAT, va no DO:
+    nguoi_dung · dinh_danh_kenh · nhap_chung_cat PHAI xuat ra file (ADR-06 c)
+    nhung xuat_kho.py khong nhac toi.
+  DAY LA DO THAT, khong phai do oan. ADR-06 (c) la quyet dinh cua chu du an
+  ("du lieu moi lam nhu du lieu cu di ... van xuat ra .md/.yaml de backup") va
+  nua sau cua no CHUA THI CONG.
+  Cong nay do dung ngay no can do — do la ly do no ton tai, va la bang chung
+  thiet ke "BO QUA co thong bao" (thay vi xanh im lang) la dung.
+  KHONG noi cong. Viec tiep theo la dung duong export.
+
+luu_y_exporter_KHAC: >
+  xuat_kho.py xuat tu kb/_kho.sqlite. DB cua LOI la mot DB KHAC, nen no can
+  duong xuat RIENG, khong phai them vai dong vao xuat_kho.py.
+  Va phai chong vong reap (ADR-06 he qua 4): xuat_kho.py:141-146 xoa moi file
+  khong nam trong tap `can_co` — ba file moi PHAI vao tap do, khong thi moi lan
+  xuat la moi lan xoa sach ban backup vua ghi.
+
+do_do:
+  check_db_dung_cho: "TOI — DDL vua tao bang ma chua co duong xuat. Viec tiep theo."
+  bon_do_cu: "check_danh_muc + check_skill (agent khac) · check_frozen (cho nguoi ky) · check_g6b (T03-90, agent khac)"
+
+no_con_lai:
+  - "T08-13: duong XUAT ba bang cua DB LOI ra file + chong vong reap (ADR-06 c + he qua 4). Cong dang DO cho no."
+  - "C1 (POST /api/nhap) va C2 (POST /api/nhap-chung-cat) chua lam — cham duong validate/kho"
+  - "KHOA_DICH_VU chua co trong env_plan/README — nguoi van hanh chua biet phai dat"
+  - "M18-R1 + M18-R3 van S4; promote lai S3 duoc roi vi bang da ton tai"

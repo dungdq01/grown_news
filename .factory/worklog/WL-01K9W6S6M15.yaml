@@ -1,0 +1,77 @@
+id: WL-01K9W6S6M15
+at: 2026-09-01
+by: claude
+buoc: "s6-module-spec · M15_kenh — pack 6 artifact + tot nghiep sang modules:"
+loai: s6; G6A cho MOT module
+gate: G6A (M15; con M16 M17)
+
+object:
+  - 06_modules/M15_kenh/spec.md          # 17 AC, 7 muc
+  - 06_modules/M15_kenh/rules.md         # 6 rule S3, moi rule du 3 ve
+  - 06_modules/M15_kenh/diagram_flow.md  # MOI mui tien deu di RA + hai kenh sau khac HANG
+  - 06_modules/M15_kenh/data_flow.md     # muc tin KHONG doi khi di qua M15 + 4 no hop dong
+  - 06_modules/M15_kenh/model_flow.md    # M15 khong so huu gi, khong nho gi + bang "thu M15 KHONG duoc quyet"
+  - 06_modules/M15_kenh/ui_flow.md       # giao dien THAT ma ta KHONG so huu
+  - project_map.yaml                     # v22 -> v23: M15 sang modules
+
+evidence:
+  - "check_g6a => xanh (15 module, 15 thu muc)"
+  - "check_map · check_ba · check_rule_surfaces · check_mermaid => xanh (lan dau)"
+
+# ══ PHAN DANG GIA NHAT ═════════════════════════════════════════════════
+BON_no_hop_dong_CHAN_M15_—_va_duong_di_vong_trong_nhu_hop_le: >
+  M15 can BON cua o LOI ma ca bon CHUA TON TAI:
+    1. POST /api/nhap        — cua ghi cho MAY, luon draft
+    2. endpoint tra dinh_danh_kenh  — "chat_id nay thuoc tai khoan nao"
+    3. endpoint ghi audit_log — FR-045 U4 doi ghi MOI tin vao
+    4. rate-limit cho ma_moi — lo da ghi security_baseline §8.1
+  Cai dang lo nhat la (1). Duong DUY NHAT dang co la POST /api/articles (taoBai),
+  va no dat review_status: approved VO DIEU KIEN — vi no duoc thiet ke cho NGUOI
+  viet. M15 dung cua do la vi pham M05-R1 TRONG KHI MOI CONG VAN XANH.
+  Da ghi thanh muc rieng o data_flow §6 va model_flow §6: neu s7 chia task M15
+  truoc khi bon cua do co, nguoi thi cong SE di vong bang /api/articles, va do la
+  duong lam mat M05-R1 ma trong nhu hop le. Day khong phai canh bao chung — day
+  la mot duong cu the, co ten, dang mo.
+
+M15-R1_la_rule_DUY_NHAT_canh_bang_QUAN_SAT_TIEN_TRINH: >
+  Nam rule kia doc ma (grep). M15-R1 phai chay `netstat` trong luc tien trinh
+  song. Ly do: mot cong co the duoc mo boi mot THU VIEN ma ma khong nhac ten —
+  doc ma khong thay, chi chay moi thay.
+  Ghi ra vi day la lop cong khac han: no khong the la mot phep grep, va s8 phai
+  dung mot fixture chay that.
+
+hoan_KHAC_voi_khong_lam_duoc__Zalo: >
+  research §10-6 xac nhan Zalo Bot API CHINH THUC da ton tai (bot.zapps.me,
+  long-polling GIONG Telegram), tuc no KHOP mo hinh chi-goi-ra va thuoc HANG "tien
+  trinh local", khong phai hang "du an ha tang".
+  No hoan vi CHI DAO luot 14, khong vi ky thuat. Ghi ro trong diagram_flow §4 de
+  lan sau khong ai doc "hoan" thanh "khong lam duoc" roi bo no khoi ke hoach.
+  Nguoc lai, Facebook khac han: "keo bai ve tu Facebook" la TINH NANG KHONG TON
+  TAI — Groups API go khoi moi phien ban 22/04/2024, scraper lon nhat TU NHAN
+  khong dang tin cho production roi ngung push 6/2024.
+
+MUC_TIN_khong_doi_khi_di_qua_M15: >
+  Viet thanh mot bang ba dong trong data_flow §4, vi day la cho de hieu sai nhat:
+  M15 dich HINH DANG, khong nang muc tin. Mot tin nhan thanh mot loi goi API VAN
+  la noi dung untrusted — va do chinh xac la ly do gate.py:133 ep draft VO DIEU
+  KIEN thay vi tin co ma nguoi goi gui.
+  Neu ai doc M15 nhu mot "lop xac thuc" thi ho se tin du lieu sau no, va do la
+  luc M05-R1 mat y nghia.
+
+mot_so_trong_research_da_SAI_va_da_duoc_sua: >
+  Nguong bot private cua Discord la 10.000 USER, KHONG phai 100 server. Moi ghi
+  chu cu noi "100 server" deu sai (research §10-6). Da ghi vao data_flow §3 kem
+  yeu cau: bang khai phai ghi NGUON + NGAY TRA, vi day dung loai so nha cung cap
+  doi ma khong ai thong bao.
+
+do_do:
+  check_danh_muc + check_skill: "FR-039 cua toi; cho sua o core/skill-src (agent khac)"
+  check_frozen: "cho NGUOI ky"
+  check_running: "he qua hai muc tren"
+  check_g6b + check_khai_mot_noi + check_worklog: "AGENT KHAC — UI frame dot hai"
+
+no_con_lai:
+  - "HAI module con lai: M16_artifact M17_cong."
+  - "BON cua o LOI chua co (xem muc tren) — moi cai la mot FR toi M08, khong noi vao M15."
+  - "Man buoc chat_id <-> tai khoan chua ton tai; toi khi do viec buoc la thao tac TAY cua chu du an tren DB, va dieu do phai duoc noi ra."
+  - "Sau lenh trong kenh/tests/ chua ton tai => sau rule S3 hien la ky luat."

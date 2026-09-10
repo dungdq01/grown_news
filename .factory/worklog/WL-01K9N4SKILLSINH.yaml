@@ -1,0 +1,123 @@
+id: WL-01K9N4SKILLSINH
+at: 2026-08-27
+by: claude
+buoc: s8 (M01_core T01-8 + T01-9 · M04_ci T04-4) — duong PATCH cua /factory:go
+loai: skill source-distiller SINH RA tu repo, khong con ban chep tay
+fr: khong mo FR — khong cham file frozen nao (core/skill-src/** khong o FROZEN.lock)
+
+object:
+  - core/tools/dong_goi_skill.py            # MOI — dong goi + cai
+  - core/tests/check_skill.py               # MOI — cong canh
+  - core/skill-src/{README,source-types,archetypes,credibility,skill-gap,intake}.md
+  - core/skill-src/concepts.seed.yaml       # 7 file tren: CUU tu bundle vao git
+  - core/skill-src/web-spec.md              # viet lai
+  - core/skill-src/source-distiller.SKILL.md   # sua loi khai `category`
+  - core/skill-src/format.md                   # sua loi khai `category`
+  - .github/workflows/ci.yml                # them 1 buoc (T04-4)
+  - 07_plan/M01_core/tasks/T01-8-dong-goi-skill.md
+  - 07_plan/M01_core/tasks/T01-9-test-cong-skill.md
+  - 07_plan/M04_ci/tasks/T04-4-cong-skill-vao-ci.md
+
+do_truoc_khi_sua:
+  ban_cai_15_file: "8 co nguon (7 khop, web-spec LECH) · 7 KHONG co nguon (~40 KB)"
+  bay_gitignore: "source-distiller.skill o root: .gitignore:13 `*.skill` => ngoai git, KHONG phai backup"
+  bon_file_references_la_chieu_sau: "archetypes · credibility · skill-gap · source-types — khong phai ban sao cua thu gi. Mat la mat that."
+
+# ══ PHAN DANG GIA NHAT ═══════════════════════════════════════════════════
+mot_loi_khai_TROI_RA_BA_CHO:
+  loi_khai: "`category` la enum DONG sau gia tri trong frontmatter.schema.json"
+  su_that: >
+    FR-034 da BO enum khoi schema (schema chi ep kebab-case). Chan ly la bang
+    `categories` trong kb/_kho.sqlite, kiem bang `validate.py --categories`.
+    Va bang do DANG TRONG sau lan don kho => luc nay MOI gia tri category deu
+    bi tu choi.
+  ba_cho: ["web-spec.md (de bai chi ra)", "SKILL.md:148 (TOI tim ra)", "format.md:121 (TOI tim ra)"]
+  vi_sao_dang_ghi: >
+    De bai chi noi web-spec lech. Neu toi chi sua dung cho duoc chi thi hai cho
+    kia con nguyen — va chung nam trong file skill DOC NHIEU NHAT (SKILL.md la
+    file nap dau tien). Sua mot cho la vá; tim het la chua.
+  cong_KHONG bat duoc: >
+    check_skill.py canh "bundle khop nguon", KHONG canh "nguon noi dung hien
+    trang". Van xuoi mo ta kien truc la cho khong dan xuat duoc, tuc cho se troi
+    tiep. Da ghi vao decisions.md muc "Doi thi".
+
+boundary_chan_dung_cho:
+  gap: "de bai bao them dong cong vao Makefile VA ci.yml"
+  do: "check_g6b muc 2 => `Makefile: ghi ngoai boundary M04_ci (['.github/**','.githooks/**'])`"
+  phat_hien: "Makefile hien KHONG module nao so huu trong project_map.modules"
+  chon: >
+    THU HEP T04-4 con `.github/workflows/ci.yml`, KHONG noi boundary. Noi tai cho
+    la tu thao rang cua chinh cong do. Va khong sua project_map — no nam trong
+    danh sach cam cham cua phien song song.
+  hau_qua_that: "KHONG mat rang: ci.yml goi thang tung cong, khong di qua `make`. Chi mat duong chay tay `make gate`."
+
+M06-R4_bien_thanh_CO_CHE:
+  rule: "cam 'tu cai skill vao agent, hoac ghi de SKILL.md nguoi da sua'"
+  ve_1: "packager KHONG tu chay — nguoi go lenh moi cai. Khong hook, khong import tu server."
+  ve_2_kho_hon: >
+    Ghi de ban nguoi da sua tay la nuot cong bien tap IM LANG. Khong the phan
+    biet "nguon di toi truoc" (cap nhat binh thuong) voi "ban cai bi sua tay"
+    neu chi so hai ben. => moi lan cai ghi `.nguon.json` = sha256 cua thu VUA
+    CAI. Lan sau, file lech manifest nghia la co nguoi sua tay => DUNG, doi
+    `--ghi-de`. Ca am co test rieng, va no kiem CA "ban nguoi sua con NGUYEN
+    sau lan dung do" — dung ma van ghi mat mot phan thi loi hua la gia.
+
+cong_phai_do_duoc_VA_khong_do_OAN:
+  do_duoc: "lech 1 byte · thieu file · file mo coi — moi ca mot phep kiem, chay tren ban gia o thu muc tam"
+  khong_do_oan:
+    ban_dung_nguon: "phai XANH"
+    hoan_nguyen: "sau ba ca pha, so lai phai XANH — chung minh ba ca khong de lai vet"
+    tren_CI: >
+      Runner CI KHONG co skill cai. Chay cong day du o do la DO OAN vi
+      'chua cai' => trong ba thang co nguoi them `|| true`. Nen CI chay mode
+      `--kiem-nguon`: chi hoi phan CI tra loi duoc (nguon co that trong git).
+      Phan "ban cai khop nguon" do may CO cai skill tra loi.
+
+mien_tru_co_TEN_thay_vi_ngoai_le_chung:
+  file: "core/skill-src/frontmatter.schema.json"
+  van_de: "ban sao THU HAI — bundle cai tu core/assets/, nen file nay khong ai doc va se troi"
+  vi_sao_khong_xoa: "nam trong danh sach CAM CHAM cua phien song song (FR-036 nhanh B)"
+  chon: "khai vao MIEN_TRU — danh sach DONG, moi muc kem ly do, in CHU Y moi lan chay. Them mot dong => phai sua file cong, tuc co nguoi doc lai luat."
+
+hai_lan_trung_bay_escape:
+  lan_1: "`\n` trong heredoc bi dich thanh xuong dong THAT => SyntaxError 'unterminated string'"
+  lan_2: "lap lai y het o lan sua thu hai"
+  R4_diem_dung: >
+    Lan thu hai dang le phai DOI HUONG chu khong va tiep. Da doi: bo escape han,
+    tach mot `print` co `\n` thanh HAI lenh `print`. Khong con escape thi khong
+    con bay.
+  cong_cu_phoi_ra: "repr() — `\b` thanh byte 0x08 vo hinh voi grep/terminal"
+
+evidence:
+  - "check_skill.py            => xanh (15/15 khop, 0 mo coi, khong ai sua tay)"
+  - "check_skill.py --tu-kiem  => xanh 5/5 (do duoc 3 ca + khong do oan 2 ca)"
+  - "check_skill.py --ca-am-ghi-de => xanh 5/5 (M06-R4 ve 2 co rang)"
+  - "check_skill.py --kiem-nguon / --trong-ci => xanh"
+  - "dong_goi_skill.py --tu-kiem => `1 file · 0 loi · 0 canh bao`, ma 0"
+  - "TAY: cd ~/.claude/skills/source-distiller && validate.py examples/mau-dat-chuan.md --no-concepts --no-categories => 0 loi"
+  - "check_g6b => `G6B: 5 dieu kien dat tren 34 task`"
+  - "pytest core/tests -q => 34 passed"
+  - "cd web && npm test => exit 0"
+  - "check_frozen => pass, KHONG ky lai FROZEN.lock"
+  - "15/17 cong xanh"
+
+quy_chu_hai_cong_do:
+  check_ba: "M09_thuvien: truong `ho_so`/`media` khong co trong schema"
+  check_running: "do VI no chay check_ba.py — do keo theo, khong phai loi rieng"
+  bang_chung_khong_phai_cua_toi: >
+    06_modules/M09_thuvien/** tao 2026-08-27, la FR-036 nhanh B cua phien song
+    song. Toi khong ghi vao M09, khong ghi vao schema (ca hai trong danh sach
+    cam cham). `find -newermt` + `git status` truoc khi phan.
+
+khong_dung_vao:
+  - "core/assets/* · core/src/* · web/** · .gitignore · project_map.yaml · FROZEN.lock — 0 dong"
+  - "KHONG xoa skill da cai (~/.claude/skills/ la noi DUY NHAT skill nap duoc)"
+  - "KHONG sua giao thuc phan tich (6 pass, cac luat L*) — viec nay la dong goi + chong troi"
+  - "KHONG sua ghi chep lich su (.factory/worklog cu, 02_proposal, build_order)"
+
+no_con_lai:
+  - "NGUOI CHOT: `Makefile` khong module nao so huu => hoac them boundary cho M04_ci, hoac khai no thuoc dau. Chua noi vi project_map cam cham."
+  - "core/skill-src/frontmatter.schema.json — ban sao thu hai vo chu, dang o MIEN_TRU. Chu so huu quyet: xoa hay giu."
+  - "RUNNING.md chua nhac `dong_goi_skill.py` — ngoai pham_vi_ghi cua ca ba task."
+  - "web-spec.md tu mo ta kien truc => se troi tiep. Duong chat hon: tro con tro vao 04_system/adr.md."
+  - "bang `categories` trong kb/_kho.sqlite DANG TRONG => moi gia tri category deu bi --categories tu choi. Thuoc M02, khong phai viec nay."

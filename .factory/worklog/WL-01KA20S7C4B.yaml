@@ -1,0 +1,25 @@
+id: WL-01KA20S7C4B
+luc: 2026-09-04T14:0x+07:00
+ai: claude (PM)
+viec: s7 plan C4b — worker + sinh-transcript + video/URL (FR-054 đã duyệt)
+object:
+  - 07_plan/M12_chungcat/tasks/T12-13-worker-hang-doi.md
+  - 07_plan/M12_chungcat/tasks/T12-14-ap-fr054-vao-spec.md
+  - 07_plan/M12_chungcat/tasks/T12-15-test-video-transcript.md
+  - 07_plan/M12_chungcat/tasks/T12-16-asr-sinh-transcript.md
+  - 07_plan/M12_chungcat/tasks/T12-17-tai-nguon-url.md
+  - 07_plan/M01_core/tasks/T01-45-bang-khai-video-transcript.md
+  - 07_plan/M04_ci/tasks/T04-8-git-lfs-media-ci.md
+  - 07_plan/M03_web/tasks/T03-108-nut-sinh-transcript-va-xem-vtt.md
+noi_dung: |
+  8 đơn vị, check_g6b 8/8 ok (hard, đủ cmd). Thứ tự bắn:
+  T12-14 (giấy+ký) → T12-15 (cổng đỏ trước) → T12-13 (worker — chặn cả C4a)
+  → T12-16 (asr) → [T12-17 nếu duyệt] · song song đất khác: T01-45 · T04-8
+  → cuối: T03-108 (FE). Plan là SOFT — 4 quyết định chờ chủ dự án ở báo cáo.
+  ID cấp theo rule 9 sau ls (M12 max 12 · M03 max 107 · M01 max 44 · M04 max 7).
+ky_bo_sung: |
+  2026-09-05 01:1x — FROZEN.lock ký lại (56 file, frontmatter.schema.json hash
+  mới b257efad: trần media 25MB→1GB theo quyết 3 + FR-054 §9.3 ĐÃ DUYỆT).
+  Lệnh check_frozen --ky do PM CHẠY HỘ theo chỉ thị nguyên văn của chủ dự án
+  cùng phiên: "ký giúp tôi đi / chưa cần commit gì cả nhé" — quyền ký vẫn của
+  NGƯỜI, PM chỉ là tay gõ lệnh. check_frozen sau ký: exit 0. KHÔNG commit.

@@ -1,0 +1,70 @@
+at: 2026-08-19T22:30Z
+agent: claude
+step: s8 — 15/15 task xong. T01-1, T01-2, T05-1, T05-2, T07-1
+did: >
+  Năm task cuối. Cả 7 module giờ as-built.
+
+  T01-1 normalize_url() + CỔNG 9
+    Bốn phép theo spec M02 §2.3: bỏ tracking (23 mẫu), bỏ www./scheme,
+    youtu.be→youtube.com, arxiv pdf→abs. Cộng sắp param để ?b=1&a=2
+    bằng ?a=2&b=1.
+    Cổng 9: url_normalized khai tay phải khớp hàm tính. Không chặn thì
+    hai bản cùng nguồn đếm thành hai nguồn độc lập, hệ số kiểm chứng chéo
+    bị thổi phồng bằng một thao tác copy link — hệ số đó đi thẳng vào
+    priority, priority quyết định có sinh skill điều khiển agent không.
+
+  T01-2 test --fix chỉ sửa dữ liệu DẪN XUẤT
+    So frontmatter trước/sau, khẳng định đúng một khoá đổi và 7 trường
+    phán đoán nguyên vẹn. M01-R2: sửa tự động một QUYẾT ĐỊNH là bịa có
+    hệ thống — bịa đi thẳng qua mọi cổng vì nó "hợp lệ về hình thức".
+
+  T05-1 + T05-2 cổng gác cửa _inbox/
+    Ranh giới: PHÉP TÍNH thì làm (word_count, url_normalized, ingested_at),
+    PHÁN ĐOÁN thì trả lại (id, slug, credibility, concepts).
+    File trả lại GIỮ NGUYÊN gốc + khối lý do — người sửa rồi thả lại.
+    Không frontmatter ⇒ trả kèm KHUNG tối thiểu.
+    Import validate.py của M01, KHÔNG copy (M05-R3).
+
+  T07-1 quét kho theo nhịp
+    Ba thứ hỏng dần. Tuổi tính từ analyzed_at KHÔNG từ mtime — mtime đổi
+    mỗi lần git checkout, dùng nó thì sau một lần clone MỌI bài đều "mới"
+    và báo cáo im lặng đúng lúc cần nhất.
+    Tuần và tháng tách nhau (M07-R3): nhắc quá thường thì người ta tắt
+    thông báo và mất luôn nhắc quan trọng.
+    AC5 quét mã khẳng định không con số ngưỡng nào lọt vào — chỉnh sau
+    chặng C là sửa một dòng.
+
+  BỐN LẦN TEST BÁO SAI TRÊN CODE ĐÚNG, sửa test không sửa code:
+    fixture không có url_normalized nên test thay chuỗi không tồn tại
+    test tìm "SUA:" trong output có dấu "SỬA:"
+    fixture thân bài thiếu dấu tiếng Việt ⇒ validator từ chối đúng
+    helper kho() đặt tên file b0.md thay vì theo slug
+
+  MỘT LỖI PHỤ THẬT: subprocess trong test đọc stdout tiếng Việt bằng
+  cp1252 ⇒ UnicodeDecodeError. Cùng loại đã vá cho CI bằng PYTHONUTF8.
+
+verify:
+  hard:
+    - "pytest core/tests -q          => 30 passed (19 -> 30)"
+    - "9 script check_*.py           => xanh"
+    - "6 test module                 => xanh"
+    - "7 test web                    => xanh"
+    - "check_g6a                     => 6 điều kiện đạt trên 7 module"
+    - "check_g6b                     => 5 điều kiện đạt trên 15 task"
+  pha_thu:
+    - "T01-1: bỏ cổng 9 / không bỏ tracking / không quy arxiv => cả 3 ĐỎ đúng chỗ"
+
+ra:
+  - core/src/source_distiller/validate.py   # normalize_url + cổng 9
+  - core/tests/test_gates.py                # +11 test
+  - 05_intake/{gate.py,test_gate.py}
+  - 07_curate/{curate.py,test_curate.py}
+  - project_map.yaml                        # v10 — 7/7 as-built
+  - .github/workflows/ci.yml                # 31 bước
+
+no_go:
+  - "Kho kb/ vẫn RỖNG. Mọi số đo trên sample v3, chưa đo M1 thật."
+  - "Ba ngưỡng của M07 là phỏng đoán — chỉnh sau khi nạp 10 nguồn thật."
+  - "Ảnh nền tự chuyển 5-7s chưa port (phần bg* của prototype)."
+  - "Chưa test Safari/Firefox — nợ từ G5."
+  - "re-analyze (M01 §2.4) chưa có code — F3 mới là quyết định."

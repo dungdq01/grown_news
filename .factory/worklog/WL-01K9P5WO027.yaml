@@ -1,0 +1,98 @@
+id: WL-01K9P5WO027
+at: 2026-08-29
+by: claude
+buoc: WO-027 — neo `(?:^|\})` nuốt dấu `}`, phép quét CSS chỉ thấy MỘT NỬA số luật
+loai: bàn giao WO-027
+wo: WO-027-neo-css-nuot-dau-ngoac.md
+
+object:
+  wo:
+    - .factory/wo/WO-027-neo-css-nuot-dau-ngoac.md
+  task:
+    - 07_plan/M03_web/tasks/T03-61-test-neo-css.md
+  test:
+    - web/test/cac-man-con-lai.test.js   # cuoi() — 1 chỗ
+    - web/test/rail-trai.test.js         # 4 chỗ
+    - web/test/ui-ba-man.test.js         # 2 chỗ
+  backlog:
+    - 06_modules/M01_core/backlog.md     # 1 ô: phép kiểm chết `.qw .nw`
+
+may_xanh:
+  - "ba cổng còn XANH sau khi đổi neo · quét web 72/73 (chỉ `he-kinh`)"
+  - >
+    Đo bằng CHÍNH mã cổng (bản dựng lại của tôi qua `node -e` sai escape):
+    tổng luật thấy được — neo cũ **416**, không neo **832** ⇒ bỏ sót đúng một nửa
+
+noi_cho_dung_no_chua_sai:
+  - >
+    Đếm theo TỪNG selector các cổng thật sự hỏi: `.top` 3·3 · `.wrap` 2·2 ·
+    `.mid` 1·1 · `.tb` 2·2 · `.view` 1·1 — hai neo cho CÙNG kết quả. **Không phép
+    kiểm nào đang đọc sai.** Tôi suýt báo đây là lỗi đang sống; nó không phải
+  - >
+    Vấn đề là nó đúng do MAY: một luật hiện ra hay không phụ thuộc vị trí
+    CHẴN/LẺ trong chuỗi luật của cả file. Thêm một luật KHÔNG LIÊN QUAN ở phía
+    trên là đổi nhịp, và một phép kiểm có thể lặng lẽ thành vô hiệu
+  - >
+    Nặng nhất ở `rail-trai` và `ui-ba-man`: chúng `.map()` MỌI match chứ không
+    lấy cái cuối, nên một luật ghi đè ở phía sau rơi vào nhịp bị bỏ là VÔ HÌNH
+
+ban_sua:
+  - >
+    Bỏ neo. `[^}]*` KHÔNG thể vượt qua một `}` nên nó không tràn sang luật khác
+    được — neo là thừa ngay từ đầu. Thay bằng `(?:^|[};])` + cờ `m`: thiếu `m`
+    thì `^` chỉ có nghĩa ở đầu CHUỖI, không ở đầu dòng
+  - "Cùng bug đã sửa ở WO-015, nơi `[hidden]{display:none}` có thật mà cổng báo 'thấy 0 luật'"
+
+mot_phep_kiem_chet_tim_ra_kem:
+  - >
+    `cac-man-con-lai.test.js:378` — `ok(!/max-width:840px/.test(cuoi(".qw .nw")))`
+    đúng VÔ ĐIỀU KIỆN: `cuoi()` trả `""`. Trong `prototype.css`, `.qw` chỉ còn
+    trong một chú thích ghi *"KHỐI `.qw` / `.qr` ĐÃ XOÁ"* (FR-033)
+  - >
+    KHÔNG xoá: mã chết của người khác, `CLAUDE.md` nói nêu ra chứ đừng xoá. Ba
+    phép ở `:240` · `:241` · `:381` đã canh đúng điều còn có nghĩa. Ô backlog mở
+
+tu_bat_duoc:
+  - >
+    Bản dựng lại `cuoi()` của tôi qua `node -e` báo "rỗng cho MỌI selector" và
+    tôi suýt kết luận cổng hỏng nặng. Sai là ở phép đo: bash nuốt escape. Chỉ khi
+    đo bằng CHÍNH file cổng (chèn dòng in, chạy, xoá) mới ra sự thật — 6/7
+    selector tìm thấy bình thường
+  - >
+    Và một lần đọc nhầm mã lỗi: `rail-trai=1` là exit của script Python vừa hỏng
+    trong cùng chuỗi lệnh, không phải của cổng. Cổng vẫn xanh. `$?` sau một chuỗi
+    `&&` đứt không nói về lệnh tôi tưởng
+
+dinh_chinh:  # 2026-08-29, sau khi agent khác chạm vào cùng vùng mã
+  - >
+    **Tôi ghi SAI nguyên nhân.** WO-027 khai lỗi là *"neo `(?:^|\}}` nuốt dấu
+    `}}` của luật trước"*. Đo lại, tách từng biến:
+      neo cũ  `(?:^|\}})`  KHÔNG cờ `m` : 417
+      neo cũ  `(?:^|\}})`  CÓ cờ `m`    : 826
+      neo mới `(?:^|[}};])` có cờ `m`   : 826   ← đóng góp ĐÚNG BẰNG KHÔNG
+      không neo                        : 834
+  - >
+    Thứ thật sự chữa là **cờ `m`**. Thiếu `m` thì `^` chỉ có nghĩa ở đầu CHUỖI,
+    nên gần như mọi luật mất một nửa cơ hội khớp. Việc tôi nới lớp ký tự từ
+    `\}}` sang `[}};]` không thay đổi một luật nào
+  - >
+    Bản vá VẪN ĐÚNG (417 → 826) — nó đúng vì tôi thêm `m` cùng lúc, không vì
+    lý do tôi viết ra. Người đọc hồ sơ cũ sẽ rút bài học sai: đi nới lớp ký tự
+    thay vì soi cờ regex
+  - >
+    Còn sót: **1 selector thật** (`.st.dr`), không phải 8. Hai cái kia là bước
+    keyframes (`0%,100%`, `from`) — không phải luật cho các cổng này
+  - >
+    Đường ĐÚNG hẳn là **quét ngoặc theo độ sâu**, không neo gì cả. Agent làm
+    WO-035 đã viết một bản như vậy trong `mo-ta-va-nut-nap.test.js` §9; bảy chỗ
+    còn lại nên chép sang. Ô backlog đã mở
+
+đỏ_do: chưa quy được chủ  # neo có từ trước, lặp lại ở ba file
+
+do_do:
+  - cong: he-kinh.test.js
+    do_do_boi: ảnh 724662 byte người dùng thêm — `python core/tools/toi_uu_anh_nen.py`
+  - cong: check_frozen.py
+    do_do_boi: chờ NGƯỜI ký sau khi FR-039 duyệt
+  - cong: check_danh_muc.py · check_skill.py · check_running.py
+    do_do_boi: agent khác · và hệ quả của hai cổng trên

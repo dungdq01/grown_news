@@ -1,0 +1,122 @@
+ulid: 01K9XH0M12RESEARCH
+ngay: 2026-09-03
+tac_nhan: claude-opus-5
+loai: ban_giao
+gate: G6A (M12 — mo lai 11 o backlog)
+pham_vi: M12_chungcat (testcases + backlog) · FR-054 §7 · doi so FR trung id
+
+viec: >
+  Nap 01_research/m12-ky-thuat-trien-khai.md vao s6 cua M12, roi xu ly bon lo
+  tim ra o luot truoc (upload MP4 / FR-054).
+
+dinh_tuyen: >
+  spec.md + rules.md cua M12 FROZEN (FROZEN.lock — dung hai file, da do).
+  Research tu khai "khong sua tai cho". testcases.md · workflow.md · backlog.md
+  KHONG frozen ⇒ ghi duoc ngay, khong can FR. Moi ca gia dinh hop dong CHUA
+  DUYET mang nhan CHO FR-053 / CHO FR-054.
+
+object:
+  - 06_modules/M12_chungcat/testcases.md   # 169 -> 550 dong · PHAN II + PHAN III
+  - 06_modules/M12_chungcat/backlog.md     # 31 -> 187 dong · 0 -> 11 o mo
+  - .factory/fr/FR-054-duong-video-transcript-thanh-hien-vat.md   # +§7 (225->349 dong)
+  - .factory/fr/FR-055-o-quyen-sua-duoc-tu-web.md  # DOI TEN tu FR-054-*
+  - .factory/worklog/WL-01K9XFS2S6CAIDAT.yaml      # 9 tham chieu FR-054 -> FR-055
+  - 04_system/adr.md                        # 2 cho
+  - 04_system/security_baseline.md          # 1 cho
+  - 02_proposal/proposal-3-quan-ly-cai-dat.md   # 1 cho
+  - 06_modules/M18_nguoidung/backlog.md     # +1 o (spec.md FROZEN, khong sua tai cho)
+
+do_da_chay:
+  cong_s6: check_g6a · check_map · check_ba · check_rule_surfaces · check_mermaid — 5/5 XANH
+  pytest: 45 passed
+  do_con_lai: check_danh_muc · check_frozen · check_g6b · check_running · check_skill
+  do_moi: KHONG CO — cung 5 do nhu truoc luot nay
+  check_frozen: dung MOT file — 06_modules/M18_nguoidung/spec.md (§10 luot truoc, cho NGUOI ky)
+
+phat_hien_ve_PHUONG_PHAP: >
+  s6 chay MOT phep thu, va no khong phai phep thu duy nhat can thiet.
+  Phep thu s6: "AC nay viet duoc testcase khong?" — no bat AC KHONG DO DUOC.
+  Phep thu cua research: "cho nao spec vo khi gap thu vien that?" — no bat AC DO
+  DUOC MA TIEN DE SAI.
+  Vi du sach nhat: AC-5.2 viet duoc testcase ngay ("kill -9 giua luc ghi => new/
+  khong co file nua voi") va tien de cua no SAI tren Windows — os.replace goi
+  MoveFileEx, thu do KHONG duoc bao dam nguyen tu. Phep thu s6 xanh; menh de sai.
+  => Da ghi bang gioi han cua s6 vao testcases.md §cuoi, ba dong.
+
+upload_MP4_do_hanh_vi: >
+  Cau hoi cua chu du an: "upload MP4 da co chua?"
+  DO THAT qua luuHienVat tren kho tam (byte mo dau ftyp mp42):
+    video/mp4 · audio/mpeg · video/quicktime · video/x-matroska · video/webm
+       => ok=true, 201  (CA NAM)
+    26214401 byte => ok=false, 413   (tran TRAN_MEDIA = 25 MB)
+  Va frontmatter.schema.json khai media.items.mime la `pattern` RFC CHUNG
+  ⇒ video/mp4 hop le o ca schema. Magic-byte chi ap cho 5 dinh dang da khai.
+  => CO, upload MP4 chay duoc. Nhung KHONG dung duoc cho video:
+     25 MB ≈ 1-2 phut video 1080p (vs ~26 phut MP3 128k, ~50 phut Opus 64k);
+     luu thanh application/octet-stream + xem_truoc "tai" (mot nut tai ve);
+     khong noi duoc source_type video (bang video doi url_normalized).
+  => VA no KHONG phai thu M12 can: research PHAN C chot audio KHONG vao kho,
+     no song trong Maildir cua job roi BI XOA; chi transcript .vtt vao kho.
+
+bon_lo_da_ghi_vao_FR-054_§7:
+  - "§4.2 KHONG cuong che duoc. No viet 'khong them mime video/*' — nhung KHONG
+     CAN them: FR-039 da doi vai bang mime tu cong NHAN sang bang RENDER. Luat
+     'khong byte video vao kho' dang song bang CHU, khong bang cong. Ba loi, ca ba
+     la quyet dinh cua chu du an vi loi nao cung cham mot FR da duyet. Toi khuyen
+     loi (b): giu FR-039 nguyen, them mot luat hep hon 'ban ghi video khong duoc
+     co media mime video/*' — cuong che duoc bang CHECK/mot cong thay vi bang mot cau."
+  - "§4.4 chot file-nguoi-tai la multipart qua web/, nhung KHONG noi tran cua
+     duong multipart. Dung 25 MB cua kho la con so SAI ve ban chat — dau vao tam
+     cua mot job khong phai noi dung kho. Can hang thu ba TRAN_NGUYEN_LIEU (M09-R5
+     da lap tien le dung: TRAN va TRAN_MEDIA la HAI hang). Va cua nen nhan AUDIO
+     chu khong VIDEO: duoi cung mot tran, audio chua 20-40x thoi luong."
+  - "V6 da HET DO. §3 khai V6 phai 'do hom nay' vi FR-052 chua ap, va goi do la
+     'cach dung de mot phu thuoc khong bi quen'. Do 2026-09-03: schema khai
+     media.type=array, minItems=1 ⇒ FR-052 DA AP. Nen dong 'phu thuoc CUNG ...
+     chua ap' o dau FR khong con dung, va V6 khong do duoc nua theo cach no mo ta."
+  - "Da viet testcase cho V1-V7 o testcases.md PHAN III. Viet ra thi lo ba cho FR
+     chua du de viet MOT ket qua mong doi: V1 (transcript do NGUOI dan => la_asr
+     false, truong model ASR mang gi?) · V5 (MOI loi that bai => neu tung loi hay
+     mot cau chung?) · V7 (VTT co BOM UTF-8 truoc WEBVTT => W3C cho phep, phep so
+     byte tho TU CHOI OAN)."
+
+FR_trung_id_da_xu_ly: >
+  HAI file cung mang id FR-054:
+    FR-054-o-quyen-sua-duoc-tu-web.md            02:18  (cua toi, con tro stub)
+    FR-054-duong-video-transcript-thanh-hien-vat 03:43  (agent khac, FR that)
+  Quy chu: khong phai loi dat so cua toi — file kia tao SAU. Nhung doi so file
+  NAO thi do bang tham chieu: ban video duoc FR-053 tro toi o BA cho (mot FR ngang
+  cap); ban cua toi chi duoc worklog cua chinh toi tro toi.
+  => Doi ban cua toi thanh FR-055, sua 9 tham chieu trong worklog + adr.md (2) +
+     security_baseline.md (1) + proposal-3 (1).
+  Tim thay them mot loi thu hai khi sua: `FR-054 §8` tro mot muc KHONG TON TAI o
+  ca hai FR — noi dung §8 song o proposal-3:173. Da sua thanh `proposal-3 §8` o
+  ba file ghi duoc.
+
+khong_lam:
+  - "KHONG sua spec.md / rules.md cua M12 — FROZEN. Moi phat hien vao backlog,
+     tick bang FR id."
+  - "KHONG sua 06_modules/M18_nguoidung/spec.md (2 cho tro FR-054 nghia cu) —
+     FROZEN va dang do. Da mo o backlog M18 thay vi sua tai cho."
+  - "KHONG sua §0-§6 cua FR-054 mot chu nao — §7 la muc rieng, ghi ro do agent
+     KHAC viet."
+  - "KHONG cai cong tu choi video/* — no THU HEP FR-039 da duyet ⇒ quyet dinh cua
+     chu du an, khong phai sua ma."
+  - "KHONG ky FROZEN.lock. KHONG commit, KHONG push."
+
+cho_NGUOI_quyet:
+  - "DUYET FR-053 (bon cho sai + nguoi chon model) — dang chan 7 o backlog M12."
+  - "DUYET FR-054 (duong video) — dang chan 4 o backlog M12, va §7 doi mot quyet
+     dinh moi (7.1 ba loi)."
+  - "7.1: chon loi a/b/c cho lo 'FR-039 cho phep byte video vao kho'. Toi khuyen b."
+  - "7.2: chot TRAN_NGUYEN_LIEU, va chot cua nhan AUDIO hay VIDEO."
+  - "7.3: sinh transcript LAN THU HAI => thay .vtt cu hay them cai thu hai?"
+  - "Ky FROZEN.lock cho M18 spec.md (§10, luot truoc) + hai cho tro FR-054 nghia cu."
+
+loi_cua_toi_trong_luot_nay: >
+  Heredoc KHONG trich dan (<<PY thay vi <<'PY') lam shell thuc thi moi backtick
+  trong chuoi Python ⇒ khoi ket cua testcases.md bi an sach moi token trong
+  backtick. Da phat hien ngay va sua bang Write + heredoc CO trich dan.
+  Day la lan thu BAY cung lop loi trong phien nay (backtick/literal trong shell
+  hoac trong phep dem tren ma nguon). Luat da lap va van lap: noi dung co backtick
+  ⇒ Write ra file roi splice, KHONG nhet vao heredoc khong trich dan.

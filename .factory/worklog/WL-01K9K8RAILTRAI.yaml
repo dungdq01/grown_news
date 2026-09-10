@@ -1,0 +1,113 @@
+id: WL-01K9K8RAILTRAI
+at: 2026-08-24
+by: claude
+buoc: s8 (M03_web)
+loai: doi khung dieu huong cho CA 6 MAN + cat rac trong HTML phat ra
+fr: FR-027-he-kinh-tren-anh.md (muc FR-027c)
+
+viec: >
+  Nguoi dung: "cần apply trang chủ mới - sử dụng layout design mới apply full
+  tất cả các màn. quy tắc: Chúng ta chỉ thay đổi UI, backend logic / chức năng
+  / DB .. tất cả giữ nguyên".
+
+pham_vi_ton_trong_quy_tac:
+  chi_doi_UI: "shell.html (markup) · prototype.css · mot kep toa do trong multiwindow · mot buoc cat khoang trang trong emitter"
+  KHONG_dung: "web/api/** · core/** · kb/** · luong du lieu · schema · index SQLite"
+  bang_chung: "13/13 cong python xanh (gom check_frozen, check_index_dan_xuat, check_ba) va 30/30 pytest — khong mot cong backend nao do"
+
+# ── Rang buoc chat nhat: tran 48 KB het du ───────────────────────────────
+tran_het_du:
+  do_truoc: "mock/index.html 49187 byte = 48.03 KB. Tran page-weight la <= 48 (lam tron). Du CON LAI: -35 byte."
+  ket_luan: "moi thu them vao markup la vuot tran ⇒ phai tim cho cat TRUOC khi them rail"
+  khong_chon_nang_tran: >
+    Nang tran de cho thay doi cua minh vua vao la dung mot cong de hop phap hoa
+    mot su phinh. Cong nay ton tai de bat "CSS/JS bi nhung lai vao HTML" (86
+    KB); nang no la lam no yeu di cho lan sau.
+
+hai_cho_cat_tim_duoc:
+  crlf:
+    do: "shell.html luu CRLF — 581 dong = 581 byte `\\r` thuan. Tren dia mock/index.html 49187 byte nhung doc dang text chi 46983."
+    sua: "`.replace(/\\r\\n/g, \"\\n\")` ngay sau khi doc shell"
+    tiet_kiem: "281 byte (chi 281 CRLF con lai sau khi catNap cat v-nap ~300 dong)"
+  thut_dau_dong:
+    do: "-3712 byte tren mock/index.html"
+    ly_le: "thut de doc MA NGUON shell.html; trinh duyet khong doc no"
+    sua: "ham `catThut()` trong `trang()` — diem chen duy nhat, chay SAU khi moi du lieu da vao"
+    CHI_cat_thut_khong_gop_khoang_trang: "`<b>a</b> <b>b</b>` mat dau cach la hai chu dinh nhau"
+    bao_ve_pre_textarea: >
+      Split theo bien <pre>/<textarea> roi chi cat o phan NGOAI. Hai the nay
+      hien RONG trong shell, nhung `.f-kq` duoc bom nguyen van THIEU/SAI/SUA luc
+      chay (FR-010) — bao ve la dung, khong phai phong xa.
+  ket_qua: "48.03 KB -> 44.13 KB · du 3958 byte cho rail"
+
+# ── Rail trai 78px ────────────────────────────────────────────────────────
+rail:
+  vi_sao_doi: >
+    Thanh ngang an 56px chieu CAO — thu khan hiem khi doc bai dai. Rail an 78px
+    chieu NGANG, thu man 1920 co thua. Va no cho dieu huong mot truc rieng,
+    khong tranh cho voi tieu de vung.
+  anh_huong_ca_6_man: >
+    `<header class=\"top\">` nam o dong 5 shell.html — NGOAI moi `.view`. Nen doi
+    no la doi khung ca 6 man. Noi dung 5 man ngoai Trang chu GIU NGUYEN, chi
+    khung doi. Dung dieu ui_guide §9 mo ta.
+  GIU_TEN_CLASS: >
+    `.top` `.tabs` `.tb` giu nguyen ten, chi doi CSS. markup-matches-css.test.js
+    doi song anh hai chieu class<->rule; doi ten la do hang loat ma khong duoc
+    gi. Cung ly FR-021 giu slug `khai-niem` khi doi chu thanh "Danh muc".
+  markup_doi_it_nhat: "chi CHUYEN `.tsearch` + `.top-r` ra khoi rail vao mot `.ph` (header trang). Khong the moi nao ngoai `.ph` va `.rail-d`."
+  icon_o_CSS_khong_o_HTML:
+    do: "5 icon inline = 1293 byte × MOI trang × 7 trang"
+    sua: "`mask-image` + data-URI trong `.tb[data-nav=...]::before`, to bang `currentColor`"
+    loi_the: "nam trong gn.css ⇒ tai mot lan roi cache; va icon tu doi mau theo aria-current"
+    tien_le: "`.grain` (prototype.css ~74) da dung dung cach nay cho anh nhieu"
+  muc_dang_mo: "nen `--hov` + `--gloss` + `--e-top`, va TAT gach chan — gach chan la ngon ngu tab NGANG, o cot doc no doc ra nhu mot duong ke lac"
+  mobile: >
+    @media 720px: rail xep NGANG duoi day, `.wrap` bo phan bu. Cot 78px tren man
+    390px la an 20% be rong. ui_guide khong noi ve mobile — day la quyet dinh cua
+    ban nay, khai ro trong CSS.
+
+kep_keo_cua_so_doi_truc:
+  truoc: "left kep tu 0 · top kep tu 56 (= chieu cao thanh tren)"
+  sau: "left kep tu 78 (khong luon xuong duoi rail) · top kep tu 0"
+  vi_sao_quan_trong: "keo vao duoi rail thi thanh tieu de cua so bien mat — khong keo ra duoc nua"
+
+# ── Rang moi ─────────────────────────────────────────────────────────────
+rang_moi:
+  file: web/test/rail-trai.test.js
+  so_phep_kiem: 22
+  ba_lop_loi_no_canh:
+    rail_che_noi_dung: >
+      `.top` la position:fixed nen KHONG chiem cho trong luong. Thieu
+      `padding-left` tren `.wrap` thi 78px dau moi trang nam duoi rail — chu van
+      o do, chi khong doc duoc. Va hai con so (78 o `.top`, 78 o `.wrap`) phai
+      KHOP — go lech la che mot dai mong, kho thay.
+    icon_phinh_HTML: "shell chi con <= 2 svg inline; >= 5 icon phai o CSS"
+    cua_so_keo_vao_duoi_rail: "kep left >= 78 va top == 0"
+  cong_6_man: "kiem tren TRANG DA BUILD ca 6 man deu co rail + rail-d + .ph + h1.lg"
+  kiem_hai_chieu: "bo `.wrap{padding-left:calc(78px…)}` => do 2 phep kiem, goi ten dung hau qua"
+
+phep_kiem_toi_viet_sai_va_tu_bat:
+  hien_tuong: "2 phep kiem mobile do trong khi CSS dung"
+  nguyen_nhan: >
+    Dung `exec` nen lay khoi @media DAU TIEN — ma file co BA khoi cung
+    breakpoint 720px (dong 567, 1460, 1752). Phep kiem soi khoi khac.
+  sua: "matchAll roi GOP moi khoi"
+  cung_lop_loi: "'ba noi khai mot luat' — tim mot cho roi ket luan cho ca file"
+
+evidence:
+  - "cd web && npm test => exit 0, 35/35 file, 0 FAIL"
+  - "npm run check => sach"
+  - "pytest core/tests -q => 30 passed"
+  - "13/13 cong check_* exit 0"
+  - "mock/index.html 48.03 -> 44.19 KB · gn.css 127 KB (tran 160)"
+  - "6/6 man build ra deu co rail + header trang"
+  - "check_frozen: dung 1 file doi (M03_web/spec.md), ky lai 27 file"
+
+no_con_lai:
+  - >
+    Trang chu chua co `#hero` (perspective 1800px), `#tower` (khoi 3D CSS thay
+    bar HTML ngang), canvas hat, ba vong tu chuyen. Rail + kinh la KHUNG; bon
+    thu do la NOI DUNG cua rieng Trang chu.
+  - "four-screens.test.js khoa 4 vung + 4 layout family (brk-g/nw/kpi/grid) — hop dong nay GIU duoc khi doi ngon ngu thi giac, da kiem qua 35/35."
+  - "Chua xem tren trinh duyet that. Nguoi chot: mo 127.0.0.1:8787, doi tone, doi anh nen, keo cua so doc sat canh trai."
+  - "FR-025 · FR-026 ve B — CHO NGUOI KY."

@@ -1,0 +1,100 @@
+id: WL-01K9NEFR038C2C4
+at: 2026-08-28
+by: claude
+buoc: s8 — FR-038/C2 giai đoạn 4 (di trú kho THẬT) + C4 (lọc theo nhóm, builder thứ tư)
+loai: bàn giao C2-cuối + C4
+fr: FR-038-tach-ba-module-noi-dung.md
+
+object:
+  task:
+    - 07_plan/M08_api/tasks/T08-12-loc-theo-nhom-va-builder-thu-tu.md   # code
+    - 07_plan/M03_web/tasks/T03-10-test-loc-nhom-bon-builder.md         # test
+    - 07_plan/M01_core/tasks/T01-20-test-gieo-du-ba-bang.md             # test (S11)
+  code:
+    - web/api/dungchung.mjs   # NHOM · loaiCuaNhom() · khoDoc(loai)
+    - web/api/articles.mjs    # locNhom() · theBai +ho_so/media · chiMucMo +concepts_proposed
+    - web/api/router.mjs      # :40 truyền `u` vào chiMucMo
+    - web/api/WORKLOG.md
+  test:
+    - web/test/loc-theo-nhom.test.js    # MỚI — 7 mục
+    - web/test/hai-ban-shape.test.js    # mục 4-5 · hai builder → BỐN
+    - web/test/WORKLOG.md
+    - web/package.json                  # cổng thứ 53
+    - core/tests/check_export_dan_xuat.py   # gieo() đủ ba bảng (S11)
+  du_lieu:
+    - kb/_kho.sqlite          # dựng lại theo schema ba bảng (C2 giai đoạn 4)
+  plan:
+    - "C:/Users/Admin/.claude/plans/c-c-users-admin-downloads-grown-news-up-bright-newt.md"
+
+may_xanh:
+  - >
+    C2/GĐ4 · kho THẬT dựng lại, HAI thước đo độc lập KHỚP:
+    bam_cay(kb,_recycle) = ef94495f161ef0e5 trước và sau ·
+    đếm-trên-FILE (không dùng SQL) y hệt: md/repo 1 · concepts.yaml 9 ·
+    categories.yaml 18 · media 0 · recycle 0
+  - "C2/GĐ4 · `xoa mo coi 0` — vòng reap của exporter (RỦI RO SỐ MỘT, S12) KHÔNG bắn"
+  - "cd web && node test/loc-theo-nhom.test.js  ->  pass (7 mục)"
+  - "cd web && node test/hai-ban-shape.test.js  ->  pass (4 builder)"
+  - "cd web && npm test  ->  exit 0 (53 file)"
+  - "PYTHONIOENCODING=utf-8 pytest core/tests -q  ->  42 passed"
+  - "19/21 cổng check_*.py xanh"
+
+kiem_hai_chieu:
+  - >
+    R5 ĐỎ TRƯỚC có thật: loc-theo-nhom 14 lỗi · hai-ban-shape 7 lỗi trên code
+    chưa sửa, mỗi lỗi nói đúng lý do của nó
+  - >
+    Hai răng XANH cả trước lẫn sau (nên chưa chứng minh được là đỏ nổi) đã phá
+    riêng: coi `?nhom=` rỗng là nhóm lạ ⇒ đỏ đúng dòng đó · mọc `than` vào
+    `theBai` ⇒ đỏ "hợp đồng thẻ đổi mà bảng này chưa cập nhật".
+    Hoàn tác cả hai, articles.mjs khớp sha256 byte
+  - >
+    S11 · bỏ nhánh `tai_lieu` khỏi view `ban_ghi` ⇒ `check_export_dan_xuat` đỏ
+    HAI răng: "nhan trung-ten = 4, can 6" và "DB₁ ≠ DB₂ sau round-trip
+    (b3839ab6… vs ca84f0ea…)". Đây chính là phép đo của RỦI RO SỐ MỘT (S12).
+    kho.schema.sql hoàn tác khớp sha (0bf7ddb12bf4efc4)
+  - >
+    `bam_cay(kb,_recycle)` vẫn ef94495f161ef0e5 SAU cả hai lượt phá — mọi phép
+    phá chạy trên bản copy tạm, kho THẬT không bị chạm
+
+do_do:
+  - cong: core/tests/check_skill.py
+    do_do_boi: agent khác
+    quy_chu: >
+      `find core/skill-src core/tools/dong_goi_skill.py -newermt 2026-08-28`
+      không trả file nào; tôi không ghi vào tập đó ở bất kỳ lượt nào của phiên
+  - cong: core/tests/check_khai_mot_noi.py
+    do_do_boi: chính tôi, CỐ Ý
+    quy_chu: >
+      3 mục "CHỜ" — `server.mjs` · `render/trang.mjs` · `build-fe.mjs` chưa ĐỌC
+      `man-hinh.json`. Consumer đấu vào ở C5; cổng đỏ tới đó là thiết kế, không
+      phải hồi quy
+
+do_duoc:
+  - >
+    `EXPLAIN QUERY PLAN` trên DDL hiện tại: `WHERE bang='video'` → SCAN cả ba
+    bảng (bang là literal trong từng nhánh UNION ALL, SQLite không tỉa nhánh
+    theo nó); `WHERE source_type IN ('video')` → SEARCH trên cả ba PK index.
+    Ngược với phương án trông gọn hơn ⇒ lọc bằng source_type
+
+phat_hien:
+  - >
+    Cổng bốn-builder tìm ra một lỗ CHƯA AI BIẾT: `chiMucMo` thiếu
+    `concepts_proposed` mà `banTuDb:156` và `docTuDia:255` đều có ⇒ trường đó CÓ
+    trên bản mock và `undefined` trên kho THẬT. Đúng lớp lỗi B8b, bản thứ tư của
+    cùng một bệnh. Đã sửa trong cùng đơn vị
+
+tu_bat_duoc:
+  - >
+    `check_g6b` §5 bắt tôi: `T01-20-gieo-du-ba-bang.md` chạm `core/tests/**` mà
+    tên không có chữ `test` ⇒ R1 vô địa chỉ. Đổi tên thành
+    `T01-20-test-gieo-du-ba-bang.md`; `check_running` đỏ theo là hệ quả, không
+    phải lỗi thứ hai
+  - >
+    `check_worklog` bắt tôi: cổng mới `loc-theo-nhom` chưa được nhắc trong
+    `test/WORKLOG.md`. Đã ghi. Cùng lượt đó nó XANH lại phép so "test: 53" —
+    trước đây nó xanh nhờ MAY (so bằng `doc in o`, tức tìm chuỗi trên cả file);
+    nợ đó vẫn còn trong backlog
+
+con_lai:
+  - "C5 · bảy màn + thanh menu hai nhóm — đơn vị dẹp cả 3 mục CHỜ của check_khai_mot_noi"

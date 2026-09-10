@@ -1,0 +1,596 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Grown_news — Trang chủ</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+<style>
+html,body{margin:0;padding:0;background:#0b0c0e}
+a{color:inherit;text-decoration:none}
+::selection{background:rgba(248,113,113,.28)}
+input,select,button,textarea{font-family:inherit}
+#root{--t1:#f2f2f0;--t2:#b8b8c0;--t3:#9a9aa4;--t4:#7c7c86;--pn:rgba(20,22,25,.6);--pn2:rgba(20,22,25,.52);--pns:rgba(17,19,22,.86);--rail:rgba(14,15,17,.72);--edge:rgba(255,255,255,.10);--div:rgba(255,255,255,.07);--hov:rgba(255,255,255,.06);--pri:#f87171;--ok:#4ade80;--warn:#fbbf24;--e1:0 1px 2px rgba(0,0,0,.3),0 8px 24px -8px rgba(0,0,0,.44);--e2:0 2px 4px rgba(0,0,0,.34),0 18px 40px -12px rgba(0,0,0,.55);--e3:0 4px 8px rgba(0,0,0,.42),0 34px 70px -18px rgba(0,0,0,.72);--etop:inset 0 1px 0 rgba(255,255,255,.09);--gloss:linear-gradient(157deg,rgba(255,255,255,.11),rgba(255,255,255,.03) 34%,rgba(255,255,255,0) 64%);--veil:radial-gradient(120% 90% at 68% 8%,rgba(11,12,14,.55) 0%,rgba(11,12,14,.86) 46%,rgba(11,12,14,.96) 100%);--rootbg:#0b0c0e;--chip-p-b:rgba(13,125,99,.2);--chip-p-f:#4dd4ad;--chip-p-e:rgba(13,125,99,.45);--chip-v-b:rgba(29,99,199,.2);--chip-v-f:#7fb2f5;--chip-v-e:rgba(29,99,199,.45);--chip-r-b:rgba(200,30,30,.18);--chip-r-f:#f87171;--chip-r-e:rgba(200,30,30,.45);--b1t:#e04b4b;--b1f:#a51d1d;--b1s:#7a1414;--b2t:#8e939c;--b2f:#5f646c;--b2s:#464a51;--b3t:#4d5158;--b3f:#36393e;--b3s:#2a2c31;--gridline:rgba(255,255,255,.07);--planeb:rgba(255,255,255,.14)}
+@keyframes cRise{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important}}
+</style>
+</head>
+<body>
+<div id="root" style="position:relative;min-height:100vh;background:var(--rootbg);color:var(--t1);font-family:'Inter',system-ui,sans-serif;font-size:15px;line-height:1.55;font-variant-numeric:tabular-nums;overflow-x:hidden;-webkit-font-smoothing:antialiased">
+<div id="photo" style="position:fixed;inset:-6% -3%;z-index:0;will-change:transform">
+    <div id="bgDark" style="position:absolute;inset:0;transition:opacity .6s ease">
+      <div data-bg="dark" data-i="0" style="position:absolute;inset:0;opacity:1;transition:opacity 1.4s ease"><div style="position:absolute;inset:0;background:url('assets/bg-dark-1.jpg') center/cover no-repeat"></div></div>
+      <div data-bg="dark" data-i="1" style="position:absolute;inset:0;opacity:0;transition:opacity 1.4s ease"><div style="position:absolute;inset:0;background:url('assets/bg-dark-2.jpg') center/cover no-repeat"></div></div>
+      <div data-bg="dark" data-i="2" style="position:absolute;inset:0;opacity:0;transition:opacity 1.4s ease"><div style="position:absolute;inset:0;background:url('assets/bg-dark-3.jpg') center/cover no-repeat"></div></div>
+    </div>
+    <div id="bgLight" style="position:absolute;inset:0;opacity:0;transition:opacity .6s ease">
+      <div data-bg="light" data-i="0" style="position:absolute;inset:0;opacity:1;transition:opacity 1.4s ease"><div style="position:absolute;inset:0;background:url('assets/bg-light-1.jpg') center/cover no-repeat"></div></div>
+      <div data-bg="light" data-i="1" style="position:absolute;inset:0;opacity:0;transition:opacity 1.4s ease"><div style="position:absolute;inset:0;background:url('assets/bg-light-2.jpg') center/cover no-repeat"></div></div>
+      <div data-bg="light" data-i="2" style="position:absolute;inset:0;opacity:0;transition:opacity 1.4s ease"><div style="position:absolute;inset:0;background:url('assets/bg-light-3.jpg') center/cover no-repeat"></div></div>
+    </div>
+  </div>
+  <div id="veil" style="position:fixed;inset:0;z-index:1;pointer-events:none;background:var(--veil)"></div>
+  <canvas id="fx" style="position:fixed;inset:0;z-index:2;pointer-events:none;width:100%;height:100%"></canvas>
+  <div style="position:fixed;inset:-25% -15%;z-index:3;pointer-events:none;opacity:.5;background:radial-gradient(38% 30% at 24% 12%,rgba(255,255,255,.20),transparent 62%),radial-gradient(30% 26% at 84% 4%,rgba(150,190,255,.16),transparent 64%),radial-gradient(46% 34% at 58% 104%,rgba(255,214,190,.10),transparent 62%)"></div>
+  <div style="position:fixed;inset:0;z-index:3;pointer-events:none;background:radial-gradient(130% 100% at 50% 40%,transparent 42%,rgba(0,0,0,.34) 100%)"></div>
+
+  <aside style="position:fixed;left:0;top:0;bottom:0;width:78px;z-index:40;display:flex;flex-direction:column;align-items:center;gap:6px;padding:22px 0;background:var(--rail);backdrop-filter:blur(14px);border-right:1px solid var(--edge);box-shadow:var(--etop)">
+    <a href="#" style="width:38px;height:38px;display:grid;place-items:center;background:#c81e1e;color:#fff;border-radius:11px;font-weight:700;font-size:17px;letter-spacing:-.02em;margin-bottom:18px;background-image:var(--gloss);box-shadow:0 2px 8px rgba(200,30,30,.4),inset 0 1px 0 rgba(255,255,255,.3)">G</a>
+    <a href="#" style="width:54px;padding:11px 0;display:flex;flex-direction:column;align-items:center;gap:6px;border-radius:11px;font-size:10.5px;font-weight:500;border:1px solid transparent;background:var(--hov);color:var(--t1);background-image:var(--gloss)">
+      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><path d="M9 22V12h6v10"></path></svg>
+      Chủ
+    </a>
+    <a href="#" style="width:54px;padding:11px 0;display:flex;flex-direction:column;align-items:center;gap:6px;border-radius:11px;font-size:10.5px;font-weight:500;border:1px solid transparent;background:transparent;color:var(--t3)">
+      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+      Bài
+    </a>
+    <a href="#" style="width:54px;padding:11px 0;display:flex;flex-direction:column;align-items:center;gap:6px;border-radius:11px;font-size:10.5px;font-weight:500;position:relative;border:1px solid transparent;background:transparent;color:var(--t3)">
+      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 2"></path></svg>
+      Duyệt
+      <span style="position:absolute;top:7px;right:7px;width:15px;height:15px;border-radius:8px;background:#c81e1e;color:#fff;font-size:9.5px;font-weight:600;display:grid;place-items:center">3</span>
+    </a>
+    <a href="#" style="width:54px;padding:11px 0;display:flex;flex-direction:column;align-items:center;gap:6px;border-radius:11px;font-size:10.5px;font-weight:500;border:1px solid transparent;background:transparent;color:var(--t3)">
+      <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><circle cx="19" cy="5" r="2"></circle><circle cx="5" cy="19" r="2"></circle><path d="m14.5 9.5 3-3M9.5 14.5l-3 3"></path></svg>
+      Khái niệm
+    </a>
+    <button id="btnTheme" title="đổi sáng / tối" style="margin-top:auto;width:38px;height:38px;display:grid;place-items:center;border-radius:11px;background:var(--hov);background-image:var(--gloss);border:1px solid var(--edge);color:var(--t2);cursor:pointer;font-size:15px">☀</button>
+    <button id="btnFlow" title="tạm dừng nền" style="width:38px;height:38px;display:grid;place-items:center;border-radius:11px;background:transparent;border:1px solid var(--edge);color:var(--t3);cursor:pointer;font-size:11px">❙❙</button>
+  </aside>
+
+  <div style="position:relative;z-index:5;padding-left:78px">
+   <div style="max-width:1280px;margin:0 auto;padding:0 48px 120px">
+
+    <header style="display:flex;align-items:center;gap:20px;padding:22px 0 20px">
+      <div style="display:flex;align-items:baseline;gap:12px">
+        <span style="font-size:20px;font-weight:600;letter-spacing:-.02em">Trang chủ</span>
+        <span style="font-size:12px;font-weight:500;letter-spacing:.09em;text-transform:uppercase;color:var(--t4);white-space:nowrap">18 · 08 · 2026</span>
+      </div>
+      <label style="margin-left:auto;display:flex;align-items:center;gap:9px;width:300px;padding:9px 13px;border-radius:11px;background:var(--hov);background-image:var(--gloss);border:1px solid var(--edge);box-shadow:var(--etop)">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" style="color:var(--t4)"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg>
+        <input type="search" placeholder="Tìm trong 9 bản…" style="flex:1;background:transparent;border:0;outline:none;color:var(--t1);font-size:13.5px">
+        <kbd style="font-size:10.5px;color:var(--t4);border:1px solid var(--edge);border-radius:5px;padding:2px 5px">⌘K</kbd>
+      </label>
+      <div style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--t3);white-space:nowrap">
+        <span style="width:7px;height:7px;border-radius:4px;background:var(--ok);box-shadow:0 0 0 3px rgba(74,222,128,.16)"></span>
+        pipeline đang chạy
+      </div>
+    </header>
+
+    <main id="view-home">
+    <div style="animation:cRise .8s cubic-bezier(.2,.7,.3,1) both">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
+        <h2 style="font-size:12px;font-weight:600;letter-spacing:.13em;text-transform:uppercase;color:var(--t1);margin:0">Nổi bật</h2>
+        <span style="font-size:12px;color:var(--t4)">ưu tiên cao nhất · 7 ngày</span>
+        <a href="#" style="margin-left:auto;font-size:13px;color:var(--t3);white-space:nowrap">xem tất cả →</a>
+      </div>
+
+      <div style="display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:18px;perspective:1800px">
+       <div id="hero" style="display:flex;flex-direction:column;gap:13px;transform-style:preserve-3d;will-change:transform">
+        <div data-rot style="display:grid;position:relative;flex:1">
+        <article data-feat="0" style="grid-area:1/1;position:relative;padding:34px 36px 30px;border-radius:20px;background:var(--pn);background-image:var(--gloss);backdrop-filter:blur(14px);border:1px solid var(--edge);box-shadow:var(--e3),var(--etop);overflow:hidden;cursor:pointer;transition:opacity .8s ease,transform .8s ease">
+          <div style="position:absolute;left:0;top:0;width:100%;height:2px;background:linear-gradient(90deg,#c81e1e,rgba(200,30,30,0))"></div>
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:22px;flex-wrap:wrap">
+            <span style="font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;padding:4px 9px;border-radius:6px;background:var(--chip-p-b);color:var(--chip-p-f);border:1px solid var(--chip-p-e)">paper</span>
+            <span style="font-size:12.5px;color:var(--t3)">14 trang · 7 phút đọc · plausible · 2 nguồn</span>
+            <span style="margin-left:auto;font-size:12px;font-weight:600;color:var(--pri);white-space:nowrap">ƯU TIÊN 65</span>
+          </div>
+          <h3 style="font-size:clamp(30px,3.1vw,44px);font-weight:600;line-height:1.1;letter-spacing:-.025em;margin:0 0 18px;text-wrap:pretty">Walk-forward validation: vì sao k-fold ngẫu nhiên nói dối về dữ liệu thời gian</h3>
+          <p style="font-size:16px;line-height:1.68;color:var(--t2);margin:0 0 26px;max-width:62ch">Chia chuỗi thời gian bằng k-fold ngẫu nhiên làm tương lai rò rỉ vào tập huấn luyện, khiến số kiểm định trở nên thấp giả.</p>
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--edge);border-radius:13px;overflow:hidden;border:1px solid var(--edge)">
+            <div style="background:var(--pn2);background-image:var(--gloss);padding:15px 18px">
+              <div style="font-size:10.5px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--t4);margin-bottom:7px">k-fold</div>
+              <div style="font-size:27px;font-weight:600;letter-spacing:-.02em">6.1<span style="font-size:14px;color:var(--t4)">%</span></div>
+            </div>
+            <div style="background:var(--pn2);background-image:var(--gloss);padding:15px 18px">
+              <div style="font-size:10.5px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--t4);margin-bottom:7px">walk-forward</div>
+              <div style="font-size:27px;font-weight:600;letter-spacing:-.02em">17.4<span style="font-size:14px;color:var(--t4)">%</span></div>
+            </div>
+            <div style="background:var(--chip-r-b);background-image:var(--gloss);padding:15px 18px">
+              <div style="font-size:10.5px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--pri);margin-bottom:7px">chạy thật</div>
+              <div style="font-size:27px;font-weight:600;letter-spacing:-.02em;color:var(--pri)">19.0<span style="font-size:14px">%</span></div>
+            </div>
+          </div>
+        </article>
+        <article data-feat="1" style="grid-area:1/1;position:relative;padding:34px 36px 30px;border-radius:20px;background:var(--pn);background-image:var(--gloss);backdrop-filter:blur(14px);border:1px solid var(--edge);box-shadow:var(--e3),var(--etop);overflow:hidden;cursor:pointer;opacity:0;transform:translateY(16px);pointer-events:none;transition:opacity .8s ease,transform .8s ease">
+          <div style="position:absolute;left:0;top:0;width:100%;height:2px;background:linear-gradient(90deg,#1d63c7,rgba(0,0,0,0))"></div>
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:22px;flex-wrap:wrap">
+            <span style="font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;padding:4px 9px;border-radius:6px;background:var(--chip-v-b);color:var(--chip-v-f);border:1px solid var(--chip-v-e)">video</span>
+            <span style="font-size:12.5px;color:var(--t3)">42 phút · plausible · 3 nguồn</span>
+            <span style="margin-left:auto;font-size:12px;font-weight:600;color:var(--pri);white-space:nowrap">ƯU TIÊN 60</span>
+          </div>
+          <h3 style="font-size:clamp(30px,3.1vw,44px);font-weight:600;line-height:1.1;letter-spacing:-.025em;margin:0 0 18px;text-wrap:pretty">Quản lý ngữ cảnh trong hệ thống agent chạy production</h3>
+          <p style="font-size:16px;line-height:1.68;color:var(--t2);margin:0 0 26px;max-width:62ch">Cắt gì khi tràn ngữ cảnh, và vì sao nén thua cắt. Ba cách nối lại chuỗi khi cửa sổ ngữ cảnh tràn.</p>
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--edge);border-radius:13px;overflow:hidden;border:1px solid var(--edge)">
+            <div style="background:var(--pn2);background-image:var(--gloss);padding:15px 18px"><div style="font-size:10.5px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--t4);margin-bottom:7px">thời lượng</div><div style="font-size:27px;font-weight:600;letter-spacing:-.02em">42<span style="font-size:14px;color:var(--t4)">′</span></div></div>
+            <div style="background:var(--pn2);background-image:var(--gloss);padding:15px 18px"><div style="font-size:10.5px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--t4);margin-bottom:7px">nguồn</div><div style="font-size:27px;font-weight:600;letter-spacing:-.02em">3</div></div>
+            <div style="background:var(--chip-v-b);background-image:var(--gloss);padding:15px 18px"><div style="font-size:10.5px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--t4);margin-bottom:7px;color:var(--chip-v-f)">ưu tiên</div><div style="font-size:27px;font-weight:600;letter-spacing:-.02em;color:var(--chip-v-f)">60</div></div>
+          </div>
+        </article>
+        <article data-feat="2" style="grid-area:1/1;position:relative;padding:34px 36px 30px;border-radius:20px;background:var(--pn);background-image:var(--gloss);backdrop-filter:blur(14px);border:1px solid var(--edge);box-shadow:var(--e3),var(--etop);overflow:hidden;cursor:pointer;opacity:0;transform:translateY(16px);pointer-events:none;transition:opacity .8s ease,transform .8s ease">
+          <div style="position:absolute;left:0;top:0;width:100%;height:2px;background:linear-gradient(90deg,#c81e1e,rgba(0,0,0,0))"></div>
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:22px;flex-wrap:wrap">
+            <span style="font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;padding:4px 9px;border-radius:6px;background:var(--chip-r-b);color:var(--chip-r-f);border:1px solid var(--chip-r-e)">repo</span>
+            <span style="font-size:12.5px;color:var(--t3)">137 file · verified</span>
+            <span style="margin-left:auto;font-size:12px;font-weight:600;color:var(--pri);white-space:nowrap">ƯU TIÊN 50</span>
+          </div>
+          <h3 style="font-size:clamp(30px,3.1vw,44px);font-weight:600;line-height:1.1;letter-spacing:-.025em;margin:0 0 18px;text-wrap:pretty">Khử trùng bản ghi bằng khoá lũy đẳng ở tầng staging</h3>
+          <p style="font-size:16px;line-height:1.68;color:var(--t2);margin:0 0 26px;max-width:62ch">Consumer đọc hàng đợi có khả năng gửi trùng. Khoá lũy đẳng ở tầng staging chặn bản ghi lặp trước khi vào kho.</p>
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--edge);border-radius:13px;overflow:hidden;border:1px solid var(--edge)">
+            <div style="background:var(--pn2);background-image:var(--gloss);padding:15px 18px"><div style="font-size:10.5px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--t4);margin-bottom:7px">file</div><div style="font-size:27px;font-weight:600;letter-spacing:-.02em">137</div></div>
+            <div style="background:var(--pn2);background-image:var(--gloss);padding:15px 18px"><div style="font-size:10.5px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--t4);margin-bottom:7px">cập nhật</div><div style="font-size:27px;font-weight:600;letter-spacing:-.02em">08<span style="font-size:14px;color:var(--t4)">·18</span></div></div>
+            <div style="background:var(--chip-r-b);background-image:var(--gloss);padding:15px 18px"><div style="font-size:10.5px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--t4);margin-bottom:7px;color:var(--pri)">ưu tiên</div><div style="font-size:27px;font-weight:600;letter-spacing:-.02em;color:var(--pri)">50</div></div>
+          </div>
+        </article>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <button data-dot="0" aria-label="tin nổi bật 1" style="height:4px;flex:1;max-width:64px;border:0;padding:0;border-radius:3px;cursor:pointer;background:var(--hov);overflow:hidden"><i data-dotfill="0" style="display:block;height:100%;width:100%;background:var(--pri);border-radius:3px;transition:width .4s ease"></i></button>
+          <button data-dot="1" aria-label="tin nổi bật 2" style="height:4px;flex:1;max-width:64px;border:0;padding:0;border-radius:3px;cursor:pointer;background:var(--hov);overflow:hidden"><i data-dotfill="1" style="display:block;height:100%;width:0%;background:var(--pri);border-radius:3px;transition:width .4s ease"></i></button>
+          <button data-dot="2" aria-label="tin nổi bật 3" style="height:4px;flex:1;max-width:64px;border:0;padding:0;border-radius:3px;cursor:pointer;background:var(--hov);overflow:hidden"><i data-dotfill="2" style="display:block;height:100%;width:0%;background:var(--pri);border-radius:3px;transition:width .4s ease"></i></button>
+          <span data-rotlabel style="margin-left:auto;font-size:11px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--t4);white-space:nowrap">01 / 03 · tự chuyển</span>
+        </div>
+       </div>
+
+        <div style="display:flex;flex-direction:column;gap:18px">
+          <article style="flex:1;padding:24px;border-radius:20px;background:var(--pn);background-image:var(--gloss);backdrop-filter:blur(14px);border:1px solid var(--edge);box-shadow:var(--e2),var(--etop);display:flex;flex-direction:column;transition:transform .25s ease;cursor:pointer" style-hover="transform:translateY(-3px)">
+            <div style="display:flex;align-items:center;gap:9px;margin-bottom:14px">
+              <span style="font-size:10.5px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;padding:3px 8px;border-radius:6px;background:var(--chip-v-b);color:var(--chip-v-f);border:1px solid var(--chip-v-e)">video</span>
+              <span style="font-size:12px;color:var(--t4)">42 phút</span>
+              <span style="margin-left:auto;font-size:11.5px;font-weight:600;color:var(--t3)">60</span>
+            </div>
+            <h3 style="font-size:20px;font-weight:600;line-height:1.28;letter-spacing:-.015em;margin:0 0 10px">Quản lý ngữ cảnh trong hệ thống agent chạy production</h3>
+            <p style="font-size:14px;line-height:1.6;color:var(--t3);margin:0">Cắt gì khi tràn ngữ cảnh, và vì sao nén thua cắt.</p>
+          </article>
+          <article style="flex:1;padding:24px;border-radius:20px;background:var(--pn);background-image:var(--gloss);backdrop-filter:blur(14px);border:1px solid var(--edge);box-shadow:var(--e2),var(--etop);display:flex;flex-direction:column;transition:transform .25s ease;cursor:pointer" style-hover="transform:translateY(-3px)">
+            <div style="display:flex;align-items:center;gap:9px;margin-bottom:14px">
+              <span style="font-size:10.5px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;padding:3px 8px;border-radius:6px;background:var(--chip-r-b);color:var(--chip-r-f);border:1px solid var(--chip-r-e)">repo</span>
+              <span style="font-size:12px;color:var(--t4)">137 file · verified</span>
+              <span style="margin-left:auto;font-size:11.5px;font-weight:600;color:var(--t3)">50</span>
+            </div>
+            <h3 style="font-size:20px;font-weight:600;line-height:1.28;letter-spacing:-.015em;margin:0 0 10px">Khử trùng bản ghi bằng khoá lũy đẳng ở tầng staging</h3>
+            <p style="font-size:14px;line-height:1.6;color:var(--t3);margin:0">Consumer đọc hàng đợi có khả năng gửi trùng.</p>
+          </article>
+        </div>
+      </div>
+
+      <div data-rise style="display:grid;grid-template-columns:minmax(0,1.32fr) minmax(0,1fr);gap:18px;margin-top:18px">
+        <div style="padding:26px 28px 12px;border-radius:20px;background:var(--pn);background-image:var(--gloss);backdrop-filter:blur(14px);border:1px solid var(--edge);box-shadow:var(--e2),var(--etop)">
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:6px">
+            <h2 style="font-size:12px;font-weight:600;letter-spacing:.13em;text-transform:uppercase;margin:0">Mới phân tích</h2>
+            <span style="font-size:12px;color:var(--t4)">3 gần nhất</span>
+            <a href="#" style="margin-left:auto;font-size:13px;color:var(--t3);white-space:nowrap">tất cả 9 →</a>
+          </div>
+          <a href="#" style="display:grid;grid-template-columns:52px minmax(0,1fr) auto;gap:18px;align-items:center;padding:17px 12px;margin:0 -12px;border-radius:10px;border-bottom:1px solid var(--div)" style-hover="background:var(--hov)">
+            <time style="font-size:12.5px;font-weight:600;color:var(--t4)">08·18</time>
+            <div>
+              <h3 style="font-size:16px;font-weight:600;letter-spacing:-.012em;line-height:1.35;margin:0 0 4px">Khử trùng bản ghi bằng khoá lũy đẳng</h3>
+              <p style="font-size:13.5px;color:var(--t3);margin:0">Consumer đọc hàng đợi có khả năng gửi trùng.</p>
+            </div>
+            <span style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--ok)">verified</span>
+          </a>
+          <a href="#" style="display:grid;grid-template-columns:52px minmax(0,1fr) auto;gap:18px;align-items:center;padding:17px 12px;margin:0 -12px;border-radius:10px;border-bottom:1px solid var(--div)" style-hover="background:var(--hov)">
+            <time style="font-size:12.5px;font-weight:600;color:var(--t4)">08·17</time>
+            <div>
+              <h3 style="font-size:16px;font-weight:600;letter-spacing:-.012em;line-height:1.35;margin:0 0 4px">Walk-forward validation: vì sao k-fold nói dối</h3>
+              <p style="font-size:13.5px;color:var(--t3);margin:0">Tương lai rò rỉ vào tập huấn luyện, sai số kiểm định thấp giả.</p>
+            </div>
+            <span style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--t3)">plausible</span>
+          </a>
+          <a href="#" style="display:grid;grid-template-columns:52px minmax(0,1fr) auto;gap:18px;align-items:center;padding:17px 12px;margin:0 -12px;border-radius:10px" style-hover="background:var(--hov)">
+            <time style="font-size:12.5px;font-weight:600;color:var(--t4)">08·16</time>
+            <div>
+              <h3 style="font-size:16px;font-weight:600;letter-spacing:-.012em;line-height:1.35;margin:0 0 4px">Prompt caching giảm 40% chi phí</h3>
+              <p style="font-size:13.5px;color:var(--t3);margin:0">Bài vendor, số liệu thiếu điều kiện đo.</p>
+            </div>
+            <span style="font-size:12.5px;font-style:italic;color:var(--warn);white-space:nowrap">⚠ conflicted</span>
+          </a>
+        </div>
+
+        <div style="padding:26px 28px 24px;border-radius:20px;background:var(--pn);background-image:var(--gloss);backdrop-filter:blur(14px);border:1px solid var(--edge);box-shadow:var(--e2),var(--etop)">
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px">
+            <h2 style="font-size:12px;font-weight:600;letter-spacing:.13em;text-transform:uppercase;margin:0">Kho</h2>
+            <span style="font-size:12px;color:var(--t4)">9 bản</span>
+            <a href="#" style="margin-left:auto;font-size:13px;color:var(--t3);white-space:nowrap">khái niệm →</a>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px 10px;margin-bottom:10px">
+            <div><div style="font-size:10.5px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--t4);margin-bottom:4px">đã duyệt</div><div style="font-size:34px;font-weight:600;letter-spacing:-.03em;line-height:1"><span data-count="5">5</span></div></div>
+            <div><div style="font-size:10.5px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--t4);margin-bottom:4px">chờ</div><div style="font-size:34px;font-weight:600;letter-spacing:-.03em;line-height:1"><span data-count="3">3</span></div></div>
+            <div><div style="font-size:10.5px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--t4);margin-bottom:4px">duyệt TB</div><div style="font-size:34px;font-weight:600;letter-spacing:-.03em;line-height:1"><span data-count="17">17</span><span style="font-size:16px;color:var(--t4)">′</span></div></div>
+            <div><div style="font-size:10.5px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--t4);margin-bottom:4px">insight</div><div style="font-size:34px;font-weight:600;letter-spacing:-.03em;line-height:1"><span data-count="2">2</span><span style="font-size:16px;color:var(--t4)">/5</span></div></div>
+          </div>
+          <div style="display:grid;position:relative">
+          <div data-pane="0" style="grid-area:1/1;transition:opacity .55s ease">
+          <div style="height:236px;display:flex;align-items:center;justify-content:center;perspective:1500px;transform:scale(.9)">
+            <div id="tower" style="transform-style:preserve-3d;transform:rotateX(60deg) rotateZ(-38deg);will-change:transform">
+              <div style="position:relative;width:250px;height:150px;background-image:linear-gradient(var(--gridline) 1px,transparent 1px),linear-gradient(90deg,var(--gridline) 1px,transparent 1px);background-size:25px 30px;border:1px solid var(--planeb);transform-style:preserve-3d">
+                <div data-bar="118" style="position:absolute;left:24px;top:44px;width:52px;height:52px;transform-style:preserve-3d">
+                  <div style="position:absolute;inset:0;background:var(--b1t);transition:transform .9s cubic-bezier(.22,.9,.3,1)"></div>
+                  <div style="position:absolute;left:0;top:0;width:52px;background:var(--b1f);transform-origin:top left;transform:translateY(52px) rotateX(90deg);transition:height .9s cubic-bezier(.22,.9,.3,1)"></div>
+                  <div style="position:absolute;left:0;top:0;height:52px;background:var(--b1s);transform-origin:top left;transform:translateX(52px) rotateY(-90deg);transition:width .9s cubic-bezier(.22,.9,.3,1)"></div>
+                </div>
+                <div data-bar="71" style="position:absolute;left:100px;top:44px;width:52px;height:52px;transform-style:preserve-3d">
+                  <div style="position:absolute;inset:0;background:var(--b2t);transition:transform .9s cubic-bezier(.22,.9,.3,1)"></div>
+                  <div style="position:absolute;left:0;top:0;width:52px;background:var(--b2f);transform-origin:top left;transform:translateY(52px) rotateX(90deg);transition:height .9s cubic-bezier(.22,.9,.3,1)"></div>
+                  <div style="position:absolute;left:0;top:0;height:52px;background:var(--b2s);transform-origin:top left;transform:translateX(52px) rotateY(-90deg);transition:width .9s cubic-bezier(.22,.9,.3,1)"></div>
+                </div>
+                <div data-bar="24" style="position:absolute;left:176px;top:44px;width:52px;height:52px;transform-style:preserve-3d">
+                  <div style="position:absolute;inset:0;background:var(--b3t);transition:transform .9s cubic-bezier(.22,.9,.3,1)"></div>
+                  <div style="position:absolute;left:0;top:0;width:52px;background:var(--b3f);transform-origin:top left;transform:translateY(52px) rotateX(90deg);transition:height .9s cubic-bezier(.22,.9,.3,1)"></div>
+                  <div style="position:absolute;left:0;top:0;height:52px;background:var(--b3s);transform-origin:top left;transform:translateX(52px) rotateY(-90deg);transition:width .9s cubic-bezier(.22,.9,.3,1)"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div style="display:flex;justify-content:space-between;gap:10px;font-size:11px;font-weight:500;letter-spacing:.09em;text-transform:uppercase;color:var(--t4);padding-top:14px;border-top:1px solid var(--div)">
+            <span style="white-space:nowrap"><span style="color:var(--pri);font-weight:600">5</span> duyệt</span>
+            <span style="white-space:nowrap"><span style="color:var(--t2);font-weight:600">3</span> nháp</span>
+            <span style="white-space:nowrap"><span style="color:var(--t3);font-weight:600">1</span> từ chối</span>
+          </div>
+          </div>
+          <div data-pane="1" style="grid-area:1/1;opacity:0;pointer-events:none;transition:opacity .55s ease;height:250px;display:flex;flex-direction:column;justify-content:center;gap:12px">
+            <div style="display:grid;grid-template-columns:112px minmax(0,1fr) 22px;gap:12px;align-items:center">
+              <span style="font-size:12.5px;color:var(--t3);white-space:nowrap">paper</span>
+              <span style="height:8px;border-radius:4px;background:var(--hov);overflow:hidden;display:block"><i data-grow="100" style="display:block;height:100%;width:100%;border-radius:4px;background:linear-gradient(90deg,#0d7d63,#12a684);box-shadow:inset 0 1px 0 rgba(255,255,255,.25);transition:width .8s cubic-bezier(.22,.9,.3,1)"></i></span>
+              <span style="font-size:12.5px;font-weight:600;color:var(--t2);text-align:right">2</span>
+            </div>
+            <div style="display:grid;grid-template-columns:112px minmax(0,1fr) 22px;gap:12px;align-items:center">
+              <span style="font-size:12.5px;color:var(--t3);white-space:nowrap">video</span>
+              <span style="height:8px;border-radius:4px;background:var(--hov);overflow:hidden;display:block"><i data-grow="100" style="display:block;height:100%;width:100%;border-radius:4px;background:linear-gradient(90deg,#1d63c7,#3f87e8);box-shadow:inset 0 1px 0 rgba(255,255,255,.25);transition:width .8s cubic-bezier(.22,.9,.3,1)"></i></span>
+              <span style="font-size:12.5px;font-weight:600;color:var(--t2);text-align:right">2</span>
+            </div>
+            <div style="display:grid;grid-template-columns:112px minmax(0,1fr) 22px;gap:12px;align-items:center">
+              <span style="font-size:12.5px;color:var(--t3);white-space:nowrap">article</span>
+              <span style="height:8px;border-radius:4px;background:var(--hov);overflow:hidden;display:block"><i data-grow="100" style="display:block;height:100%;width:100%;border-radius:4px;background:linear-gradient(90deg,#8a6d00,#b18d0a);box-shadow:inset 0 1px 0 rgba(255,255,255,.25);transition:width .8s cubic-bezier(.22,.9,.3,1)"></i></span>
+              <span style="font-size:12.5px;font-weight:600;color:var(--t2);text-align:right">2</span>
+            </div>
+            <div style="display:grid;grid-template-columns:112px minmax(0,1fr) 22px;gap:12px;align-items:center">
+              <span style="font-size:12.5px;color:var(--t3);white-space:nowrap">repo</span>
+              <span style="height:8px;border-radius:4px;background:var(--hov);overflow:hidden;display:block"><i data-grow="50" style="display:block;height:100%;width:50%;border-radius:4px;background:linear-gradient(90deg,#c81e1e,#e05a5a);box-shadow:inset 0 1px 0 rgba(255,255,255,.25);transition:width .8s cubic-bezier(.22,.9,.3,1)"></i></span>
+              <span style="font-size:12.5px;font-weight:600;color:var(--t2);text-align:right">1</span>
+            </div>
+            <div style="display:grid;grid-template-columns:112px minmax(0,1fr) 22px;gap:12px;align-items:center">
+              <span style="font-size:12.5px;color:var(--t3);white-space:nowrap">docs</span>
+              <span style="height:8px;border-radius:4px;background:var(--hov);overflow:hidden;display:block"><i data-grow="50" style="display:block;height:100%;width:50%;border-radius:4px;background:linear-gradient(90deg,#8a6d00,#b18d0a);box-shadow:inset 0 1px 0 rgba(255,255,255,.25);transition:width .8s cubic-bezier(.22,.9,.3,1)"></i></span>
+              <span style="font-size:12.5px;font-weight:600;color:var(--t2);text-align:right">1</span>
+            </div>
+            <div style="display:grid;grid-template-columns:112px minmax(0,1fr) 22px;gap:12px;align-items:center">
+              <span style="font-size:12.5px;color:var(--t3);white-space:nowrap">thông báo</span>
+              <span style="height:8px;border-radius:4px;background:var(--hov);overflow:hidden;display:block"><i data-grow="50" style="display:block;height:100%;width:50%;border-radius:4px;background:linear-gradient(90deg,#6b6f78,#8e939c);box-shadow:inset 0 1px 0 rgba(255,255,255,.25);transition:width .8s cubic-bezier(.22,.9,.3,1)"></i></span>
+              <span style="font-size:12.5px;font-weight:600;color:var(--t2);text-align:right">1</span>
+            </div>
+          </div>
+          <div data-pane="2" style="grid-area:1/1;opacity:0;pointer-events:none;transition:opacity .55s ease;height:250px;display:flex;flex-direction:column;justify-content:center;gap:12px">
+            <div style="display:grid;grid-template-columns:112px minmax(0,1fr) 22px;gap:12px;align-items:center">
+              <span style="font-size:12.5px;color:var(--t3);white-space:nowrap">idempotency</span>
+              <span style="height:8px;border-radius:4px;background:var(--hov);overflow:hidden;display:block"><i data-grow="100" style="display:block;height:100%;width:100%;border-radius:4px;background:linear-gradient(90deg,#0d7d63,#12a684);box-shadow:inset 0 1px 0 rgba(255,255,255,.25);transition:width .8s cubic-bezier(.22,.9,.3,1)"></i></span>
+              <span style="font-size:12.5px;font-weight:600;color:var(--t2);text-align:right">5</span>
+            </div>
+            <div style="display:grid;grid-template-columns:112px minmax(0,1fr) 22px;gap:12px;align-items:center">
+              <span style="font-size:12.5px;color:var(--t3);white-space:nowrap">context-mgmt</span>
+              <span style="height:8px;border-radius:4px;background:var(--hov);overflow:hidden;display:block"><i data-grow="80" style="display:block;height:100%;width:80%;border-radius:4px;background:linear-gradient(90deg,#0d7d63,#12a684);box-shadow:inset 0 1px 0 rgba(255,255,255,.25);transition:width .8s cubic-bezier(.22,.9,.3,1)"></i></span>
+              <span style="font-size:12.5px;font-weight:600;color:var(--t2);text-align:right">4</span>
+            </div>
+            <div style="display:grid;grid-template-columns:112px minmax(0,1fr) 22px;gap:12px;align-items:center">
+              <span style="font-size:12.5px;color:var(--t3);white-space:nowrap">eval-harness</span>
+              <span style="height:8px;border-radius:4px;background:var(--hov);overflow:hidden;display:block"><i data-grow="40" style="display:block;height:100%;width:40%;border-radius:4px;background:linear-gradient(90deg,#1d63c7,#3f87e8);box-shadow:inset 0 1px 0 rgba(255,255,255,.25);transition:width .8s cubic-bezier(.22,.9,.3,1)"></i></span>
+              <span style="font-size:12.5px;font-weight:600;color:var(--t2);text-align:right">2</span>
+            </div>
+            <div style="display:grid;grid-template-columns:112px minmax(0,1fr) 22px;gap:12px;align-items:center">
+              <span style="font-size:12.5px;color:var(--t3);white-space:nowrap">walk-forward</span>
+              <span style="height:8px;border-radius:4px;background:var(--hov);overflow:hidden;display:block"><i data-grow="20" style="display:block;height:100%;width:20%;border-radius:4px;background:linear-gradient(90deg,#1d63c7,#3f87e8);box-shadow:inset 0 1px 0 rgba(255,255,255,.25);transition:width .8s cubic-bezier(.22,.9,.3,1)"></i></span>
+              <span style="font-size:12.5px;font-weight:600;color:var(--t2);text-align:right">1</span>
+            </div>
+            <div style="display:grid;grid-template-columns:112px minmax(0,1fr) 22px;gap:12px;align-items:center">
+              <span style="font-size:12.5px;color:var(--t3);white-space:nowrap">data-leakage</span>
+              <span style="height:8px;border-radius:4px;background:var(--hov);overflow:hidden;display:block"><i data-grow="20" style="display:block;height:100%;width:20%;border-radius:4px;background:linear-gradient(90deg,#8a6d00,#b18d0a);box-shadow:inset 0 1px 0 rgba(255,255,255,.25);transition:width .8s cubic-bezier(.22,.9,.3,1)"></i></span>
+              <span style="font-size:12.5px;font-weight:600;color:var(--t2);text-align:right">1</span>
+            </div>
+            <div style="display:grid;grid-template-columns:112px minmax(0,1fr) 22px;gap:12px;align-items:center">
+              <span style="font-size:12.5px;color:var(--t3);white-space:nowrap">backpressure</span>
+              <span style="height:8px;border-radius:4px;background:var(--hov);overflow:hidden;display:block"><i data-grow="20" style="display:block;height:100%;width:20%;border-radius:4px;background:linear-gradient(90deg,#8a6d00,#b18d0a);box-shadow:inset 0 1px 0 rgba(255,255,255,.25);transition:width .8s cubic-bezier(.22,.9,.3,1)"></i></span>
+              <span style="font-size:12.5px;font-weight:600;color:var(--t2);text-align:right">1</span>
+            </div>
+          </div>
+          </div>
+          <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-top:12px;padding-top:12px;border-top:1px solid var(--div)">
+            <button data-tab="0" style="padding:5px 11px;border-radius:8px;border:1px solid transparent;background:transparent;color:var(--t4);font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;white-space:nowrap;transition:background .3s ease,color .3s ease">trạng thái</button>
+            <button data-tab="1" style="padding:5px 11px;border-radius:8px;border:1px solid transparent;background:transparent;color:var(--t4);font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;white-space:nowrap;transition:background .3s ease,color .3s ease">loại nguồn</button>
+            <button data-tab="2" style="padding:5px 11px;border-radius:8px;border:1px solid transparent;background:transparent;color:var(--t4);font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;white-space:nowrap;transition:background .3s ease,color .3s ease">khái niệm</button>
+            <span style="margin-left:auto;font-size:10.5px;color:var(--t4);white-space:nowrap">đổi mỗi 5 giây</span>
+          </div>
+        </div>
+      </div>
+
+      <div data-rise style="margin-top:34px">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
+          <h2 style="font-size:12px;font-weight:600;letter-spacing:.13em;text-transform:uppercase;margin:0">Kho gần đây</h2>
+          <span style="font-size:12px;color:var(--t4)">4 / 9 dòng</span>
+          <a href="#" style="margin-left:auto;font-size:13px;color:var(--t3);white-space:nowrap">xem tất cả →</a>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px">
+          <a href="#" style="display:flex;flex-direction:column;gap:11px;padding:20px;border-radius:16px;background:var(--pns);background-image:var(--gloss);border:1px solid var(--edge);border-top:2px solid #0d7d63;box-shadow:var(--e1),var(--etop);transition:transform .25s ease" style-hover="transform:translateY(-4px)">
+            <div style="display:flex;justify-content:space-between;font-size:10.5px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--t4)"><span>paper</span><span style="color:var(--pri)">65</span></div>
+            <h3 style="font-size:15.5px;font-weight:600;line-height:1.34;letter-spacing:-.012em;margin:0;flex:1">Walk-forward validation: vì sao k-fold ngẫu nhiên nói dối</h3>
+            <div style="display:flex;justify-content:space-between;font-size:11.5px;color:var(--t4);padding-top:11px;border-top:1px solid var(--div);white-space:nowrap"><span style="color:var(--ok)">approved</span><span>08-17</span></div>
+          </a>
+          <a href="#" style="display:flex;flex-direction:column;gap:11px;padding:20px;border-radius:16px;background:var(--pns);background-image:var(--gloss);border:1px solid var(--edge);border-top:2px solid #c81e1e;box-shadow:var(--e1),var(--etop);transition:transform .25s ease" style-hover="transform:translateY(-4px)">
+            <div style="display:flex;justify-content:space-between;font-size:10.5px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--t4)"><span>repo</span><span style="color:var(--pri)">50</span></div>
+            <h3 style="font-size:15.5px;font-weight:600;line-height:1.34;letter-spacing:-.012em;margin:0;flex:1">Khử trùng bản ghi bằng khoá lũy đẳng ở tầng staging</h3>
+            <div style="display:flex;justify-content:space-between;font-size:11.5px;color:var(--t4);padding-top:11px;border-top:1px solid var(--div);white-space:nowrap"><span style="color:var(--ok)">approved</span><span>08-18</span></div>
+          </a>
+          <a href="#" style="display:flex;flex-direction:column;gap:11px;padding:20px;border-radius:16px;background:var(--pns);background-image:var(--gloss);border:1px solid var(--edge);border-top:2px solid #1d63c7;box-shadow:var(--e1),var(--etop);transition:transform .25s ease" style-hover="transform:translateY(-4px)">
+            <div style="display:flex;justify-content:space-between;font-size:10.5px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--t4)"><span>video</span><span style="color:var(--pri)">60</span></div>
+            <h3 style="font-size:15.5px;font-weight:600;line-height:1.34;letter-spacing:-.012em;margin:0;flex:1">Quản lý ngữ cảnh trong hệ thống agent production</h3>
+            <div style="display:flex;justify-content:space-between;font-size:11.5px;color:var(--t4);padding-top:11px;border-top:1px solid var(--div);white-space:nowrap"><span style="color:var(--ok)">approved</span><span>08-14</span></div>
+          </a>
+          <a href="#" style="display:flex;flex-direction:column;gap:11px;padding:20px;border-radius:16px;background:var(--pns);background-image:var(--gloss);border:1px solid var(--edge);border-top:2px solid #0d7d63;box-shadow:var(--e1),var(--etop);transition:transform .25s ease" style-hover="transform:translateY(-4px)">
+            <div style="display:flex;justify-content:space-between;font-size:10.5px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--t4)"><span>paper</span><span></span></div>
+            <h3 style="font-size:15.5px;font-weight:600;line-height:1.34;letter-spacing:-.012em;margin:0;flex:1">STORM: tổng hợp đa góc nhìn</h3>
+            <div style="display:flex;justify-content:space-between;font-size:11.5px;color:var(--t4);padding-top:11px;border-top:1px solid var(--div);white-space:nowrap"><span style="color:var(--ok)">approved</span><span>08-16</span></div>
+          </a>
+        </div>
+      </div>
+    </div>
+</main>
+
+</div>
+
+<script>
+(function () {
+  var root = document.getElementById('root');
+  var reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ── Chủ đề sáng / tối ── */
+  var LIGHT = {
+    '--t1':'#17171a','--t2':'#3a3a42','--t3':'#5e5e68','--t4':'#63636c',
+    '--pn':'rgba(252,252,251,.78)','--pn2':'rgba(252,252,251,.7)','--pns':'rgba(250,250,249,.92)','--rail':'rgba(252,252,251,.8)',
+    '--edge':'rgba(255,255,255,.85)','--div':'rgba(23,23,26,.09)','--hov':'rgba(23,23,26,.045)',
+    '--pri':'#c81e1e','--ok':'#15803d','--warn':'#854d0e',
+    '--e1':'0 1px 2px rgba(23,23,26,.05),0 2px 8px -2px rgba(23,23,26,.07)',
+    '--e2':'0 1px 2px rgba(23,23,26,.06),0 10px 28px -8px rgba(23,23,26,.13)',
+    '--e3':'0 2px 4px rgba(23,23,26,.07),0 24px 56px -14px rgba(23,23,26,.2)',
+    '--etop':'inset 0 1px 0 rgba(255,255,255,.9)',
+    '--gloss':'linear-gradient(157deg,rgba(255,255,255,.55),rgba(255,255,255,.14) 36%,rgba(255,255,255,0) 66%)',
+    '--veil':'radial-gradient(120% 90% at 68% 8%,rgba(238,240,242,.5) 0%,rgba(238,240,242,.76) 46%,rgba(234,237,240,.9) 100%)',
+    '--rootbg':'#eef0f2',
+    '--chip-p-b':'rgba(13,125,99,.1)','--chip-p-f':'#0a6b55','--chip-p-e':'rgba(13,125,99,.32)',
+    '--chip-v-b':'rgba(29,99,199,.1)','--chip-v-f':'#1d63c7','--chip-v-e':'rgba(29,99,199,.3)',
+    '--chip-r-b':'rgba(200,30,30,.09)','--chip-r-f':'#c81e1e','--chip-r-e':'rgba(200,30,30,.28)',
+    '--b1t':'#e05a5a','--b1f':'#c81e1e','--b1s':'#9a1515',
+    '--b2t':'#c2c5ca','--b2f':'#9a9ea5','--b2s':'#7b7e84',
+    '--b3t':'#dcdee1','--b3f':'#bbbec2','--b3s':'#9da0a5',
+    '--gridline':'rgba(23,23,26,.08)','--planeb':'rgba(23,23,26,.18)'
+  };
+  var light = localStorage.getItem('gn-theme') === 'light';
+  function applyTheme() {
+    for (var k in LIGHT) light ? root.style.setProperty(k, LIGHT[k]) : root.style.removeProperty(k);
+    document.getElementById('bgDark').style.opacity = light ? '0' : '1';
+    document.getElementById('bgLight').style.opacity = light ? '1' : '0';
+    document.getElementById('btnTheme').textContent = light ? '☾' : '☀';
+  }
+  document.getElementById('btnTheme').onclick = function () {
+    light = !light;
+    localStorage.setItem('gn-theme', light ? 'light' : 'dark');
+    applyTheme(); showBg(bgi);
+  };
+  applyTheme();
+
+  /* ── Tự chuyển: tin nổi bật · ảnh nền · biểu đồ ── */
+  var feat = 0, pane = 0, bgi = 0, hover = false;
+
+  function showFeat(i) {
+    feat = (i + 3) % 3;
+    [].forEach.call(document.querySelectorAll('[data-feat]'), function (el) {
+      var on = +el.getAttribute('data-feat') === feat;
+      el.style.opacity = on ? '1' : '0';
+      el.style.transform = on ? 'none' : 'translateY(16px)';
+      el.style.pointerEvents = on ? 'auto' : 'none';
+    });
+    [].forEach.call(document.querySelectorAll('[data-dotfill]'), function (el) {
+      el.style.width = +el.getAttribute('data-dotfill') === feat ? '100%' : '0%';
+    });
+    var lb = document.querySelector('[data-rotlabel]');
+    if (lb) lb.textContent = '0' + (feat + 1) + ' / 03 · tự chuyển';
+  }
+
+  function showPane(i) {
+    pane = (i + 3) % 3;
+    [].forEach.call(document.querySelectorAll('[data-pane]'), function (el) {
+      var on = +el.getAttribute('data-pane') === pane;
+      el.style.opacity = on ? '1' : '0';
+      el.style.pointerEvents = on ? 'auto' : 'none';
+      el.style.zIndex = on ? '2' : '1';
+      if (on) [].forEach.call(el.querySelectorAll('[data-grow]'), function (b, k) {
+        var w = b.getAttribute('data-grow');
+        b.style.width = '0%';
+        setTimeout(function () { b.style.width = w + '%'; }, 60 + k * 70);
+      });
+    });
+    [].forEach.call(document.querySelectorAll('[data-tab]'), function (el) {
+      var on = +el.getAttribute('data-tab') === pane;
+      el.style.background = on ? 'var(--hov)' : 'transparent';
+      el.style.borderColor = on ? 'var(--edge)' : 'transparent';
+      el.style.color = on ? 'var(--t1)' : 'var(--t4)';
+    });
+  }
+
+  function showBg(i) {
+    bgi = (i + 3) % 3;
+    var theme = light ? 'light' : 'dark';
+    [].forEach.call(document.querySelectorAll('[data-bg]'), function (el) {
+      if (el.getAttribute('data-bg') !== theme) return;
+      el.style.opacity = +el.getAttribute('data-i') === bgi ? '1' : '0';
+    });
+  }
+
+  [].forEach.call(document.querySelectorAll('[data-dot]'), function (b) {
+    b.onclick = function (e) { e.preventDefault(); showFeat(+b.getAttribute('data-dot')); };
+  });
+  [].forEach.call(document.querySelectorAll('[data-tab]'), function (b) {
+    b.onclick = function (e) { e.preventDefault(); showPane(+b.getAttribute('data-tab')); };
+  });
+  var rot = document.querySelector('[data-rot]');
+  if (rot) {
+    rot.addEventListener('mouseenter', function () { hover = true; });
+    rot.addEventListener('mouseleave', function () { hover = false; });
+  }
+  showFeat(0); showPane(0); showBg(0);
+  if (!reduced) {
+    setInterval(function () { if (!hover && !document.hidden) showFeat(feat + 1); }, 6000);
+    setInterval(function () { if (!hover && !document.hidden) showPane(pane + 1); }, 5000);
+    setInterval(function () { if (!document.hidden) showBg(bgi + 1); }, 7000);
+  }
+
+  /* ── Đếm số · dựng khối 3D · hiện dần khi cuộn ── */
+  function countUp(scope) {
+    [].forEach.call(scope.querySelectorAll('[data-count]'), function (el) {
+      if (el.__c) return; el.__c = 1;
+      var target = +el.getAttribute('data-count');
+      if (reduced) { el.textContent = target; return; }
+      var v = 0, t = setInterval(function () {
+        v += Math.max(1, Math.ceil(target / 14));
+        if (v >= target) { v = target; clearInterval(t); }
+        el.textContent = v;
+      }, 42);
+    });
+  }
+  function growBars(scope) {
+    [].forEach.call(scope.querySelectorAll('[data-bar]'), function (bar, i) {
+      if (bar.__g) return; bar.__g = 1;
+      var h = +bar.getAttribute('data-bar');
+      var top = bar.children[0], front = bar.children[1], side = bar.children[2];
+      if (!top || !front || !side) return;
+      if (reduced) {
+        top.style.transform = 'translateZ(' + h + 'px)';
+        front.style.height = h + 'px'; side.style.width = h + 'px';
+        return;
+      }
+      top.style.transform = 'translateZ(0px)'; front.style.height = '0px'; side.style.width = '0px';
+      setTimeout(function () {
+        top.style.transform = 'translateZ(' + h + 'px)';
+        front.style.height = h + 'px'; side.style.width = h + 'px';
+      }, 140 + i * 130);
+    });
+  }
+  var rises = [].slice.call(document.querySelectorAll('[data-rise]'));
+  if (reduced) rises.forEach(function (el) { countUp(el); growBars(el); });
+  else {
+    rises.forEach(function (el, i) {
+      el.style.opacity = '0';
+      el.style.transform = 'translateY(26px)';
+      el.style.transition = 'opacity .75s cubic-bezier(.2,.7,.3,1) ' + (i * 80) + 'ms, transform .75s cubic-bezier(.2,.7,.3,1) ' + (i * 80) + 'ms';
+    });
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (!e.isIntersecting) return;
+        e.target.style.opacity = '1';
+        e.target.style.transform = 'none';
+        io.unobserve(e.target);
+        countUp(e.target); growBars(e.target);
+      });
+    }, { threshold: 0.12 });
+    rises.forEach(function (el) { io.observe(el); });
+  }
+  countUp(document);
+  growBars(document);
+
+  /* ── Trôi nhiều lớp khi cuộn ── */
+  var photo = document.getElementById('photo'), hero = document.getElementById('hero'), tower = document.getElementById('tower');
+  var tick = false;
+  addEventListener('scroll', function () {
+    if (tick) return; tick = true;
+    requestAnimationFrame(function () {
+      tick = false;
+      var y = scrollY || 0;
+      if (photo) photo.style.transform = 'translate3d(0,' + (y * 0.07).toFixed(1) + 'px,0) scale(1.03)';
+      if (hero) {
+        var p = Math.max(0, Math.min(1, y / 620));
+        hero.style.transform = 'perspective(1800px) rotateX(' + (p * 2.6).toFixed(2) + 'deg) translateY(' + (-y * 0.028).toFixed(1) + 'px)';
+      }
+      if (tower) {
+        var r = tower.getBoundingClientRect();
+        var q = Math.max(-1, Math.min(1, (innerHeight / 2 - (r.top + r.height / 2)) / innerHeight));
+        tower.style.transform = 'rotateX(' + (60 - q * 7).toFixed(2) + 'deg) rotateZ(' + (-38 + q * 10).toFixed(2) + 'deg)';
+      }
+    });
+  }, { passive: true });
+
+  /* ── Nền hạt 3D ── */
+  var c = document.getElementById('fx'), ctx = c.getContext('2d'), raf = null, running = true;
+  var N = 120, F = 620, W = 0, H = 0, pts = [];
+  for (var i = 0; i < N; i++) pts.push({ x: (Math.random() - .5) * 2600, y: (Math.random() - .5) * 1700, z: Math.random() * 1900 + 60 });
+  function size() { W = c.clientWidth; H = c.clientHeight; c.width = W; c.height = H; }
+  addEventListener('resize', size); size();
+
+  var spin = 0, last = 0, FRAME = 1000 / 30;
+  function step(t) {
+    raf = requestAnimationFrame(step);
+    if (document.hidden || t - last < FRAME) return;
+    last = t;
+    spin += 0.0011;
+    ctx.clearRect(0, 0, W, H);
+    var dot = light ? '40,45,58,' : '200,210,230,';
+    var line = light ? '60,66,80,' : '150,160,180,';
+    var spark = light ? '200,30,30,' : '248,113,113,';
+    var cx = W * .66, cy = H * .42, ca = Math.cos(spin), sa = Math.sin(spin), proj = [];
+    for (var i = 0; i < N; i++) {
+      var p = pts[i];
+      p.z -= 3.2;
+      if (p.z < 40) { p.z = 1960; p.x = (Math.random() - .5) * 2600; p.y = (Math.random() - .5) * 1700; }
+      var rx = p.x * ca - p.z * sa, rz = p.x * sa + p.z * ca;
+      if (rz < 40) { proj.push(null); continue; }
+      var s = F / rz;
+      proj.push({ sx: cx + rx * s, sy: cy + p.y * s, s: s });
+    }
+    for (var i = 0; i < N; i++) {
+      var a = proj[i]; if (!a) continue;
+      for (var j = i + 1; j < i + 3 && j < N; j++) {
+        var b = proj[j]; if (!b) continue;
+        var dx = a.sx - b.sx, dy = a.sy - b.sy, d2 = dx * dx + dy * dy;
+        if (d2 < 15000) {
+          ctx.strokeStyle = 'rgba(' + line + (.09 * (1 - d2 / 15000)).toFixed(3) + ')';
+          ctx.lineWidth = .7;
+          ctx.beginPath(); ctx.moveTo(a.sx, a.sy); ctx.lineTo(b.sx, b.sy); ctx.stroke();
+        }
+      }
+    }
+    for (var i = 0; i < N; i++) {
+      var a = proj[i]; if (!a) continue;
+      ctx.fillStyle = i % 11 === 0
+        ? 'rgba(' + spark + Math.min(.62, a.s * 1.6).toFixed(3) + ')'
+        : 'rgba(' + dot + Math.min(.5, a.s * 1.3).toFixed(3) + ')';
+      ctx.beginPath(); ctx.arc(a.sx, a.sy, Math.max(.5, a.s * 1.5), 0, 6.2832); ctx.fill();
+    }
+  }
+  if (!reduced) raf = requestAnimationFrame(step);
+
+  document.getElementById('btnFlow').onclick = function () {
+    running = !running;
+    this.textContent = running ? '❙❙' : '▶';
+    if (running) { last = 0; raf = requestAnimationFrame(step); }
+    else { cancelAnimationFrame(raf); ctx.clearRect(0, 0, W, H); }
+  };
+})();
+</script>
+</body>
+</html>

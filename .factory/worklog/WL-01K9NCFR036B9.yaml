@@ -1,0 +1,36 @@
+id: WL-01K9NCFR036B9
+at: 2026-08-28
+by: claude
+buoc: s8 — FR-036/B9 tổng hợp All, thước đo chất lượng không trộn (M09-R4)
+loai: bàn giao B9
+fr: FR-036-khung-than-bai-5-muc.md
+
+object:
+  task:
+    - 07_plan/M03_web/tasks/T03-19-tong-hop-all.md            # code
+    - 07_plan/M03_web/tasks/T03-20-test-tong-hop-all.md       # test
+  code:
+    - web/render/trang.mjs          # phanTich + apprPT + nenPT · ba pane đổi nền
+  test:
+    - web/test/thu-vien-tong-hop.test.js   # MỚI — 18 phép kiểm
+    - web/package.json
+    - web/test/WORKLOG.md
+    - web/WORKLOG.md                       # "| Test | 52 |"
+  plan:
+    - "C:/Users/Admin/.claude/plans/c-c-users-admin-downloads-grown-news-up-bright-newt.md"
+
+may_xanh:
+  - "cd web && node test/thu-vien-tong-hop.test.js  ->  pass (18 phép kiểm)"
+  - "cd web && npm test  ->  exit 0 (52 file)"
+  - "18/19 cổng check_*.py xanh"
+  - >
+    5/5 răng ĐỎ được khi phá (sau một lượt siết `#acount`), trang.mjs khôi phục
+    nguyên byte (29a35b5efd218445)
+
+do_do:
+  - cong: core/tests/check_skill.py
+    do_do_boi: agent khác
+    quy_chu: không nằm trong tập file tôi đổi ở lượt này
+
+con_lai:
+  - "B10 — tài liệu + hồ sơ quyết định (egress video · git 25 MB · runbook di trú · 'ppt/word không xem trước ở v1'). ĐƠN VỊ CUỐI của plan."

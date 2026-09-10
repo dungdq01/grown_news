@@ -1,0 +1,51 @@
+{
+  "$comment": "BẢNG KHAI DẠNG ĐỊA CHỈ — nguồn duy nhất cho câu 'cái gì là một địa chỉ' và 'phân giải nó bằng gì'. B-A5 + B-A6. Trước file này, `validate.py` dùng một LOCATOR_RE khớp MỌI ngoặc vuông dài 2-80 ký tự, nên một dãy số và một công thức Taylor đều được tính là 'có địa chỉ'. Cùng khuôn với khung-than-bai.json / loai-nguon.json / man-hinh.json / media-mime.json / dich-vu.json.",
+  "$comment_nguyen_ly": "Địa chỉ phân giải được = trỏ vào thứ KHO CÓ, không trỏ ra Internet mở. Kho là chân lý; một địa chỉ mà kho không kiểm được thì không khác một địa chỉ không có. Đây là lý do `muc` (§II.4) có manh=khong: nguồn nằm ngoài kho thì không gì đối chiếu được.",
+  "$comment_bo_qua": "B-A5: thứ KHÔNG khớp dạng nào thì BỎ QUA, không báo lỗi. Công thức toán và dãy số trong ngoặc vuông viết thoải mái. Cổng chỉ đỏ khi một mục KHÔNG CÓ địa chỉ nào hiểu được — không bao giờ đỏ vì có thêm thứ nó không hiểu.",
+  "$comment_manh": "day_du = phân giải tới từng đơn vị được nêu (trang/dòng có thật). mot_phan = kiểm được bản ghi tồn tại và đúng loại, KHÔNG kiểm được mốc bên trong. khong = không có gì để đối chiếu. Chỉ `day_du` và `mot_phan` mới tính vào citations_verified.",
+  "phien_ban": 1,
+  "dang": [
+    {
+      "ten": "slug",
+      "mau": "^([a-z0-9][a-z0-9-]{1,79})$",
+      "phan_giai": "có file kb/*/<slug>.md",
+      "manh": "day_du",
+      "vi_du": "[xgboost-stap-by-step]",
+      "bat_link_gay": false
+    },
+    {
+      "ten": "slug-trang",
+      "mau": "^([a-z0-9][a-z0-9-]{1,79}):p\\.([0-9]{1,4})$",
+      "phan_giai": "slug phân giải được ∧ media của nó là PDF ∧ trang ≤ số trang thật (pypdf)",
+      "manh": "day_du",
+      "vi_du": "[xgboost-stap-by-step:p.7]",
+      "bat_link_gay": true
+    },
+    {
+      "ten": "slug-moc",
+      "mau": "^([a-z0-9][a-z0-9-]{1,79}):t=([0-9]{1,2}:[0-5][0-9](?::[0-5][0-9])?)$",
+      "phan_giai": "slug phân giải được ∧ bản ghi là video. KHÔNG kiểm được mốc có nằm trong thời lượng — muốn kiểm phải tải video về, mà LÕI không gọi ra ngoài (B-E2).",
+      "manh": "mot_phan",
+      "vi_du": "[thien-duong-chuot-tuong-lai:t=03:15]",
+      "bat_link_gay": true
+    },
+    {
+      "ten": "file-dong",
+      "mau": "^([A-Za-z0-9._/-]+\\.[A-Za-z0-9]{1,8}):([0-9]{1,6})(?:-([0-9]{1,6}))?$",
+      "phan_giai": "có file kho/<đường dẫn> ∧ số dòng cuối ≤ số dòng thật. Mọi đuôi, không riêng .md — đo trên kb-mock: 42 địa chỉ `nguon.py:10-40` bị bỏ sót khi khoá cứng .md.",
+      "manh": "day_du",
+      "vi_du": "[docs/xgboost-taylor-bac-hai.md:12-31] · [nguon.py:10-40]",
+      "bat_link_gay": false
+    },
+    {
+      "ten": "muc",
+      "mau": "^§[IVXLCDM0-9][A-Za-z0-9.]*$",
+      "phan_giai": "KHÔNG PHÂN GIẢI ĐƯỢC. Mục của một tài liệu nằm ngoài kho — không có bản sao cục bộ để đối chiếu. Nhận dạng để ĐẾM vào citations_sampled, không bao giờ vào citations_verified.",
+      "manh": "khong",
+      "vi_du": "[§II.4]",
+      "bat_link_gay": false
+    }
+  ],
+  "$comment_tong_hop": "FR-044 (ho_so: tong-hop) đòi địa chỉ MANG TÊN NGUỒN — `[slug:p.7]` chứ không `[p.7]`. Ba dạng `slug*` ở trên đã có sẵn hình dạng đó, nên khi cổng T2 của FR-044 được cài thì nó dùng lại bảng này, không khai lần thứ hai.",
+  "$comment_link_gay": "`bat_link_gay` KHÔNG suy được từ `manh`, và trộn hai thứ đó là đỏ oan. `[backend]` trong một ví dụ `category: [backend]` khớp dạng `slug` y hệt một địa chỉ thật — báo 'link gãy' cho nó là phạt người viết vì một dấu ngoặc vuông trong khối mã. Chỉ `:p.N` và `:t=` có cú pháp KHÔNG thể gõ nhầm, nên chỉ hai dạng đó mới được đỏ khi không phân giải được. Các dạng khác không phân giải được thì chỉ KHÔNG tính vào citations_verified — im lặng, đúng tinh thần B-A5."
+}

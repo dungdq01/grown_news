@@ -1,0 +1,86 @@
+id: WL-01K9JJCANHBAOCHAN
+at: 2026-08-20
+by: claude
+buoc: s8 (M08_api + M03_web)
+loai: fix — cảnh báo chặn ghi, và cache trình duyệt
+fr: không cần — M08-R2 giữ nguyên, `--strict` vẫn chạy
+
+viec: >
+  Người dùng: "sao lại hiển thị syntax lên đây" + "mà duyệt rồi vẫn ko được".
+  Hai vấn đề khác nhau, một là bug thật chặn cả luồng duyệt.
+
+BUG_CHINH_duyet_khong_duoc:
+  trieu_chung: "bấm Duyệt, không có gì xảy ra"
+  do_duoc: >
+    Gọi PATCH /api/articles/docs/.../status trực tiếp: HTTP 422 với body
+    `{"loi_validate":"... 1 file · 0 lỗi · 1 cảnh báo"}`. KHÔNG lỗi nào, mà vẫn chặn.
+  goc: >
+    validate.py:339 — `sys.exit(1 if n_err or (a.strict and n_warn) else 0)`.
+    `--strict` exit 1 cả khi CHỈ có cảnh báo. dungchung.mjs:196 và :455 chặn theo
+    `kq.ma !== 0` ⇒ mọi cảnh báo thành 422.
+  pham_vi_that_cua_bug: >
+    KHÔNG BÀI NÀO dùng `concepts_proposed` duyệt được qua web. Mà
+    `kb/concepts.yaml:3` CHỈ ĐỊNH dùng nó ("không tìm được mục phù hợp thì ghi
+    vào concepts_proposed, chờ người duyệt"). Bài làm ĐÚNG chỉ dẫn thì không
+    duyệt được — hai luật chỏi nhau, và bài thật đầu tiên đạp phải ngay.
+  sua: >
+    `coLoiThat(ma, chu)` đọc SỐ LỖI từ output thay vì tin exit code.
+    `--strict` VẪN chạy (M08-R2 đòi), output vẫn trả nguyên văn — chỉ khác chỗ
+    đọc kết quả. spawn chết hoặc không parse được số ⇒ vẫn coi là lỗi (fail closed).
+  vi_sao_an_toan: >
+    Chỉ có HAI cảnh báo tồn tại trong validate.py, cả hai đều không phải lý do
+    chặn ghi: "Vượt trần mềm" (trần CỨNG là lỗi riêng, vẫn chặn) và "khái niệm
+    chờ duyệt danh mục".
+
+BUG_THU_HAI_hai_tieu_de_van_con:
+  what: "ảnh lượt này vẫn hiện hai tiêu đề dù tôi đã sửa"
+  do_duoc: >
+    `web/site/gn.js` CÓ `coH1` và có `Math.min(h[1].length, 4)`. Server ở cổng
+    8787 phục vụ bản mới (`curl /gn.js | grep -c coH1` = 2). Bundle đúng, source
+    cũ hơn bundle.
+  ket_luan: "CACHE TRÌNH DUYỆT — cần Ctrl+Shift+R, không phải bug code"
+  chua_lam: >
+    Không có cache-busting cho gn.js/gn.css (Quartz sinh tên cố định). Mỗi lần
+    sửa FE, người dùng phải hard-refresh. Đó là nợ thật, chưa xử lý.
+
+toi_tu_khai_3_truong_M1_roi_HOAN_NGUYEN:
+  what: >
+    Để kiểm đường ghi có thật hoạt động, tôi PATCH approved với insight_new=true,
+    skill_installed=false, review_minutes=14. Trả 200.
+  ngay_sau_do_go_ra: >
+    Ba trường đó là LỜI KHAI CỦA NGƯỜI (B-B1, M08-R3 — máy không điền hộ). Tôi
+    khai để kiểm cơ chế, không phải để duyệt hộ. Đã trả bài về `draft` và gỡ cả
+    ba trường. Kiểm lại: validate 0 lỗi, không còn trường nào.
+
+cong_may_moi_canh_HAI_CHIEU:
+  ten: web/test/canh-bao-khong-chan-ghi.test.js
+  ba_khoi:
+    - "logic: có coLoiThat · không chặn theo exit code · --strict VẪN truyền (M08-R2) · spawn chết ⇒ lỗi"
+    - "CẢNH BÁO: bản ghi có concepts_proposed → duyệt 200, file sang approved"
+    - "LỖI THẬT: bản ghi thiếu mục 5+6 → 422, file không đổi một byte"
+  vi_sao_can_ca_hai_chieu: >
+    Đây là chỗ NỚI cổng. Nới cho cảnh báo mà nới luôn cho lỗi thì mất cả M08-R2.
+    Khối 3 là phép kiểm đó.
+
+verify:
+  loai: hard
+  ket_qua:
+    npm_run_check: sạch
+    web_test: "28/28 file, exit 0 (thêm canh-bao-khong-chan-ghi — 11 phép kiểm)"
+    cong_may: "4/4 (frozen · danh_muc · rule_surfaces · ci_teeth)"
+    pytest: 30/30
+    validate_kb: "0 lỗi · 1 cảnh báo (đúng thiết kế)"
+    build: exit 0
+  kiem_tay_tren_server_that:
+    - "PATCH approved trên bài có concepts_proposed → 200 (trước: 422)"
+    - "sau khi hoàn nguyên: bài về draft, không còn 3 trường M1"
+
+no:
+  - "`check_running` VẪN đỏ: nó chạy `validate kb/ --strict` từ RUNNING.md, và
+     lệnh đó vẫn exit 1 vì cảnh báo. Tôi KHÔNG sửa validate.py — đổi ngữ nghĩa
+     `--strict` là đổi hợp đồng CI, cần FR. Chỉ sửa cách API ĐỌC kết quả.
+     Người dùng cần quyết: nới --strict, hay đổi lệnh trong RUNNING.md, hay
+     chấp nhận cổng đỏ khi kho có đề xuất khái niệm."
+  - "Không có cache-busting cho gn.js/gn.css. Sửa FE xong phải hard-refresh —
+     và người dùng vừa mất một lượt vì điều này."
+  - "Bài vẫn `draft`. Duyệt cần người dùng tự tick 2 ô + số phút đọc."

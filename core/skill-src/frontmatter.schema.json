@@ -1,0 +1,669 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://smartlog.local/schemas/source-analysis-frontmatter/v2",
+  "title": "Source Analysis Frontmatter",
+  "description": "Validate phần YAML frontmatter của file .md. Parse YAML rồi validate bằng schema này.",
+  "type": "object",
+  "required": [
+    "id",
+    "slug",
+    "source_type",
+    "url",
+    "protocol_version",
+    "analyzed_at",
+    "one_liner",
+    "credibility_max",
+    "review_status",
+    "origin",
+    "conformance"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^src_[a-z0-9]{6,}$"
+    },
+    "slug": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
+    },
+    "source_type": {
+      "type": "string",
+      "enum": [
+        "repo",
+        "paper",
+        "video",
+        "article",
+        "docs",
+        "announcement",
+        "tai-lieu"
+      ]
+    },
+    "url": {
+      "type": "string",
+      "format": "uri"
+    },
+    "version_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "protocol_version": {
+      "type": "string"
+    },
+    "analyzed_at": {
+      "type": "string"
+    },
+    "title": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "author": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "publisher": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "published_at": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "size": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "license": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "decay_risk": {
+      "type": "string",
+      "enum": [
+        "low",
+        "medium",
+        "high"
+      ]
+    },
+    "archetype": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "enum": [
+        "library",
+        "application",
+        "framework",
+        "infra",
+        "research",
+        "agent",
+        null
+      ]
+    },
+    "one_liner": {
+      "type": "string",
+      "maxLength": 160
+    },
+    "concepts": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
+      },
+      "description": "Chỉ chứa id có trong concepts.yaml. Không được tự sinh."
+    },
+    "concepts_proposed": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Khái niệm chưa có trong danh mục. Không tính vào hệ số kiểm chứng."
+    },
+    "category": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$"
+      },
+      "$comment": "FR-034 — bo enum, thanh vien kiem bang validate.py cong --categories (danh muc song trong DB). Giu DONG BO voi core/assets/frontmatter.schema.json.",
+      "description": "CHỦ ĐỀ của bài — bài này thuộc mảng nào. Khác `concepts` (khái niệm kỹ thuật bài dạy) và `source_type` (dạng nguồn). Không bắt buộc."
+    },
+    "credibility_max": {
+      "type": "string",
+      "enum": [
+        "verified",
+        "plausible",
+        "claimed",
+        "conflicted"
+      ],
+      "description": "Mức cao nhất trong file. Chỉ để lọc và hiển thị — KHÔNG dùng làm cổng chặn. Cổng khóa vào skill_candidates[].credibility."
+    },
+    "corroboration_factor": {
+      "type": "number",
+      "enum": [
+        0.6,
+        1,
+        1.3,
+        1.6
+      ]
+    },
+    "independent_sources": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "contradicted_by": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "skill_candidates": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "capability",
+          "verdict",
+          "credibility"
+        ],
+        "properties": {
+          "capability": {
+            "type": "string"
+          },
+          "verdict": {
+            "type": "string",
+            "enum": [
+              "NEW",
+              "DEEPEN",
+              "OVERLAP",
+              "OUT_OF_SCOPE"
+            ]
+          },
+          "target_skill": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "proposed_name": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "priority": {
+            "type": "number"
+          },
+          "credibility": {
+            "type": "string",
+            "enum": [
+              "verified",
+              "plausible",
+              "claimed",
+              "conflicted"
+            ]
+          },
+          "reason_rejected": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "why_now": {
+            "type": "string",
+            "minLength": 15,
+            "description": "Phải nối với một vấn đề có thật. Không nối được thì relevance không thể ≥4."
+          },
+          "draft_trigger": {
+            "type": "string",
+            "description": "Cụm kích hoạt cụ thể người dùng thật sẽ nói"
+          },
+          "score": {
+            "type": "object",
+            "required": [
+              "relevance",
+              "frequency",
+              "durability",
+              "cost"
+            ],
+            "properties": {
+              "relevance": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 5
+              },
+              "frequency": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 5
+              },
+              "durability": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 5
+              },
+              "corroboration_factor": {
+                "type": "number",
+                "enum": [
+                  0.6,
+                  1,
+                  1.3,
+                  1.6
+                ]
+              },
+              "cost": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 5
+              }
+            }
+          }
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "verdict": {
+                  "enum": [
+                    "NEW",
+                    "DEEPEN"
+                  ]
+                }
+              },
+              "required": [
+                "verdict"
+              ]
+            },
+            "then": {
+              "required": [
+                "why_now",
+                "score",
+                "priority",
+                "draft_trigger"
+              ]
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "verdict": {
+                  "enum": [
+                    "OVERLAP",
+                    "OUT_OF_SCOPE"
+                  ]
+                }
+              },
+              "required": [
+                "verdict"
+              ]
+            },
+            "then": {
+              "required": [
+                "reason_rejected"
+              ],
+              "properties": {
+                "reason_rejected": {
+                  "type": "string",
+                  "minLength": 5
+                }
+              }
+            }
+          }
+        ]
+      }
+    },
+    "review_status": {
+      "type": "string",
+      "enum": [
+        "draft",
+        "approved",
+        "edited",
+        "rejected"
+      ]
+    },
+    "reviewed_by": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "reject_reason": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "word_count": {
+      "type": "integer",
+      "maximum": 1800
+    },
+    "unresolved_count": {
+      "type": "integer"
+    },
+    "insight_new": {
+      "type": "boolean",
+      "description": "M1.1 — bản này cho một insight người duyệt CHƯA BIẾT và SẼ HÀNH ĐỘNG THEO. Chỉ người đặt, không phải máy. Ngưỡng dự án: >=3/10 bản đầu. FR-001."
+    },
+    "skill_installed": {
+      "type": "boolean",
+      "description": "M1.2 — đã sinh skill thật từ bản này VÀ cài vào agent VÀ output agent đổi theo hướng tốt hơn. Cả ba điều, không phải chỉ sinh file. Ngưỡng: >=1/10. FR-001."
+    },
+    "review_minutes": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "M1.3 — số phút thực duyệt bản này. Ngưỡng: trung bình <20. Bấm giờ khi duyệt, không ước. FR-001."
+    },
+    "origin": {
+      "type": "string",
+      "enum": [
+        "pipeline",
+        "external",
+        "manual"
+      ]
+    },
+    "origin_tool": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "origin_protocol_version": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "conformance": {
+      "type": "string",
+      "enum": [
+        "A",
+        "B",
+        "C"
+      ],
+      "description": "Mức D bị từ chối ở cổng, không vào kho"
+    },
+    "ingested_at": {
+      "type": "string"
+    },
+    "citations_sampled": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "citations_verified": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "unverifiable_citations": {
+      "type": "boolean"
+    },
+    "url_normalized": {
+      "type": "string",
+      "description": "Dùng để đếm nguồn độc lập, không dùng url gốc"
+    },
+    "ho_so": {
+      "$comment": "FR-036/B1 — HỒ SƠ kiểm. `phan-tich` đòi thân theo khung khai; `thu-vien` là kho nguyên liệu (hiện vật + nhãn), miễn cổng mục/dẫn nhập/tinh túy/locator. THIẾU TRƯỜNG ⇒ phan-tich, nên không bài cũ nào phải sửa.",
+      "type": "string",
+      "enum": [
+        "phan-tich",
+        "thu-vien"
+      ],
+      "description": "Hồ sơ kiểm: phan-tich (mặc định) hoặc thu-vien."
+    },
+    "media": {
+      "$comment": "FR-036/B1 — con trỏ vào bảng `media` trong kb/_kho.sqlite. `sha256` và `so_byte` do MÁY tính (M09-R2): nhận từ client là để client chọn khoá lưu trữ. `ten_goc` CHỈ để hiện, không bao giờ là đường dẫn.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sha256",
+        "mime",
+        "ten_goc",
+        "so_byte"
+      ],
+      "properties": {
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "mime": {
+          "type": "string",
+          "enum": [
+            "application/pdf",
+            "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+            "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+            "application/vnd.ms-powerpoint",
+            "application/msword"
+          ]
+        },
+        "ten_goc": {
+          "type": "string",
+          "maxLength": 200
+        },
+        "so_byte": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 26214400
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "review_status": {
+            "const": "rejected"
+          }
+        },
+        "required": [
+          "review_status"
+        ]
+      },
+      "then": {
+        "properties": {
+          "reject_reason": {
+            "type": "string",
+            "minLength": 5
+          }
+        },
+        "required": [
+          "reject_reason"
+        ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "source_type": {
+            "const": "repo"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "archetype": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "archetype"
+        ]
+      }
+    },
+    {
+      "$comment": "claimed/conflicted + chỉ 1 nguồn độc lập thì ứng viên đó không được NEW hay DEEPEN",
+      "if": {
+        "properties": {
+          "independent_sources": {
+            "const": 1
+          }
+        },
+        "required": [
+          "independent_sources"
+        ]
+      },
+      "then": {
+        "properties": {
+          "skill_candidates": {
+            "type": "array",
+            "items": {
+              "not": {
+                "allOf": [
+                  {
+                    "properties": {
+                      "credibility": {
+                        "enum": [
+                          "claimed",
+                          "conflicted"
+                        ]
+                      }
+                    },
+                    "required": [
+                      "credibility"
+                    ]
+                  },
+                  {
+                    "properties": {
+                      "verdict": {
+                        "enum": [
+                          "NEW",
+                          "DEEPEN"
+                        ]
+                      }
+                    },
+                    "required": [
+                      "verdict"
+                    ]
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "$comment": "FR-012 — bỏ khoá `review_status: const draft`. Khoá cũ áp VĨNH VIỄN nên bài external không bao giờ approve được, kể cả tay trong editor — chỏi vòng đời M02 §2.2 và over-enforce M05-R1 (luật nói 'khi ghi vào kb/', không phải cả đời). Bất biến 'external VÀO KHO ở draft' vẫn còn 3 răng: gate.py hardcode draft · test_gate -k draft_external · M05-R1. Bản này lệch lại sau FR-012 vì hai file không sinh ra từ nhau — check_danh_muc.py giờ canh.",
+      "if": {
+        "properties": {
+          "origin": {
+            "const": "external"
+          }
+        },
+        "required": [
+          "origin"
+        ]
+      },
+      "then": {
+        "properties": {
+          "citations_sampled": {
+            "type": "integer",
+            "minimum": 2
+          }
+        },
+        "required": [
+          "citations_sampled",
+          "citations_verified"
+        ]
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "conformance": {
+            "const": "C"
+          }
+        },
+        "required": [
+          "conformance"
+        ]
+      },
+      "then": {
+        "required": [
+          "url"
+        ],
+        "properties": {
+          "url": {
+            "type": "string",
+            "minLength": 8
+          }
+        }
+      }
+    },
+    {
+      "$comment": "FR-036/B1 · `tai-lieu` là HIỆN VẬT: phải khai hồ sơ thư-viện và phải trỏ một hiện vật. Cùng khuôn `repo ⇒ archetype` — per-kind required field, không phải một schema thứ hai.",
+      "if": {
+        "properties": {
+          "source_type": {
+            "const": "tai-lieu"
+          }
+        },
+        "required": [
+          "source_type"
+        ]
+      },
+      "then": {
+        "required": [
+          "ho_so",
+          "media"
+        ],
+        "properties": {
+          "ho_so": {
+            "const": "thu-vien"
+          }
+        }
+      }
+    },
+    {
+      "$comment": "FR-036/B1 · hồ sơ thư-viện được MIỄN thân theo khung, nên phải có thứ THAY THẾ: hoặc byte trong kho, hoặc url ngoài thật. Miễn cả hai là một bản ghi rỗng. `word_count` chặn ở 400 vì `--fix` tự điền nó, và không có trần này thì một abstract 2000 từ dán vào thân bị cổng 1800 của bản PHÂN TÍCH trả về — một luật không liên quan gì tới thư viện.",
+      "if": {
+        "properties": {
+          "ho_so": {
+            "const": "thu-vien"
+          }
+        },
+        "required": [
+          "ho_so"
+        ]
+      },
+      "then": {
+        "properties": {
+          "word_count": {
+            "type": "integer",
+            "maximum": 400
+          }
+        },
+        "anyOf": [
+          {
+            "required": [
+              "media"
+            ]
+          },
+          {
+            "required": [
+              "url"
+            ],
+            "properties": {
+              "url": {
+                "minLength": 12
+              }
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "$comment_fr033": "FR-033 — BO rang buoc 'approved => bat buoc 3 truong M1'. Nguoi dung bo hoan toan buoc duyet: bai tao tren web len site ngay. Ba truong insight_new/skill_installed/review_minutes VAN TON TAI va van ghi duoc, nhung khong con bat buoc — vi khong con buoc duyet nao de sinh ra chung. HE QUA: M1 khong con do duoc tu kho."
+}

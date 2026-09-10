@@ -1,0 +1,91 @@
+id: WL-01K9J4FR011
+at: 2026-08-19
+by: claude
+buoc: s6→s8 (M08_api MỚI + M02_kb + M03_web + M01_core schema)
+loai: feature lớn + amend-frozen ×2 đợt + module mới
+fr: FR-011-ban-bien-tap-local.md · FR-012-external-duoc-duyet.md
+
+viec: >
+  upgrade.md phase 2 — người dùng chốt qua 3 câu hỏi: (1) .md giữ nguồn chân lý,
+  API trả JSON là view; (2) duyệt trên web — đảo B-C3 có điều kiện qua FR;
+  (3) CRUD đủ 4, xoá = recycle, tạo bài ngay trên web. Kèm redesign màn Nạp nguồn
+  thành 3 lối ngang hàng + form viết bài.
+
+pham_vi_ghi:
+  - .factory/fr/FR-011 + FR-012      # mở TRƯỚC khi chạm frozen
+  - core/assets/frontmatter.schema.json   # FROZEN — FR-012, ký đợt 1
+  - 06_modules/M08_api/**            # module pack 6 artifact, 5 rule, spec+rules tự thành frozen
+  - 06_modules/M02_kb/{rules,spec}.md · 06_modules/M03_web/{rules,spec}.md  # FROZEN — ký đợt 2
+  - project_map.yaml                 # M08 + kb_writers + api_writes, version 11
+  - 07_plan/M08_api/tasks/T08-1..3 · 07_plan/M03_web/tasks/T03-5..7
+  - web/api/{dungchung,router,articles,status,recycle}.mjs   # MỚI
+  - web/server.mjs                   # mount router, luận cứ mới
+  - web/test/{_api.mjs,api-crud,api-status,api-recycle,api-guard}.test.js  # MỚI
+  - web/test/no-write-path.test.js   # whitelist literal ĐÓNG 3 đường
+  - web/test/four-screens.test.js    # sửa CÓ CHỦ ĐÍCH — luật "không form" đổi theo FR-011
+  - web/plugins/home-pages/shell.html · multiwindow.inline.ts · prototype.css  # FE
+  - core/tests/check_worklog.py      # sửa bug walk sập vì junction _quartz
+  - brd B-C3 · prd · security_baseline §1/§5/§6 · flow-tong · ui_flow ×2 · data_flow
+  - screen_inventory · spec_overview · RUNNING.md · WORKLOG ×5 (web + api MỚI)
+
+phat_hien_chan_duong: >
+  Schema khoá `origin external ⇒ review_status const draft` VĨNH VIỄN — mọi bài
+  external (toàn bộ hàng màn Chờ duyệt) không approve được ở ĐÂU CẢ, kể cả tay
+  trong editor. Chỏi vòng đời M02 §2.2 và over-enforce M05-R1 ("khi ghi vào",
+  không phải cả đời). Chưa từng lộ vì kho chỉ có 2 bài external draft.
+  ⇒ FR-012 bỏ đúng khoá const, GIỮ citations>=2. Bất biến "external VÀO KHO ở
+  draft" còn 3 răng: gate.py hardcode · test -k draft_external · M05-R1.
+
+quyet_dinh_1_tach_B_C3_lam_hai: >
+  "Web không ghi kb/" đang gộp bundle tĩnh (deploy được — giữ read-only tuyệt
+  đối) với API biên tập local (M08, 127.0.0.1, người bấm). Đảo có điều kiện:
+  chỉ vế sau được ghi, và mọi ghi qua validate.py --strict (M08-R2). B-B1 giữ
+  nguyên bằng CẤU TRÚC: 3 trường M1 không có default trong code (M08-R3,
+  api-guard quét literal) — máy không có gì để điền vào chỗ chỉ người trả lời.
+
+quyet_dinh_2_POST_khong_qua_gate: >
+  gate.py hardcode external + đòi citations_sampled>=2 — đúng cho hàng NHẬP,
+  ép bài người tự viết khai man (M05-R2 "bịa có hệ thống"). Bài tự viết đi
+  validate thẳng, origin manual, server áp draft. Hai cửa, hai loại hàng,
+  một đích draft.
+
+quyet_dinh_3_nut_duyet_o_cua_so_doc: >
+  Không đặt nút duyệt ở hàng danh sách màn Chờ duyệt — đặt ở CHÂN CỬA SỔ ĐỌC:
+  B-B1 tồn tại vì "chỗ duy nhất một người đọc thật", nút phải đứng cạnh nội
+  dung vừa đọc. Duyệt từ queue = bấm bài (mở đọc) rồi duyệt trong cửa sổ.
+
+quyet_dinh_4_dinh_danh_type_slug: >
+  Route /:type/:slug ánh xạ 1:1 vào kb/<type>/<slug>.md — type enum đóng 6,
+  slug whitelist [a-z0-9-]: traversal chặn bằng CẤU TRÚC. id vẫn trả trong
+  payload nhưng không làm địa chỉ (tra id = quét cả kho mỗi request).
+
+bug_that_sua_duong:
+  - check_worklog.py sập NotADirectoryError: rglob duyệt HẾT cây rồi mới filter,
+    mà _quartz chứa junction (link-plugins) ⇒ pathlib scandir một FILE qua
+    junction. Sửa: os.walk + cắt nhánh TRƯỚC khi đi vào (dirnames[:] =).
+  - Test api-* lúc đầu hardcode cổng 8791-8793 ⇒ đỏ vì MÔI TRƯỜNG: máy đang có
+    server cũ/phiên AI khác giữ 8787-8792. Sửa: cổng do HĐH cấp (listen(0)).
+
+ghi_chu_hai_ai_song_song: >
+  Phiên AI khác làm FR-013 (thang độ nổi) + FR-014 (nhịp/chuyển động) cùng lúc,
+  trên CÙNG working tree. Comment trong project_map của họ dán nhầm nhãn
+  "FR-011" cho việc elevation — đã sửa thành FR-013 kèm chú thích. Hai commit
+  của tôi (T08 backend, T03-6/7 FE) có lẫn thay đổi đang dở của họ trong
+  multiwindow.inline.ts / prototype.css — cây tại thời điểm commit 22/22 test
+  xanh nên giữ nguyên, KHÔNG gỡ (surgical: không đụng việc dở của người khác).
+
+evidence:
+  - node web/test/api-crud.test.js      # 27 kiểm — vòng CRUD + ca âm + kho sạch
+  - node web/test/api-status.test.js    # 15 kiểm — M1, bảng chuyển, etag, FR-012
+  - node web/test/api-recycle.test.js   # 10 kiểm — byte-equal, restore, epoch
+  - node web/test/api-guard.test.js     # 21 kiểm tĩnh — M08-R1..R5 bằng cấu trúc
+  - cd web && npm test                  # 22/22 file xanh
+  - python -m pytest core/tests -q      # 30 xanh (py -3.13)
+  - python core/tests/check_frozen.py   # khớp lock sau 2 đợt ký (26 file)
+  - check_g6a · check_g6b (21 task) · check_ba · check_mermaid · check_worklog xanh
+
+no_con_lai:
+  - AC-2.5.2 (soft): trải nghiệm duyệt trên bản chạy thật — NGƯỜI chốt
+  - FR-011 · FR-012 trạng_thái MỞ — thi hành theo plan người dùng duyệt, chờ ký
+  - Trang đọc site tĩnh là bản build — sau mutation UI nhắc npm run build
+  - GET /api/articles parse mỗi request — nghìn bài mới cần cache đọc

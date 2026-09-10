@@ -1,0 +1,83 @@
+ulid: 01M1X4H9K6R2N8T5V3ZQWBPDF7
+thoi_diem: 2026-09-07T09:30+07:00
+tac_nhan: claude-opus-5
+loai: ban_giao
+module: M03_web + M08_api
+don_vi: ẩn dòng việc cũ · CHỨNG MINH donBanCu/donNhapCu bắn thật
+
+viec: >
+  Hai việc chủ dự án chốt: (1) dòng việc cũ ẩn mặc định, (2) chạy THẬT hai hàm
+  dọn — vì trước đó chúng mới có cổng TĨNH.
+
+do_sau:
+  - lenh: node web/test/ban-cu-vao-rac.test.js
+    ket_qua: pass — 20/20 vế
+  - lenh: cd web && npm test
+    ket_qua: exit 0 · 3212 vế ok · 0 FAIL
+  - lenh: python -m pytest core/tests -q
+    ket_qua: 49 passed
+  - lenh: 'for f in chungcat/tests/check_*.py; do python "$f"; done'
+    ket_qua: 40/40 XANH
+
+viec_1_an_dong_cu:
+  hinh_dang: >
+    `CU_HIEN = false` mặc định; dòng cũ bị lọc khỏi danh sách, và một công tắc
+    ở cuối nói *"N bản cũ đang ẩn — hiện"* / *"ẩn bản cũ"*.
+  an_khong_xoa: >
+    Một tab chỉ hiện bản mới nhất là một tab không trả lời được *"đã chạy mấy
+    lần, tốn bao nhiêu"* — mà đó là câu hàng đợi việc sinh ra để trả lời.
+  an_thi_phai_dem: >
+    Giấu một thứ mà không nói đã giấu bao nhiêu là để người không biết mình
+    đang không thấy gì.
+  do_that: >
+    Tab video Hermes: **2 dòng** + *"1 bản cũ đang ẩn — hiện"* → bấm → **3
+    dòng**, đúng **1** dòng mang `cct-cu` (gạch đỏ), công tắc đổi thành *"ẩn
+    bản cũ"*.
+
+viec_2_chay_that:
+  donNhapCu:
+    cach: "tạo nháp A rồi nháp B cùng `nguon` — 0 model, 0 validate"
+    ket_qua: "A `nhap` → **`da_bo`** ngay khi B ra đời; B giữ `nhap`. BẮN THẬT."
+  donBanCu:
+    fixture_chan_hai_lan:
+      - "`word_count` — fixture tối giản trượt; phải dùng thân bài THẬT làm khuôn"
+      - >
+        `url_normalized` — tôi khai `kho://<slug>` trong khi chuẩn hoá BỎ
+        `kho://` và ra `<slug>` trần. Lỗi in ra hai chuỗi trông GIỐNG HỆT nhau
+        nên hai vòng đầu tôi đoán sai; chỉ khi in NGUYÊN VĂN cả câu mới thấy
+        vế *"ra '<slug>'"* ở cuối.
+    ket_qua_vong_1: >
+      **`ban_cu_vao_rac = []`** — KHÔNG dọn gì, cả hai bản còn trong kho.
+      Cổng TĨNH vẫn xanh suốt.
+    goc: >
+      `khoDoc` trả khoá **`type`**, tôi đọc `b.source_type` (undefined). Nên
+      `duong` thành `undefined/<slug>` — không khớp phép chặn — và
+      `chuyenSangRac(undefined, …)` không tìm ra hàng nào. HAI lỗi tên trường
+      trong một hàm, và không lỗi nào lộ ra trừ khi chạy.
+    sua_kem: >
+      Bỏ luôn phép suy *"bản mới nhất"* từ `analyzed_at`: bản vừa duyệt là bản
+      mới nhất THEO ĐỊNH NGHĨA. Suy từ một ngày do model khai là thêm một chỗ
+      sai (bản mới có thể mang ngày cũ).
+    ket_qua_vong_2: >
+      `ban_cu_vao_rac = ["article/thu-nghiem-donbancu-1"]` · kho còn ĐÚNG bản 2
+      · thùng rác có bản 1. **BẮN THẬT.**
+
+bai_hoc:
+  - >
+    Cổng đọc NGUỒN không thay được một lần chạy. Hai hàm này xanh cổng suốt
+    hai vòng trong khi một trong hai không làm gì cả.
+  - >
+    Lần thứ TƯ trong phiên: cổng đỏ oan vì đọc phải CHÚ THÍCH — vế `1d` bắt
+    `b.source_type` và nó khớp đúng câu tôi vừa viết để GIẢI THÍCH tại sao khoá
+    ấy sai. Nay cổng bỏ chú thích trước khi đo.
+
+rac_da_don:
+  - "2 bài `thu-nghiem-donbancu-*` khỏi kho"
+  - "4 mục khỏi bảng `recycle` + 4 file trong `_recycle/article/`"
+  - "15 bản nháp thử khỏi `web/_loi.sqlite`"
+  trang_thai_cuoi: "kho **5 bài** · hàng nháp **1** (`da_duyet`) · thùng rác **1** (`xgboost-taylor-bac-hai`, của chủ dự án)"
+
+object:
+  - web/api/nhap-cua.mjs
+  - web/plugins/cctab/src/cctab.inline.ts
+  - web/test/ban-cu-vao-rac.test.js

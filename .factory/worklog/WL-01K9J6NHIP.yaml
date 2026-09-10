@@ -1,0 +1,146 @@
+id: WL-01K9J6NHIP
+at: 2026-08-19
+by: claude
+buoc: s8 (M03_web) + s5 (hợp đồng UI)
+loai: feature + amend-frozen
+fr: FR-014-nhip-va-chuyen-dong.md
+
+viec: >
+  Người dùng kèm 3 ảnh: tách layout dính nhau · scroll ngang vùng Nổi bật ·
+  đổi màu core sang "trắng be viền xanh đỏ tím" (cả dark) · thêm hiệu ứng wow.
+
+pham_vi_ghi:
+  - 05_uiux/tokens.css                # --vien-mau, --vien-sang × 2 bộ
+  - 05_uiux/DESIGN.md                 # §3 viền màu · §4 đổi family + nhịp cột
+  - web/styles/prototype.css          # .pn::before + khối "NHỊP + CHUYỂN ĐỘNG v1.3"
+  - web/plugins/multiwindow/src/scripts/multiwindow.inline.ts
+  - web/test/motion-polish.test.js    # MỚI
+  - web/package.json
+  - project_map.yaml                  # ui_frozen v1.2 → v1.3
+
+hoi_truoc_khi_lam:
+  vi_sao: >
+    Bốn việc, KHÔNG cùng mức rủi ro. Đổi màu nền đụng contrast-audit.json
+    (frozen, 50/50 cặp WCAG đã validate trên 4 loại ảnh nền) — đổi nền là mọi
+    cặp đó lạc hậu, phải đo lại và bump contract.
+  nguoi_dung_chot:
+    - "VIỀN màu thay vì đổi nền — giữ nền đã validate"
+    - "cả BỐN hiệu ứng: tách layout · scroll ngang · chuyển động panel · bar chạy từ 0"
+  ly_le_dung: >
+    Viền KHÔNG chứa chữ nên chỉ cần đạt 1.35:1 của viền, không phải 4.5:1 của
+    chữ. Đây là chỗ rẻ nhất để thêm màu mà không đụng 50 cặp.
+
+dao_luat_section_4:
+  luat: 'DESIGN.md:156 — "4 layout family khác nhau, KHÔNG family nào lặp"'
+  doi: vùng Nổi bật từ "lưới bất đối xứng" sang "dải cuộn ngang" (scroll-snap)
+  giu_duoc: >
+    Bất đối xứng CÒN, chỉ đổi trục: thẻ lớn min(46%,620px), thẻ nhỏ
+    min(30%,380px) — tỷ lệ 1.5:1 đúng như `1.5fr 1fr 1fr` bản cũ. Bốn family vẫn
+    khác nhau.
+  chi_man_rong: >
+    Chỉ ≥1081px. Dưới đó .brk-g đã xếp dọc theo SCR-02 mobile ("6 cột không đọc
+    được trên mobile ⇒ chip cuộn ngang") — không đụng.
+
+vien_lam_SAI_lan_dau_sua_lan_hai:
+  nguoi_dung_bao: >
+    "sai ý tôi rồi. Giữ màu core, còn hiệu ứng màu sáng ở viền các ô thôi.
+    Làm như này trẻ trâu lắm — bỏ hiệu ứng màu cầu vồng kia đi."
+    Kèm 3 ảnh cho thấy gradient phủ KÍN mặt panel.
+
+  loi_1_ky_thuat:
+    what: >
+      Dùng pseudo-element + mask-composite:exclude, nhưng khai thuộc tính VIẾT
+      TẮT `mask:` SAU `mask-composite:`. Viết tắt RESET composite về mặc định
+      ⇒ mask không loại trừ gì ⇒ gradient tràn kín cả mặt panel.
+    vi_sao_khong_bat_duoc: >
+      Test motion-polish của tôi chỉ kiểm "có chuỗi mask-composite trong CSS" —
+      nó CÓ, nên test xanh. Sự hiện diện của thuộc tính không chứng minh nó có
+      hiệu lực. Người dùng thấy bằng mắt, test không.
+
+  loi_2_tham_my:
+    what: gradient 3 hue trên sáu panel — quá ồn cho một tờ báo tri thức
+    nguoi_dung_goi_dung: "trẻ trâu"
+    bai_hoc: '"wow" không phải "nhiều màu"'
+
+  ban_dung:
+    css: |
+      .pn{--vien:var(--edge)}
+      .pn::after{box-shadow:inset 0 0 0 1px var(--vien);transition:box-shadow .28s}
+      .pn:hover{--vien:var(--vien-nhan)}
+    vi_sao_tot_hon: >
+      box-shadow inset VỐN nằm đúng ở viền — không cần mask, không cần cắt gì.
+      Ít cơ chế hơn ⇒ ít chỗ vỡ hơn. Đổi màu qua custom property nên hover chỉ
+      là đổi giá trị biến.
+    mot_hue: >
+      --c-video (xanh) — xa --brand đỏ nhất trong palette nên không tranh với
+      dấu nhấn thương hiệu, và đã validate CVD.
+      Tone sáng 34%, tone tối 52% (nền thẫm hấp thụ).
+    mien_tru: .pn.brk đã có viền đỏ riêng ⇒ ::after display:none
+
+  test_da_siet: >
+    motion-polish giờ kiểm NGƯỢC LẠI: đòi KHÔNG còn --vien-mau/--vien-sang,
+    KHÔNG có gradient phủ mặt panel, và viền phải là box-shadow inset. Kiểm sự
+    VẮNG MẶT của thứ đã sai, không chỉ sự hiện diện của thứ đúng.
+
+ba_bay_gap_khi_thi_hanh:
+  bay_1_bar_chay_sau_lop_mo:
+    do_duoc: 4/5 khối .bars nằm TRONG .pn.rise (đo trên HTML thật màn Kho)
+    van_de: >
+      Panel bắt đầu opacity:0, mất .55s để hiện. Bar chạy ngay lúc đó thì diễn
+      ra SAU lớp mờ — mắt bỏ mất hoàn toàn.
+    sua: mọi delay bar cộng 260ms ⇒ hai chuyển động NỐI nhau, không chồng nhau
+  bay_2_js_chi_quan_sat_rise:
+    van_de: >
+      .bars cần class .in riêng. Thiếu vòng quan sát thứ hai thì bar KHÔNG BAO
+      GIỜ chạy, và không có gì báo lỗi.
+    bay_con: >
+      Delay bar do CSS đặt theo :nth-child. Nếu JS đặt style.transitionDelay lên
+      .bars thì nó ĐÈ mất — nên chỉ đặt cho .rise.
+  bay_3_reduced_motion:
+    van_de: >
+      Ba luật mới dùng transform. Tắt transition mà không trả về trạng thái CUỐI
+      ⇒ người bật giảm chuyển động thấy panel VÔ HÌNH và bar RỖNG vĩnh viễn.
+    muc_do: lỗi a11y, không phải lỗi thẩm mỹ
+    sua: khối @media riêng trả .rise về opacity:1 và bar về scaleX(1)
+
+verify:
+  loai: hard
+  lenh:
+    - "cd web && npm run check"                 # sạch
+    - "cd web && node test/motion-polish.test.js"  # MỚI, xanh
+    - "cd web && node test/token-only.test.js"     # xanh — 0 px/rem gõ tay
+    - "python core/tests/check_frozen.py"          # + 4 cổng, 5/5 OK
+  ket_qua: xanh
+  do_duoc_trong_gn_css:
+    - "--vien-mau / --vien-sang: 2 lần khai mỗi cái (sáng + tối)"
+    - ".pn::before + mask-composite có mặt; .pn.brk miễn trừ"
+    - ".two gap --s-lg, cột phải lệch, chỉ ở ≥1081px"
+    - "scaleX(0) + 6 bar lệch nhịp, delay đầu 260ms vs panel 600ms"
+    - "scroll-snap-type:x mandatory, scrollbar mảnh nhưng CÒN"
+    - "3 khối prefers-reduced-motion trả về trạng thái cuối"
+  test_moi: >
+    web/test/motion-polish.test.js — canh 4 hiệu ứng + 3 bẫy. Gồm một phép kiểm
+    đọc contrast-audit.json và đòi nền vẫn alpha .9 như contract đã validate:
+    đổi nền là test đỏ, buộc phải mở FR đo lại.
+
+hai_test_do_KHONG_phai_viec_nay:
+  what: four-screens · markup-matches-css
+  nguyen_nhan: >
+    shell.html bị sửa 118 dòng NGOÀI phiên này (plan phase 2 — bàn biên tập
+    local). 13 class thiếu luật CSS đều là của phase 2: api-only, api-thieu, rc,
+    np-3, np-form, f-h, f-g, f-row, f-2, f-set, f-chon, f-act, f-kq.
+    four-screens đỏ vì màn Chờ duyệt giờ có <form> duyệt — cũng phase 2.
+  xac_minh: >
+    Tôi chỉ sửa tokens.css, prototype.css, multiwindow.inline.ts. Mọi test liên
+    quan việc này đều OK: motion-polish, token-only, css-applied, page-weight,
+    open-card, filter-counts.
+
+no:
+  - "CHƯA xem bằng mắt. Mọi kiểm chứng là đo trên CSS/JS đã build. Cảm giác
+     'wow bao nhiêu là đủ' cần người xem — sửa một chỗ trong tokens.css là đổi
+     được toàn bộ."
+  - "Scroll ngang chưa có nút mũi tên trái/phải. Cuộn bằng bánh xe/trackpad/kéo
+     thanh được, nhưng chuột không có bánh xe thì chỉ còn kéo thanh mảnh 6px.
+     Nếu cần, thêm hai nút là việc nhỏ."
+  - "Viền gradient dùng mask-composite — Safari cần -webkit- prefix (đã thêm).
+     Chưa test Safari/Firefox thật; nợ này đã ghi trong 05_uiux/README từ s5."
