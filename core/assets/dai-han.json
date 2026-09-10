@@ -1,0 +1,13 @@
+{
+  "$comment": "NGUỒN KHAI DUY NHẤT của 'chữ Hán là gì'. Hai bên đọc, ở HAI VÙNG khác nhau: M13_truyhoi (THỢ) chèn dấu cách quanh mỗi chữ Hán trước khi đưa vào FTS5 — không chèn thì unicode61 cắt câu 15 chữ thành ĐÚNG MỘT token và mọi truy vấn tiếng Trung trả 0; M12_chungcat (THỢ) đếm tỉ lệ ký tự Hán để định tuyến model theo ngôn ngữ. Trước file này, bốn dải gõ cứng trong chungcat/src/dinh_tuyen.py:27-33 với ghi chú 'tạm, chuyển sang bảng khai chung khi M13 dựng'.",
+  "phien_ban": 1,
+  "$comment_dai": "Mỗi dải là [đầu, cuối] INCLUSIVE, số nguyên codepoint. Giữ dạng SỐ chứ không phải chuỗi regex: hai bên đọc là Python và (sau này) JS, và một regex `[\\u4E00-\\u9FFF]` viết cho engine này không chắc đúng ở engine kia — nhất là với dải ngoài BMP cần surrogate pair. Bên đọc tự dựng phép kiểm từ số.",
+  "dai": [
+    {"tu": 13312,  "den": 19903,  "ten": "CJK Ext A",                 "$vi_sao": "chữ hiếm, có thật trong văn bản phồn thể cổ"},
+    {"tu": 19968,  "den": 40959,  "ten": "CJK Unified Ideographs",    "$vi_sao": "dải CHÍNH — gần như mọi chữ Hán hiện đại, cả phồn lẫn giản"},
+    {"tu": 63744,  "den": 64255,  "ten": "CJK Compatibility Ideographs", "$vi_sao": "biến thể tương thích; bỏ dải này thì cùng một chữ có hai kết quả tuỳ nguồn gõ"},
+    {"tu": 131072, "den": 173791, "ten": "CJK Ext B",                 "$vi_sao": "ngoài BMP — chính chỗ một regex viết tay dễ trượt vì surrogate pair"}
+  ],
+  "$comment_khong_gom": "KHÔNG gồm Hiragana/Katakana (3040–30FF) và Hangul (AC00–D7AF). Chúng KHÔNG phải chữ Hán, và gộp vào đây làm `ti_le_han` của M12 định tuyến một bài tiếng Nhật sang model tiếng Trung. Cần tiếng Nhật/Hàn thì mở một FR khác với một bảng khác — không nới bảng này.",
+  "$comment_nguong": "Bảng này KHÔNG chứa ngưỡng tỉ lệ. `nguong_han` của M12 sống ở chungcat/assets/ vì nó là tham số ĐO ĐƯỢC của một module; dải ký tự là ĐỊNH NGHĨA dùng chung. Trộn hai thứ vào một file là chỗ để sau này ai đó đổi ngưỡng và tưởng mình đang đổi định nghĩa."
+}

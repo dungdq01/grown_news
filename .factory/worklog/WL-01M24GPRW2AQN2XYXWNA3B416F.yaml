@@ -64,4 +64,24 @@ keo_theo:
   - "T03-125 khai wireframe SCR-22 nhung SCR-22-nhip-sinh.md da ton tai ⇒ wireframe tim toan van lay SCR-27; PM sua task file."
   - "T13-1 ghi '19 cong' nhung liet 20 ten (them check_nghe_loopback cua T13-4 AC2) ⇒ dung 20."
 
-tiep_theo: "T01-51 (bang khai + validate.py) — lam 14 ve tren XANH; dan output xanh vao CUNG entry nay (R5, rule.md muc 8)."
+xanh_sau_T01_51:   # R5 — cung entry voi DO o tren (rule.md muc 8). Moc: sau commit bf5e33f, tren cay T01-51 (xem WL-01M24H6J8XPKNN0V72NRY3095P)
+  - lenh: ".venv/Scripts/python core/tests/check_dia_chi.py"
+    ket_qua: |
+      4 · dạng `file-anchor` — FR-073 A1 · A2 · A4, kho giả ở thư mục tạm
+        ok   bảng khai có dạng `file-anchor`
+        ok   A1 · `[docs/x.md#anchor]` nhận dạng là `file-anchor` và phân giải được
+        ok   A1 · anchor sai luật slug (chữ hoa, gạch dưới) ⇒ KHÔNG nhận dạng
+        ok   A2 · ca `đ` — `### Đường ống dữ liệu` ⇒ #duong-ong-du-lieu phân giải được
+        ok   A2 · heading trùng lần hai ⇒ hậu tố -1 phân giải được
+        ok   A2 · anchor không thuộc heading nào ⇒ nhận dạng nhưng KHÔNG phân giải
+        ok   A2 · file không tồn tại ⇒ KHÔNG phân giải
+        ok   A1 · cả hai `#anchor` ĐẾM vào citations_sampled (khai 2 = máy đếm 2)
+        ok   A2 · một anchor không thuộc heading nào ⇒ citations_verified máy đếm 1 ≠ khai 2 ⇒ ĐỎ nêu số
+        ok   A4 · dựng hai lần ⇒ cùng danh sách anchor (điểm bất động)
+        ok   A4 · dedup vòng while: `Foo 1 · Foo · Foo` ⇒ foo-1 · foo · foo-2
+        ok   A4 · đổi thứ tự heading ⇒ hậu tố đổi theo: `Foo · Foo · Foo 1` ⇒ foo · foo-1 · foo-1-1
+        ok   A4 · state theo FILE, reset mỗi file — file khác KHÔNG mang hậu tố
+        ok   luật fold = slugGoiY: lower → NFD → bỏ dấu → đ→d → [^a-z0-9]+→-
+        ok   luật fold cắt ở 60 SAU khi bỏ `-` đầu/cuối — đúng thứ tự của bản JS
+      địa chỉ phân giải được · citations_* do máy đếm · công thức không bị đỏ oan   · exit 0
+      14/14 ve DO o tren ⇒ ok. Khong ve nao bi xoa hay noi de xanh.
