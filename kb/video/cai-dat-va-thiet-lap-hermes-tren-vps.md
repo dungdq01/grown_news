@@ -20,11 +20,7 @@ word_count: 273
 citations_sampled: 0
 citations_verified: 0
 url_normalized: youtube.com/watch?v=Z0YO9KyVhVg
-media:
-- sha256: 0f2305e097d63c8404602e82f0b046f9d49d4deff5835fa3da62c24c72e6cff2
-  mime: text/vtt
-  ten_goc: cai-dat-va-thiet-lap-hermes-tren-vps.vtt
-  so_byte: 20519
+media: []
 ---
 
 Hướng dẫn Hermes Agent trên Hostinger — hướng dẫn cài đặt và thiết lập hoàn chỉnh cho Hermes Agent trên VPS Hostinger. Kết nối Telegram, tạo skills có thể tái sử dụng, lên lịch cron jobs và chạy một AI agent tự lưu trữ 24/7. Không cần lập trình.

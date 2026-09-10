@@ -54,6 +54,24 @@ web/_loi.sqlite
 web/_loi.sqlite-wal
 web/_loi.sqlite-shm
 
+# ═══ 2026-09-10 · CHẶN MỌI FILE DB, KHÔNG LIỆT TỪNG TÊN ═══════════════════════
+# Chủ dự án chốt: *"chặn push các file .db lên git"*. Ba dòng liệt tên ở trên
+# KHÔNG đủ — chúng che `kb/_kho.sqlite` nhưng KHÔNG che `kb/_kho.sqlite.truoc-di-tru-*`
+# (bản sao trước di trú), và một bản 135 MB đã lọt vào lịch sử ở `b7f6ba9`
+# (2026-09-09), cùng `web/_loi.sqlite.hong` 0.3 MB ở `6ffa918`. Đo: GitHub chặn
+# CỨNG file > 100 MB ⇒ repo không push được cho tới khi gỡ khỏi lịch sử.
+# Bài học: một danh sách TÊN không che được các biến thể của tên. Dùng MẪU.
+*.db
+*.sqlite
+*.sqlite-*
+*.sqlite.*
+*.db-*
+*.db.*
+# Ngoại lệ có chủ đích — file .db KHÔNG phải database:
+!Thumbs.db
+# Export .md/.yaml của kho vẫn vào git như cũ (FR-034 một chiều DB→file);
+# mẫu trên chỉ chặn chính file DB, không chạm `kb/**/*.md`.
+
 # ADR-06 (c) + FR-050 cach 2 — BAN LUI cua ba bang GOC KHONG vao git.
 #
 # Chu du an chot 2026-09-02: "luu backup o o, kieu nhu /_backup".

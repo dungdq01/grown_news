@@ -1,0 +1,61 @@
+WEBVTT
+
+00:00:00.550 --> 00:00:03.730
+Cloth vừa ra mắt bộ Agent bán hàng, chạy ngay trong app của bạn.
+
+00:00:04.190 --> 00:00:09.570
+Cloth for Commerce là bộ khung mở để bạn tự dựng Agent của mình, Agent cho khách và Agent cho người bán.
+
+00:00:09.920 --> 00:00:10.720
+người
+
+00:00:10.720 --> 00:00:10.980
+bán.
+
+00:00:11.400 --> 00:00:15.000
+Bốniành làm sẵn, bán lẻ, du lịch, viễn thông, giải trí.
+
+00:00:15.700 --> 00:00:18.360
+Trước đây khách hỏi xong là nhảy sang một trợ lý bên thứ ba.
+
+00:00:18.740 --> 00:00:20.640
+Đơn vẫn về nhưng quan hệ với khách thì mất.
+
+00:00:21.240 --> 00:00:24.480
+Bây giờ Agent chạy ngay trong app, giữ lại được cả hai.
+
+00:00:25.220 --> 00:00:26.600
+Đây là Agent cho người mua hàng.
+
+00:00:27.080 --> 00:00:30.620
+Nó so sánh từng hạng vé rồi thêm thẳng vào giỏ cho khách
+
+00:00:31.000 --> 00:00:33.060
+và nó nhớ sở thích của khách cho lần mua sau.
+
+00:00:33.960 --> 00:00:35.440
+Còn đây là Agent cho người bán.
+
+00:00:35.900 --> 00:00:39.160
+Mỗi sáng nó báo món sắp hết và món cần giảm giá,
+
+00:00:39.340 --> 00:00:41.320
+nhưng mọi thay đổi đều nằm chờ bạn duyệt.
+
+00:00:41.750 --> 00:00:42.570
+Bắt đầu
+
+00:00:42.570 --> 00:00:43.540
+từ đơn giản,
+
+00:00:43.690 --> 00:00:45.860
+đây là mã nguồn mở nên bạn fork về là tự làm chủ.
+
+00:00:46.200 --> 00:00:50.110
+Clone repo, cài plugin cho Cloud Code rồi tả agent bạn muốn.
+
+00:00:50.610 --> 00:00:52.550
+Bản demo chạy thật đang chờ bạn.
+
+00:00:52.770 --> 00:00:55.470
+Link mình để ở phần bình luận, theo dõi Ken kiến thức.

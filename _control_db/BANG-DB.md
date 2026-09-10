@@ -220,8 +220,8 @@ nhap_chung_cat.nguoi_dung_id  → nguoi_dung.id
 `lan_thu` cột: `stt` PK · `khi` NN df=now · `ip` · `ma_bam` *(băm, KHÔNG lưu mã)*
 
 > 🔴 **Đây là nợ đang mở.** Hai bảng không có trong `loi.schema.sql` ⇒
-> `BANG_LOI` (`loidb.mjs:37`) khai **5**, DB thật có **6–7**, và
-> **`lan_thu` hôm nay không tồn tại** vì DB vừa bị clear và chưa ai gọi
+> `BANG_LOI` (`loidb.mjs:37`) khai **5**, DB thật có **5–7** tuỳ lúc. Hôm nay
+> **`lan_thu` KHÔNG TỒN TẠI** — file DB được dựng lại và chưa ai gọi
 > `loiChoThu()`. **Sự tồn tại của một bảng đang phụ thuộc vào việc ai gọi hàm
 > nào trước** — xem [09-08 §3.2](2026-09-08-bang-khoa-chinh-va-noi-dung.md).
 
@@ -263,6 +263,8 @@ Chi tiết + lệnh xoá: [09-10 rà soát](2026-09-10-ra-soat-file-sql-va-db-ra
 | 5 | `boi` NULL cho mọi dòng `audit_loi` — cột *"AI ĐÃ làm"* chưa từng được ghi | 09-08 | [09-08 §3.5](2026-09-08-bang-khoa-chinh-va-noi-dung.md) |
 | 6 | transcript `.vtt` có `la_dan_xuat=0`, `kieu_moc=NULL` | 09-08 | [09-08 §3.2](2026-09-08-bang-khoa-chinh-va-noi-dung.md) |
 | 7 | 2 test ghi thẳng vào DB **thật** (không đặt `LOI_DB`) | 09-08 | [09-08 §3.6](2026-09-08-bang-khoa-chinh-va-noi-dung.md) |
+| 8 | Thao tác clear **không để lại dòng audit** — xem §9 | 09-10 | §9 |
+| 9 | `audit_loi` từng bị **dựng lại từ đầu** (124 → stt 1) — trigger `khong_xoa` không phủ việc thay cả file | 09-10 | §9 |
 
 ---
 
@@ -274,6 +276,50 @@ Chi tiết + lệnh xoá: [09-10 rà soát](2026-09-10-ra-soat-file-sql-va-db-ra
 | cột `space` trên mọi bảng nội dung | sau ADR-09 | hình dạng chờ quyết — [09-09](2026-09-09-space-model-anh-huong-database.md) §3 |
 | cột `space` cho `audit_log` + `audit_loi` | ⏰ **trước khi mở space thứ hai** | append-only ⇒ **không backfill được** |
 | `space` · `space_member` | sau ADR-09 | mô hình quyền mới, ngoài `FR-045` |
+
+---
+
+## 6b · Hai lần dữ liệu LÕI biến mất — quy chủ
+
+Hai **sự kiện khác nhau**, đừng gộp.
+
+### ① Clear bản chưng cất — 2026-09-10 08:18 · ✅ **có chủ**
+
+Chủ dự án xác nhận: *"tôi bảo agent clear các bản chưng cất – transcript"*.
+
+| | trước (`_backup/truoc-clear-2026-09-10/`) | sau |
+|---|---:|---:|
+| `nhap_chung_cat` | 8 | **0** |
+| `audit_loi` | 2 | 2 (không đổi) |
+
+Xoá hàng ở đúng một bảng, **không đụng audit** — thao tác sạch. Ảnh chụp trước
+khi xoá **có thật** ở `_backup/truoc-clear-2026-09-10/`, đúng `rule.md` mục 16.
+
+⚠️ **Nhưng không có dòng audit nào cho chính lần clear đó.** Dòng cuối của
+`audit_loi` là `duyet-nhap-vao-kho` lúc `01:06:43`; lần clear lúc `08:18` không
+để lại vết. Ba tháng sau, câu *"8 bản nháp kia đi đâu"* chỉ trả lời được bằng
+trí nhớ. Một thao tác huỷ có chủ ý vẫn nên có tên trong sổ.
+
+### ② `audit_loi` bị dựng lại từ đầu — trước 2026-09-09 23:43 · ⚠️ **chưa quy được chủ**
+
+| mốc | `audit_loi` |
+|---|---|
+| 2026-09-08 | **124 hàng**, `stt` liên tục `1..124`, sớm nhất `2026-09-04 03:36` |
+| 2026-09-09 23:43 → nay | **2 hàng**, `stt` `1..2`, sớm nhất `2026-09-09 23:43` |
+
+Và ảnh chụp `truoc-clear` **cũng chỉ có 2 hàng** ⇒ mất mát này xảy ra **trước**
+lần clear ①, không phải do nó.
+
+**Không thể do `DELETE`**: `audit_loi_khong_xoa` là trigger `BEFORE DELETE` →
+`RAISE(ABORT)`. `stt` quay về `1` ⇒ **cả file DB được dựng lại**, không phải hàng
+bị xoá. `lan_thu` biến mất hoàn toàn cũng khớp giả thuyết đó.
+
+> **Bài học cho thiết kế, không phải để quy trách**: ba trigger append-only bảo
+> vệ `audit_loi` ở mức **hàng**. Chúng **không** bảo vệ ở mức **file**. Một
+> `audit_loi` "chỉ-nối-thêm" mà xoá được bằng cách thay file thì lời hứa
+> append-only chỉ đúng với người tôn trọng nó.
+> Vế bù duy nhất là `_backup/audit-loi.yaml` — và nó **chỉ giữ trạng thái hiện
+> tại**, không giữ lịch sử đã mất.
 
 ---
 
@@ -363,7 +409,8 @@ lại** `kb/_kho.sqlite` (rule 3 + rule 16).
 
 | ngày | đổi gì |
 |---|---|
-| 2026-09-10 | Lập file. Đo `kb/_kho.sqlite` (11 bảng + 3 view) · `web/_loi.sqlite` (6 bảng — `lan_thu` vắng vì DB vừa clear). Ghi 7 nợ đang mở, 4 thứ đã chết. |
+| 2026-09-10 | Lập file. Đo `kb/_kho.sqlite` (11 bảng + 3 view) · `web/_loi.sqlite` (6 bảng — `lan_thu` vắng). Ghi 7 nợ đang mở, 4 thứ đã chết. |
+| 2026-09-10 | Thêm **§6b** — quy chủ hai lần dữ liệu LÕI biến mất: ① clear bản chưng cất **có chủ** (chủ dự án xác nhận), ② `audit_loi` bị dựng lại từ đầu **chưa quy được chủ**. Nợ lên **9**. |
 
 ---
 

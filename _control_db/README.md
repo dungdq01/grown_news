@@ -41,3 +41,4 @@ Thư mục của agent **KIỂM SOÁT DỮ LIỆU**. Chỉ CHECK · REVIEW · G�
 | 2026-09-09 | [2026-09-09-space-model-anh-huong-database.md](2026-09-09-space-model-anh-huong-database.md) | Space Model: ảnh hưởng tới schema — PK, ontology, media, export, quyền |
 | 2026-09-10 | [2026-09-10-dinh-tuyen-space.md](2026-09-10-dinh-tuyen-space.md) | định tuyến /factory:go cho Space — FR → ADR-09 → s6; G1/G2/G3 đã bỏ |
 | 2026-09-10 | [2026-09-10-ra-soat-file-sql-va-db-rac.md](2026-09-10-ra-soat-file-sql-va-db-rac.md) | rà soát .sql + DB rác — 0 file .sql rác; 135 MB đã vào git |
+| 2026-09-10 | [2026-09-10-danh-gia-env-va-duong-dan-db.md](2026-09-10-danh-gia-env-va-duong-dan-db.md) | đánh giá .env cho đường dẫn DB + lỗi push git (135 MB trong lịch sử) |

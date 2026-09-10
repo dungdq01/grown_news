@@ -25,18 +25,6 @@ media:
   mime: image/jpeg
   ten_goc: mo-mang-tam-mat-sau-khi-xem-chi-lauren-xai-ai.jpg
   so_byte: 45591
-- sha256: 43723a81648ca39c1dce07f8bbbae5d405ccdc64ce549d00f80749b1c31c91a2
-  mime: text/vtt
-  ten_goc: mo-mang-tam-mat-sau-khi-xem-chi-lauren-xai-ai.vtt
-  so_byte: 58617
-- sha256: 32c3b595ec767ba03ae4b95e7c7c3e76aec27b00f872e49f344c2b4f9ef5cf9e
-  mime: text/vtt
-  ten_goc: mo-mang-tam-mat-sau-khi-xem-chi-lauren-xai-ai.vtt
-  so_byte: 53985
-- sha256: 1d4f447b66311b35c2ed04c1b27e151307609dad8af91fc9416939d509ed25de
-  mime: text/vtt
-  ten_goc: mo-mang-tam-mat-sau-khi-xem-chi-lauren-xai-ai.vtt
-  so_byte: 53857
 ---
 
 Chị này đang chạy team 20+ GrokBot agents song song. Sáng ngủ dậy thấy khoảng 20 PR đã tự merge vào main. Ở SpaceXAI, 85% kỹ sư đã vận hành đội ngũ 10+ bot như thế này.
