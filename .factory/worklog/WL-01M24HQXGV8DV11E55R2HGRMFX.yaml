@@ -1,0 +1,79 @@
+entry: ban-giao
+ulid: 01M24HQXGV8DV11E55R2HGRMFX
+ngay: 2026-09-10
+module: M08_api (chu web/api) · M13_truyhoi (huong loi)
+don_vi: [T08-35]
+fr: FR-072 §1.1 · §1.4 · ADR-08 Z9 · rule.md 13 (cot `space` = diem noi khoa)
+nhanh: m13 (worktree ../gn-m13), tren e932753 (T01-51)
+tieu_de: >-
+  T08-35 — GET /api/kho-delta (NAM truong, trang duoc, sha_than doi theo than) · GET /api/tim
+  (proxy POST truyhoi/truy-hoi, khoa chieu KHOA_WEB_TRUYHOI + x-aud: truyhoi o lai server) ·
+  gocTho(ten) doc cong theo TEN tu dich-vu.json (0 `=== "chungcat"`). AC3 poke CHO PM (Q4).
+
+object:
+  - web/api/tho-cua.mjs                  # gocTho(ten) · headerKhoa(ten) · goiTho(..., tho=) · chetTho(res,e,ten) · cuaKhoDelta · cuaTim
+  - web/api/dungchung.mjs                # +khoDelta() — SQL o day (api-guard: handler khong cam SQL)
+  - web/api/router.mjs                   # +GET /api/kho-delta · +GET /api/tim (chi GET, 0 duong ghi moi)
+  - 07_plan/M08_api/tasks/T08-35-kho-delta.test.js   # CONG VIET TRUOC (rule.md 8) — xem `cho_PM`
+  - .factory/worklog/WL-01M24HQXGV8DV11E55R2HGRMFX.yaml
+
+quyet_dinh_trong_luot:
+  - "`loai` cua kho-delta = `source_type` (cot co that trong view ban_ghi). Phan loai `pl` (bai-viet|tai-lieu|video) M13 tu suy tu loai-nguon.json — bang khai doc nhu file, khong them truong thu sau."
+  - "`updated_at` = frontmatter.analyzed_at: view ban_ghi KHONG co moc sua. Ghi thang trong comment khoDelta() de M13 khong tin no mot minh; tin hieu doi that la `sha_than` = sha256(than)."
+  - "`space` = hang `\"mac-dinh\"` trong ma (SPACE_MAC_DINH), khong doc DB — cot chua ton tai (FR-080 chua ap). Diem noi khoa: doi phai qua FR + bao PM-Space. Khong cham."
+  - "Khoa chieu theo quy uoc PM chot 2026-09-10 (Q3): env `KHOA_WEB_TRUYHOI`, header `x-khoa-dich-vu` + `x-aud: truyhoi`. chungcat GIU hop dong cu `X-Khoa-Loi`/`CHUNGCAT_KHOA_LOI` trong bang HEADER_KHOA_CU (ngoai le CO TEN, xoa khi FR-078 ap) — khong doi hanh vi M12 o luot nay."
+  - "`k` thieu ⇒ web khai K_MAC_DINH = 20 tuong minh (ui_flow §2c); `nguon: null` luon co mat trong payload (AC-5.3); facet chi nhan 5 khoa TANG (cat·loai·cpt·pl·nguon), 0 bang doi ten; `space` KHONG nhan tu client o luot nay."
+  - "Cat trang: chep khuon catTrang cua articles.mjs (module-private ben do, articles.mjs ngoai pham_vi_ghi) — limit vang ⇒ tra het, tran 500."
+
+do_do:
+  - lenh: "node 07_plan/M08_api/tasks/T08-35-kho-delta.test.js   (TRUOC khi sua ma, tai e932753)"
+    ket_qua: |
+      §1 kho-delta: FAIL trả 200 (trả 404) · FAIL ≥3 bản ghi seed (được 0) · FAIL tong · FAIL slug seed · FAIL ?limit=1&offset=1 (404) · FAIL sha_than đổi (undefined → undefined)
+         ok  đọc được bài để sửa · ok PUT sửa thân ⇒ 200   (cửa ghi cũ chạy — kho tạm seed đúng)
+      §2 /api/tim: FAIL trả 200 (404 "Không có đường này.") · FAIL POST sang truyhoi · FAIL x-aud · FAIL x-khoa-dich-vu · FAIL cau_hoi/k/pl/nguon · FAIL thiếu k · FAIL thiếu q ⇒ 400 (trả 404)
+      §3 SKIP AC3 · poke — chờ PM (Q4)
+      §4 gocTho: FAIL `=== "chungcat"` ⇒ 0 (thấy 1) · ok 5 cửa cũ tới chungcat giả
+      §5 FAIL truyhoi chết ⇒ 502 (trả 404)
+      19 lỗi · exit 1  — DO vi LUAT (duong chua co, hang con go cung), khong vi harness.
+      Ghi chu: lan chay dau tien 21 loi co 2 ve DO OAN (GET bai 404, PUT 400) vi test truyen OBJECT `dungKho()` vao batServer
+      (KB_DIR="[object Object]" ⇒ kho rong). Sua test: `const { kho, rac } = dungKho()` · `const { schema } = dungSchema()`.
+      Cung loi nay dang nam trong web/test/loi-tho-cua.test.js (khong can ban ghi nen khong ai thay) — xem keo_theo.
+  - lenh: "node 07_plan/M08_api/tasks/T08-35-kho-delta.test.js   (SAU khi sua 3 file)"
+    ket_qua: |
+      §1 12/12 ok (200 · ≥3 bản ghi · tong · năm trường đúng · space=mac-dinh · sha 64 hex · loai · slug · limit/offset · sửa bài ⇒ sha_than ĐỔI · bài khác GIỮ)
+      §2 14/14 ok (200 · trả nguyên ket_qua · POST /truy-hoi · x-aud: truyhoi · x-khoa-dich-vu=KHOA_WEB_TRUYHOI · KHÔNG x-khoa-loi · cau_hoi có dấu · k=5 số · pham_vi.pl · nguon: null có mặt · 0 khoá lộ · thiếu k ⇒ mặc định số · thiếu q ⇒ 400)
+      §3 SKIP AC3 (chờ PM)
+      §4 5/5 ok (`=== "chungcat"` = 0 · 0 số cổng gõ tay · /api/model vẫn tới chungcat giả · hai tên hai gốc · /truy-hoi không tới chungcat)
+      §5 ok truyhoi chết ⇒ 502
+      pass · exit 0
+  - lenh: "node web/test/api-guard.test.js · node web/test/loi-tho-cua.test.js"
+    ket_qua: "api-guard: 1 FAIL `thiếu banXuat ở: ghiKieuMoc` — Y HET tren cay main (do doi chieu, xem đỏ_do) · loi-tho-cua: pass"
+  - lenh: "for t in test/api-*.test.js test/loi-*.test.js test/tho-*.test.js test/xuat-*.test.js: node $t"
+    ket_qua: "12/13 exit 0 (api-crud · api-index-khong-can-build · api-recycle · api-status · loi-cua-http · loi-cua · loi-nhap-cua · loi-tho-cua · xuat-pdf-typst · xuat-transcript · xuat-van-ban); 1 exit 1 = api-guard (pre-existing)"
+  - lenh: "cd web && npm test   (AC5)"
+    ket_qua: |
+      Chuoi && dung o four-screens.test.js (12 FAIL 'JS roi ve tai trang that…', 'bai mau lay tu kho mau', …) — cac ve doc `web/site/**`
+      (site Quartz build, .gitignore:24, worktree KHONG co `web/_quartz` — CI clone rieng o ci.yml:215-217). `npm run build` (build-fe) chay OK
+      6 file .inline.ts nhung khong sinh site. ⇒ AC5 CHUA do duoc trong worktree; khong lien quan 3 file .mjs sua (khong test nao trong 12 ve doc web/api).
+      Chay lai AC5 tren may co web/_quartz (main) hoac CI khi merge — ghi day, khong tu nhan xanh.
+
+đỏ_do:
+  - "api-guard `ghiKieuMoc thiếu banXuat`: pre-existing — chu la b7f6ba9 (WO-074 · T12-31 + T03-131), do y het tren cay main. Khong thuoc luot nay."
+  - "npm test dung o four-screens (12 FAIL): moi truong worktree thieu web/_quartz + web/site — chua-quy-duoc-nguoi (ha tang build), khong phai ma."
+
+cho_PM:
+  - "Q1 (2026-09-10) PM noi pham_vi_ghi T08-35 them `web/test/kho-delta.test.js` + `web/package.json`: tai commit nay task file CHUA co ⇒ cong van song o 07_plan/M08_api/tasks/T08-35-kho-delta.test.js (rule.md 8: cong viet truoc o thu muc task). Khi PM noi: `git mv` sang web/test/kho-delta.test.js, doi 1 dong import `./_api.mjs`, them `&& node test/kho-delta.test.js` vao package.json — cung luot, mot commit nho."
+  - "Q4 AC3 `/reindex-poke`: CHO PM quyet. Test in SKIP kem ly do; ma KHONG poke. M13 (T13-4) khong dung endpoint nay cho toi khi quyet."
+
+khong_lam:
+  - "KHONG sua articles.mjs (catTrang) — ngoai pham_vi_ghi; chep khuon 12 dong."
+  - "KHONG doi hop dong X-Khoa-Loi cua chungcat — FR-078 team M12."
+  - "KHONG nhan `space` tu query /api/tim — diem noi khoa; M13 coi moi ban ghi = mac-dinh toi FR-080."
+  - "KHONG sua loi-tho-cua.test.js (KB_DIR object) — ngoai pham_vi_ghi; ghi keo_theo."
+
+keo_theo:
+  - "web/test/loi-tho-cua.test.js:73 truyen object `dungKho()` thang vao batServer ⇒ KB_DIR='[object Object]', kho tam RONG — test van xanh vi khong can ban ghi. La mot cong xanh tren kho rong (`#cong-xanh-vi-neo-sai`). Chu: M03/M08 (T03-91 so huu glob loi-*). Khong mo o o day vi khong phai keo theo cua luot nay — bao PM."
+  - "M13 T13-2: indexer doc kho-delta {slug, loai, updated_at, sha_than, space}; so `sha_than` (khong tin updated_at mot minh); `file` = kb/<loai>/<slug>.md; goc qua GET /api/xuat/<loai>/<slug>?dang=goc."
+  - "FR-078 (M12): khi ap khuon ADR-08 cho chungcat, xoa dong `chungcat` trong HEADER_KHOA_CU (tho-cua.mjs) va doi CHUNGCAT_KHOA_LOI -> KHOA_WEB_CHUNGCAT — mot dong, cung luot voi FR."
+
+tiep_theo: "T13-1 — 20 cong truyhoi/tests trong MOT commit (dang viet: _nap.py · _khung.py · _loi_gia.py · golden.yaml · fixtures/chuan-hoa-chung.json xong)."
