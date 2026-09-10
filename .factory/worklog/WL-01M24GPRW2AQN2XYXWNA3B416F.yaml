@@ -1,0 +1,67 @@
+entry: ban-giao
+ulid: 01M24GPRW2AQN2XYXWNA3B416F
+ngay: 2026-09-10
+module: M01_core (chu cong) · M13_truyhoi (huong loi)
+don_vi: [T01-52]
+fr: FR-073 (A1 · A2 · A4)
+nhanh: m13 (worktree ../gn-m13, goc 6ffa918 "before m13" = main luc bat dau)
+tieu_de: >-
+  T01-52 — cong DI TRUOC: ba ve `file-anchor` (A1 nhan dang · A2 phan giai · A4 dedup)
+  trong check_dia_chi.py §4 — DO vi LUAT (dia-chi.json chua co dang), khong vi ImportError
+
+object:
+  - core/tests/check_dia_chi.py            # +§4, 14 ve moi; §1-§3 khong doi — SHA ghi o `commit` duoi
+  - .factory/worklog/WL-01M24GPRW2AQN2XYXWNA3B416F.yaml
+
+harness_khac_ban_giao:  # do 2026-09-10 truoc dong dau, khong co trong BAN-GIAO-DEV.md
+  - "`python` tren PATH = hermes venv 3.11, THIEU pytest + pypdf ⇒ check_dia_chi chet o `import pypdf`. Moi lenh o day chay bang `C:/Users/Admin/Downloads/Grown_news/.venv/Scripts/python` (3.14.2) + PYTHONIOENCODING=utf-8. Import kiem: validate.py nap tu gn-m13/core/src (khong phai ban -e cua main)."
+  - "../gn-m13 dung o 8ccc653, 21 commit sau main ⇒ `git merge --ff-only main` truoc; main khi do da co them 6ffa918 'before m13' (gom ca diff WO-094 validate.py + WO-090 dungchung.mjs truoc do chua commit) ⇒ khong con rui ro merge hai file do."
+  - "Kho that: 12 ban ghi (ban giao ghi 13) · 9 heading ##/### trong `than` · 0 bai chu Han."
+
+do_do:
+  - lenh: "grep -c file-anchor core/assets/dia-chi.json · grep -c goi_duoc core/assets/dich-vu.json · ls core/assets/dai-han.json"
+    ket_qua: "0 · 0 · khong co — dung trang thai T01-51 chua ap; DO duoi day la vi LUAT"
+  - lenh: ".venv/Scripts/python core/tests/check_dia_chi.py   (moc TRUOC T01-51, tai 6ffa918 + §4)"
+    ket_qua: |
+      §1–§3 cu: toan bo `ok` (khong doi).
+      4 · dạng `file-anchor` — FR-073 A1 · A2 · A4, kho giả ở thư mục tạm
+        FAIL bảng khai có dạng `file-anchor`   FR-073 §1 chưa áp vào dia-chi.json — T01-51
+        FAIL validate.py có `anchor_fold` + `anchor_cua_file`   T01-51 chưa cài — ImportError: cannot import name 'anchor_cua_file' from 'source_distiller.validate' (C:\Users\Admin\Downloads\gn-m13\core\src\source_distiller\validate.py)
+        FAIL A1 · `[docs/x.md#anchor]` nhận dạng là `file-anchor` và phân giải được   trả về None
+        FAIL A1 · anchor sai luật slug (chữ hoa, gạch dưới) ⇒ KHÔNG nhận dạng   trả về None
+        FAIL A2 · ca `đ` — `### Đường ống dữ liệu` ⇒ #duong-ong-du-lieu phân giải được   trả về None
+        FAIL A2 · heading trùng lần hai ⇒ hậu tố -1 phân giải được   trả về None
+        FAIL A2 · anchor không thuộc heading nào ⇒ nhận dạng nhưng KHÔNG phân giải   trả về None
+        FAIL A2 · file không tồn tại ⇒ KHÔNG phân giải   trả về None
+        FAIL A1 · cả hai `#anchor` ĐẾM vào citations_sampled (khai 2 = máy đếm 2)   trả về: (…'Mục 3.2 không có địa chỉ nào máy hiểu — … Dạng nhận: [xgboost-stap-by-step] · [xgboost-stap-by-step:p.7] · [thien-duong-chuot-tuong-lai:t=03:15] · [docs/xgboost-taylor-bac-hai.md:12-31] · [nguon.py:10-40] · [§II.4]', 'citations_sampled khai 2 nhưng máy đếm 0 — …', 'citations_verified khai 2 nhưng máy đếm 0 — …', 'origin external nhưng citations_sampled=0 (cần ≥2)'], [])
+        FAIL A2 · một anchor không thuộc heading nào ⇒ citations_verified máy đếm 1 ≠ khai 2 ⇒ ĐỎ nêu số   trả về: (… cùng danh sách trên …)
+        FAIL A4 · dựng hai lần ⇒ cùng danh sách anchor (điểm bất động)   T01-51 chưa cài `anchor_cua_file`
+        FAIL A4 · dedup vòng while: `Foo 1 · Foo · Foo` ⇒ foo-1 · foo · foo-2   T01-51 chưa cài `anchor_cua_file`
+        FAIL A4 · đổi thứ tự heading ⇒ hậu tố đổi theo   T01-51 chưa cài `anchor_cua_file`
+        FAIL A4 · state theo FILE, reset mỗi file   T01-51 chưa cài `anchor_cua_file`
+      --------------------------------------------------------------
+      14 chỗ chưa đạt — B-A5/B-A6 chưa có răng   · exit 1
+      BANG CHUNG "do vi luat": dong `Dạng nhận:` liet 6 vi du, KHONG co vi du nao mang `#` ⇒ bang khai
+      chua biet dang; `citations_sampled … máy đếm 0` ⇒ hai `[docs/x.md#…]` khong duoc dem.
+  - lenh: ".venv/Scripts/python -m pytest core/tests -q"
+    ket_qua: "6 failed, 43 passed — Y HET truoc khi them §4 (do tai 6ffa918 truoc khi sua: 6 failed, 43 passed). Xem đỏ_do."
+  - lenh: "check_g6b.py 2>&1 | grep -E '^\\s+- ' | grep -cE 'T13-|T01-5[1-9]|M13|T08-35'"
+    ket_qua: "0 (tong g6b: 34 loi, khong dong nao mang ma don vi toi)"
+
+đỏ_do:
+  - "pytest 6 failed (test_thieu_muc_bi_chan · test_thieu_muc_con_bi_chan · test_dan_nhap_phinh_bi_chan · test_muc_tinh_tuy_van_doi_locator · test_ho_so_phan_tich_van_bi_chan_khi_thieu_muc · test_ho_so_vang_mac_dinh_la_phan_tich): chu la commit 6ffa918 'before m13' — WO-094 them `tu_do_khung = origin == 'pipeline'` o validate.py:456-457, ma fixture core/tests/fixtures/dat-chuan.md:17 khai `origin: pipeline` ⇒ 6 test doi loi 'thieu muc/dia chi/dan nhap' nay nhan []. Quy chu bang: `git log -2 -- validate.py` (6ffa918, b7ab3f8) · 6ffa918 KHONG cham test_gates.py · so pytest truoc/sau §4 bang nhau. KHONG thuoc T01-52; T01-51 AC4 'suite core xanh' se KHONG dat duoc cho toi khi chu WO-094 sua fixture/test — bao PM."
+  - "check_g6b 34 loi: cua nguoi khac (khong dong nao khop T13-|T01-5[1-9]|M13|T08-35)."
+
+khong_lam:
+  - "KHONG viet §6 dai-han vao core/tests/check_khai_mot_noi.py: PM chot 2026-09-10 'noi task file' (them file nay vao pham_vi_ghi T01-52) nhung tai 6ffa918 `grep -c check_khai_mot_noi 07_plan/M01_core/tasks/T01-52-*.md` = 0 ⇒ DUNG ve nay (CLAUDE.md: can ghi ngoai pham_vi_ghi ⇒ khong noi tai cho). Se lam ngay khi task file co dong do."
+  - "KHONG viet A3 (ba ban khop) — ban thu ba (`id` tren heading render) chua ton tai; o C3 o 06_modules/M03_web/backlog.md."
+  - "KHONG cham core/assets/** va validate.py — do la T01-51, commit ke tiep."
+  - "KHONG sua 6 test pytest dang do — khong phai loi cua luot nay, chu la WO-094."
+
+keo_theo:
+  - "CHO PM: them `core/tests/check_khai_mot_noi.py` vao pham_vi_ghi T01-52; them `web/test/kho-delta.test.js` + `web/package.json` vao pham_vi_ghi T08-35 (quyet 2026-09-10)."
+  - "CHO chu WO-094 (dev M03/M12): 6 test_gates do vi fixture dat-chuan.md `origin: pipeline` nay duoc mien khung — can fixture/test noi ro ca nao mien, ca nao khong (o backlog thuoc M01 — toi khong mo vi khong phai keo theo cua toi)."
+  - "T03-125 khai wireframe SCR-22 nhung SCR-22-nhip-sinh.md da ton tai ⇒ wireframe tim toan van lay SCR-27; PM sua task file."
+  - "T13-1 ghi '19 cong' nhung liet 20 ten (them check_nghe_loopback cua T13-4 AC2) ⇒ dung 20."
+
+tiep_theo: "T01-51 (bang khai + validate.py) — lam 14 ve tren XANH; dan output xanh vao CUNG entry nay (R5, rule.md muc 8)."
