@@ -1,0 +1,55 @@
+entry: ban-giao
+ulid: 01M24KNBHWG4M5BV9G3SHX7K1N
+ngay: 2026-09-10
+module: M13_truyhoi
+don_vi: [T13-2]
+fr: FR-072 §1.3 (duong du lieu) · FR-073 (anchor + dedup) · spec §1 · §2 · AC-1.1 · 1.2 · 1.3 · 2.1 · 2.2 · 2.3 · 2.4
+nhanh: m13 (worktree ../gn-m13), sau T13-3 (1/2)
+tieu_de: >-
+  T13-2 — INDEXER: truyhoi/pyproject.toml · src/anchor.py (slugGoiY tung buoc + BoAnchor dedup) · src/db.py
+  (DDL tai_lieu/facet/chunks + chunks_fts external content + 3 trigger, TRUYHOI_INDEX, tu choi kb/) ·
+  src/indexer.py (kho-delta → goc?dang=goc → chunk ##/### → thay CA BAI mot transaction; tang dan theo
+  sha_than+updated_at+checksum; mo coi; kiem_lech). 6/6 cong T13-2 DO → XANH.
+
+object:
+  - truyhoi/pyproject.toml            # requires-python>=3.13 · dependencies=[pyyaml] · packages=[]
+  - truyhoi/src/anchor.py
+  - truyhoi/src/db.py
+  - truyhoi/src/indexer.py
+  - .factory/worklog/WL-01M24KNBHWG4M5BV9G3SHX7K1N.yaml
+
+quyet_dinh_trong_luot:
+  - "Don vi thay trong chi muc la BAI (doc_id), khong phai file: hien vat cua bai doi qua frontmatter cua bai, DELETE theo file se de chunk hien vat cu mo coi (phu luc A2)."
+  - "Tang dan hai nac: (sha_than, updated_at) bang ⇒ 0 fetch 0 ghi; khac ⇒ fetch, checksum=sha256(moi byte) bang ⇒ 1 UPDATE metadata (khong ghi chunk); khac ⇒ rechunk. Do bang total_changes o cong 6."
+  - "Chunk tren ban `?dang=goc` (kem frontmatter) de so dong tuyet doi khop kb/<loai>/<slug>.md; frontmatter bo qua, fence ``` mo voi heading; doan truoc heading dau la chunk anchor rong."
+  - "`title, tim = (chuan_hoa_tim(x) for x in (heading_path, body))` — MOT call-site trong indexer (M13-R1 dem 2 tren toan src sau khi rank co)."
+  - "facet: khoa TANG nguyen van (loai · pl · nguon · cat · cpt) + space; `pl` tu loai-nguon.json, `nguon` port nguonCua (trang.mjs:1464-1500) doc media-mime.json — ban thu hai cua mot luat FE ⇒ o backlog M13 (cong doi chieu sau)."
+  - "url_loi(): env TRUYHOI_LOI_URL, mac dinh cong `web` tu dich-vu.json (Z6); tu choi host ngoai loopback (M13-R5)."
+
+do_do:
+  - lenh: "for c in dung_lai_duoc lech_kho_bao_duoc khong_cham_kho anchor_mot_luat dia_chi_phan_giai reindex_tang_dan: .venv/Scripts/python truyhoi/tests/check_$c.py"
+    ket_qua: |
+      TRUOC (tai fe03eaa, chua co truyhoi/src): 6/6 `ĐỎ · CHƯA CÓ MÃ — truyhoi/src/indexer.py chưa tồn tại` exit 1  (WL-01M24K42AB1QEAP9YG1NP06T23)
+      SAU:
+      check_dung_lai_duoc      XANH · chỉ mục dựng lại là điểm bất động · kho rỗng hợp lệ
+      check_lech_kho_bao_duoc  XANH · lệch kho nêu đúng slug · mồ côi nêu được · re-index xong hết lệch
+      check_khong_cham_kho     XANH · 0 dòng mã chạm kho · 0 open() dưới kb/ · mọi lần đọc là HTTP tới LÕI
+                               (· chờ T13-4 ve truy van · chờ T13-7 ve hien vat qua HTTP — NOI RA, khong xanh im lang)
+      check_anchor_mot_luat    XANH · anchor một luật · 9 heading thật + 4 ca riêng khớp JS · dedup ổn định  (N = 9 in ra, nguong 50 chua dat — Q2)
+      check_dia_chi_phan_giai  XANH · line_end ≤ số dòng · dia_chi khớp dạng đã khai (· §2 /truy-hoi bo qua — chờ T13-4)
+      check_reindex_tang_dan   XANH · chỉ bài đổi mới tính lại · thân y hệt ⇒ 0 ghi · FTS khớp bảng thường
+  - lenh: "core/tests: check_rule_surfaces · check_g6a · check_ba · check_frozen · check_g6b(dem toi) · pytest"
+    ket_qua: "31/47/0 pass · M13 6/6·6 rule·23/1 · m-ba sach · frozen pass · g6b 0 · pytest 6 failed/43 (WO-094, khong doi)"
+  - lenh: ".venv/Scripts/python core/tests/check_map.py"
+    ket_qua: "1 lech: `M08_api · _recycle/**` — goc `_recycle` khong ton tai. Xem đỏ_do."
+
+đỏ_do:
+  - "check_map `_recycle/**`: 6ffa918 'before m13' (nguoi khac) xoa 5 file tracked trong _recycle/ ⇒ git khong con giu thu muc; cay main van PASS vi `_recycle/` con tren dia (thu muc runtime, khong tracked), worktree moi khong co. Xu tai cho: `mkdir _recycle` trong worktree (thu muc rong, khong commit) ⇒ check_map khop 18/18. Khong phai loi ma; ghi de dev khac dung worktree biet."
+  - "pytest 6 failed: WO-094 (xem WL-01M24GPRW2)."
+
+keo_theo:
+  - "M13 backlog (mo khi den G6C): `pl`/`nguon` trong indexer.facet_cua la ban thu hai cua phanLoaiCua/nguonCua (trang.mjs) — can cong doi chieu fixture chung, cung khuon check_anchor_mot_luat."
+  - "T13-7 noi vao `indexer.chunks_cua_bai(row, fm, goc) -> (chunks, bytes_hien_vat)` — hook da dat, checksum da gom byte hien vat."
+  - "can bump project_map (PM-Space giu but): M13 status → dang dung; truyhoi/src + truyhoi/tests da co."
+
+tiep_theo: "T13-4 (api.py · rank.py · assets/nguong.json) — lam xanh cong 5(§2) · 9 · 10 · 15 · 16 · 17 + mo khoa T13-3 (2/2)."
