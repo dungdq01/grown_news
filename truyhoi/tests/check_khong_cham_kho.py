@@ -22,10 +22,12 @@ import _loi_gia  # noqa: E402
 import _nap  # noqa: E402
 
 CONG = "check_khong_cham_kho.py"
+# `kb/_media` CHỈ bị cấm khi đi kèm một phép TRUY CẬP (open/Path/read/connect) — chuỗi hiển thị
+# `file = "kb/_media/<sha>.md"` cho chunk hiện vật là ĐỊA CHỈ trả về (sample v3), không phải lối đọc.
 MAU_CAM = [
     (re.compile(r"sqlite3\.connect\([^)\n]*_kho"), "sqlite3.connect(… _kho …)"),
     (re.compile(r"_kho\.sqlite"), "literal `_kho.sqlite`"),
-    (re.compile(r"kb/_media|kb\\\\_media|[\"']_media[\"']"), "literal `kb/_media`"),
+    (re.compile(r"(?:open|Path|read_text|read_bytes|connect|glob|iterdir)\([^\n]*(?:kb/_media|kb\\\\_media)"), "truy cập `kb/_media`"),
     (re.compile(r"\bopen\([^)\n]*[\"'](?:\.\./)*kb/"), "open(… \"kb/…\")"),
 ]
 
