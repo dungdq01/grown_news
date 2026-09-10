@@ -1,0 +1,83 @@
+# golden.yaml — M13 (spec §6 · AC-6.1 · AC-6.2 · AC-6.3)
+#
+# EXPECT ĐỊA CHỈ, KHÔNG EXPECT ĐIỂM. Một entry có khoá `expect_diem` là DỪNG
+# (workflow §4): điểm đổi khi w_title đổi, và golden ghim điểm sẽ đỏ mỗi lần tinh
+# chỉnh xếp hạng — nó dạy người ta bỏ qua nó.
+#
+# Địa chỉ dạng `file#anchor` (FR-073) — `file` là đường trong kho (`kb/<loai>/<slug>.md`),
+# `anchor` sinh từ heading bằng đúng luật slugGoiY. Anchor dưới đây tính từ heading
+# THẬT của bài `repo/ruflo-bo-khung-van-hanh-cho-agent.md` (đo 2026-09-10: bài duy
+# nhất trong kho có heading ##/###; 9 heading). Bảy ca Việt theo 7 ca dấu của
+# Pagefind (research §6) — cùng một bài là cố ý: bảy ca đo CÁCH GÕ, không đo độ rộng kho.
+#
+# Bốn ca tiếng Trung CÓ MẶT nhưng `expect_trong_top_k: null`: kho có 0 bài chữ Hán
+# (đếm bằng dải core/assets/dai-han.json). AC-6.3 là `soft` — cổng NÓI RA số thật rồi
+# exit 0; điền địa chỉ thật khi kho có ≥2 bài (phồn hoặc giản đều tính, chủ dự án
+# 2026-09-09) và ghi `he_chu` của từng ca để lúc trượt biết trượt vì hệ chữ hay vì tìm.
+
+phien_ban: 1
+k_mac_dinh: 10
+
+ca_viet:
+  - ten: co-dau-sang-khong-dau
+    mo_ta: "gõ CÓ DẤU, bài có dấu — đường cơ bản"
+    query: "rủi ro và tầm nhìn"
+    k: 10
+    expect_trong_top_k: ["kb/repo/ruflo-bo-khung-van-hanh-cho-agent.md#5-rui-ro-va-tam-nhin"]
+  - ten: khong-dau-sang-co-dau
+    mo_ta: "gõ KHÔNG DẤU tìm được bài có dấu (remove_diacritics 2)"
+    query: "rui ro va tam nhin"
+    k: 10
+    expect_trong_top_k: ["kb/repo/ruflo-bo-khung-van-hanh-cho-agent.md#5-rui-ro-va-tam-nhin"]
+  - ten: nfd
+    mo_ta: "câu gõ ở dạng NFD (dấu tách rời) — chuẩn hoá NFC trước khi tìm"
+    query: "y nghĩa thực tế"
+    k: 10
+    expect_trong_top_k: ["kb/repo/ruflo-bo-khung-van-hanh-cho-agent.md#4-y-nghia-thuc-te"]
+    nfd: true
+  - ten: chu-d-thuong
+    mo_ta: "ca `đ` — tokenizer KHÔNG fold đ→d; chuan_hoa_tim phải làm"
+    query: "dau vao"
+    k: 10
+    expect_trong_top_k: ["kb/repo/ruflo-bo-khung-van-hanh-cho-agent.md#3-1-dau-vao"]
+  - ten: chu-d-hoa
+    mo_ta: "ca `Đ` hoa — lower trước rồi đ→d"
+    query: "Đầu vào"
+    k: 10
+    expect_trong_top_k: ["kb/repo/ruflo-bo-khung-van-hanh-cho-agent.md#3-1-dau-vao"]
+  - ten: hon-hop-dau
+    mo_ta: "một nửa có dấu, một nửa không — người gõ vội"
+    query: "tinh tuy thực tế"
+    k: 10
+    expect_trong_top_k: ["kb/repo/ruflo-bo-khung-van-hanh-cho-agent.md#3-4-tinh-tuy"]
+  - ten: viet-hoa
+    mo_ta: "VIẾT HOA toàn bộ — lower là một bước của chuan_hoa_tim"
+    query: "BỐI CẢNH"
+    k: 10
+    expect_trong_top_k: ["kb/repo/ruflo-bo-khung-van-hanh-cho-agent.md#2-boi-canh"]
+
+ca_trung:
+  - ten: zh-mot-chu
+    mo_ta: "1 chữ — token một-chữ sau khi chèn cách"
+    query: "線"
+    he_chu: phon
+    k: 10
+    expect_trong_top_k: null
+  - ten: zh-hai-chu
+    mo_ta: "2 chữ — độ dài phổ biến nhất, chỗ trigram chết"
+    query: "資料"
+    he_chu: phon
+    k: 10
+    expect_trong_top_k: null
+  - ten: zh-bon-chu
+    mo_ta: "4 chữ"
+    query: "記憶體最佳化"
+    he_chu: phon
+    k: 10
+    expect_trong_top_k: null
+  - ten: zh-tron-viet
+    mo_ta: "câu TRỘN Việt + Trung — tìm được bằng cả ba đường: ket hop · 資 料 · pipeline"
+    query: "Kết hợp 資料管線 với pipeline"
+    he_chu: phon
+    k: 10
+    expect_trong_top_k: null

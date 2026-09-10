@@ -1,0 +1,74 @@
+entry: ban-giao
+ulid: 01M24H6J8XPKNN0V72NRY3095P
+ngay: 2026-09-10
+module: M01_core (chu ba bang khai + validate.py) · M13_truyhoi · M12_chungcat (doc)
+don_vi: [T01-51]
+fr: FR-077 (ap §1.1) · FR-073 (ap §1) · FR-072 §1.2 (goi_duoc · can_key_model) · ADR-08 §Doi thi 3
+nhanh: m13 (worktree ../gn-m13), tren bf5e33f (T01-52)
+tieu_de: >-
+  T01-51 — ba bang khai M13 can ma dat M01 giu: dai-han.json (MOI, FR-077 §1.1 nguyen van) ·
+  dia-chi.json +1 dang `file-anchor` (FR-073 §1 nguyen van) · dich-vu.json `goi_duoc` cho 4 THO +
+  truyhoi.can_key_model=false + vai web · validate.py anchor_fold/anchor_cua_file/phan_giai file-anchor
+  ⇒ 14 ve DO cua T01-52 sang XANH
+
+object:
+  - core/assets/dai-han.json                        # MOI — 4 dai, giu DUNG so cua _DAI_HAN M12
+  - core/assets/dia-chi.json                        # +1 phan tu `file-anchor`, phien_ban 1 -> 2
+  - core/assets/dich-vu.json                        # +goi_duoc x4, truyhoi.can_key_model false, vai web, $comment_goi_duoc, phien_ban 2 -> 3
+  - core/src/source_distiller/validate.py           # +import unicodedata · anchor_fold · anchor_cua_file · nhanh file-anchor trong phan_giai
+  - .factory/worklog/WL-01M24GPRW2AQN2XYXWNA3B416F.yaml   # them khoi `xanh_sau_T01_51` (R5 cung entry)
+  - .factory/worklog/WL-01M24H6J8XPKNN0V72NRY3095P.yaml
+
+quyet_dinh_trong_luot:
+  - "`goi_duoc` cho CA BON THO (truyhoi [web, chatbot] · chungcat/chatbot/artifact [web]) — theo T01-51 AC3 'khong dich vu THO nao thieu khoa goi_duoc' + ADR-08 §3 'them goi_duoc tung dich vu'. Ba cai [web] = GIU HIEN TRANG Z8 cu; FR-078 §2.4 giu quyen them chieu THO→THO cho M12. BIEN (kenh, cong) khong co khoa: khong ai goi vao."
+  - "Quy uoc khoa chieu (PM chot 2026-09-10 qua hoi-dap): env `KHOA_<TU>_<TOI>` · header `x-khoa-dich-vu` + `x-aud: <toi>` · ben nhan suy `tu` bang so khoa. Ghi vao `$comment_goi_duoc` de M12 (FR-078) va web (T08-35) chep cung khuon."
+  - "phien_ban bump (dia-chi 1->2, dich-vu 2->3): hinh dang bang khai doi thi so phien ban doi; khong cong nao doc so nay."
+  - "anchor_cua_file bo qua frontmatter va heading trong khoi ``` — de khop indexer M13 (T13-2) va renderer (C3) sau nay; ca test cua T01-52 khong doi."
+
+do_do:
+  - lenh: "python -c: codepoint cua _DAU_KET_HOP · anchor_fold 3 ca · anchor_cua_file 2 thu tu · json.load 3 bang"
+    ket_qua: |
+      ['0x5b', '0x300', '0x2d', '0x36f', '0x5d']   (dung dai U+0300–036F nhu ban JS)
+      huong-dan-cai-dat duong-ong-du-lieu 60
+      ['foo-1', 'foo', 'foo-2'] ['foo', 'foo-1', 'foo-1-1']
+      dai-han json ok, phien_ban 1 · dia-chi json ok, phien_ban 2 · dich-vu json ok, phien_ban 3
+      grep -c file-anchor dia-chi.json = 1 · grep -c goi_duoc dich-vu.json = 5 (4 khoa + 1 comment)
+  - lenh: ".venv/Scripts/python core/tests/check_dia_chi.py"
+    ket_qua: "XANH — 14/14 ve §4 `ok`, §1–§3 `ok`, exit 0. Output nguyen van dan vao WL-01M24GPRW2AQN2XYXWNA3B416F `xanh_sau_T01_51` (R5 cung entry voi DO)."
+  - lenh: ".venv/Scripts/python core/tests/check_khai_mot_noi.py"
+    ket_qua: "pass · hai tập khai một nơi, mọi tầng đọc bảng khai · exit 0 (CHUA co §dai-han — xem khong_lam)"
+  - lenh: ".venv/Scripts/python core/tests/check_ba.py"
+    ket_qua: "m-ba (phần máy): sạch — không điểm treo nào · exit 0"
+  - lenh: ".venv/Scripts/python core/tests/check_g6a.py"
+    ket_qua: "G6A: 6 điều kiện đạt trên cả 18 module · exit 0"
+  - lenh: ".venv/Scripts/python core/tests/check_rule_surfaces.py"
+    ket_qua: "pass · … mọi rule S3 trong rules.md có cơ chế thật · exit 0 (M13-R1..R6 van CHO — dung, T13-1 chua chay)"
+  - lenh: ".venv/Scripts/python core/tests/check_frozen.py"
+    ket_qua: |
+      LAN 1: FAIL · 19 file frozen lệch baseline (.githooks/pre-commit · 3 contracts · 15 rules.md/spec.md) — KHONG file nao thuoc luot nay.
+      Quy chu: cung commit 6ffa918, cay main `pass`; `git ls-files --eol` ⇒ index i/lf, worktree gn-m13 w/crlf (core.autocrlf=true o gitconfig he thong, worktree checkout ra CRLF);
+      `git diff --ignore-cr-at-eol` ⇒ 0 dong. Tuc lech CHI la EOL. FROZEN.lock dang bam byte cua CAY LAM VIEC main — main co file LF (vd M13 rules.md, do Edit viet)
+      xen file CRLF (vd M01 rules.md) ⇒ lock la hon hop LF/CRLF. Xu: `git show HEAD:<f> > <f>` cho 19 file (khoi phuc DUNG blob da commit, khong doi noi dung).
+      LAN 2: pass · mọi file frozen khớp baseline đã ký · exit 0. `git diff --stat` 19 file ⇒ rong.
+  - lenh: ".venv/Scripts/python -m pytest core/tests -q"
+    ket_qua: "6 failed, 43 passed — Y HET truoc luot (bf5e33f va 6ffa918). Xem đỏ_do."
+  - lenh: "check_g6b.py 2>&1 | grep -E '^\\s+- ' | grep -cE 'T13-|T01-5[1-9]|M13|T08-35'"
+    ket_qua: "0"
+
+đỏ_do:
+  - "pytest 6 failed: chu la 6ffa918 (WO-094, validate.py:456 `tu_do_khung` mien khung cho origin=pipeline; fixture dat-chuan.md:17 la origin: pipeline). Khong doi so truoc/sau luot nay. T01-51 AC4 'suite core xanh' KHONG dat duoc vi ly do nay — khong thuoc luot nay, khong sua (test_gates.py ngoai pham_vi_ghi). Bao PM."
+  - "check_frozen lan 1: EOL cua worktree, chua-quy-duoc-nguoi (config he thong core.autocrlf=true); da khoi phuc byte committed; KHONG ky lai lock."
+
+khong_lam:
+  - "KHONG viet §dai-han (H1·H2·H4) vao core/tests/check_khai_mot_noi.py — PM da chot 'noi task file T01-52' nhung task file chua co dong do (`grep -c check_khai_mot_noi T01-52-*.md` = 0 tai 6ffa918). DUNG ve nay theo CLAUDE.md; H1/H2/H4 tam kiem tay o tren (4 dai du khoa · tang dan · khong chong · khong Hiragana/Hangul — cung so FR-077 §5 da doi chieu voi _DAI_HAN M12). Lam ngay khi task file duoc noi."
+  - "KHONG sua chungcat/src/dinh_tuyen.py — FR-078 cua team M12; o M12/backlog.md:631 do ho tick."
+  - "KHONG ky FROZEN.lock; KHONG doi gia tri 4 dai; KHONG them nguong vao dai-han.json (FR-077 §3)."
+  - "KHONG cham check() trong validate.py (vung WO-094 vua commit)."
+
+keo_theo:
+  - "FROZEN.lock hon hop LF/CRLF: lock bam byte cay lam viec main, khong bam blob. CI (Linux, checkout LF) se do o cac file ma lock ky tren byte CRLF — lop `#cong-xanh-vi-neo-sai`. De nghi M01: check_frozen.py bam sau khi chuan hoa EOL (hoac bam blob `git hash-object`) roi ky lai MOT lan co FR. Toi khong mo o backlog M01 (khong phai keo theo cua luot nay), ghi day de PM quyet."
+  - "M12: `dinh_tuyen._DAI_HAN` nay la ban thu HAI cua core/assets/dai-han.json — FR-078 D1/D2 dong duoc; tick M12/backlog.md:631."
+  - "M13 T13-3: `chuan_hoa_tim` doc dai-han.json; T13-4 `_tu_ai()` doc goi_duoc + quy uoc KHOA_<TU>_TRUYHOI; T08-35 web dung KHOA_WEB_TRUYHOI + x-aud: truyhoi."
+  - "can bump project_map (PM-Space giu but): entity/bang khai `dai-han.json` chu M01 — neu map liet bang khai o `he_thong`/M01."
+
+tiep_theo: "T08-35 (web: kho-delta · /api/tim · gocTho(ten)); AC3 poke MO cho PM (Q4). Sau do T13-1 (20 cong, MOT commit)."

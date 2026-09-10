@@ -1,0 +1,56 @@
+entry: ban-giao
+ulid: 01M24MFFK9T8GQSYBXZTZ17C9J
+ngay: 2026-09-10
+module: M04_ci (chu .github/**) · M13_truyhoi (huong loi)
+don_vi: [T04-9]
+fr: R2 (khong tu nhan xong) · T13-1 (20 cong) · khuon ci.yml:352 cua M12
+nhanh: m13 (worktree ../gn-m13), sau 0de96c7 (T13-6)
+tieu_de: >-
+  T04-9 — CI chay cong M13: buoc `pip install -e ./truyhoi` + vong `for f in truyhoi/tests/check_*.py` (khong liet
+  tay, khong ghi so vao ten buoc) + vong `--tu-kiem` (moi cong phai DO DUOC). Ve kho-that cua check_golden_du_ca
+  KHAI TUONG MINH bo qua o CI bang env TRUYHOI_KHONG_CO_LOI=1 (cong in "CHUA DO", khong xanh) — vi CI KHONG dung
+  duoc kho that tu export da commit (do duoc, xem do_do).
+
+object:
+  - .github/workflows/ci.yml                  # +3 buoc: cai truyhoi · vong cong M13 (env TRUYHOI_KHONG_CO_LOI=1) · vong --tu-kiem
+  - truyhoi/tests/check_golden_du_ca.py       # (commit rieng T13-1) env TRUYHOI_LOI_URL cho LOI; nhanh BO QUA CO KHAI khi TRUYHOI_KHONG_CO_LOI=1
+  - .factory/worklog/WL-01M24MFFK9T8GQSYBXZTZ17C9J.yaml
+
+vi_sao_khong_dung_kho_that_trong_CI: |
+  Thu 3 cach tren may nay (script scratchpad, KHONG cham kho that):
+    1 copy kb/ cua worktree → dung_lai_db.py: FAIL `0f2305….vtt: byte bam ra c1d9d6…` — file .vtt tracked bi checkout CRLF
+      (core.autocrlf=true he thong) nen sha256 lech ten. Blob committed bam DUNG 0f2305… (git show → LF 20519 byte).
+    2 copy bo _media → dung_lai_db.py: FAIL `kho thieu byte im lang` (bai tro media khong co byte — dung y thiet ke).
+    3 git -c core.autocrlf=false archive HEAD kb (byte LF nhu checkout Linux) → dung_lai_db.py: FAIL `kho thieu byte`:
+      chi 14 file _media duoc track (.gitignore:95 `kb/_media/*` + ngoai le), cac bai khac tro sha KHONG co trong git.
+  ⇒ Export da commit KHONG tu du de dung lai DB; CI (checkout sach) khong the co LOI that. Vay golden 7 ca Viet + zh
+    do TAY tren may co :8787 (sau khi merge m13 + restart web), ghi worklog — khuon `check_e2e_chung_cat --that`.
+  Cong golden: khong co env ⇒ DO nhu thuong (khong ai vo tinh xanh); co env ⇒ in "BO QUA CO KHAI … CHUA DO" exit 0.
+
+do_do:
+  - lenh: "TRUYHOI_KHONG_CO_LOI=1 python truyhoi/tests/check_golden_du_ca.py"
+    ket_qua: "`BỎ QUA CÓ KHAI (TRUYHOI_KHONG_CO_LOI=1) — LÕI http://127.0.0.1:8787 không trả lời: 7 ca Việt + vế zh CHƯA ĐO ở đây…` · `CHƯA ĐO · golden.yaml đủ ca, vế chạy thật để lại cho máy có kho` · exit 0"
+  - lenh: "python truyhoi/tests/check_golden_du_ca.py   (khong env)"
+    ket_qua: "ĐỎ — 1 vế (LÕI thật :8787 trả /api/kho-delta ma=404) · exit 1 — dung: khong co cach xanh im lang"
+  - lenh: "mo phong vong CI: for t in truyhoi/tests/check_*.py: TRUYHOI_KHONG_CO_LOI=1 python $t"
+    ket_qua: "chạy 20 · đỏ 0"
+  - lenh: "for t in truyhoi/tests/check_*.py: python $t --tu-kiem"
+    ket_qua: "20/20 exit 0 (da chay o T13-1 va sau moi lan sua cong)"
+  - lenh: "python core/tests/check_ci_teeth.py · check_version_pin.py · check_rule_surfaces.py (M04-R1)"
+    ket_qua: "ci_teeth pass · version_pin pass (python 3.13 pin == requires-python core) · M04-R1 `ci.yml: 0 chỗ nuốt lỗi` (buoc moi dung set -e, khong || true)"
+  - lenh: "python -c yaml.safe_load(ci.yml)"
+    ket_qua: "80 steps; 3 buoc M13: 'cài truyhoi (M13)' · 'cổng M13 — truy hồi (mọi check_*.py, 0 mạng · 0 model)' · 'cổng M13 — tự kiểm đỏ được (--tu-kiem)'"
+  - lenh: "grep -c truyhoi ci.yml · grep -ci 'secrets.*truyhoi'"
+    ket_qua: "6 · 0 (AC2: khong secret nao ten truyhoi — can_key_model=false)"
+
+đỏ_do: "khong co do moi. CI that chua chay (repo chua co remote — rule.md 17 memory) ⇒ buoc nay chi do bang mo phong vong lap tai cho + yaml parse; lan push dau se la lan do that."
+
+khong_lam:
+  - "KHONG them buoc dung kho that / server trong CI — export khong tu du (xem vi_sao). Khong 'sua' bang cach noi .gitignore cho _media."
+  - "KHONG ghi so cong vao ten buoc."
+
+keo_theo:
+  - "M04/M09/M02 (bao PM): (a) file .vtt tracked trong kb/_media bi CRLF khi checkout Windows autocrlf=true ⇒ sha256 lech ten ⇒ dung_lai_db.py tu choi — can `.gitattributes` `kb/_media/** -text` (hoac binary); (b) export kb/ da commit khong tu du de dung lai DB (media chi track 14 file) — FR-034 'file→DB duy nhat' khong chay duoc tu clone sach; RUNNING.md:54 noi 'clone moi chay dung_lai_db.py mot lan' la cau sai hom nay."
+  - "T13-6 dong khi: merge m13 → main, restart :8787, chay `python truyhoi/tests/check_golden_du_ca.py` (khong env) tren may chu du an, dan output vao WL-01M24M8ZQTYTNY6VA2W84198AJ."
+
+tiep_theo: "T03-125 — DUNG: task file khai wireframe SCR-22 nhung SCR-22-nhip-sinh.md da ton tai; ban nhap SCR-27 o scratchpad cho PM; can PM sua task file roi NGUOI duyet truoc moi dong ma."

@@ -1,0 +1,39 @@
+entry: ban-giao
+ulid: 01M24KNBHJDS1G5CV99CFJDQ3V
+ngay: 2026-09-10
+module: M13_truyhoi
+don_vi: [T13-3]
+phan: "1/2 — chuan_hoa.py (0 phu thuoc). Phan 2/2 (indexer goi + rank goi ⇒ 2 call-site, bo 10 truy van) chi do duoc sau T13-4."
+fr: FR-077 (H3 · H5) · M13-R1 · spec §3
+nhanh: m13 (worktree ../gn-m13), tren fe03eaa
+tieu_de: >-
+  T13-3 (1/2) — truyhoi/src/chuan_hoa.py: chuan_hoa_tim = NFC → lower → đ→d → chen cach quanh MOI chu Han →
+  gom space; dai Han doc tu core/assets/dai-han.json NHU FILE (0 literal, H3), thieu bang ⇒ raise neu ten
+  file (H5), env TRUYHOI_DAI_HAN ghi de cho test.
+
+object:
+  - truyhoi/src/chuan_hoa.py
+  - .factory/worklog/WL-01M24KNBHJDS1G5CV99CFJDQ3V.yaml
+
+vi_sao_lam_truoc_T13_2: "workflow.md §2 buoc 1 'chuan_hoa + bang khai dai Han ← 0 phu thuoc, TRUOC TAT CA': indexer (T13-2) dien cot `tim` = chuan_hoa_tim(body) ngay tu dong dau — khong co ham nay thi indexer phai bia mot ban chuan hoa tam, tuc ban THU HAI (M13-R1). Task T13-3 khai phu_thuoc T13-2 chi vi no cung sua indexer.py (phan 2/2)."
+
+do_do:
+  - lenh: ".venv/Scripts/python truyhoi/tests/check_doi_chieu_chuan_hoa.py"
+    ket_qua: "XANH · hai THỢ nhìn cùng một tập chữ Hán · cùng Latin fold · idempotent (10 ca fixture chung; chungcat.verify.chuan_hoa import TRONG cong)"
+  - lenh: ".venv/Scripts/python truyhoi/tests/check_mot_ham_chuan_hoa.py"
+    ket_qua: |
+      §1 AST: ok 1 def · FAIL 'gọi ở đúng HAI chỗ' (['indexer.py:119'] — 1/2, cho rank T13-4) · ok 0 chungcat · ok 0 literal Han · ok 0 ban thu hai
+      §2 hanh vi: 5/5 ok (sau khi SUA CONG: ve `Đường  Ống` ban dau mong `duong ong` — sai spec §3, dau thanh GIU, tokenizer fold; nay mong `dường ống`)
+      §3 H5: ok tien trinh do khi TRUYHOI_DAI_HAN tro file khong co · ok stderr neu `dai-han.json`
+      ⇒ ĐỎ 1 vế (call-site 1/2) — DUNG, cho T13-4.
+  - lenh: ".venv/Scripts/python truyhoi/tests/check_ba_thu_tieng.py"
+    ket_qua: "ĐỎ · CHƯA CÓ MÃ — truyhoi/src/rank.py chưa tồn tại (T13-3 AC2/AC3 do sau T13-4)"
+
+đỏ_do: "check_mot_ham_chuan_hoa 1 ve + check_ba_thu_tieng: cho rank.py (T13-4) — chu la don vi ke tiep cua toi. Ve `Đường Ống` do oan la loi CONG (toi viet o T13-1), da sua o cong, khong sua ham."
+
+khong_lam:
+  - "KHONG import chungcat.verify trong truyhoi/src."
+  - "KHONG go mot so dai Han nao — lop regex dung tu chr(tu)-chr(den) cua bang khai."
+  - "KHONG bo dau thanh trong chuan_hoa_tim — do la viec cua tokenizer (remove_diacritics 2)."
+
+tiep_theo: "T13-2 (cung luot): pyproject · anchor.py · db.py · indexer.py — 6 cong xanh."

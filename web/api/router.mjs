@@ -25,7 +25,9 @@ import {
   cuaBuocDinhDanh, cuaDungMaMoi, cuaGhiAudit, cuaNhap, cuaNhapChungCat,
   cuaTraDinhDanh, cuaXemPhien,
 } from "./loi-cua.mjs"
-import { cuaChayLaiViec, cuaDsViec, cuaJob, cuaModel, cuaMotViec, cuaTaiVideo, cuaXoaViec } from "./tho-cua.mjs"
+import {
+  cuaChayLaiViec, cuaDsViec, cuaJob, cuaKhoDelta, cuaModel, cuaMotViec, cuaTaiVideo, cuaTim, cuaXoaViec,
+} from "./tho-cua.mjs"
 import {
   cuaBoNhap, cuaDsNhap, cuaDuyetNhap, cuaMotNhap, cuaSuaNhap, cuaTraLaiNhap,
 } from "./nhap-cua.mjs"
@@ -65,6 +67,20 @@ export async function xuLyApi(req, res) {
    */
   if (phan[1] === "model" && phan.length === 2 && req.method === "GET") {
     void cuaModel(req, res)
+    return true
+  }
+  /*
+   * T08-35 · HAI cửa phục vụ M13_truyhoi. `kho-delta` là cửa ĐỌC của LÕI cho
+   * indexer (M13 không mở `_kho.sqlite` — M13-R3). `tim` là proxy web→truyhoi:
+   * khoá chiều + `x-aud` gắn ở server, trình duyệt không cầm (cùng lý lẽ T08-20).
+   * Chỉ GET — 0 đường ghi mới.
+   */
+  if (phan[1] === "kho-delta" && phan.length === 2 && req.method === "GET") {
+    cuaKhoDelta(req, res, u)
+    return true
+  }
+  if (phan[1] === "tim" && phan.length === 2 && req.method === "GET") {
+    void cuaTim(req, res, u)
     return true
   }
   /* T08-21 · hai cửa ĐỌC việc. Đòi khoá ở THỢ (danh sách lộ slug của kho),

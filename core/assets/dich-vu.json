@@ -4,7 +4,8 @@
   "$comment_cong": "`cong: null` nghia la dich vu KHONG nghe — khong phai chua gan so. SUA 2026-09-01 (FR-045): cau cu noi 'BIEN luon null' va cau do het dung — cong/ thuoc BIEN va nghe 443. Dieu dung con lai: chi dich vu khai `nghe_ngoai: true` moi duoc nghe NGOAI loopback, va hien co dung mot.",
   "$comment_key_model": "`can_key_model` quyết định biến môi trường nào được truyền cho tiến trình. Chỉ THỢ nhận key. Đây là cưỡng chế bằng CẤU TRÚC cho B-E2: LÕI không có gì để xác thực nên không gọi model được kể cả khi ai đó viết nhầm một dòng fetch.",
   "$comment_hai_truc": "HAI BO TU VUNG, MOT BANG KHAI (chi dao 2026-09-01, adr.md#ADR-05 'HAI bo tu vung'). Truc SAN PHAM (noi gia tri, noi voi nguoi): bon dich vu `vung: THO` — chungcat/truyhoi/chatbot/artifact — la CORE cua san pham, tuc cac services AI/LLM; `web` va `cong` va `kenh` la HE THONG. Truc TIN CAY (viet luat va cong Z1-Z8): `web` la LOI, services la THO, kenh/cong la BIEN. KHONG them cot thu ba cho truc san pham: no dung bang `vung`, va hai cot noi cung mot dieu se lech nhau. Doc mot chu `core` ma khong biet dang o truc nao thi tra ve adr.md#ADR-05.",
-  "phien_ban": 2,
+  "$comment_goi_duoc": "ADR-08 Z9 (2026-09-07) · FR-072 §1.2: `goi_duoc` đứng trên dịch vụ BỊ GỌI, liệt các dịch vụ được gọi vào; BÊN NHẬN cưỡng chế (`_tu_ai()`). Mỗi chiều (từ → tới) một khoá riêng + `aud` riêng (FR-047 §2.1 L3 · CVE-2025-41258). Quy ước tên (chốt PM 2026-09-10): biến môi trường `KHOA_<TU>_<TOI>` viết hoa — vd `KHOA_WEB_TRUYHOI`, `KHOA_CHATBOT_TRUYHOI`; lời gọi mang header `x-khoa-dich-vu: <khoá>` + `x-aud: <tới>`; bên nhận suy ra `từ` bằng cách so khoá với từng phần tử `goi_duoc` (hmac.compare_digest), KHÔNG tin header tự khai tên người gọi. Thiếu khoá · khoá sai · `aud` sai · ngoài mảng ⇒ 403. Thêm khách = một phần tử vào mảng + một biến khoá, không sửa mã. Hôm nay `chungcat`/`chatbot`/`artifact` = [\"web\"] là GIỮ HIỆN TRẠNG Z8 cũ (chỉ web gọi vào) — thêm chiều THỢ→THỢ cho chúng là quyết định riêng khi có lời gọi thật (FR-078 §2.4). Dịch vụ BIÊN (`kenh`, `cong`) không có `goi_duoc`: không dịch vụ nào gọi vào chúng.",
+  "phien_ban": 3,
   "dich_vu": [
     {
       "ten": "web",
@@ -14,7 +15,7 @@
       "ngon_ngu": "node",
       "cong": 8787,
       "can_key_model": false,
-      "vai": "SSR + MỘT CỬA GHI + gateway chuẩn hoá output. Client DUY NHẤT của mọi dịch vụ THỢ.",
+      "vai": "SSR + MỘT CỬA GHI + gateway chuẩn hoá output. Wrapper — UI + chuẩn hoá output cho người (ADR-08: không còn là client duy nhất của THỢ).",
       "nghe_ngoai": false
     },
     {
@@ -25,6 +26,7 @@
       "ngon_ngu": "python",
       "cong": 8790,
       "can_key_model": true,
+      "goi_duoc": ["web"],
       "vai": "nguyên liệu → bản nháp. Hai kiểu: chưng cất một nguồn (ho_so phan-tich) và tổng hợp N nguồn (ho_so tong-hop, FR-044). Engine cắm rút được.",
       "nghe_ngoai": false
     },
@@ -35,7 +37,8 @@
       "vung": "THO",
       "ngon_ngu": "python",
       "cong": 8791,
-      "can_key_model": true,
+      "can_key_model": false,
+      "goi_duoc": ["web", "chatbot"],
       "vai": "chỉ mục + truy hồi. Phạm vi truy hồi lấy từ bộ lọc facet — control HIỂN THỊ, không phải top-k ẩn.",
       "nghe_ngoai": false
     },
@@ -47,6 +50,7 @@
       "ngon_ngu": "node",
       "cong": 8788,
       "can_key_model": true,
+      "goi_duoc": ["web"],
       "vai": "hỏi → đáp KÈM ĐỊA CHỈ. Không có trong kho thì từ chối, có phân loại lý do. Trả JSON, không trả trình bày.",
       "nghe_ngoai": false
     },
@@ -58,6 +62,7 @@
       "ngon_ngu": "python",
       "cong": 8792,
       "can_key_model": true,
+      "goi_duoc": ["web"],
       "vai": "bài đã duyệt → slide · giọng đọc · video. Chạy PHÚT, nên API bất đồng bộ.",
       "nghe_ngoai": false
     },

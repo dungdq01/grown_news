@@ -1,0 +1,16 @@
+{
+  "$comment": "FIXTURE CHUNG M12/M13 cho cổng đối chiếu `check_doi_chieu_chuan_hoa.py` (M13-R1 why · FR-078 §1.1). Hai hàm KHÁC MỤC ĐÍCH — `chungcat.verify.chuan_hoa` (NFKC · ligature · casefold, để so khớp quote) và `truyhoi.chuan_hoa.chuan_hoa_tim` (NFC · lower · đ→d · chèn cách Hán, để tokenize) — nên ĐƯỢC PHÉP ra hai chuỗi khác nhau. Thứ phải KHỚP là PHẦN GIAO: (a) cùng tập ký tự Hán (đọc từ core/assets/dai-han.json — bên nào đếm/chèn thiếu một dải là lệch), (b) chữ cái Latin sau khi cả hai bỏ dấu và hạ chữ phải bằng nhau, (c) cả hai đều idempotent. Mỗi ca ghi `han` = số ký tự Hán mà bảng khai nói CÓ trong chuỗi — cổng đo cả hai bên ra cùng số.",
+  "phien_ban": 1,
+  "ca": [
+    {"ten": "viet-co-dau", "vao": "Hướng dẫn cài đặt", "han": 0},
+    {"ten": "chu-d", "vao": "Đường ống dữ liệu đi qua đây", "han": 0},
+    {"ten": "hoa-thuong-tron", "vao": "PIPELINE Tái Tạo được", "han": 0},
+    {"ten": "han-phon-4", "vao": "記憶體最佳化", "han": 6},
+    {"ten": "han-gian-4", "vao": "数据管线设计", "han": 6},
+    {"ten": "tron-viet-han", "vao": "Kết hợp 資料管線 với pipeline", "han": 4},
+    {"ten": "ext-a-hiem", "vao": "chữ hiếm 㐀 trong dải Ext A", "han": 1},
+    {"ten": "ext-b-ngoai-bmp", "vao": "ngoài BMP 𠀀 một chữ", "han": 1},
+    {"ten": "kana-khong-phai-han", "vao": "ひらがな カタカナ 한글", "han": 0},
+    {"ten": "tuong-thich", "vao": "豈 更 車", "han": 3}
+  ]
+}

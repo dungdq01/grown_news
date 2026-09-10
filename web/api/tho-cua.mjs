@@ -26,7 +26,7 @@ import { createReadStream, existsSync, readFileSync, statSync } from "node:fs"
 import { basename, dirname, join } from "node:path"
 import { fileURLToPath } from "node:url"
 
-import { loiGhiAudit, loiXemPhien } from "./dungchung.mjs"
+import { khoDelta, loiGhiAudit, loiXemPhien } from "./dungchung.mjs"
 
 const API = dirname(fileURLToPath(import.meta.url))
 
@@ -36,16 +36,23 @@ const json = (res, ma, o) => {
 }
 
 /**
- * Gốc của THỢ. Số cổng ĐỌC TỪ `dich-vu.json` — `Z6`: *"cổng khai MỘT nơi"*.
- * Gõ `8790` ở đây là bản thứ hai của một con số đã có chủ.
- * `CHUNGCAT_GOC` chỉ để test tiêm THỢ giả; không phải đường cấu hình chính.
+ * Gốc của MỘT THỢ, theo TÊN. Số cổng ĐỌC TỪ `dich-vu.json` — `Z6`: *"cổng khai
+ * MỘT nơi"*. Gõ `8790`/`8791` ở đây là bản thứ hai của một con số đã có chủ.
+ *
+ * `T08-35` · `FR-072 §1.4`: bản trước gõ cứng `thu_muc === "chungcat"` ở đúng chỗ
+ * này, và cả 5 cửa đi qua nó. Thêm `truyhoi` bằng một hằng thứ hai là đúng thứ
+ * `Z6` cấm — nên hàm nhận `ten`, và mọi cửa cũ truyền `"chungcat"` tường minh.
+ *
+ * `<TEN>_GOC` (vd `CHUNGCAT_GOC`, `TRUYHOI_GOC`) chỉ để test tiêm THỢ giả; không
+ * phải đường cấu hình chính.
  */
-function gocTho() {
-  if (process.env.CHUNGCAT_GOC) return process.env.CHUNGCAT_GOC
+function gocTho(ten) {
+  const seam = process.env[`${ten.toUpperCase()}_GOC`]
+  if (seam) return seam
   const d = JSON.parse(readFileSync(
     join(API, "..", "..", "core", "assets", "dich-vu.json"), "utf8"))
-  const dv = d.dich_vu.find((x) => x.thu_muc === "chungcat")
-  if (!dv) throw new Error("`chungcat` không có trong bảng khai dịch vụ")
+  const dv = d.dich_vu.find((x) => x.thu_muc === ten)
+  if (!dv || dv.cong == null) throw new Error(`\`${ten}\` không có trong bảng khai dịch vụ, hoặc không nghe`)
   return `http://127.0.0.1:${dv.cong}`
 }
 
@@ -53,13 +60,34 @@ function gocTho() {
    theo, và người dùng không biết nên chờ hay bấm lại — rồi họ bấm lại. */
 const TRAN_MS = 8000
 
-async function goiTho(duong, { method = "GET", than, khoaNguoi } = {}) {
-  const h = { "content-type": "application/json" }
-  const khoa = process.env.CHUNGCAT_KHOA_LOI
-  if (khoa) h["x-khoa-loi"] = khoa
+/*
+ * KHOÁ THEO CHIỀU `web → <thợ>` — mỗi chiều MỘT khoá (`FR-047 §2.1 L3`,
+ * `CVE-2025-41258`: một khoá dùng được ở nhiều đích thì đích nào cũng nhận).
+ *
+ * Khuôn chung `ADR-08` (khai ở `dich-vu.json` `$comment_goi_duoc`, chốt PM
+ * 2026-09-10): env `KHOA_WEB_<TEN>` · header `x-khoa-dich-vu` + `x-aud: <tên>`.
+ *
+ * `chungcat` còn đi hợp đồng CŨ `X-Khoa-Loi` + `CHUNGCAT_KHOA_LOI` (`M12-R7`) —
+ * đổi nó là việc của `FR-078` (team M12), không phải của cửa này. Bảng nhỏ này
+ * là NGOẠI LỆ CÓ TÊN, không phải hằng thứ hai: xoá dòng `chungcat` khi FR-078 áp.
+ */
+const HEADER_KHOA_CU = { chungcat: { bien: "CHUNGCAT_KHOA_LOI", header: "x-khoa-loi" } }
+
+function headerKhoa(ten) {
+  const cu = HEADER_KHOA_CU[ten]
+  if (cu) {
+    const k = process.env[cu.bien]
+    return k ? { [cu.header]: k } : {}
+  }
+  const k = process.env[`KHOA_WEB_${ten.toUpperCase()}`]
+  return { "x-aud": ten, ...(k ? { "x-khoa-dich-vu": k } : {}) }
+}
+
+async function goiTho(duong, { method = "GET", than, khoaNguoi, tho = "chungcat" } = {}) {
+  const h = { "content-type": "application/json", ...headerKhoa(tho) }
   if (khoaNguoi != null) h["x-nguoi-dung"] = String(khoaNguoi)
   const bo = AbortSignal.timeout(TRAN_MS)
-  const r = await fetch(gocTho() + duong, {
+  const r = await fetch(gocTho(tho) + duong, {
     method, headers: h, signal: bo,
     body: than === undefined ? undefined : JSON.stringify(than),
   })
@@ -74,10 +102,73 @@ async function goiTho(duong, { method = "GET", than, khoaNguoi } = {}) {
  * 500 nói *"lỗi ở tôi"*; 502 nói *"lỗi ở dịch vụ phía sau"*. FE hiển thị hai
  * câu khác nhau cho hai ca đó, và người dùng làm hai việc khác nhau.
  */
-const chetTho = (res, e) => json(res, 502, {
-  loi: "dịch vụ chưng cất không trả lời — kiểm xem nó có đang chạy không",
+const chetTho = (res, e, ten = "chưng cất") => json(res, 502, {
+  loi: `dịch vụ ${ten} không trả lời — kiểm xem nó có đang chạy không`,
   chi_tiet: String(e?.name ?? e),
 })
+
+/* ═══ T08-35 · HAI CỬA PHỤC VỤ M13_truyhoi ════════════════════════════════════
+ *
+ * `GET /api/kho-delta` — cửa ĐỌC của LÕI cho indexer: M13 KHÔNG mở `_kho.sqlite`
+ * (`M13-R3`), nó hỏi LÕI "bản ghi nào đổi" rồi re-index tăng dần (`AC-2.4`).
+ * SQL ở `dungchung.khoDelta` (api-guard: handler không cầm SQL); ở đây chỉ cắt
+ * trang — khuôn `catTrang` của `articles.mjs` (module-private bên đó, nên chép
+ * đúng luật: `limit` vắng ⇒ trả hết, trần 500).
+ *
+ * `GET /api/tim` — web gọi M13 để TÌM (`FR-072 §1.4`, `ADR-08`: web là wrapper).
+ * Dịch query string sang đúng MỘT hình dạng `POST /truy-hoi` (`FR-072 §1.1`):
+ * khoá facet là khoá `TANG` của FE nguyên văn (0 bảng đổi tên — `AC-5.2`);
+ * `nguon: null` KHAI TƯỜNG MINH nghĩa cả kho (`AC-5.3`: khoá vắng ⇒ M13 trả 400);
+ * `k` vắng ⇒ web khai MẶC ĐỊNH ở đây (`ui_flow §2c`) — M13 không được mặc định.
+ * Khoá chiều `web→truyhoi` + `x-aud: truyhoi` do `goiTho` gắn, Ở LẠI SERVER.
+ * Web KHÔNG ghép đoạn thành câu trả lời — trả nguyên `ket_qua[]` (`model_flow §3`).
+ */
+const K_MAC_DINH = 20
+const KHOA_TANG = ["cat", "loai", "cpt", "pl", "nguon"]
+
+function catTrang(u, items) {
+  const soNguyen = (ten, macDinh) => {
+    const v = u.searchParams.get(ten)
+    if (v === null || v === "") return macDinh
+    const n = Number(v)
+    return Number.isInteger(n) && n >= 0 ? n : macDinh
+  }
+  const tong = items.length
+  const offset = Math.min(soNguyen("offset", 0), tong)
+  const limitTho = u.searchParams.get("limit")
+  if (limitTho === null || limitTho === "") return { items, tong, offset: 0, limit: null }
+  const limit = Math.min(soNguyen("limit", tong), 500)
+  return { items: items.slice(offset, offset + limit), tong, offset, limit }
+}
+
+export function cuaKhoDelta(req, res, u) {
+  return json(res, 200, catTrang(u, khoDelta()))
+}
+
+export async function cuaTim(req, res, u) {
+  const q = (u.searchParams.get("q") ?? "").trim()
+  if (!q) return json(res, 400, { loi: "thiếu `q` — câu tìm không được rỗng" })
+  const kTho = u.searchParams.get("k")
+  const k = kTho === null || kTho === "" ? K_MAC_DINH : Number(kTho)
+  if (!Number.isInteger(k) || k < 1 || k > 200) {
+    return json(res, 400, { loi: "`k` phải là số nguyên 1..200" })
+  }
+  const pham_vi = {}
+  for (const kh of KHOA_TANG) {
+    const v = u.searchParams.getAll(kh).flatMap((s) => s.split(","))
+      .map((s) => s.trim()).filter(Boolean)
+    if (v.length) pham_vi[kh] = v
+  }
+  try {
+    const r = await goiTho("/truy-hoi", {
+      method: "POST", tho: "truyhoi",
+      than: { cau_hoi: q, pham_vi, nguon: null, k },
+    })
+    return json(res, r.ma, r.than ?? {})
+  } catch (e) {
+    return chetTho(res, e, "truy hồi")
+  }
+}
 
 /* ═══ GET /api/model — danh mục cho bộ chọn ════════════════════════════════
  *

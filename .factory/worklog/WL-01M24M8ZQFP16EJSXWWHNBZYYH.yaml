@@ -1,0 +1,45 @@
+entry: ban-giao
+ulid: 01M24M8ZQFP16EJSXWWHNBZYYH
+ngay: 2026-09-10
+module: M13_truyhoi
+don_vi: [T13-7]
+fr: FR-072 §1.3 (T4 · T5) · AC-2.5 · AC-2.6 · M13-R3 (ve DOC truc tiep)
+nhanh: m13 (worktree ../gn-m13), sau 0b9178a (T13-5)
+tieu_de: >-
+  T13-7 — CHUNK HIEN VAT VAN BAN qua cua LOI: truyhoi/src/hien_vat.py (doc_cue MOT ham cho .vtt + .srt · moc()
+  mm:ss · chunk_cue gop ≤cue_moi_chunk, neo slug:t=, ba khoa null TUONG MINH, tu choi moc vuot thoi luong ·
+  chon_hien_vat) + indexer.chunks_cua_bai noi vao (media qua GET /api/articles/media/<sha>, .md/.txt chunk
+  theo heading, byte hien vat vao checksum) + indexer.hoan_thien (MOT call-site chuan_hoa_tim cho moi chunk).
+
+object:
+  - truyhoi/src/hien_vat.py
+  - truyhoi/src/indexer.py           # +import hien_vat · _lam_chunk tra chunk THO · hoan_thien() · chunks_cua_bai doc hien vat
+  - .factory/worklog/WL-01M24M8ZQFP16EJSXWWHNBZYYH.yaml
+
+quyet_dinh_trong_luot:
+  - "hien_vat KHONG goi chuan_hoa_tim (se la call-site thu 3, M13-R1 doi dung 2) — moi chunk (than · cue · .md) di qua indexer.hoan_thien() mot cho."
+  - "Doc byte GOC qua /api/articles/media/<sha>, KHONG qua /api/xuat?dang=txt (vttSangTxt bo moc — neo t= mat)."
+  - "text/vtt chi giu ban CUOI trong media[] (cung loi xuat-cua.mjs:373); .md/.txt giu het."
+  - "Chunk .md hien vat: file = kb/_media/<sha><duoi> (dia chi hien thi, dang file-dong), duoi tu media-mime.json. Chuoi `kb/_media` o day la DIA CHI TRA VE, khong phai loi doc — check_khong_cham_kho da sua de chi cam khi di kem open/Path/read (xem do_do)."
+  - "cue_moi_chunk = 3 (nguong.json) — neo = moc cue DAU cua nhom; khong cat giua mot cue."
+
+do_do:
+  - lenh: ".venv/Scripts/python truyhoi/tests/check_chunk_hien_vat.py   (TRUOC: `ĐỎ · CHƯA CÓ MÃ — truyhoi/src/hien_vat.py chưa tồn tại`)"
+    ket_qua: |
+      §1 ok .vtt va .srt ⇒ CUNG moc [1.0, 4.5, 195.0] · ok moc() 03:15 · 00:04 · ok tu choi cue 99:59 tren 240s (neu moc + thoi luong)
+      §2 ok video co transcript ⇒ chunk cue · ok N chunk cue: slug-moc trong thoi luong · ba khoa null CO MAT · hien-vat:text/vtt
+         ok .md tai len ⇒ heading, CO anchor/line_*, file-dong, hien-vat:text/plain · ok anchor `ba-cau-hoi-con-lai`
+         ok than mang nhan than · ok 0 chunk cue deo nhan than · ok ban ghi khong hien vat ⇒ chi than · ok doc qua /api/articles/media/<sha>, 0 ?dang=txt
+      XANH · exit 0
+  - lenh: "check_khong_cham_kho · check_dung_lai_duoc · check_reindex_tang_dan · check_dia_chi_phan_giai · check_mot_ham_chuan_hoa (sau khi noi hien vat)"
+    ket_qua: |
+      check_khong_cham_kho: LAN 1 FAIL `indexer.py:207 — literal kb/_media` (chuoi dia chi hien thi); sua CONG: chi cam `kb/_media` khi di kem open/Path/read_*/connect/glob — tu-kiem 3/3 (ca `open("kb/_media/x.vtt")` van bat). LAN 2 XANH — ve 'hien vat qua HTTP' nay CHAY THAT (het 'chờ T13-7'), 0 open() duoi kb/.
+      check_dung_lai_duoc XANH (diem bat dong GIU khi co chunk hien vat — T13-7 AC3) · check_reindex_tang_dan XANH · check_dia_chi_phan_giai XANH (slug-moc + file-dong deu phan giai) · check_mot_ham_chuan_hoa XANH (van 2 call-site: indexer.hoan_thien + rank.cau_match)
+
+đỏ_do: "check_khong_cham_kho lan 1: do oan cua CONG (regex literal qua rong), khong phai ma — da sua cong, ghi ro."
+
+keo_theo:
+  - "FR-079 (M12 text PDF ⇒ hien vat text/plain la_dan_xuat): khi co, chon_hien_vat() thay qua cung cua, 0 dong ma moi (MIME_MD da gom text/plain)."
+  - "M13 backlog: cue_moi_chunk=3 CHUA DO — do tren golden zh khi co transcript tieng Trung that."
+
+tiep_theo: "T13-6 (tin_hieu.py + hooks api.py + golden)."

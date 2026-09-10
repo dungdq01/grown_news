@@ -10,7 +10,7 @@ Phụ thuộc: pyyaml, jsonschema
 Cài như pre-commit hook trong kho kb/.
 """
 
-import argparse, json, re, sys
+import argparse, json, re, sys, unicodedata
 from pathlib import Path
 
 try:
@@ -136,6 +136,61 @@ def _so_trang_pdf(f):
         return None
 
 
+# ── anchor `file#anchor` — FR-073 §1 (T01-51) ────────────────────────────
+# Luật fold chép TỪNG BƯỚC từ `slugGoiY()` của FE
+# (web/plugins/multiwindow/src/scripts/multiwindow.inline.ts):
+#   lower → NFD → bỏ dấu kết hợp U+0300–036F → đ→d → [^a-z0-9]+ → '-'
+#   → bỏ MỘT '-' đầu/cuối → cắt 60 (cắt SAU khi bỏ '-', đúng thứ tự bản JS).
+# Đây là bản Python THỨ HAI của một luật chỉ có bằng JS; cổng đối chiếu hai bản
+# là M13 `check_anchor_mot_luat` (AC-2.2), ba bản là A3 của FR-073 (C3, M03).
+_DAU_KET_HOP = re.compile("[̀-ͯ]")
+_KHONG_SLUG = re.compile(r"[^a-z0-9]+")
+_HEADING = re.compile(r"^(#{2,3})\s+(.+?)\s*#*\s*$")
+
+
+def anchor_fold(s):
+    """`## Hướng dẫn cài đặt` → `huong-dan-cai-dat`. Không dedup — xem `anchor_cua_file`."""
+    s = unicodedata.normalize("NFD", str(s).lower())
+    s = _DAU_KET_HOP.sub("", s).replace("đ", "d")
+    s = _KHONG_SLUG.sub("-", s)
+    s = re.sub(r"^-|-$", "", s)
+    return s[:60]
+
+
+def anchor_cua_file(text):
+    """Anchor của MỌI heading ##/### trong một file, đúng thứ tự, dedup kiểu
+    github-slugger: hai heading fold về cùng chuỗi ⇒ `-1`, `-2` (vòng while, nên
+    một heading thật tên `foo-1` đã chiếm chỗ cũng không va). State theo FILE —
+    mỗi lần gọi là một file, không có gì sống qua hai lần gọi. Frontmatter bỏ
+    qua; heading trong khối ``` không tính (đó là mã, không phải mục)."""
+    ra, dem = [], {}
+    dong = text.replace("\r\n", "\n").split("\n")
+    bat_dau = 0
+    if dong and dong[0].strip() == "---":
+        for j in range(1, len(dong)):
+            if dong[j].strip() == "---":
+                bat_dau = j + 1
+                break
+    trong_fence = False
+    for l in dong[bat_dau:]:
+        if l.lstrip().startswith(("```", "~~~")):
+            trong_fence = not trong_fence
+            continue
+        if trong_fence:
+            continue
+        m = _HEADING.match(l)
+        if not m:
+            continue
+        goc = anchor_fold(m.group(2))
+        a = goc
+        while a in dem:
+            dem[goc] = dem.get(goc, 0) + 1
+            a = f"{goc}-{dem[goc]}"
+        dem[a] = 0
+        ra.append(a)
+    return ra
+
+
 def phan_giai(ten, manh, k, kho):
     """Địa chỉ có trỏ vào thứ KHO CÓ không. `manh: khong` không bao giờ
     phân giải được — nguồn nằm ngoài kho thì không có gì đối chiếu."""
@@ -174,6 +229,12 @@ def phan_giai(ten, manh, k, kho):
             return False
         het = int(k.group(3) or k.group(2))
         return het <= len(f.read_text(encoding="utf-8", errors="replace").splitlines())
+    if ten == "file-anchor":
+        # FR-073 A2: file tồn tại ∧ MỘT heading fold ra đúng anchor (kể cả hậu tố dedup).
+        f = kho / k.group(1)
+        if not f.exists():
+            return False
+        return k.group(2) in anchor_cua_file(f.read_text(encoding="utf-8", errors="replace"))
     return False
 
 

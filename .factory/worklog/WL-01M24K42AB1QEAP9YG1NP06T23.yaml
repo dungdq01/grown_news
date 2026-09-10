@@ -1,0 +1,98 @@
+entry: ban-giao
+ulid: 01M24K42AB1QEAP9YG1NP06T23
+ngay: 2026-09-10
+module: M13_truyhoi
+don_vi: [T13-1]
+fr: FR-072 (T1·T4·T5·T6·T8) · FR-073 (A1/A2 phia M13) · FR-077 (H3·H5) · rules M13-R1..R6
+nhanh: m13 (worktree ../gn-m13), tren cf51668 (T08-35)
+tieu_de: >-
+  T13-1 — don vi TEST M13: 20 cong truyhoi/tests/check_*.py + _nap.py + _khung.py + _loi_gia.py +
+  golden.yaml + fixtures/chuan-hoa-chung.json, MOT commit. 19/20 cong DO "CHUA CO MA" (dung ly do,
+  khong ImportError); 1 cong GIAY (check_hop_dong_v3) XANH ngay. 20/20 --tu-kiem chung minh DO DUOC.
+  check_rule_surfaces: M13-R1..R6 roi CHO — OK 25->31 · CHO 53->47 · DO 0.
+
+object:
+  - truyhoi/tests/_nap.py                    # khuon chungcat/tests/_nap.py, SRC=truyhoi/src, exit 3 thieu goi / exit 1 thieu ma
+  - truyhoi/tests/_khung.py                  # kiem/chot · --tu-kiem · tam() · env_tam() · nguon_src()/lot_ma()/cay_ast() · goi() · bat_service() · bang khai doc nhu FILE (dia-chi · dai-han)
+  - truyhoi/tests/_loi_gia.py                # LOI GIA 127.0.0.1:8895-8899, 4 cua (kho-delta · articles · xuat?dang=goc · media), kho_mau() 4 ban ghi · kho_mau_zh() +2 zh (CHI cho AC-3.2)
+  - truyhoi/tests/golden.yaml                # 7 ca Viet (anchor tinh tu 9 heading THAT cua kb/repo/ruflo-…md) + 4 ca zh expect null (soft toi khi kho co ≥2 bai Han)
+  - truyhoi/tests/fixtures/chuan-hoa-chung.json   # 10 ca, `han` = so ky tu Han theo dai-han.json
+  - truyhoi/tests/check_dung_lai_duoc.py         # AC-1.1
+  - truyhoi/tests/check_lech_kho_bao_duoc.py     # AC-1.2
+  - truyhoi/tests/check_khong_cham_kho.py        # AC-1.3 · AC-2.6e2 · R3 (AST + audit hook open)
+  - truyhoi/tests/check_anchor_mot_luat.py       # AC-2.1 · AC-2.2 · R2 (node -e chay slugGoiY THAT tu multiwindow.inline.ts)
+  - truyhoi/tests/check_dia_chi_phan_giai.py     # AC-2.3 · T2/T3
+  - truyhoi/tests/check_reindex_tang_dan.py      # AC-2.4 (total_changes · count(chunks)==count(chunks_fts) · integrity-check)
+  - truyhoi/tests/check_mot_ham_chuan_hoa.py     # AC-3.1 · AC-3.4 · R1 (AST 1 def · 2 call-site · 0 chungcat · 0 literal Han · H5 thieu bang ⇒ do noi ten file)
+  - truyhoi/tests/check_ba_thu_tieng.py          # AC-3.2 · AC-3.3 (10 ca, rang: bo chuan hoa query ⇒ ca d/zh truot)
+  - truyhoi/tests/check_snippet_chi_preview.py   # AC-4.1 · R4
+  - truyhoi/tests/check_w_title_do_rieng.py      # AC-4.2 (hai so vi_en/zh · bind · doi so ⇒ hang doi)
+  - truyhoi/tests/check_pham_vi_hien_thi.py      # AC-5.1 · AC-5.2 (dem doc lap · khoa TANG · k bat buoc · space cho FR-080 — NOI RA)
+  - truyhoi/tests/check_tap_nguon_la_tham_so.py  # AC-5.3 · T8
+  - truyhoi/tests/check_golden_du_ca.py          # AC-6.1 · AC-6.2 · AC-6.3 (zh dem tren KHO THAT :8787, soft noi so)
+  - truyhoi/tests/check_tin_hieu_van_hanh.py     # AC-7.1
+  - truyhoi/tests/check_khong_embedding.py       # AC-7.2 · R5
+  - truyhoi/tests/check_nghe_loopback.py         # T13-4 AC2 (bind · cong tu bang khai · /health khai duong index)
+  - truyhoi/tests/check_ai_goi_vao.py            # AC-1.6 · R6 · T6 (3 ca 403 · 2 ca 2xx · them khach = bang khai TAM)
+  - truyhoi/tests/check_chunk_hien_vat.py        # AC-2.5 · AC-2.6 · T4
+  - truyhoi/tests/check_doi_chieu_chuan_hoa.py   # R1 why · FR-078 §1.1 (fixture chung; import chungcat.verify TRONG cong)
+  - truyhoi/tests/check_hop_dong_v3.py           # FR-072 T1 (sample v3 ↔ spec §1a hai chieu; model_flow §2 tro spec)
+  - .factory/worklog/WL-01M24K42AB1QEAP9YG1NP06T23.yaml
+
+so_cong: "20 (T13-1 ghi '19' nhung liet 20 ten: 17 cmd cua spec + check_nghe_loopback (T13-4 AC2) + check_doi_chieu_chuan_hoa + check_hop_dong_v3) — dung 20, ghi day de PM sua so."
+
+hop_dong_ma_cong_doi_o_truyhoi_src:   # dieu cac cong GIA DINH ve ma T13-2..7 — bang khai cho dev (chinh la toi) khong doan lai
+  - "chuan_hoa.chuan_hoa_tim(s) · chuan_hoa.co_han(s) · env TRUYHOI_DAI_HAN (duong bang khai, thieu ⇒ raise neu 'dai-han.json' ra stderr)"
+  - "anchor.slug(s) · anchor.BoAnchor().sinh(h)"
+  - "db.mo(ghi=False) · db.duong_index() (env TRUYHOI_INDEX) · db.DDL (chua 'remove_diacritics 2') · bang tai_lieu(doc_id, file, checksum, updated_at, sha_than, space…) · facet(doc_id, khoa, gia_tri) · chunks(id, doc_id, anchor, line_start, line_end, dia_chi, heading_path, body, nguon_van_ban, title, tim, thu_tu) · chunks_fts external content"
+  - "indexer.reindex(con, day_du=False) · indexer.kiem_lech(con) -> {lech, mo_coi, chua_index} · env TRUYHOI_LOI_URL · doc GET /api/kho-delta · /api/articles/<loai>/<slug> · /api/xuat/<loai>/<slug>?dang=goc · /api/articles/media/<sha> (KHONG ?dang=txt)"
+  - "hien_vat.doc_cue(text) (vtt + srt) · hien_vat.moc(giay) -> mm:ss · hien_vat.chunk_cue(cues, *, doc_id, file, title, thoi_luong) raise khi moc vuot"
+  - "rank.truy_hoi(con, *, cau_hoi, pham_vi, nguon, k) -> {ket_qua[10 khoa], so_ban_ghi_trong_pham_vi, tong} · rank.doc_w_title() -> {vi_en, zh} (env TRUYHOI_W_TITLE_VI_EN/_ZH ghi de cho test) · rank.chon_w_title(q)"
+  - "tin_hieu.TinHieu(thu_muc).doc() -> {truy_van_0_ket_qua, go_lai}; file tin-hieu* canh index"
+  - "api.chay(cong=None) · api.cong_tu_bang_khai() · env TRUYHOI_DICH_VU (duong dich-vu.json, test tro ban TAM) · header x-phien · /health {ok, duong_index, moc_index_gan_nhat} · 400: thieu k · thieu nguon · nguon khong list|null · khoa facet la · space khong chuoi · 403: ngoai goi_duoc (neu ten + 'goi_duoc') · aud sai · thieu/sai khoa"
+
+do_do:
+  - lenh: "for c in truyhoi/tests/check_*.py: .venv/Scripts/python $c --tu-kiem"
+    ket_qua: |
+      20/20 exit 0 — moi cong DO DUOC tren fixture co-tinh-hong o thu muc tam:
+      dung_lai_duoc 3/3 · lech_kho 4/4 · khong_cham_kho 3/3 · anchor_mot_luat 3/3 (node -e, sua slice 60→80 ⇒ neu heading dai; bo đ→d ⇒ lech)
+      dia_chi_phan_giai 6/6 · reindex_tang_dan 3/3 · mot_ham_chuan_hoa 4/4 · ba_thu_tieng 4/4 · snippet 4/4 · w_title 5/5
+      pham_vi 4/4 · tap_nguon 3/3 · golden 5/5 · tin_hieu 3/3 · khong_embedding 3/3 · nghe_loopback 3/3
+      ai_goi_vao 3/3 (server GIA tra 200 ca 3 ca ⇒ cham do dung 3 ca 403 — T13-1 AC4) · chunk_hien_vat 4/4 · doi_chieu 4/4 · hop_dong_v3 3/3 (bo 1 truong MOT phia tren ban tmp ⇒ neu truong + chieu — T13-1 AC5)
+  - lenh: "for c in truyhoi/tests/check_*.py: .venv/Scripts/python $c"
+    ket_qua: |
+      19/20 exit 1 voi dong `ĐỎ · CHƯA CÓ MÃ — truyhoi/src/<module>.py chưa tồn tại` + don vi dung (T13-2/3/4/5/6/7) — DUNG LY DO, khong ImportError goi.
+      1/20 exit 0: check_hop_dong_v3 (cong GIAY — so sample v3 ↔ spec §1a, khong can ma): XANH · sample v3 ↔ spec §1a khớp hai chiều · model_flow trỏ đúng.
+      0/20 exit 3 (khong thieu goi: pyyaml co trong .venv).
+  - lenh: ".venv/Scripts/python core/tests/check_rule_surfaces.py"
+    ket_qua: "PHAN B: S3 lenh CHAY DUOC 31 · CHO 47 · DO 0 (baseline 25 · 53 · 0) — sau rule M13-R1..R6 roi CHO cung mot commit, khong co cua so do oan. pass."
+  - lenh: ".venv/Scripts/python core/tests/check_g6a.py"
+    ket_qua: "ok M13_truyhoi 6/6 artifact · 6 rule · AC 23 hard/1 soft · G6A: 6 điều kiện đạt trên cả 18 module"
+  - lenh: ".venv/Scripts/python core/tests/check_ba.py"
+    ket_qua: "m-ba (phần máy): sạch — không điểm treo nào"
+  - lenh: "check_g6b.py | grep -E '^\\s+- ' | grep -cE 'T13-|T01-5[1-9]|M13|T08-35'"
+    ket_qua: "0 · W5: ok T13-0 7/7 · T13-1 5/5 · T13-2 6/6 …"
+  - lenh: "ls truyhoi/tests/check_*.py | wc -l"
+    ket_qua: "20"
+
+đỏ_do: "19 cong do = CHUA CO MA (T13-2..7 chua dung) — dung y R5, chu la chinh don vi ke tiep cua toi. Khong do la cua nguoi khac trong luot nay."
+
+quyet_dinh_trong_luot:
+  - "Q2 (PM 2026-09-10): check_anchor_mot_luat chi dung heading KHO THAT (kb/*/*.md), in N thuc (hom nay 9) va noi nguong 50 chua dat; 4 ca AC-2.1 la ca rieng."
+  - "check_golden_du_ca: 7 ca Viet chay tren KHO THAT qua LOI :8787 (dia chi golden = heading that cua bai repo/ruflo); zh dem bai Han tren kho that bang dai dai-han.json, <2 ⇒ soft noi so, exit 0. LOI that khong tra loi ⇒ DO (dieu kien ban giao T13-6), khong phai trang thai hop le."
+  - "check_hop_dong_v3 do spec §1a (FROZEN) thay model_flow §2 vi model_flow KHONG liet ten 10 truong (grep heading_path ⇒ 0); cong van doi model_flow §2 tro `spec §1a` + `FR-072 §1.1`. Khac chu T13-1 AC5 mot chut — ghi ra, khong lam xanh vo can cu."
+  - "Moi cong co cờ --tu-kiem (khuon check_rule_surfaces) chay TRUOC khi dung ma that; _khung.lot_ma() bo docstring/comment de soi MA, khong soi loi ke."
+  - "Cong 5/11/12/17/19: doc bang khai (dia-chi.json · dai-han.json · dich-vu.json) nhu FILE — khong import core/ hay chungcat/ (rieng cong 19 import chungcat.verify TRONG cong theo dinh nghia cua no)."
+  - "kho_mau_zh() co 2 ban ghi Han CHI cho AC-3.2 (tokenizer); AC-6.3 khong dung fixture."
+
+khong_lam:
+  - "KHONG viet mot dong nao trong truyhoi/src (T13-2..7)."
+  - "KHONG cham spec.md/rules.md M13 (FROZEN) du T13-1 ghi 19 cong — ghi lech so vao day, PM sua task file."
+  - "KHONG dung /reindex-poke trong bat ky cong nao (Q4 cho PM)."
+
+keo_theo:
+  - "PM: T13-1 task file ghi '19 cong' — thuc te 20 (them check_nghe_loopback cua T13-4 AC2). Sua so o task file (khong frozen)."
+  - "PM: model_flow §2 khong liet 10 ten truong — check_hop_dong_v3 do spec §1a; neu muon dung chu 'model_flow §2' thi them bang ten truong vao model_flow (non-frozen) hoac sua chu task."
+  - "T13-2..7: hop dong ma o muc `hop_dong_ma_cong_doi_o_truyhoi_src` la DAC TA cho code — doi ten/ky la sua cong truoc (R1: cong thuoc don vi test)."
+
+tiep_theo: "T13-2 (pyproject · anchor.py · db.py · indexer.py) — lam xanh cong 1·2·3·4·5·6."

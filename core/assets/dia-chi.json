@@ -3,7 +3,7 @@
   "$comment_nguyen_ly": "Địa chỉ phân giải được = trỏ vào thứ KHO CÓ, không trỏ ra Internet mở. Kho là chân lý; một địa chỉ mà kho không kiểm được thì không khác một địa chỉ không có. Đây là lý do `muc` (§II.4) có manh=khong: nguồn nằm ngoài kho thì không gì đối chiếu được.",
   "$comment_bo_qua": "B-A5: thứ KHÔNG khớp dạng nào thì BỎ QUA, không báo lỗi. Công thức toán và dãy số trong ngoặc vuông viết thoải mái. Cổng chỉ đỏ khi một mục KHÔNG CÓ địa chỉ nào hiểu được — không bao giờ đỏ vì có thêm thứ nó không hiểu.",
   "$comment_manh": "day_du = phân giải tới từng đơn vị được nêu (trang/dòng có thật). mot_phan = kiểm được bản ghi tồn tại và đúng loại, KHÔNG kiểm được mốc bên trong. khong = không có gì để đối chiếu. Chỉ `day_du` và `mot_phan` mới tính vào citations_verified.",
-  "phien_ban": 1,
+  "phien_ban": 2,
   "dang": [
     {
       "ten": "slug",
@@ -36,6 +36,15 @@
       "manh": "day_du",
       "vi_du": "[docs/xgboost-taylor-bac-hai.md:12-31] · [nguon.py:10-40]",
       "bat_link_gay": false
+    },
+    {
+      "ten": "file-anchor",
+      "mau": "^([A-Za-z0-9._/-]+\\.md)#([a-z0-9]+(?:-[a-z0-9]+)*)$",
+      "phan_giai": "có file kho/<đường dẫn> ∧ file có heading mà ASCII-fold (luật slugGoiY: NFD → bỏ dấu → đ→d → [^a-z0-9]+→- → cắt 60) ra ĐÚNG anchor này",
+      "manh": "day_du",
+      "vi_du": "[docs/xgboost-taylor-bac-hai.md#vi-sao-bac-hai]",
+      "$vi_sao": "M13 chunk theo ##/### và sinh anchor bằng cùng luật slugGoiY của FE (decisions.md 2026-09-01 (1)). Đây là dạng địa chỉ chatbot trích; không khai thì B-A5 không phủ, và M14 'phân giải qua dia-chi.json' là câu sai.",
+      "$dedup": "hai heading fold về cùng anchor ⇒ hậu tố -1, -2 (github-slugger: vòng while, state theo FILE, reset mỗi file — ref-impl §180). Renderer và indexer PHẢI cùng đi qua một object có state, theo cùng thứ tự heading."
     },
     {
       "ten": "muc",

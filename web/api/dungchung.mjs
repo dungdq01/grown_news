@@ -348,6 +348,36 @@ export function khoDoc(loai) {
   return ds
 }
 
+/*
+ * T08-35 · KHO-DELTA cho indexer M13 — NĂM trường, không hơn không kém.
+ *
+ *   slug · loai (= `source_type`) · updated_at · sha_than · space
+ *
+ * `sha_than` = sha256(`than`) là TÍN HIỆU ĐỔI thật: DB không có mốc sửa, nên
+ * `updated_at` = `fm.analyzed_at` (mốc phân tích, không phải mốc sửa — ghi thẳng
+ * ra đây để M13 không tin nó một mình). `space` là cột DÀNH SẴN = `"mac-dinh"`
+ * cho tới `FR-080` áp (view `ban_ghi` chưa có cột) — ĐIỂM NỐI KHOÁ với nhánh
+ * Space (`rule.md` mục 13): đổi tên/giá trị phải qua FR VÀ báo PM-Space.
+ * Đọc DB CHÂN LÝ (view `ban_ghi`), không đọc export `kb/` (FR-034).
+ */
+const SPACE_MAC_DINH = "mac-dinh"
+
+export function khoDelta() {
+  const hang = doc("SELECT source_type, slug, frontmatter, than FROM ban_ghi ORDER BY slug")
+  if (!hang) return []
+  return hang.map((r) => {
+    let fm = null
+    try { fm = JSON.parse(r.frontmatter) } catch { /* fm hỏng ⇒ updated_at null, vẫn liệt */ }
+    return {
+      slug: r.slug,
+      loai: r.source_type,
+      updated_at: fm?.analyzed_at ?? null,
+      sha_than: createHash("sha256").update(r.than ?? "").digest("hex"),
+      space: SPACE_MAC_DINH,
+    }
+  })
+}
+
 /** Số bài trong kho — guard "kho rỗng thì không suy được gì" của danhmuc.mjs. */
 export function demSoBai() {
   const hang = doc("SELECT count(*) AS n FROM ban_ghi")

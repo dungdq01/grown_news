@@ -1,0 +1,21 @@
+# truyhoi — M13_truyhoi (THỢ · chỉ mục + truy hồi · :8791)
+#
+# Khai phụ thuộc MỘT chỗ (bài học M12). Dịch vụ chạy tại chỗ, không phải package:
+# `packages = []` — `pip install -e ./truyhoi` chỉ để CI cài phụ thuộc (T04-9), mã nạp
+# qua `sys.path` như `chungcat/`.
+#
+# 0 dep mạng · 0 dep vector (M13-R5, spec §7 HOÃN): mọi thứ là stdlib — sqlite3 (FTS5),
+# urllib (HTTP tới LÕI 127.0.0.1), unicodedata, hashlib, json, re, http.server.
+# `pyyaml` CHỈ cho cổng đọc `truyhoi/tests/golden.yaml`; mã service không cần.
+
+[project]
+name = "grown-truyhoi"
+version = "0.1.0"
+description = "M13_truyhoi — chỉ mục FTS5 + truy hồi kèm địa chỉ; chỉ mục là dữ liệu DẪN XUẤT"
+requires-python = ">=3.13"        # ADR-02 + FR-005 — cùng bản pin với M01_core và M12
+dependencies = [
+  "pyyaml>=6,<7",
+]
+
+[tool.setuptools]
+packages = []
