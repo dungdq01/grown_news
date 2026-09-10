@@ -44,6 +44,11 @@ jobs:
       - name: cài chungcat (M12) — không extra `asr`
         run: python -m pip install -e "./chungcat"
 
+      # `truyhoi` (M13, T04-9): stdlib + pyyaml (cho golden.yaml). `can_key_model: false`
+      # trong dich-vu.json — KHÔNG secret nào tên truyhoi ở đây, và cổng M13 chạy với env rỗng.
+      - name: cài truyhoi (M13)
+        run: python -m pip install -e "./truyhoi"
+
       # ── luật của M01 ──
       - name: pytest — kiểm luật có hiệu lực
         run: python -m pytest core/tests -q
@@ -361,6 +366,39 @@ jobs:
       # là một lần chạy tay, ghi worklog.
       - name: E2E chưng cất — mock
         run: python chungcat/tests/check_e2e_chung_cat.py --mock
+
+      # ══ luật của M13 — truy hồi (T04-9) ═══════════════════════════════════
+      #
+      # Cùng lý lẽ M12: chạy CẢ THƯ MỤC bằng vòng lặp, không liệt kê tay, không ghi
+      # số cổng vào tên bước (số đổi là tên nói dối). Mọi cổng chạy trên kho TẠM +
+      # LÕI GIẢ trong tiến trình (`_loi_gia.py`, 8895–8899), 0 mạng · 0 model · 0 khoá.
+      #
+      # `check_golden_du_ca` có vế chạy trên KHO THẬT qua LÕI thật (:8787). CI KHÔNG
+      # dựng được kho thật: đo 2026-09-10, `dung_lai_db.py` từ export đã commit dừng ở
+      # "kho thiếu byte" (export không tự đủ). Nên vế đó KHAI TƯỚNG MINH bỏ qua bằng env
+      # `TRUYHOI_KHONG_CO_LOI=1` — cổng in "CHƯA ĐO", không xanh; chạy tay trên máy có
+      # LÕI thật rồi ghi worklog (khuôn `--mock`/`--that` của M12 ngay trên).
+      - name: cổng M13 — truy hồi (mọi check_*.py, 0 mạng · 0 model)
+        env:
+          TRUYHOI_KHONG_CO_LOI: '1'
+        run: |
+          set -e
+          n=0
+          for f in truyhoi/tests/check_*.py; do
+            echo "── $f"
+            python "$f"
+            n=$((n+1))
+          done
+          echo "M13: $n cổng đã chạy"
+
+      # Mỗi cổng M13 phải ĐỎ ĐƯỢC: `--tu-kiem` chạy phép kiểm trên fixture cố-tình-hỏng
+      # ở thư mục tạm. Một cổng không đỏ được là một cổng chưa được thử (#cổng-xanh-vì-neo-sai).
+      - name: cổng M13 — tự kiểm đỏ được (--tu-kiem)
+        run: |
+          set -e
+          for f in truyhoi/tests/check_*.py; do
+            python "$f" --tu-kiem
+          done
 
       # ── S4: hook local. CI kiểm cả bề mặt kia, vì hook bỏ qua được ──
       - name: hook chặn file sai format (M04 AC-2.5.1)
