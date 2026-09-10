@@ -1,0 +1,11 @@
+{
+  "$comment": "THAM SỐ ĐO ĐƯỢC của M13 — số ở đây là số phải ĐO rồi đặt, không phải hằng trong mã (AC-4.2 · spec §4). Đọc qua rank.doc_w_title(); test ghi đè bằng env TRUYHOI_W_TITLE_VI_EN / TRUYHOI_W_TITLE_ZH để chứng minh số được dùng thật (đổi số ⇒ hạng đổi).",
+  "$comment_w_title": "HAI số, không một: token một-CHỮ của tiếng Trung (sau khi chuan_hoa_tim chèn cách) cho điểm bm25 khác hẳn token một-TỪ của vi/en — một số dùng chung là một số sai cho ít nhất một thứ tiếng. Chọn theo `co_han(cau_hoi)`. Bắt đầu 5..10 rồi ĐO trên golden (spec §4: đừng chép 1000/500/1 của zk — số đó cho filename-là-tiêu-đề). Hai số dưới là điểm khởi đầu CHƯA ĐO — golden expect địa chỉ nên không đỏ khi tinh chỉnh.",
+  "phien_ban": 1,
+  "w_title": {"vi_en": 5.0, "zh": 8.0},
+  "tran_k": 200,
+  "$comment_cue_moi_chunk": "Số cue transcript gộp vào một chunk (T13-7). Neo `slug:t=` lấy mốc cue ĐẦU của nhóm; không cắt giữa một cue.",
+  "cue_moi_chunk": 3,
+  "$comment_tran_body_byte": "Trần một chunk không phải để cắt bằng chứng (M13-R4 cấm cắt) — chỉ để từ chối một heading ôm cả file vào một đoạn khổng lồ; vượt trần thì vẫn giữ trọn, ghi cảnh báo.",
+  "tran_body_byte": 200000
+}

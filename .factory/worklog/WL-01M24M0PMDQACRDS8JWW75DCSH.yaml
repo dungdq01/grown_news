@@ -1,0 +1,60 @@
+entry: ban-giao
+ulid: 01M24M0PMDQACRDS8JWW75DCSH
+ngay: 2026-09-10
+module: M13_truyhoi
+don_vi: [T13-4, "T13-3 (2/2)"]
+fr: FR-072 §1.1 · §1.2 (T2 · T3 · T6) · ADR-08 Z9 · M13-R1 · R4 · R5 · R6 · AC-1.6 · 3.1 · 3.2 · 3.3 · 3.4 · 4.1 · 4.2
+nhanh: m13 (worktree ../gn-m13), sau fb6ddd0 (T13-2)
+tieu_de: >-
+  T13-4 — SERVICE :8791: truyhoi/src/api.py (ThreadingHTTPServer loopback, cong tu dich-vu.json, .env o chay(),
+  _tu_ai() doc goi_duoc + x-aud + khoa chieu KHOA_<TU>_TRUYHOI, POST /truy-hoi validate hop dong, GET /health
+  khai duong index + moc) · src/rank.py (MOT cau SQL: MATCH + facet EXISTS + doc_id IN, bm25 bind w_title
+  hai so, dem cung request, 10 khoa, 0 snippet) · assets/nguong.json (w_title vi_en/zh CHUA DO, tran_k,
+  cue_moi_chunk). Dong T13-3 (2/2): call-site thu hai cua chuan_hoa_tim o rank.cau_match.
+
+object:
+  - truyhoi/src/api.py
+  - truyhoi/src/rank.py
+  - truyhoi/assets/nguong.json
+  - .factory/worklog/WL-01M24M0PMDQACRDS8JWW75DCSH.yaml
+
+quyet_dinh_trong_luot:
+  - "MATCH noi token bang OR (bag-of-words): cau 'bac hai khong dau' trong sample v3 chi giao `bậc hai` voi ket qua thu hai — AND se tra 0. Ghi de PM biet; doi sang AND/NEAR la mot quyet dinh xep hang, do bang golden (expect dia chi, khong do khi doi)."
+  - "Response DUNG 3 khoa goc (hop dong FROZEN) — KHONG them `tap_nguon`/echo `nguon` de 'noi ro ca kho'. Ca-kho noi bang SO: so_ban_ghi_trong_pham_vi == count(tai_lieu). Cong 12 sua theo huong nay; muon khoa tuong minh thi mo FR (o backlog M13)."
+  - "_tu_ai() doc dich-vu.json MOI request (file nho) ⇒ them khach = sua bang khai, khong restart; env TRUYHOI_DICH_VU cho test tro ban TAM (khong sua file that)."
+  - "Thieu khoa va khoa sai cung 403 mot cau — fail-closed, khong lo oracle; thong bao neu ten dich vu (tu header x-tu neu co) + duong sua `goi_duoc` + `KHOA_<TU>_TRUYHOI`."
+  - "Validate 400 truoc khi mo DB: cau_hoi rong · thieu k · k ngoai 1..tran_k · thieu khoa nguon · nguon khong list|null · pham_vi khong object · khoa facet la (khong dich, khong bo qua) · space khong chuoi · 0 token sau chuan hoa."
+  - "w_title: 5.0 (vi_en) · 8.0 (zh) la diem KHOI DAU CHUA DO (spec §4: bat dau 5..10 roi do) — golden expect dia chi nen khong do khi tinh chinh; viec DO ghi backlog M13 cho G6C."
+  - "KHONG dung /reindex-poke (Q4 cho PM). KHONG cham ui_flow.md (backlog T13-0 tro T13-4 sua §1, nhung ui_flow.md KHONG trong pham_vi_ghi T13-4 ⇒ bao PM, khong noi tai cho)."
+
+do_do:
+  - lenh: "11 cong lien quan, TRUOC (tai fb6ddd0): mot_ham 1 FAIL (call-site 1/2) · ba_thu_tieng/snippet/w_title/khong_embedding/nghe_loopback/ai_goi_vao/pham_vi/tap_nguon `ĐỎ · CHƯA CÓ MÃ — truyhoi/src/rank.py|api.py` · dia_chi §2 + khong_cham_kho ve truy van 'chờ T13-4'"
+    ket_qua: |
+      SAU:
+      check_mot_ham_chuan_hoa   XANH · một hàm chuan_hoa_tim · hai chỗ gọi · dải Hán từ bảng khai · thiếu bảng thì đỏ nói tên   (T13-3 AC1 DONG)
+      check_ba_thu_tieng        XANH · 10/10 ba thứ tiếng · bộ ca có răng · remove_diacritics 2                                  (T13-3 AC2/AC3 DONG)
+      check_snippet_chi_preview XANH · snippet() không trên đường trả · body đầy đủ qua rowid
+      check_w_title_do_rieng    XANH · w_title hai số từ cấu hình · SQL bind · đổi số ⇒ hạng đổi
+      check_khong_embedding     XANH · 0 lời gọi mạng ngoài loopback · 0 embedding · phụ thuộc sạch
+      check_nghe_loopback       XANH · nghe loopback · cổng từ bảng khai · /health khai đường chỉ mục + mốc
+      check_ai_goi_vao          XANH · ba ca 403 · hai ca 2xx · danh sách người gọi từ bảng khai · thêm khách không sửa mã
+      check_dia_chi_phan_giai   XANH · … · 10 trường · doc_id thật   (§2 nay CHAY that, het 'chờ T13-4')
+      check_khong_cham_kho      XANH (ve truy van chay; con 'chờ T13-7' ve hien vat)
+      check_pham_vi_hien_thi    XANH · số trong phạm vi = đếm độc lập · đổi facet ⇒ tập đổi · k bắt buộc · khoá TANG nguyên văn · space chờ FR-080  (T13-5 AC1)
+      check_tap_nguon_la_tham_so XANH · nguon bắt buộc · null = cả kho nói rõ · [a,b] chặn c · lọc trong cùng câu SQL             (T13-5 AC2)
+  - lenh: "hai cong sua trong luot (do oan, khong phai loi ma) — ghi ro:"
+    ket_qua: |
+      check_ba_thu_tieng §3: ve 'ca đ trong tap truot khi bo chuan hoa' SAI voi OR-semantics (`đường ống` van ra nho `ống`→`ong`);
+        sua thanh do MOT token `đường` tho ⇒ khong ra, qua chuan_hoa_tim ⇒ ra. tu-kiem 4/4.
+      check_pham_vi_hien_thi §3: ve dung pl=[video] nhung cau hoi khong khop bai video ⇒ tap rong ⇒ do oan;
+        sua thanh pl=[bai-viet] + kiem phan loai qua loai-nguon.json. tu-kiem 4/4.
+      check_tap_nguon_la_tham_so §2: ve 'noi ro ca kho' doi khoa them ngoai hop dong FROZEN ⇒ sua thanh so_ban_ghi_trong_pham_vi == count(tai_lieu) + dung 3 khoa goc.
+
+đỏ_do: "khong co do moi cua nguoi khac; pytest 6 failed (WO-094) va api-guard 1 FAIL (WO-074) khong doi."
+
+keo_theo:
+  - "M13 backlog (G6C): DO w_title tren golden roi dat so; MATCH OR vs AND/NEAR; khoa `tap_nguon` tuong minh can FR neu PM muon."
+  - "PM: ui_flow.md §1 (dia chi `file#anchor` bam duoc → hai dang dia_chi) — o backlog T13-0 tro T13-4 nhung file KHONG trong pham_vi_ghi T13-4; can PM noi hoac giao don vi khac."
+  - "PM (Q4): /reindex-poke — api.py hien 404 cho POST khac /truy-hoi; them endpoint = ~15 dong + mot cong, sau khi quyet."
+
+tiep_theo: "T13-5: ghi so (da xanh trong ma T13-4, khong dong ma rieng) · T13-7 hien_vat.py · T13-6 tin_hieu.py + golden."
