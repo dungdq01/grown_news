@@ -1,0 +1,46 @@
+entry: ban-giao
+ulid: 01M24M0PMQQ0SRSQ57Q4ZY80YK
+ngay: 2026-09-10
+module: M13_truyhoi
+don_vi: [T13-5]
+fr: FR-072 §1.1 (T7 · T8) · AC-5.1 · AC-5.2 · AC-5.3 · FR-080 (CHO AP — canh xuyen nhanh #1)
+nhanh: m13 (worktree ../gn-m13)
+tieu_de: >-
+  T13-5 — pham_vi (khoa TANG + space) · nguon[] tuong minh: hai cong AC1/AC2 XANH bang ma da viet trong T13-4
+  (rank._vi_tu + api._kiem_truy_hoi); don vi nay KHONG co dong ma rieng — chi ghi so + ve space CHO FR-080.
+
+object:
+  - truyhoi/src/api.py     # _kiem_truy_hoi: khoa facet la ⇒ 400 · space khong chuoi ⇒ 400 · thieu nguon ⇒ 400 · nguon khong list|null ⇒ 400 · thieu k ⇒ 400  (commit T13-4)
+  - truyhoi/src/rank.py    # _vi_tu: EXISTS(facet) tung khoa + doc_id IN (nguon) trong CUNG cau MATCH; dem cung request  (commit T13-4)
+  - .factory/worklog/WL-01M24M0PMQQ0SRSQ57Q4ZY80YK.yaml
+
+vi_sao_khong_co_ma_rieng: >-
+  Cau SQL mot khoi (phu luc A4) khong tach duoc 'truy hoi' khoi 'pham vi' — vi tu facet/nguon LA cau MATCH
+  (AC-5.2: khong top-k an). Tach hai commit se la mot commit T13-4 tra ve sai hop dong roi T13-5 sua lai —
+  mot cua so ma sai giua hai commit, khong ai can. Nen ma nam o T13-4, T13-5 la don vi XAC NHAN: chay hai
+  cong, ghi so, ghi ve chua do duoc.
+
+do_do:
+  - lenh: ".venv/Scripts/python truyhoi/tests/check_pham_vi_hien_thi.py"
+    ket_qua: |
+      §1 AST: ok 0 bang doi ten phan_loai↔pl · ok 0 hang k
+      §2 5/5 ok: pham_vi={} · pl=[video] · cat=[data] · loai=[docs,article] · cpt=[rag] ⇒ so_ban_ghi_trong_pham_vi == dem doc lap (SQL cua cong tren bang facet)
+      §3 ok pl=[bai-viet] ⇒ tap con · ok moi ket qua thuoc bai-viet · ok k=1 facet khac top-1 van co ket qua (loc TRONG MATCH)
+      §4 ok thieu k ⇒ 400 · ok khoa `phan_loai` ⇒ 400
+      §5 ok space=mac-dinh ⇒ 200 ca kho · ok space=123 ⇒ 400
+         ·  soft — vế 'đổi space ⇒ tập ứng viên đổi' CHƯA đo được: cột `space` chỉ có sau FR-080 (T01-90, PM-Space). Không xanh bằng fixture bịa cột.
+      XANH · exit 0
+  - lenh: ".venv/Scripts/python truyhoi/tests/check_tap_nguon_la_tham_so.py"
+    ket_qua: |
+      §1 ok MATCH + doc_id IN cung cau SQL
+      §2 ok thieu khoa nguon ⇒ 400 neu `nguon` · ok nguon: null ⇒ ca kho (ca hai bai ra) · ok so_ban_ghi_trong_pham_vi == count(tai_lieu) va DUNG 3 khoa goc
+      §3 ok [ghi-chu, huong-dan] ⇒ bai trong tap co ket qua · ok pipeline-basics (khop MANH nhat, ngoai tap) KHONG ra · ok so_ban_ghi = 2 · ok nguon: [] ⇒ 0/0 · ok nguon chuoi ⇒ 400
+      XANH · exit 0
+
+đỏ_do: "khong co."
+
+cho:
+  - "FR-080 AP (T01-90, PM-Space): khi view ban_ghi co cot `space` va kho-delta tra gia tri that, chi can indexer.facet_cua nhan `row['space']` (da nhan) — 0 dong ma; ve 'đổi space ⇒ tập đổi' cua cong 11 §5 lat sang do that. Khong xanh truoc bang fixture bia cot."
+
+keo_theo:
+  - "M13 backlog: khoa `tap_nguon`/echo `nguon` tuong minh trong response can FR (hop dong v3 FROZEN 3 khoa) — hom nay 'noi ro ca kho' bang so."
