@@ -35,6 +35,7 @@ import urllib.request
 from pathlib import Path
 
 import db
+import hien_vat
 from anchor import BoAnchor
 from chuan_hoa import chuan_hoa_tim
 
@@ -116,12 +117,19 @@ def _cat_trang_cuoi(dong: list[str], ls: int, le: int) -> int:
 
 
 def _lam_chunk(*, doc_id, file, anchor, ls, le, heading_path, body, nguon_van_ban, thu_tu) -> dict:
-    title, tim = (chuan_hoa_tim(x) for x in (heading_path, body))
+    """Chunk THÔ — `title`/`tim` điền sau ở `hoan_thien()` (một call-site chuan_hoa_tim cho MỌI chunk)."""
     return {
         "doc_id": doc_id, "file": file, "anchor": anchor, "line_start": ls, "line_end": le,
         "dia_chi": f"{file.removeprefix('kb/')}:{ls}-{le}", "heading_path": heading_path,
-        "body": body, "nguon_van_ban": nguon_van_ban, "title": title, "tim": tim, "thu_tu": thu_tu,
+        "body": body, "nguon_van_ban": nguon_van_ban, "thu_tu": thu_tu,
     }
+
+
+def hoan_thien(chunks: list[dict]) -> list[dict]:
+    """Điền cột CHỈ ĐỂ TÌM cho mọi chunk (than · cue · .md) — chỗ gọi DUY NHẤT của chuan_hoa_tim phía index (M13-R1)."""
+    for c in chunks:
+        c["title"], c["tim"] = (chuan_hoa_tim(x) for x in (c["heading_path"], c["body"]))
+    return chunks
 
 
 def chunk_markdown(text: str, *, doc_id: str, file: str, title: str, nguon_van_ban: str, thu_tu_dau: int = 0) -> list[dict]:
@@ -214,10 +222,27 @@ def facet_cua(fm: dict, loai: str, space: str) -> list[tuple[str, str]]:
 
 # ── dựng ─────────────────────────────────────────────────────────────────────
 def chunks_cua_bai(row: dict, fm: dict, goc: str) -> tuple[list[dict], list[bytes]]:
-    """(chunk[], byte hiện vật đã fetch). T13-7 nối hiện vật văn bản vào đây."""
+    """(chunk[] đã hoàn thiện, byte hiện vật đã fetch — vào checksum).
+
+    `than` luôn; rồi MỖI hiện vật văn bản (T13-7 · FR-072 §1.3) qua `GET /api/articles/media/<sha>`:
+    transcript ⇒ chunk theo cue (`hien_vat.chunk_cue`), `.md`/`.txt` ⇒ chunk theo heading như than.
+    Bản ghi không có hiện vật văn bản ⇒ chỉ than, 0 lỗi (AC-2.5 edge 4)."""
     file = f"kb/{row['loai']}/{row['slug']}.md"
     title = str(fm.get("title") or row["slug"])
-    return chunk_markdown(goc, doc_id=row["slug"], file=file, title=title, nguon_van_ban="than"), []
+    chunks = chunk_markdown(goc, doc_id=row["slug"], file=file, title=title, nguon_van_ban="than")
+    them: list[bytes] = []
+    for hv in hien_vat.chon_hien_vat(fm):
+        b, _mime = lay_bytes(f"/api/articles/media/{hv['sha256']}")
+        them.append(b)
+        mime = str(hv.get("mime", ""))
+        if mime in hien_vat.MIME_CUE:
+            cues = hien_vat.doc_cue(b)
+            chunks += hien_vat.chunk_cue(cues, doc_id=row["slug"], file=file, title=title, thu_tu_dau=len(chunks))
+        else:
+            duong_hv = f"kb/_media/{hv['sha256']}{hien_vat.duoi_cua(mime)}"
+            chunks += chunk_markdown(b.decode("utf-8", errors="replace"), doc_id=row["slug"], file=duong_hv,
+                                     title=title, nguon_van_ban="hien-vat:text/plain", thu_tu_dau=len(chunks))
+    return hoan_thien(chunks), them
 
 
 def reindex(con, *, day_du: bool = False) -> dict:
