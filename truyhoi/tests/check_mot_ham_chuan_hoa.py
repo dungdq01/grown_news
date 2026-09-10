@@ -91,7 +91,9 @@ except (_nap.ThieuMa, _nap.ThieuGoi) as e:
 
 print("\n2 · hành vi: NFC → lower → đ→d → cách quanh Hán → gom space\n")
 f = chuan_hoa.chuan_hoa_tim
-K.kiem(f("Đường  Ống") == "duong ong", "`Đường  Ống` ⇒ `duong ong` (lower · đ→d · gom space)", repr(f("Đường  Ống")))
+# Dấu thanh GIỮ NGUYÊN — fold dấu là việc của tokenizer (`remove_diacritics 2`); hàm chỉ lo
+# `đ` (tokenizer không fold được) và chữ Hán. Bản đầu của vế này mong `duong ong` — sai spec §3.
+K.kiem(f("Đường  Ống") == "dường ống", "`Đường  Ống` ⇒ `dường ống` (lower · đ→d · gom space · dấu GIỮ)", repr(f("Đường  Ống")))
 K.kiem(f("é") == f("é") == "é", "NFD → NFC (dấu giữ, không bỏ — tokenizer lo fold dấu)", repr(f("é")))
 K.kiem(f("Kết hợp 資料管線 với pipeline") == "kết hợp 資 料 管 線 với pipeline", "chèn cách quanh MỖI chữ Hán", repr(f("Kết hợp 資料管線 với pipeline")))
 K.kiem(f("ひらがな") == "ひらがな", "Hiragana KHÔNG bị chèn cách (không phải Hán — FR-077 H4)", repr(f("ひらがな")))
