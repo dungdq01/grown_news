@@ -2,7 +2,18 @@
 # Chỉ mục + quan hệ. Không chép nội dung: mọi ô có con trỏ về nơi sự thật sống.
 # Bản đồ lệch spec ⇒ spec thắng, bản đồ sửa.
 
-version: 31
+version: 32
+# v32 — PM M13 rà sau REVIEW nhánh m13 (2026-09-10, factory-reviewer nhịp ⑤).
+#       Reviewer CHẶN merge vì map nói SAI ba chỗ về một service vừa được dựng:
+#       `truyhoi CHƯA vào CI` (ci.yml nay có 6 dòng truyhoi) · `F6 0 mã`
+#       (nay 8 file `truyhoi/src/**`) · khối M13 THIẾU khoá `status` trong khi
+#       mọi module có mã đều có. `check_map` xanh 18/18 suốt — nó chỉ đối chiếu
+#       module ↔ thư mục, KHÔNG đọc `status`/`flows`/`S3_toolchain`. Đúng lớp mù
+#       đã ghi ở v30 (`depends_on` sai mà im lặng): một sự thật khai bằng VĂN XUÔI
+#       thì không cổng nào đọc.
+#       ⚠️ PM-Space giữ bút map (rule 13). Lượt này PM M13 chạm vì merge chặn ở
+#       đây và mọi dòng sửa đều thuộc M13 — KHÔNG chạm dòng nào của Space
+#       (entity Space · BaiHoc · T01-90). Đã báo ở worklog.
 # v29 — media-mime.json vào chủ M03 (ghi chú có ở M03 từ trước,
 #       `version:` bị bỏ quên; bump này trả nợ luôn cả nó).
 # v31 — PM rà tiến độ 2026-09-08 (2 lượt — lượt 2 theo audit 9-chỗ của dev
@@ -153,6 +164,25 @@ modules:
     # file (kb là bản export, chân lý ở DB — FR-034). Dữ liệu vẫn LÀ của
     # M02, nhưng cạnh trong map đo bằng LỜI GỌI, không bằng gốc dữ liệu.
     depends_on: [M08_api]
+    status: as-built               # v32 · nhánh `m13` (16 commit): 8 file
+                                   # `truyhoi/src/**` + 20 cổng `truyhoi/tests/`,
+                                   # 19/20 xanh. CHƯA đóng G6C — còn: T13-6 AC1
+                                   # (7 ca Việt) chỉ đo được SAU khi merge +
+                                   # restart :8787 · AC-6.3 vế zh `soft` (kho có
+                                   # 1 bài Hán, cần ≥2) · T13-5 vế `space` chờ
+                                   # FR-080 áp (T01-90, PM-Space) · T01-52 lượt
+                                   # hai + T03-150 chưa xong. `as-built` ở đây
+                                   # nghĩa CÓ MÃ CHẠY, không nghĩa ĐÃ KÝ.
+    api:                           # v32 · cửa của M13 và hai cửa LÕI phục vụ nó
+      - {duong: "POST /truy-hoi", cong: 8791, chu: M13_truyhoi,
+         hop_dong: "05_uiux/contracts/truyhoi.sample.v3.json · spec §1a (FR-072)",
+         goi_duoc: "[web, chatbot] — đọc từ core/assets/dich-vu.json, bên NHẬN cưỡng chế (ADR-08 Z9)"}
+      - {duong: "GET /health", cong: 8791, chu: M13_truyhoi,
+         note: "khai ĐƯỜNG chỉ mục + mốc index gần nhất — cấm health trần (bài học M12)"}
+      - {duong: "GET /api/kho-delta", cong: 8787, chu: M08_api,
+         note: "slug · loai · updated_at · sha_than · space — nguồn incremental cho AC-2.4 (T08-35)"}
+      - {duong: "GET /api/tim", cong: 8787, chu: M08_api,
+         note: "proxy sang :8791, khoá chiều web→truyhoi ở lại server (T08-35)"}
     luat_rieng: >
       Chỉ mục là DỮ LIỆU DẪN XUẤT — dựng lại được từ kho, không phải chân lý
       (cùng nguyên tắc B-C1). Mất chỉ mục không mất gì.
@@ -1104,8 +1134,15 @@ enforcement:
       - {cmd: "python core/src/source_distiller/validate.py kb/", gate: 8 cổng format}
       - {cmd: "pytest core/tests -q", gate: 49 test, note: kiểm luật có hiệu lực}
       - {cmd: "for f in core/tests/check_*.py", gate: 31 cổng check, note: v31 đếm bằng ls}
-    ci: .github/workflows/ci.yml   # v31 · CÓ RỒI (M04 as-built). Nợ còn:
-                                   # chungcat/** + truyhoi/** CHƯA vào CI — T04-8.
+      - {cmd: "for f in truyhoi/tests/check_*.py", gate: 20 cổng M13,
+         note: "v32 · đếm bằng ls trên nhánh m13; mỗi cổng có vế --tu-kiem tự chứng minh ĐỎ ĐƯỢC"}
+    ci: .github/workflows/ci.yml   # v32 · truyhoi/** ĐÃ vào CI (T04-9, nhánh m13):
+                                   # `pip install -e ./truyhoi` + vòng `for f in
+                                   # truyhoi/tests/check_*.py` + vòng `--tu-kiem`
+                                   # (6 dòng `truyhoi` trong ci.yml, đếm bằng grep).
+                                   # ⚠️ CHƯA từng chạy trên runner: repo mới có
+                                   # remote 2026-09-10, lần push đầu là lần đo THẬT.
+                                   # Nợ còn: chungcat/** CHƯA vào CI — T04-8.
   S4_git:
     hook: .githooks/pre-commit
     note: chặn commit .md sai format trong kb/; đã kiểm chứng chặn thật
@@ -1123,7 +1160,9 @@ enforcement:
     modules: [M03_web, M08_api, M12_chungcat]
     steps: Sinh transcript → tai_nguon (allowlist+ingress) → faster-whisper → gan-hien-vat → tab Transcript
   F6_truy_hoi:
-    p0: false                      # plan 9 đơn vị đã duyệt, 0 mã (2026-09-08)
+    p0: false                      # v32 · 12 đơn vị đã duyệt; MÃ ĐÃ CÓ trên nhánh
+                                   # `m13` — 8 file truyhoi/src + 20 cổng, 19/20
+                                   # xanh. Chưa merge vào main lúc bump này.
     purpose: kho → chỉ mục dẫn xuất → tìm đoạn kèm địa chỉ bấm được
     modules: [M03_web, M08_api, M13_truyhoi]
 
