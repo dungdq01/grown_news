@@ -99,8 +99,11 @@ with K.tam("gn_m13_cham_") as tmp, _loi_gia.LoiGia(_loi_gia.kho_mau()) as loi:
             con.close()
         K.kiem(mo_kb == [], "0 lần open() trỏ vào <repo>/kb/** khi dựng + truy vấn", " · ".join(mo_kb[:3]))
         K.kiem(any("/api/kho-delta" in x["duong"] for x in loi.nhan), "indexer gọi GET /api/kho-delta của LÕI (HTTP, không đọc file)")
-        K.kiem(any("/api/articles/media/" in x["duong"] for x in loi.nhan) or not any(d.get("media") for d in _loi_gia.kho_mau().values()),
-               "hiện vật đọc qua GET /api/articles/media/<sha> (T13-7) — không mở kb/_media",
-               "chưa thấy request media; T13-7 chưa dựng hoặc đọc sai cửa")
+        if (K.SRC / "hien_vat.py").exists():
+            K.kiem(any("/api/articles/media/" in x["duong"] for x in loi.nhan),
+                   "hiện vật đọc qua GET /api/articles/media/<sha> (T13-7) — không mở kb/_media",
+                   "chưa thấy request media — đọc sai cửa")
+        else:
+            print("  ·  chờ T13-7 — chưa có hien_vat.py, vế 'hiện vật đọc qua HTTP' chưa đo được")
 
 K.chot("0 dòng mã chạm kho · 0 open() dưới kb/ · mọi lần đọc là HTTP tới LÕI")

@@ -44,10 +44,11 @@ def soi(nguon: dict[str, str], cay: dict[str, ast.Module]) -> dict:
                     kq["import_chungcat"].append(f"{f}:{node.lineno}")
             if isinstance(node, ast.Call) and getattr(node.func, "id", getattr(node.func, "attr", "")) == "chuan_hoa_tim":
                 kq["goi"].append(f"{f}:{node.lineno}")
-            # bản thứ hai: một def KHÁC tên vừa normalize(...) vừa .lower()
+            # bản thứ hai: một def KHÁC tên vừa NFC vừa .lower() vừa đ→d — đúng ba bước của
+            # chuan_hoa_tim. `anchor.slug` dùng NFD (luật slug, mục đích khác) nên KHÔNG tính.
             if isinstance(node, ast.FunctionDef) and node.name != "chuan_hoa_tim":
                 src = ast.unparse(node)
-                if "normalize(" in src and ".lower()" in src and ("'đ'" in src or '"đ"' in src):
+                if "'NFC'" in src and ".lower()" in src and "'đ'" in src:
                     kq["ban_thu_hai"].append(f"{f}:{node.lineno} def {node.name}")
     for f, txt in nguon.items():
         for i, dong in enumerate(txt.splitlines(), 1):
