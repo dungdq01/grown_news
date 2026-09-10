@@ -83,11 +83,12 @@ with K.tam("gn_m13_pv_") as tmp, _loi_gia.LoiGia(_loi_gia.kho_mau()) as loi:
 
             print("\n3 · đổi phạm vi ⇒ tập ứng viên đổi (không lọc sau top-k)\n")
             _, ca_kho, _ = hoi({}, k=50)
-            _, chi_video, _ = hoi({"pl": ["video"]}, k=50)
+            _, chi_bv, _ = hoi({"pl": ["bai-viet"]}, k=50)
             ids_kho = {x["doc_id"] for x in ca_kho["ket_qua"]}
-            ids_video = {x["doc_id"] for x in chi_video["ket_qua"]}
-            K.kiem(ids_video and ids_video < ids_kho, "pl=[video] ⇒ tập nhỏ hơn và là con của cả kho", f"{ids_video} vs {ids_kho}")
-            K.kiem(all(loi.kho[d]["loai"] == "video" for d in ids_video), "mọi kết quả trong pl=[video] đều là video")
+            ids_bv = {x["doc_id"] for x in chi_bv["ket_qua"]}
+            pl_cua = {l: m["ten"] for m in K.doc_json(K.ASSETS / "loai-nguon.json")["module"] for l in m["loai"]}
+            K.kiem(ids_bv and ids_bv < ids_kho, "pl=[bai-viet] ⇒ tập nhỏ hơn và là con của cả kho", f"{ids_bv} vs {ids_kho}")
+            K.kiem(all(pl_cua.get(loi.kho[d]["loai"]) == "bai-viet" for d in ids_bv), "mọi kết quả trong pl=[bai-viet] đều thuộc phân loại bài viết (theo loai-nguon.json)")
             # top-k ẩn: k=1 trên cả kho rồi lọc sau sẽ RỖNG với facet không chứa top-1; lọc trong SQL thì vẫn có.
             top1 = ca_kho["ket_qua"][0]["doc_id"] if ca_kho["ket_qua"] else None
             khac = next((d for d in ids_kho if d != top1), None)

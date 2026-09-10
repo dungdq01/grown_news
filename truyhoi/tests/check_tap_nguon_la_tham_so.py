@@ -74,8 +74,15 @@ with K.tam("gn_m13_tn_") as tmp, _loi_gia.LoiGia(kho) as loi:
             ma, j, _ = K.goi(cong, "POST", "/truy-hoi", {"cau_hoi": "retrieval", "pham_vi": {}, "nguon": None, "k": 10}, H)
             K.kiem(ma == 200 and {x["doc_id"] for x in j["ket_qua"]} >= {"pipeline-basics", "ghi-chu-hoi-thao-rag"},
                    "`nguon: null` ⇒ cả kho: chunk của cả hai bài ra", str(j)[:120] if j else "")
-            K.kiem(j is not None and (j.get("nguon", "vang") is None or j.get("tap_nguon") == "ca-kho"),
-                   "response NÓI RÕ đang cả-kho (echo `nguon: null` hoặc `tap_nguon: ca-kho`)", str({k: v for k, v in (j or {}).items() if k != 'ket_qua'}))
+            # Hợp đồng v3 là FROZEN với đúng 3 khoá gốc — KHÔNG thêm khoá để "nói rõ". Cả-kho nói bằng SỐ:
+            # `so_ban_ghi_trong_pham_vi` == tổng bản ghi trong chỉ mục. Muốn khoá tường minh (`tap_nguon`)
+            # thì mở FR — ô backlog M13.
+            con2 = db.mo()
+            tong_kho = con2.execute("SELECT count(*) FROM tai_lieu").fetchone()[0]
+            con2.close()
+            K.kiem(j is not None and j.get("so_ban_ghi_trong_pham_vi") == tong_kho and set(j) == {"ket_qua", "so_ban_ghi_trong_pham_vi", "tong"},
+                   f"`nguon: null` ⇒ so_ban_ghi_trong_pham_vi == cả kho ({tong_kho}) và response ĐÚNG 3 khoá gốc (hợp đồng FROZEN)",
+                   str({k: v for k, v in (j or {}).items() if k != 'ket_qua'}))
 
             print("\n3 · `nguon: [a, b]` ⇒ chunk khớp mạnh ở c KHÔNG ra\n")
             ma, j, _ = K.goi(cong, "POST", "/truy-hoi",

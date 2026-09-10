@@ -105,8 +105,11 @@ with K.tam("gn_m13_3tt_") as tmp, _loi_gia.LoiGia(_loi_gia.kho_mau_zh()) as loi:
             kq_tho = {ten: tho(q) for ten, q, _m in MUOI}
             n_tho, truot_tho = dem_dat(kq_tho)
             K.kiem(n_tho < 10, f"không chuẩn hoá query ⇒ {n_tho}/10 (<10) — bộ ca có răng", str(truot_tho))
-            K.kiem(any("đ→d" in t for t in truot_tho) and any("zh" in t for t in truot_tho),
-                   "ca đ và ca zh nằm trong tập trượt khi bỏ chuẩn hoá — đúng hai bệnh AC-3.2 mô tả", str(truot_tho))
+            K.kiem(any("zh" in t for t in truot_tho), "ca zh nằm trong tập trượt khi bỏ chuẩn hoá (chữ Hán không được chèn cách)", str(truot_tho))
+            # Ca `đ` đo bằng MỘT token: với OR, `đường ống` vẫn ra nhờ `ống`→`ong`; nên so đúng token có đ.
+            K.kiem("huong-dan-cai-dat" not in tho("đường") and "huong-dan-cai-dat" in
+                   [x["doc_id"] for x in rank.truy_hoi(con, cau_hoi="đường", pham_vi={}, nguon=None, k=10)["ket_qua"]],
+                   "token `đường` thô KHÔNG tìm được (tokenizer không fold đ) — qua chuan_hoa_tim thì tìm được")
         finally:
             con.close()
 
