@@ -1,9 +1,8 @@
 # `truyhoi` — M13_truyhoi
 
-> **KHUNG RỖNG.** Dựng ở s4 (2026-08-31) để `project_map` khai được và
-> `check_map` kiểm được hai chiều. **Chưa có một dòng logic nào**, và đó là
-> đúng: luật s4 — *"scaffold là khung, không phải code chức năng; logic
-> nghiệp vụ nào xuất hiện ở đây là đi lậu qua s5–s8"*.
+> **ĐANG CHẠY** (2026-09-11). Dựng khung ở s4 (2026-08-31), có mã ở `T13-2`…`T13-9`.
+> Chỉ mục là **DẪN XUẤT**: xoá `index.sqlite` rồi dựng lại bất cứ lúc nào, mất nó không
+> mất gì. Đo trên kho thật: 16 tài liệu · 111 chunk · `hong []`.
 
 | | |
 |---|---|
@@ -43,29 +42,41 @@
 - chính sách gửi RA · `04_system/security_baseline.md` §3.1, §4b
 - thứ tự dựng · `04_system/build_order.md`
 
-## Lệnh — hôm nay chạy được gì
+## Lệnh — chạy gì, và hai biến dễ quên
 
-`truyhoi/` **chưa có một dòng mã nào**, nên chưa lệnh nào của module này chạy được.
-Ba lệnh dưới đây là **cổng GIẤY**, chạy từ gốc repo, và chúng canh hợp đồng của M13
-kể cả khi chưa có mã:
+`truyhoi/` đã có mã và đã **chạy thật** (2026-09-11): chuỗi `web → :8791` trả kết quả kèm
+`dia_chi` trên kho thật — 16 tài liệu · 111 chunk.
 
 ```bash
-python core/tests/check_g6a.py            # 6 artifact · 6 rule · AC 23 hard/1 soft
-python core/tests/check_rule_surfaces.py  # M13-R1..R6: CHỜ tới khi truyhoi/tests/ dựng
-python core/tests/check_frozen.py         # spec.md + rules.md khớp baseline đã ký
+python truyhoi/src/api.py                 # service: bind 127.0.0.1:8791, cổng ĐỌC từ dich-vu.json (Z6)
+python truyhoi/src/indexer.py --day-du    # dựng lại chỉ mục từ đầu (chỉ mục là DẪN XUẤT — xoá được)
+python truyhoi/src/indexer.py --kiem-lech # chỉ ĐỌC: nêu slug lệch · mồ côi · chưa index (AC-1.2)
+for f in truyhoi/tests/check_*.py; do python "$f"; done          # 21 cổng
+for f in truyhoi/tests/check_*.py; do python "$f" --tu-kiem; done # mỗi cổng tự chứng minh ĐỎ ĐƯỢC
 ```
 
-Mười tám cổng của module (`truyhoi/tests/check_*.py`) dựng ở **`T13-1`**, và dựng
-**cả mười tám trong MỘT lượt**: `check_rule_surfaces` xếp một rule là CHỜ khi thư mục
-cha chưa có, nhưng **ĐỎ** khi thư mục đã có mà file thì không — nên file đầu tiên tạo
-ở `truyhoi/tests/` lật mọi rule còn lại sang đỏ cùng lúc.
+### Hai biến, hai đường — nhầm là mất nửa buổi
 
-Khi có mã, service chạy bằng: `python truyhoi/src/api.py` (bind `127.0.0.1:8791`, số
-cổng **đọc từ `dich-vu.json`**, không gõ tay — `Z6`).
+**1 · `.env` chỉ đến được TIẾN TRÌNH DỊCH VỤ, và chỉ lúc KHỞI ĐỘNG.**
+`KHOA_WEB_TRUYHOI` (khoá chiều `web→truyhoi`, `ADR-08` Z9) nằm ở `.env` **gốc repo**. Cả hai
+bên nạp nó MỘT LẦN lúc dậy — `web/server.mjs` (`loadEnvFile`) và `api.py` (`nap_env()` trong
+`chay()`). Sửa `.env` ⇒ **restart CẢ HAI**; chưa restart thì `/api/tim` trả **403** — đó là
+fail-closed đúng, không phải bug. Đo 2026-09-11: `:8890` (web đã restart) trả 200; `:8787`
+(site chính, dậy trước khi có khoá) vẫn 403 trên cùng một mã.
 
-## Chưa có gì
+**2 · CỔNG và `indexer.py` KHÔNG đọc `.env`** — chúng là tiến trình rời, không ai gọi `nap_env()`.
+Chạy tay thì `export` từng biến:
 
-Không `package.json`, không `pyproject.toml`, không mã nguồn. Chúng sinh ở
-**đơn vị việc đầu tiên** của module này (`T13-2` khai `truyhoi/pyproject.toml` —
-khai phụ thuộc MỘT chỗ, bài học M12) — dựng trước là dựng một cấu hình chưa ai
-biết cần gì.
+```bash
+export PYTHONIOENCODING=utf-8                      # BẮT BUỘC trên Windows (console cp1252 giết dòng print)
+export TRUYHOI_LOI_URL=http://127.0.0.1:8890       # LÕI nào đang có /api/kho-delta (mặc định: cổng `web` trong dich-vu.json)
+export TRUYHOI_INDEX=/duong/khac/index.sqlite      # tuỳ chọn — test luôn dùng thư mục tạm (rule.md 16)
+```
+
+Còn `TRUYHOI_DAI_HAN` (bảng khai dải Hán) và `TRUYHOI_DICH_VU` (bảng khai dịch vụ) chỉ để **cổng**
+trỏ sang bản TẠM mà không đụng file thật — không phải đường cấu hình cho vận hành.
+
+## Chưa có gì — và không cần có
+
+Không `package.json`. `pyproject.toml` có từ `T13-2` (stdlib + `pyyaml` cho `golden.yaml`; 0 dep
+mạng, 0 dep vector — `M13-R5` đòi 0 lời gọi mạng, `spec §7` hoãn vector).

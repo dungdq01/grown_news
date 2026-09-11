@@ -1909,6 +1909,8 @@ một cổng không ai mô tả được là một cổng không ai biết khi n
 | `in-pdf-dinh-dang` | `WO-095` — trang in dựng HTML thật từ Markdown (bảng · danh sách · tiêu đề), thoát thẻ của model, và có luật ngắt trang |
 
 | `xuat-pdf-typst` | `WO-096` — `?dang=pdf` dựng bằng Typst (New Computer Modern); mã Typst của model bị thoát; thiếu binary thì 503 |
+| `kho-delta` | `T08-35`/`T03-150` — cửa `GET /api/kho-delta` trả ĐÚNG năm trường cho indexer M13, và proxy `GET /api/tim` mang khoá chiều `web→truyhoi` + `x-aud` mà **khoá ở lại server**; `gocTho(ten)` đọc cổng theo TÊN (hết hằng `chungcat`). Cổng viết TRƯỚC mã: 19 lỗi → pass |
+| `heading-id-anchor` | `T03-148`/`T03-149` (C3 · `FR-073` A3) — `id` trên heading render phải BẰNG `slugGoiY()` và bằng `anchor_py()` của M13 trên heading kho thật (**ba bản**, chạy JS+Python thật). Trước đó `md()` không sinh `id` nào ⇒ địa chỉ `file#anchor` chatbot trích bấm không tới đâu, hỏng IM LẶNG |
 
 **Bài học đắt nhất của đợt: một cổng XANH không chứng minh gì nếu nó neo sai.**
 

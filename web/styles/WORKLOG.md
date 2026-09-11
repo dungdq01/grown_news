@@ -8,7 +8,7 @@
 
 | File | Là gì | Sửa được không |
 |---|---|---|
-| `prototype.css` | 828 dòng **bê nguyên** từ `app-v20.html`; hiện 3287 dòng (phần thêm FR-011 · FR-013 · FR-014 · FR-016 · FR-017 · FR-021 · FR-022 · FR-027a–j · FR-038 · WO-012 · WO-013 · WO-015 · WO-016 · WO-017 · WO-020 · WO-021 · FR-042 · T03-90 · T03-112 · T03-115) | **hợp đồng G5 frozen** — sửa phải qua FR |
+| `prototype.css` | 828 dòng **bê nguyên** từ `app-v20.html`; hiện 3322 dòng (+`.tim-*` của panel tìm, `T03-125` · SCR-27) (phần thêm FR-011 · FR-013 · FR-014 · FR-016 · FR-017 · FR-021 · FR-022 · FR-027a–j · FR-038 · WO-012 · WO-013 · WO-015 · WO-016 · WO-017 · WO-020 · WO-021 · FR-042 · T03-90 · T03-112 · T03-115) | **hợp đồng G5 frozen** — sửa phải qua FR |
 | `custom.scss` | ánh xạ token của s5 lên biến Quartz | được |
 
 `tokens.css` **không nằm ở đây** — nó ở `05_uiux/tokens.css` (113 token, nguồn

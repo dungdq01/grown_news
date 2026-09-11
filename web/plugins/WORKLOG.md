@@ -346,3 +346,27 @@ và nó gãy đúng lúc mạng chậm.
 **CSS đi kèm nằm TRONG chunk** (`trCss()` / `KHOI_CSS`), không vào
 `prototype.css`: `gn.css` đang sát trần, và một luật CSS chỉ dùng ở một màn mà
 nằm trong bundle chung là đúng thứ `FR-061` chống.
+
+---
+
+## `timkiem` — chunk nạp-theo-focus của panel tìm toàn văn (`T03-125` · SCR-27)
+
+Ô `#q` trước đó lọc **chuỗi trên DOM đã render** (`boDau(the.textContent).includes(tim)`) — tức chỉ
+thấy tít và một dòng mô tả, trong khi `PRD U6` hứa full-text *"trên tít, one_liner, thân bài"* từ đợt
+**một**. Plugin này gọi `GET /api/tim` → `POST :8791/truy-hoi` (M13), tức truy hồi thật trên chỉ mục
+FTS5 — tìm được cả trong thân bài lẫn transcript. **Phép lọc thẻ cũ GIỮ NGUYÊN**: lọc là thu hẹp
+lưới đang xem, tìm là truy hồi cả kho — hai việc khác nhau.
+
+**Ba điều đã trả giá ở chỗ khác, nên làm đúng ngay từ đầu:**
+
+1. **Chunk riêng, nạp lúc `#q` nhận focus** (khuôn `cctab`). `gn.js` vừa phải nới trần lần thứ năm cho
+   C3; người chưa gõ vào ô tìm không đáng tải một byte nào của màn này. `multiwindow` chỉ giữ **một
+   dòng cầu** (`rule.md` 15).
+2. **Tự tô từ `body` đầy đủ, không dùng `snippet()`** — `M13-R4`: trần 64 token cắt giữa câu mà vẫn
+   TRÔNG như trích dẫn, rồi cổng verify-quote của M14 so một đoạn đã bị cắt với nguồn.
+3. **`so_ban_ghi_trong_pham_vi` đến CÙNG lời gọi** (`AC-5.1`). Hai lời gọi là hai thời điểm, và số trên
+   màn có thể không phải số đã dùng để trả lời — tiền lệ `#acount` hiện 20 khi SSR trả 16.
+
+Câu hỏi đi **nguyên văn** xuống M13: chuẩn hoá là việc của `chuan_hoa_tim`, làm thêm một lần ở FE là
+dựng bản thứ hai của một luật (đúng thứ `M13-R1` cấm). `k` do **web** khai (20) — M13 từ chối request
+thiếu `k` (`AC-5.2`), nên mặc định phải tường minh ở một phía.

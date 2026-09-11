@@ -1,0 +1,51 @@
+entry: ban-giao
+ulid: 01M27G1RZ5P6CN6VEQDAZ4NRN9
+ngay: 2026-09-11
+module: M13_truyhoi (README) · M03_web (WORKLOG cua web)
+don_vi: ["T03-125 (van hanh + tai lieu)", "T13-9 (do that lan hai)"]
+nhanh: m13 (worktree ../gn-m13), sau 59b60c3
+tieu_de: >-
+  CHAY THAT XUYEN SUOT tren tien trinh cua chu du an (:8890 web m13 → :8791 truyhoi) — do lai bang so may.
+  Ghi HAI BIEN de quen vao truyhoi/README (.env chi den tien trinh DICH VU va chi luc khoi dong; cong +
+  indexer.py CLI phai export), va dong ba ve check_worklog do luot nay lam lech.
+
+object:
+  - truyhoi/README.md            # header "KHUNG RONG" -> "DANG CHAY" + muc Lenh viet lai + §"Hai bien, hai duong"
+  - web/WORKLOG.md               # so test 138 -> 140
+  - web/styles/WORKLOG.md        # prototype.css 3287 -> 3322 dong
+  - web/plugins/WORKLOG.md       # muc `timkiem` (vi sao chunk theo focus · 0 snippet · so den cung loi goi)
+  - web/test/WORKLOG.md          # hai dong bang: `kho-delta` · `heading-id-anchor`
+  - .factory/worklog/WL-01M27G1RZ5P6CN6VEQDAZ4NRN9.yaml
+
+do_do:
+  - lenh: "curl :8890/api/tim?q=hermes&k=3   (web nhanh m13, chu du an restart)"
+    ket_qua: |
+      200 · {"ket_qua":[{"doc_id":"cai-dat-va-thiet-lap-hermes-tren-vps","file":"kb/video/cai-dat-va-thiet-lap-hermes-tren-vps.md",
+      "anchor":"","line_start":1,"line_end":17,"dia_chi":"video/cai-dat-va-thiet-lap-hermes-tren-vps.md:1-17",
+      "heading_path":"Cài Đặt và Thiết Lập Hermes trên VPS","body":"Hướng dẫn Hermes Agent trên Hostinger…"}]
+      ⇒ chuoi THAT web → truyhoi tra ket qua kem dia_chi phan giai duoc. Khong mock, khong 502.
+  - lenh: "curl :8791/health"
+    ket_qua: '{"ok": true, "so_tai_lieu": 16, "so_chunk": 111, "moc_index_gan_nhat": "2026-09-11T05:15:52Z", "sqlite_version": "3.50.4"}  — sqlite 3.50.4 ≥ 3.45 nen `remove_diacritics 2` chay dung (db.mo() probe lai moi lan mo).'
+  - lenh: "curl :8787/api/tim?q=hermes"
+    ket_qua: "403 — site chinh day TRUOC khi .env co khoa. Cung MA, khac TIEN TRINH: day la bang chung cho luat 'sua .env ⇒ restart', khong phai bug."
+  - lenh: "python core/tests/check_worklog.py (tu web/)"
+    ket_qua: |
+      TRUOC: 13 van de — trong do BA ve CUA LUOT NAY: `plugin timkiem khong duoc nhac` · `test heading-id-anchor khong duoc nhac`
+             · `test kho-delta khong duoc nhac`; cong hai so lieu lech (prototype.css 3322 vs tai lieu 3287 · test 140 vs 138).
+      SAU:   8 van de, TAT CA la duong dan trong `web/site/**` (gn.js · gn.css · index.json · mau-nap-nguon.md) —
+             worktree chua build Quartz (`web/_quartz` la thuong nguon ngoai git). Cay main CO web/site nen cong do pass o do.
+  - lenh: "python core/tests/check_running.py"
+    ket_qua: "5 muc khong chay — Y HET tren main (do doi chieu). Do nen."
+
+hai_bien_de_quen:   # ghi vao truyhoi/README §"Hai bien, hai duong" — day la ban tom tat
+  - "`.env` GOC REPO: ca `web/server.mjs` (loadEnvFile) lan `api.py` (nap_env trong chay()) doc MOT LAN luc day. Sua .env ⇒ restart CA HAI. Chua restart ⇒ /api/tim 403 (fail-closed dung)."
+  - "CONG test + `indexer.py` CLI KHONG doc .env — tien trinh roi, khong ai goi nap_env(). Chay tay thi `export PYTHONIOENCODING=utf-8 TRUYHOI_LOI_URL=http://127.0.0.1:<cong web>`."
+
+đỏ_do:
+  - "8 van de con lai cua check_worklog: thieu `web/site/**` trong worktree (chua build Quartz) — moi truong, khong phai ma; main pass."
+  - "check_running 5 muc: do nen, y het main."
+
+keo_theo:
+  - "M03/M04: cong `check_worklog` va `four-screens` doi `web/site/**` co san ⇒ moi worktree moi deu do cho toi khi clone `web/_quartz` + build. Dang mot dong trong RUNNING.md hoac mot buoc `npm run site` — de nghi PM."
+
+tiep_theo: "Cho PM: don vi doi cong T03-125 vao web/test. Con lai: 14 commit tren m13 chua push."

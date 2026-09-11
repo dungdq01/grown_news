@@ -31,7 +31,7 @@ kb/**/*.md ──filter approved──> gộp url_normalized ──> shell proto
 | Trạng thái | **as-built** — s8 chặng B |
 | Stack | Quartz **v5** (FR-007) |
 | Plugin tự viết | 6 |
-| Test | 138, tất cả xanh (`cai-dat` nay đỗ ở thư mục task theo `rule.md` mục 8) |   <!-- +loi-cua, +loi-cua-http, +rate-limit, +phan-quyen, +loi-tho-cua, +chung-cat-ui, +cat-binh-luan-js, +loi-nhap-cua, +chung-cat-quan-ly, +chung-cat-nhap, +tab-theo-doi-chung-cat, +chung-cat-hover, +sinh-transcript-ui, +hien-vat-gan, +mot-bien-mau, +man-co-chunk-phai-cat, +chunk-tu-chua, +sau-khi-ghi-video, +o-chi-dan, +viec-theo-loai, +xuat-van-ban, +nut-tai-xuong, +sau-phan-quyet,
+| Test | 140, tất cả xanh (+`kho-delta` T03-150 · +`heading-id-anchor` T03-148) (`cai-dat` nay đỗ ở thư mục task theo `rule.md` mục 8) |   <!-- +loi-cua, +loi-cua-http, +rate-limit, +phan-quyen, +loi-tho-cua, +chung-cat-ui, +cat-binh-luan-js, +loi-nhap-cua, +chung-cat-quan-ly, +chung-cat-nhap, +tab-theo-doi-chung-cat, +chung-cat-hover, +sinh-transcript-ui, +hien-vat-gan, +mot-bien-mau, +man-co-chunk-phai-cat, +chunk-tu-chua, +sau-khi-ghi-video, +o-chi-dan, +viec-theo-loai, +xuat-van-ban, +nut-tai-xuong, +sau-phan-quyet,
      +mau-trang-thai, +menu-tai-dot-hai, +xuat-transcript, +mo-nhap-da-duyet,
      +header-theo-man, +ban-cu-vao-rac, +the-viec-noi-ro-loai, +mo-theo-slug,
      +cua-so-transcript, +chung-cat-sau-transcript, +o-chi-dan-hien-that,
