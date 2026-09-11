@@ -800,6 +800,33 @@ Vì:      (2) đo lúc chốt: `multiwindow.inline.ts` **4 167 dòng**, `cctab` 
 
 ---
 
+## 2026-09-10 · Không bao giờ đẩy file DB lên git — `rule.md` 19, và giá của một danh sách TÊN
+
+Chọn:    `.gitignore` chặn file DB bằng **MẪU** (`*.db` · `*.sqlite` · `*.sqlite-*` ·
+         `*.sqlite.*` · `*.db-*` · `*.db.*`, ngoại lệ `!Thumbs.db`), không liệt tên.
+         Và: bỏ toàn bộ 141 commit, dựng lại **một commit gốc** để gỡ blob khỏi lịch sử.
+Thay vì: (a) thêm ba dòng tên mới vào danh sách cũ · (b) `git rm --cached` từ giờ và
+         để blob nằm lại trong lịch sử · (c) push nguyên trạng vào repo Private.
+Vì:      ba dòng liệt tên cũ che `kb/_kho.sqlite` nhưng **không** che hai biến thể
+         `kb/_kho.sqlite.truoc-di-tru-*` (**135 MB**, vào từ `b7f6ba9`) và
+         `web/_loi.sqlite.hong*`. GitHub chặn **cứng** file > 100 MB ⇒ repo không push
+         được, và `.gitignore` **không** gỡ được blob đã nằm trong commit — (b) vô ích.
+         (c) thì `web/_loi.sqlite.hong` là DB của LÕI và nó **hỏng**
+         (`integrity_check` → malformed) nên không ai kiểm chứng được nó có `ten`/`chat_id`,
+         đúng thứ `FR-050` cấm. Repo chưa từng push (`git branch -r` rỗng) nên viết lại
+         lịch sử lúc đó **rẻ nhất**; sau lần push đầu thì mọi bản clone phải re-clone.
+Đổi thì: (1) 141 commit rời khỏi git — **bằng chứng R5 không mất** vì nó nằm ở
+         `.factory/worklog/**` (234+ entry) đi theo commit gốc; `rule.md` mục 8 đã chốt
+         R5 đo bằng worklog, không bằng git log. Đó là lý do quy ước ghi worklog tồn tại.
+         (2) Backup `Downloads/grown_news-BACKUP-20260910-2025.bundle` (192 MB) giữ đủ —
+         xoá chỉ khi chắc không cần. (3) `.git` 224 MB → 28 MB. (4) `m13` rebase lên gốc
+         mới, 16/16 commit, 0 conflict.
+*Bài học một câu*: **một danh sách TÊN không che được các biến thể của TÊN.**
+         Cùng lớp với `check_g6b` crash và AC "grep NFD ⇒ đúng 1 chỗ" — phép đo neo vào
+         thứ đã nghĩ tới, không neo vào thứ cần bắt.
+
+---
+
 ## 2026-09-10 · Mỗi module một nhánh + một worktree; `main` chỉ nhận merge — `rule.md` 17
 
 Chọn:    Tên nhánh `m<NN>` (`m13` · `m12` · `m03`…), worktree `../gn-<tên>`; commit của

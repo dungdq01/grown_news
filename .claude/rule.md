@@ -62,7 +62,10 @@
     một ngày (242431f · f611550 — `git add -A` quét cả bàn) và va ID 4 lần trong
     tuần. Không tạo nhánh thứ hai cho cùng module (vd `M13-gn` cạnh `m13`) — hai
     nhánh một module là hai chỗ sẽ lệch. Đo lúc chốt: `m13` đã có 2 commit đúng
-    cách; repo CHƯA có remote ⇒ `push` là việc chủ dự án mở remote trước.
+    cách. **Cập nhật 2026-09-11**: remote ĐÃ CÓ —
+    `https://github.com/dungdq01/grown_news.git`; `main` và `m13` đã push. Dev
+    push nhánh của mình (`git push -u origin m<NN>`) — không cần xin, vì nó
+    không đụng `main`. Đừng để commit dồn nhiều ngày trên một máy.
 18. TỪ M12 VỀ TRƯỚC GIỮ NGUYÊN — KHÔNG ĐỔI GÌ NỮA (chủ dự án chốt 2026-09-10, nguyên
     văn *"chúng ta chốt lại từ m12 về trước giữ nguyên, ko đổi gì nữa"*): M01–M12 đóng
     băng PHẠM VI. Không mở task tính năng mới, không đổi hợp đồng/spec, không đòi team
@@ -71,3 +74,19 @@
     10 bước), và áp FR đã duyệt trước mốc này (FR-078 · FR-079 vẫn thuộc team M12,
     làm khi họ rảnh — không phải nợ của M13). Việc mới cho M12 ⇒ mở FR, chủ dự án
     quyết lại mốc này. Mục 14–16 vẫn áp cho mã MỚI viết trong M01–M12 khi sửa bug.
+19. KHÔNG BAO GIỜ ĐẨY FILE DB LÊN GIT (chốt 2026-09-10, chủ dự án: *"chặn push các
+    file .db lên git"*). `.gitignore` chặn bằng **MẪU**, không liệt tên:
+    `*.db` · `*.sqlite` · `*.sqlite-*` · `*.sqlite.*` · `*.db-*` · `*.db.*`
+    (ngoại lệ `!Thumbs.db`). Export `.md`/`.yaml` của kho vẫn vào git như cũ
+    (FR-034, một chiều DB→file) — mẫu chỉ chặn chính file DB.
+    **Vì sao là MẪU chứ không phải danh sách tên**: ba dòng liệt tên cũ che
+    `kb/_kho.sqlite` nhưng KHÔNG che `kb/_kho.sqlite.truoc-di-tru-*` và
+    `web/_loi.sqlite.hong*` — hai biến thể lọt vào lịch sử, một bản **135 MB**.
+    GitHub chặn CỨNG file > 100 MB ⇒ repo không push được, và `.gitignore` KHÔNG
+    gỡ được blob đã nằm trong commit. Giá phải trả: bỏ toàn bộ 141 commit, dựng
+    lại một commit gốc (2026-09-10, backup ở `Downloads/grown_news-BACKUP-*.bundle`).
+    Một danh sách TÊN không che được các biến thể của TÊN.
+    Ba việc kèm theo: (a) thấy file DB trong `git status` ⇒ DỪNG, `git rm --cached`,
+    **không** commit rồi xoá sau — blob vẫn ở lại; (b) `web/_loi.sqlite.hong*` là DB
+    của LÕI và nó HỎNG nên không ai kiểm chứng được có `ten`/`chat_id` — đúng thứ
+    `FR-050` cấm; (c) file > 10 MB bất kỳ ⇒ hỏi trước khi add.
