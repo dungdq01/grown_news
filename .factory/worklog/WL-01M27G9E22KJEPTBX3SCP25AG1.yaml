@@ -1,0 +1,57 @@
+entry: su-co
+ulid: 01M27G9E22KJEPTBX3SCP25AG1
+ngay: 2026-09-11
+module: M01_core (chu core/tests/check_running.py + core/tools) · M02_kb (kho) · M04_ci (.gitattributes)
+don_vi: []
+nhanh: m13 (worktree ../gn-m13)
+tieu_de: >-
+  SU CO (da khac phuc): chay `python core/tests/check_running.py` trong WORKTREE lam XOA 16 file export
+  trong kb/ va dung lai kb/_kho.sqlite THANH RONG. Kho THAT cua chu du an (cay main + :8787) KHONG he han gi.
+  Nguyen nhan: cong M01 CHAY THAT cac lenh GHI cua RUNNING.md tren kb/ cua cay dang dung.
+
+muc_do: "cao — mat du lieu dan xuat trong worktree; 0 mat mat o cay main / kho that cua chu du an"
+
+object:
+  - kb/** (worktree gn-m13)        # 16 .md + 3 media bi xoa → KHOI PHUC bang `git checkout -- kb kb-mock`
+  - kb/_kho.sqlite (worktree)      # 0 ban ghi → dung lai 16 ban ghi · 8 media bang `core/tools/dung_lai_db.py`
+  - kb/_media/*.vtt (worktree)     # ghi lai dung byte da commit (LF) — xem `vi_sao_lan_dau_that_bai`
+  - .factory/worklog/WL-01M27G9E22KJEPTBX3SCP25AG1.yaml
+
+chuoi_su_kien:
+  - "Toi chay `check_running.py` de doi chieu mot do do (cong nay KHONG nam trong danh sach verify cua don vi nao cua toi — toi tu chay them)."
+  - "`check_running` doc RUNNING.md, lay moi lenh `python …` roi CHAY THAT tru hai truong hop: lenh co co `--fix|--ghi|--ky` (CHI_CU_PHAP) hoac nam trong danh sach `GHI_KHONG_CO` (chi co `07_curate/curate.py`)."
+  - "`python core/tools/dung_lai_db.py` (RUNNING.md:173) va `python core/tools/xuat_kho.py` (:174) KHONG co co nao va KHONG trong danh sach ⇒ chay THAT, tren `kb/` cua cay hien tai."
+  - "Trong WORKTREE, `kb/_media/*.vtt` bi checkout ra CRLF (core.autocrlf=true) ⇒ sha256 lech ten file ⇒ `dung_lai_db` TU CHOI giua chung va de lai DB RONG (139 KB, 0 ban ghi)."
+  - "`xuat_kho` sau do coi moi file export la MO COI (DB rong) ⇒ xoa 16 .md + 3 media."
+  - "LUOI cua WO-039 trong chinh cong do CO bao vet (`sinh_kb_mock.py — de lai vet: kb-mock/...`) nhung KHONG chan hai lenh kia va khong hoan tac."
+
+do_do:
+  - lenh: "git status --short -- kb kb-mock (ngay sau su co)"
+    ket_qua: "26 dong: 16 `D` (.md + 3 media + _audit.jsonl + _nhat-ky-danh-muc.md), 5 `M` (categories/concepts/loai-nguon yaml o kb va kb-mock)"
+  - lenh: "sqlite: select count(*) from ban_ghi  (worktree · main)"
+    ket_qua: "worktree 0 · MAIN 16 — kho that KHONG hong. `curl :8787/api/kho-delta` van tra day du."
+  - lenh: "git checkout -- kb kb-mock"
+    ket_qua: "16 .md + 3 media + 5 yaml ve nguyen; git status -- kb: 0 dong lech noi dung"
+  - lenh: "for f in $(git ls-files kb/_media); do git show HEAD:$f > $f; done"
+    ket_qua: "ghi lai dung BYTE da commit (LF) ⇒ het loi `ten file NOI DOI ve noi dung cua chinh no`"
+  - lenh: "python core/tools/dung_lai_db.py  (lan 2)"
+    ket_qua: "`Khong dung DB tiep: mot kho thieu byte im lang…` — export chi track 3/8 media, DB can 8"
+  - lenh: "chep 5 file media thieu tu ../Grown_news/kb/_media (CHI COPY, khong xoa gi) + dung_lai_db lan 3"
+    ket_qua: "`da dung kb\\_kho.sqlite · bai_viet 3 · tai_lieu 2 · video 11 · media 8 · concepts 5 · categories 11 · audit 23`"
+  - lenh: "doi chieu worktree vs main"
+    ket_qua: "worktree ban_ghi 16 · media 8 · 16 slug — MAIN ban_ghi 16 · media 8 · 16 slug. KHOP."
+  - lenh: ":8791/health · :8890/api/tim?q=hermes"
+    ket_qua: "health ok · /api/tim 200 — hai tien trinh cua chu du an khong bi anh huong"
+
+con_lai:
+  - "`kb/_media/258f826e….vtt` va `c4f6bcf….vtt` hien `M` trong git status — do la trang thai DUNG: byte = blob da commit (LF), sha256 khop ten. `git checkout` chung se tra ve CRLF va lam `dung_lai_db` hong lai. KHONG commit, KHONG checkout."
+
+keo_theo:
+  - "M01 (cong): `check_running.py` CHAY THAT `dung_lai_db.py` + `xuat_kho.py` tren `kb/` cua cay dang dung. Tren main vo hai (DB va export khop), tren worktree/clone moi thi PHA. De nghi: them ca hai vao `GHI_KHONG_CO`, hoac chay chung voi `KB_DIR` tro thu muc tam — cong khong duoc pha thu no dang do. Day la lop loi `WO-039` da tung bat mot lan (`curate.py`) va danh sach ay 'se khong bao gio day'."
+  - "M04 (.gitattributes): `kb/_media/**` phai `-text` (hoac `binary`). Hom nay `.vtt` tracked bi checkout CRLF ⇒ sha256 lech ten ⇒ `dung_lai_db` tu choi tren MOI clone/worktree Windows. Cung goc voi no FROZEN.lock da ghi o WL-01M24H6J8XPKNN0V72NRY3095P."
+  - "M02/M01 (RUNNING.md:54): cau *'Clone moi chua co DB: chay dung_lai_db.py mot lan de dung'* KHONG dung hom nay — export chi track 3/8 media nen clone sach khong dung lai duoc DB. Da ghi lan dau o WL-01M24MFFK9T8GQSYBXZTZ17C9J (T04-9), nay co them bang chung."
+
+hoc_duoc: >-
+  Chay mot cong KHONG thuoc danh sach verify cua don vi minh la mot hanh dong ghi tiem an: cong cung la
+  chuong trinh, va mot cong 'kiem tai lieu' hoa ra chay moi lenh trong tai lieu do. Lan sau: doc cong truoc
+  khi chay no lan dau tren mot cay co du lieu, hoac chay voi KB_DIR tam.

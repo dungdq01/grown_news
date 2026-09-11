@@ -3,6 +3,28 @@
 > Nợ do một thay đổi CỤ THỂ vừa gây ra. Không phải TODO, không phải ý tưởng.
 > Ô `[ ]` trỏ artifact có thật; `[x]` phải kèm object (commit · PR · FR id).
 
+## 2026-09-11 · KÉO THEO từ lượt M13 — một cổng của M01 PHÁ dữ liệu của cây đang dùng
+Mở bởi dev M13 (`WL-01M27G9E22KJEPTBX3SCP25AG1` — sự cố đã khắc phục). Kho **thật** của chủ dự án
+không hề hấn gì; thiệt hại nằm ở worktree `../gn-m13`.
+
+- [ ] **`core/tests/check_running.py` CHẠY THẬT `dung_lai_db.py` và `xuat_kho.py` trên `kb/` của cây**
+      **đang dùng.** Hai lệnh ở `RUNNING.md:173-174` không có cờ `--fix|--ghi|--ky` và không nằm trong
+      `GHI_KHONG_CO` (chỉ có `07_curate/curate.py`), nên nhánh “chỉ kiểm cú pháp” không bắt chúng.
+      Đo 2026-09-11 trên worktree: `.vtt` trong `kb/_media` checkout ra CRLF ⇒ sha256 lệch tên ⇒
+      `dung_lai_db` từ chối giữa chừng, để lại **DB RỖNG**; `xuat_kho` sau đó coi 16 file export là
+      **mồ côi** và **xoá** chúng. Lưới `WO-039` trong chính cổng có báo vết của `sinh_kb_mock.py`
+      nhưng không chặn hai lệnh này và không hoàn tác. Trên `main` vô hại (DB và export khớp) — và
+      đó chính là lý do nó sống lâu mà không ai thấy.
+      Đóng bằng: thêm cả hai vào `GHI_KHONG_CO`, hoặc chạy chúng với `KB_DIR` trỏ thư mục tạm — một cổng
+      không được phá thứ nó đang đo.
+      · object: `core/tests/check_running.py:37,45,109` · `RUNNING.md:173-174` · `core/tools/{dung_lai_db,xuat_kho}.py`
+
+- [ ] **`RUNNING.md:54` nói sai về clone mới.** Câu *“Clone mới chưa có DB: chạy `dung_lai_db.py` một lần
+      để dựng”* không chạy được hôm nay: `kb/_media/*` bị `.gitignore` trừ vài ngoại lệ (3/8 file),
+      nên một clone sạch luôn dừng ở *“kho thiếu byte”*. Đo hai lần: `WL-01M24MFFK9T8GQSYBXZTZ17C9J`
+      (T04-9, lúc tính chuyện cho CI dựng kho thật) và `WL-01M27G9E22KJEPTBX3SCP25AG1` (hôm nay).
+      · object: `RUNNING.md:54` · `.gitignore:95` · `core/tools/dung_lai_db.py`
+
 ## 2026-09-01 · C1 đóng G-6/G-7, và nó để lại nợ ở M02
 Thay đổi: `core/assets/dia-chi.json` (mới) · `validate.py` · `check_dia_chi.py`
 (mới) · `check_khung.py` · `test_gates.py` · `core/pyproject.toml` · `kb-mock/**`.
