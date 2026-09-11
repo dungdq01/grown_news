@@ -1,9 +1,17 @@
-# T03-148 — lấy lại byte `gn.js`, và `tach()` đọc được cả ba dạng khai báo
+# T03-151 — lấy lại byte `gn.js`, và `tach()` đọc được cả ba dạng khai báo
 
 > `WO-097`.
+> 🔁 **Đổi số `T03-148` → `T03-151` (2026-09-11, PM M13 làm theo chỉ đạo chủ dự án).**
+> `T03-148` đã bị `T03-148-test-heading-id-anchor.md` lấy từ 09-10 08:37 (commit
+> `805ccd3`, **8 chỗ trỏ tới**: `T03-149` · hai `backlog.md` · `BAN-GIAO-DEV` · ba
+> worklog). Bản này tạo 09-11 06:57, **2 chỗ trỏ** ⇒ đổi bản ít tham chiếu ngoài hơn,
+> cùng cách đã xử `FR-070`/`FR-071`/`WO-084`. Nội dung KHÔNG đổi.
+> `check_g6b` tố đúng: hai file một ID thì file sau **ghi đè** file trước trong dict
+> của cổng, nên `phạm_vi_ghi` của một trong hai **không được kiểm** — R1 mất địa chỉ.
+> ID mới: `ls 07_plan/M03_web/tasks` max dải hiện hành = 150 ⇒ 151 (190+ là PM-Space).
 
 phạm_vi_ghi:
-  - 07_plan/M03_web/tasks/T03-148-lay-lai-byte-va-thuoc-tach.md
+  - 07_plan/M03_web/tasks/T03-151-lay-lai-byte-va-thuoc-tach.md
   - web/plugins/multiwindow/src/scripts/multiwindow.inline.ts
   - web/test/chung-cat-nhom-theo-bai.test.js
   - _devops/infra.md

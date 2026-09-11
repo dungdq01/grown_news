@@ -3,6 +3,12 @@ ulid: 01M26W3CB2CBQQXC6SZPREJJ52
 ngay: 2026-09-11
 module: M03_web
 don_vi: T03-148
+# ⚠️ ĐỔI SỐ 2026-09-11 (PM M13, chỉ đạo chủ dự án): đơn vị này nay là **T03-151**,
+#    file `07_plan/M03_web/tasks/T03-151-lay-lai-byte-va-thuoc-tach.md`.
+#    `T03-148` đã bị `T03-148-test-heading-id-anchor.md` lấy từ 09-10 08:37 (805ccd3,
+#    8 chỗ trỏ) — `check_g6b` tố ID TRÙNG: file sau ghi đè file trước nên một
+#    `phạm_vi_ghi` không được kiểm. Đổi bản ít tham chiếu ngoài hơn, cùng cách đã
+#    xử FR-070/FR-071/WO-084. NỘI DUNG BIÊN GHI NÀY KHÔNG SỬA — chỉ thêm con trỏ.
 wo: WO-097
 tieu_de: >-
   Khai lenh chay vao _devops/infra.md — va chinh lenh do bat gn.js vo tran;

@@ -1,0 +1,63 @@
+entry: ban-giao
+ulid: 01KB4GIDTRUNG
+ngay: 2026-09-11
+module: M03_web (task doi so) · M13_truyhoi (PM lam)
+don_vi: [T03-151]
+tieu_de: >-
+  Doi so T03-148 -> T03-151 cho task team M03 (ID trung voi task C3 cua toi).
+  Viec doi so LAM LO hai loi CO SAN ma ID trung dang che.
+
+object:
+  - "07_plan/M03_web/tasks/T03-151-lay-lai-byte-va-thuoc-tach.md (git mv tu T03-148-*)"
+  - ".factory/worklog/WL-01M26W3CB2CBQQXC6SZPREJJ52.yaml (them con tro, KHONG sua noi dung)"
+  - .factory/worklog/WL-01KB4GIDTRUNG.yaml
+
+chi_dao_nguyen_van: "2026-09-11: 'doi luon'"
+
+vi_sao_doi_ban_CUA_M03_chu_khong_phai_ban_cua_toi: |
+  T03-148-test-heading-id-anchor.md (C3)         09-10 08:37 · commit 805ccd3 · 8 cho tro
+  T03-148-lay-lai-byte-va-thuoc-tach.md (M03)    09-11 06:57 · commit ae0aae5 · 2 cho tro
+  Doi ban IT THAM CHIEU NGOAI hon — cung cach da xu FR-070 · FR-071 · WO-084.
+  ID moi: ls 07_plan/M03_web/tasks max dai hien hanh = 150 ⇒ 151 (190+ la PM-Space).
+
+lam_gi: |
+  1 git mv (khong copy — lich su file theo no)
+  2 sua tieu de + dong pham_vi_ghi tu-tro-chinh-no trong file; them khoi giai thich
+    doi so o dau, NOI DUNG task KHONG doi
+  3 worklog cua team M03 (WL-01M26W3C...): THEM comment con tro doi so ngay duoi
+    `don_vi`, **KHONG sua noi dung bien ghi cua ho** — bien ghi la vat cua nguoi ghi.
+    `don_vi: T03-148` giu nguyen de doc lai con thay dung thu ho da ghi luc do.
+
+DOI SO LAM LO HAI LOI CO SAN — day la diem dang ghi nhat: |
+  Sau khi het ID trung, check_g6b bat T03-151 hai loi:
+    - ghi `_devops/infra.md` NGOAI boundary M03_web (be/fe cua M03 khong co _devops/**)
+    - cham `web/test/chung-cat-nhom-theo-bai.test.js` ma ten khong phai don vi test (R1)
+  Hai loi nay CO TU TRUOC, khong phai toi gay ra. Chung bi CHE vi dung dieu cong da
+  canh bao: "file sau ghi de file truoc nen pham_vi_ghi cua MOT TRONG HAI khong duoc
+  kiem" — ban M03 chinh la ban bi de, nen hai loi cua no khong ai thay.
+  ⇒ ID trung khong chi lam mat dia chi R1; no con TAT phep kiem cho mot don vi that.
+  Hai loi nay la viec cua chu T03-151 (team M03): hoac khai `_devops/**` vao mot chu
+  trong project_map, hoac tach cong sang don vi test rieng. Toi KHONG sua.
+
+lan_va_ID_thu_NAM_trong_tuan: |
+  FR-070 x2 · FR-071 x2 · T04-10 <-> T04-90 · WO-084 x2 · T03-148 x2.
+  Rule 9 da co cach tranh (ls lay max+1 NGAY truoc khi tao + ghi worklog cung luot);
+  cong chong va that la check_scope = T04-90 cua PM-Space, CHUA thi cong.
+  De nghi: uu tien T04-90 len — nam lan va trong mot tuan la mot phep do, khong phai xui.
+
+do_do:
+  - lenh: python core/tests/check_g6b.py
+    ket_qua: "ID TRUNG T03-148: HET. T03-148 (C3) ok 3 AC/3 cmd · T03-151 ok 5 AC/5 cmd"
+  - lenh: "grep -rn T03-148 (tru ban C3)"
+    ket_qua: "chi con worklog M03 giu `don_vi: T03-148` co chu dinh + comment con tro"
+  - lenh: "python -c yaml.safe_load worklog M03"
+    ket_qua: "parse OK — comment YAML khong pha cau truc"
+đỏ_do: >
+  Hai loi moi hien cua T03-151 (_devops/infra.md ngoai boundary · cham file test) la
+  CUA TEAM M03, co tu truoc, bi ID trung che. Khong phai do luot nay gay ra.
+
+khong_lam:
+  - "KHONG sua noi dung task T03-151 — chi doi so va them khoi giai thich."
+  - "KHONG sua noi dung worklog cua team M03 — chi them comment con tro."
+  - "KHONG sua hai loi moi hien cua T03-151 — viec cua chu no."
+  - "KHONG doi so ban C3 (T03-148) — 8 cho dang tro."
