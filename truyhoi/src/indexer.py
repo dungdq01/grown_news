@@ -30,6 +30,7 @@ import json
 import os
 import re
 import sys
+import urllib.error
 import urllib.parse
 import urllib.request
 from pathlib import Path
@@ -245,19 +246,55 @@ def chunks_cua_bai(row: dict, fm: dict, goc: str) -> tuple[list[dict], list[byte
     return hoan_thien(chunks), them
 
 
+class CuaHong(Exception):
+    """Một cửa của LÕI trả mã không xử được cho MỘT bản ghi — bản ghi đó bị bỏ CÓ TÊN, không kéo chết cả lượt."""
+
+    def __init__(self, cua: str, ma: int):
+        self.cua, self.ma = cua, ma
+        super().__init__(f"{cua} → {ma}")
+
+
+def lay_bai_va_goc(row: dict) -> tuple[dict, bytes]:
+    """(frontmatter+body của /api/articles, byte văn bản để chunk) cho một bản ghi.
+
+    WO-099 · 11/16 bản ghi kho thật KHÔNG có file trong kho (video đăng ký bằng URL — FR-075):
+    `?dang=goc` trả **422 có chủ đích**. Đó là hợp đồng đúng của LÕI; M13 không được giả định
+    "mọi bản ghi đều có file gốc". 422 ⇒ văn bản = `body` của `/api/articles` (cửa đã gọi sẵn cho
+    metadata — 0 cửa mới). Khi đó `line_start/line_end` đếm trên CHÍNH thân đó (WO-099 §4.4) — lệch
+    export `kb/<loai>/<slug>.md` một đoạn frontmatter; ô backlog M13 mở, cần một `dang` của LÕI trả
+    .md kèm frontmatter cho URL-only (M01–M12 đóng băng phạm vi, rule.md 18 ⇒ FR sau).
+    Mã khác 2xx/422 (500, 404…) ở bất kỳ cửa nào ⇒ `CuaHong` — bản ghi bị bỏ, CÓ NÊU slug + cửa + mã."""
+    cua_bai = f"/api/articles/{row['loai']}/{row['slug']}"
+    try:
+        bai = lay_json(cua_bai)
+    except urllib.error.HTTPError as e:
+        raise CuaHong(cua_bai, e.code) from e
+    cua_goc = f"/api/xuat/{row['loai']}/{row['slug']}?dang=goc"
+    try:
+        goc_b, _ = lay_bytes(cua_goc)
+        return bai, goc_b
+    except urllib.error.HTTPError as e:
+        if e.code != 422:
+            raise CuaHong(cua_goc, e.code) from e
+    return bai, str(bai.get("body") or "").encode("utf-8")
+
+
 def reindex(con, *, day_du: bool = False) -> dict:
     delta = lay_delta()
     if day_du:
         db.xoa_sach(con)
     luu = {r[0]: r for r in con.execute("SELECT doc_id, sha_than, updated_at, checksum FROM tai_lieu")}
-    dem = {"xem": len(delta), "doi": 0, "bo_qua": 0, "chi_moc": 0, "mo_coi": 0}
+    dem = {"xem": len(delta), "doi": 0, "bo_qua": 0, "chi_moc": 0, "mo_coi": 0, "hong": []}
     for row in delta:
         s = luu.get(row["slug"])
         if s and s[1] == row["sha_than"] and s[2] == row.get("updated_at"):
             dem["bo_qua"] += 1
             continue
-        goc_b, _ = lay_bytes(f"/api/xuat/{row['loai']}/{row['slug']}?dang=goc")
-        bai = lay_json(f"/api/articles/{row['loai']}/{row['slug']}")
+        try:
+            bai, goc_b = lay_bai_va_goc(row)
+        except CuaHong as e:
+            dem["hong"].append({"slug": row["slug"], "cua": e.cua, "ma": e.ma})
+            continue
         fm = bai.get("frontmatter") or {}
         chunks, them = chunks_cua_bai(row, fm, goc_b.decode("utf-8", errors="replace"))
         checksum = hashlib.sha256(goc_b + b"".join(them)).hexdigest()
@@ -301,7 +338,9 @@ def main(argv: list[str]) -> int:
             return 1 if any(kq.values()) else 0
         kq = reindex(con, day_du="--day-du" in argv)
         print(json.dumps({**kq, "index": str(db.duong_index())}, ensure_ascii=False))
-        return 0
+        for h in kq["hong"]:
+            print(f"HỎNG · {h['slug']} ← {h['cua']} mã {h['ma']}")
+        return 1 if kq["hong"] else 0
     finally:
         con.close()
 

@@ -1,0 +1,49 @@
+entry: ban-giao
+ulid: 01M278GFTS2ESAS40CG468G94F
+ngay: 2026-09-11
+module: M13_truyhoi
+don_vi: [T13-9]
+wo: WO-099
+nhanh: m13 (worktree ../gn-m13), sau 48bf6d7 (T13-8)
+tieu_de: >-
+  T13-9 — indexer chiu 422: lay_bai_va_goc() goi /api/articles TRUOC (mot lan, dung cho fm), thu ?dang=goc,
+  422 ⇒ van ban = body cua articles; ma khac 2xx/422 o bat ky cua ⇒ CuaHong ⇒ ban ghi vao reindex()['hong']
+  (slug, cua, ma), khong nem, khong keo chet ca luot. Kho THAT: reindex 16/16 · hong [] · golden 7/7 ca Viet DAT.
+
+object:
+  - truyhoi/src/indexer.py                 # +CuaHong · +lay_bai_va_goc · reindex tra `hong` · main in HONG va exit 1
+  - 06_modules/M13_truyhoi/backlog.md      # +o keo theo: dia chi file:A-B cua ban ghi URL-only lech frontmatter — can FR cho LOI
+  - .factory/worklog/WL-01M278GFTS2ESAS40CG468G94F.yaml
+
+do_do:
+  - lenh: ".venv/Scripts/python truyhoi/tests/check_ban_ghi_khong_file_goc.py   (TRUOC: 4 ve DO 'reindex NEM HTTPError' — WL-01M278GFTFP4)"
+    ket_qua: "SAU: A ok · B ok (hong = [{pipeline-basics, /api/xuat/article/pipeline-basics?dang=goc, 500}], bai khac van index) · C ok 6/6, kiem_lech rong, hong [] · D ok (webmcp-gia ← /api/articles 404, khong vao index, bai khac van) — XANH"
+  - lenh: ".venv/Scripts/python truyhoi/tests/check_golden_du_ca.py   (KHO THAT :8787, lan do that dau tien — WO-099 §1 truoc do traceback)"
+    ket_qua: |
+      kho thật: 16 bản ghi · 1 bản ghi có chữ Hán
+      ok   reindex 16/16 bản ghi, 0 bản ghi hỏng   ·  reindex: {xem 16, doi 16, bo_qua 0, chi_moc 0, mo_coi 0, hong []}
+      ok   7 ca Việt đạt trên kho thật (w_title=5) — trượt: không
+      ok   AC-6.2 · đổi w_title 5→10 KHÔNG đổi đạt/trượt
+      soft — kho có 1 < 2 bài tiếng Trung, vế zh chưa đo được
+      XANH · golden đủ ca · 7 ca Việt đạt · zh: soft 1/2   (T13-6 DONG duoc; T13-9 AC2 dat)
+  - lenh: "TRUYHOI_INDEX=/tmp/gn-idx-that.sqlite python truyhoi/src/indexer.py --day-du   (kho that)"
+    ket_qua: '{"xem": 16, "doi": 16, "bo_qua": 0, "chi_moc": 0, "mo_coi": 0, "hong": []} · exit 0'
+  - lenh: "20 cong M13 con lai (ca kho_mau moi co webmcp-gia)"
+    ket_qua: "20/20 XANH — check_dung_lai_duoc/check_chunk_hien_vat het traceback (T13-9 AC4); check_dia_chi_phan_giai XANH (AC3: line_end ≤ so dong THAN duoc dung); check_anchor_mot_luat in N = 29 heading that (kho lon them)"
+  - lenh: "core/tests: rule_surfaces 31/47/0 · g6a M13 6/6·6·23/1 · check_ba sach · frozen pass · check_map 18/18"
+    ket_qua: "pass het"
+  - lenh: "check_g6b | grep '^  - ' | grep -cE 'T13-|T01-5[1-9]|M13|T08-35|T03-1(48|49|50|25)'"
+    ket_qua: "1 — `T03-148: ID TRÙNG` (hai task file cung so, WO-097 vs C3) — KHONG phai cua luot nay, PM da nhan doi so (Q1 2026-09-11)"
+
+đỏ_do: "g6b 1 dong: T03-148 trung ID — chu la PM (hai task file), dang cho PM doi so. Khong do khac."
+
+quyet_dinh_trong_luot:
+  - "Goi /api/articles TRUOC roi moi thu goc: mot lan goi cho ca fm lan fallback — 0 cua moi, 0 request thua."
+  - "422 KHONG phai hong (hop dong dung FR-075) ⇒ khong vao hong; moi ma khac ngoai 2xx ⇒ CuaHong ⇒ bo ban ghi CO TEN. Loi mang (URLError) van nem — do la LOI chet, khong phai mot ban ghi hong."
+  - "line_start/line_end cua ban ghi URL-only dem tren THAN (PM chot Q3) — o backlog mo, can FR cho LOI mot `dang` .md kem frontmatter."
+
+keo_theo:
+  - "M08/M11 (FR sau, rule 18): `dang` tra .md kem frontmatter cho video URL-only de dia chi file:A-B khop export."
+  - "T13-6 dong duoc: golden 7/7 tren kho that; zh soft 1/2 (kho co 1 bai Han — them 1 bai nua la lat hard)."
+
+tiep_theo: "T01-52 luot hai (check_khai_mot_noi §dai-han) → T03-150 → SCR-27."

@@ -64,6 +64,17 @@ chỗ thuộc một chủ khác — ô trỏ đúng người.
       (gộp FR kế tiếp cùng ô AC-2.2 ở trên).
       · object: `07_plan/M08_api/tasks/T08-35-*` AC3 · `07_plan/M08_api/tasks/T08-35-kho-delta.test.js:24-25`
 
+## 2026-09-11 · KÉO THEO từ `T13-9` (WO-099 — indexer chịu 422)
+
+- [ ] **Địa chỉ `file:A-B` của bản ghi KHÔNG có file gốc lệch export một đoạn frontmatter.**
+      `?dang=goc` trả 422 cho 11/16 bản ghi (video đăng ký URL, FR-075) ⇒ `indexer.lay_bai_va_goc`
+      lấy `than` qua `/api/articles` và đếm `line_start/line_end` trên **chính thân đó** (chốt PM
+      2026-09-11, WO-099 §4.4). Export `kb/<loai>/<slug>.md` có frontmatter ở đầu nên dòng A-B
+      **lệch** đúng số dòng frontmatter; bản ghi có file gốc thì không lệch — hai nghĩa cho một
+      dạng địa chỉ. Đóng bằng: một `dang` của LÕI trả `.md` kèm frontmatter cho bản ghi URL-only
+      (đất M08/M11, đóng băng phạm vi `rule.md` 18 ⇒ **FR**), rồi bỏ nhánh fallback.
+      · object: `truyhoi/src/indexer.py` `lay_bai_va_goc` · `web/api/xuat-cua.mjs:580-622` · `core/assets/xuat-dang.json` `theo_loai.video`
+
 ## Bốn thứ M13 đang chờ — KHÔNG phải backlog
 
 Bốn thứ M13 đang chờ **không** thuộc backlog:
