@@ -138,7 +138,10 @@ if (TU_KIEM) {
   ok(l1.length === 1 && l1[0].includes("Hướng Hướng"), "JS cắt 80 thay 60 ⇒ CHỈ heading dài bị nêu, kèm tên bản (anchor_py ≠ slugGoiY)", l1.join(" · "))
   const mayKhongD = lapMay(SRC, (s) => s.replace('.replace(/đ/g, "d")', ""))
   const l2 = jsPy(soiBaBan(mayKhongD, hs, py))
-  ok(l2.length === 1 && l2[0].includes("Đường ống"), "JS bỏ đ→d ⇒ CHỈ heading `Đường ống…` bị nêu", l2.join(" · "))
+  // Hai heading có `đ` (`cài đặt` · `Đường ống`) nên bỏ bước đ→d làm lệch CẢ HAI — đòi đúng một là
+  // kỳ vọng sai của bản đầu, và một cổng kỳ vọng sai thì đỏ oan đúng lúc nó phải nói thật.
+  ok(l2.length === 2 && l2.some((x) => x.includes("Đường ống")) && l2.some((x) => x.includes("cài đặt")),
+    "JS bỏ đ→d ⇒ nêu ĐÚNG hai heading có `đ`, không nêu heading khác", l2.join(" · "))
   const may = lapMay(SRC)
   const l3 = jsPy(soiBaBan(may, hs, py))
   ok(l3.length === 0, "hai bản y hệt ⇒ 0 lệch JS↔PY (không đỏ oan)", l3.join(" · "))

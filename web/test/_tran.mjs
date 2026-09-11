@@ -34,8 +34,22 @@
  * (6469 byte, chỉ Trang chủ dùng) vào chunk thì `gn.js` còn 98492 — nhưng HTML
  * Trang chủ dư **9 byte**, không đủ cho một thẻ `<script>` thứ hai (+48). Cửa
  * ra của bundle này bị khoá ở trần HTML Trang chủ, không ở chính nó.
+ *
+ * ⚠️ **LẦN NỚI THỨ NĂM — `js` 103 → 104 (T03-149 · C3, chủ dự án duyệt 2026-09-11).**
+ * Số đo, không phải cảm giác: `gn.js` sau `T03-151` là **105463 / 105472** — dư **9 byte**.
+ * `md()` sinh `id` trên heading tốn **128 byte** (một `Record` dedup + `id="${neo(h[2])}"`),
+ * nên 105591 ⇒ vượt 119. Bốn đường lấy byte của `FR-061a §2` đã đo bằng 0 từ trước; rút
+ * tiếp trong `multiwindow.inline.ts` là sửa mã của việc khác và phá trần 8 dòng của `rule.md` 15.
+ *
+ * Cái 128 byte ấy mua gì: `file#anchor` mà M13 sinh (và chatbot trích) **bấm tới đúng heading**.
+ * Không có nó, mọi địa chỉ trỏ vào HTML không có `id` — hỏng IM LẶNG, cả hai phía đều "chạy
+ * đúng" (ô C3 mở 2026-09-02, đóng ở đây). Cổng đối chiếu BA bản: `web/test/heading-id-anchor.test.js`.
+ *
+ * Câu của `FR-074 §3` vẫn đúng và vẫn là nợ: **nới trần mua thời gian, KHÔNG trả nợ.** Đường trả
+ * nợ đã có tên từ `FR-061a §3` (dời `home-motion` ra chunk, kẹt ở trần HTML Trang chủ) — không
+ * phải việc của T03-149, và nới lần thứ sáu thì phải trả nó trước.
  */
-export const TRAN_KB = { css: 104, js: 103 }
+export const TRAN_KB = { css: 104, js: 104 }
 
 /** Trần theo BYTE — thứ phần lớn cổng cần. */
 export const TRAN = {

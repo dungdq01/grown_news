@@ -287,6 +287,8 @@ function md(src) {
     }
   };
   const inline = (s: string) => esc(s).replace(/`([^`]+)`/g, "<code>$1</code>").replace(/\*\*([^*]+)\*\*/g, "<b>$1</b>").replace(/(^|[^*])\*([^*]+)\*/g, "$1<i>$2</i>").replace(/\[(§[^\]]+)\]/g, '<a class="loc">[$1]</a>');
+  // C3 (T03-149) · id heading = slugGoiY + dedup github-slugger, state THEO BÀI (reset mỗi md()) — cùng luật với anchor M13 (FR-073 §1).
+  const D: Record<string, number> = {}; const neo = (t: string) => { const g = slugGoiY(t); let a = g; while (a in D) a = g + "-" + (D[g] = (D[g] || 0) + 1); D[a] = 0; return a; };
   for (const dong2 of src.split(/\r?\n/)) {
     const d = dong2.trim();
     if (!d) {
@@ -310,7 +312,7 @@ function md(src) {
     if (h) {
       dongList();
       const c = Math.min(h[1].length, 4);
-      ra.push(`<h${c}>` + inline(h[2]) + `</h${c}>`);
+      ra.push(`<h${c} id="${neo(h[2])}">` + inline(h[2]) + `</h${c}>`);
       continue;
     }
     const li = d.match(/^[-*]\s+(.*)$/) ?? d.match(/^\d+\.\s+(.*)$/);

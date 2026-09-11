@@ -29,7 +29,13 @@
 Phát hiện khi viết `testcases.md` cho M13 (phép thử s6: *viết không nổi testcase
 ⇒ AC mơ hồ*). Worklog: `WL-01K9X2S6DONG`.
 
-- [ ] **C3 phải sinh `id` trên heading, và `id` đó phải KHỚP `anchor` của M13.**
+- [x] **C3 phải sinh `id` trên heading, và `id` đó phải KHỚP `anchor` của M13.**
+      · **ĐÓNG 2026-09-11** · object: `T03-148` (`web/test/heading-id-anchor.test.js` — ca D là cổng
+      BA bản A3 của `FR-073`: 29 heading kho thật, `id` HTML == `slugGoiY()` == `anchor_py()` khớp từng
+      ký tự) → `T03-149` (`md()` sinh `id`, 3 dòng đổi trong `multiwindow.inline.ts`, nhánh `m13`).
+      Cái giá đã trả: trần `gn.js` nới lần thứ năm 103→104 KB (chủ dự án duyệt 2026-09-11) — 128 byte,
+      lý do ghi trong `web/test/_tran.mjs`. Còn NGOÀI ô: `napvideo.inline.ts:101` là bản sao thứ hai
+      của `slugGoiY` (M11) — `node test/heading-id-anchor.test.js --mot-luat` đếm được, việc của M11.
       Đo 2026-09-02:
       `grep -rn anchor web/render/ web/plugins/` ⇒ **0**;
       `grep -o '<h[23][^>]*>' web/site/index.html` ⇒ `<h2 data-i18n=...>` `<h3>`

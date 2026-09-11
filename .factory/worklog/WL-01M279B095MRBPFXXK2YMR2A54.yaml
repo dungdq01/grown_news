@@ -1,0 +1,63 @@
+entry: ban-giao
+ulid: 01M279B095MRBPFXXK2YMR2A54
+ngay: 2026-09-11
+module: M03_web
+don_vi: [T03-149]
+fr: FR-073 §1 ($dedup) · A3 · M13-R2 · o C3 (M03/backlog.md:7, mo 2026-09-02) · rule.md 15
+nhanh: m13 (worktree ../gn-m13), sau 6d0030f (T03-148)
+tieu_de: >-
+  T03-149 — C3 DONG: md() sinh id tren heading = slugGoiY + dedup github-slugger state THEO BAI
+  (3 dong doi trong multiwindow.inline.ts, rule 15 cho ≤8). Dia chi `file#anchor` cua M13 BAM TOI DUNG HEADING.
+  Gia phai tra: tran gn.js noi lan thu NAM 103→104 KB (chu du an duyet) — 128 byte, ly do ghi trong _tran.mjs.
+
+object:
+  - web/plugins/multiwindow/src/scripts/multiwindow.inline.ts   # +2 dong (comment + D/neo), doi 1 dong heading — git diff --numstat: 3 them / 1 bo
+  - web/test/_tran.mjs                                          # TRAN_KB.js 103 → 104 + khoi ly do (so do, cai 128 byte mua gi, no van con ten)
+  - web/test/heading-id-anchor.test.js                          # sua ky vong tu-kiem ca 'bo đ→d' (xem đỏ_do)
+  - 06_modules/M03_web/backlog.md                               # o C3 [ ] → [x] kem object
+  - .factory/worklog/WL-01M279B095MRBPFXXK2YMR2A54.yaml
+
+ma_da_viet: |
+  const D: Record<string, number> = {};
+  const neo = (t: string) => { const g = slugGoiY(t); let a = g; while (a in D) a = g + "-" + (D[g] = (D[g] || 0) + 1); D[a] = 0; return a; };
+  ...
+  ra.push(`<h${c} id="${neo(h[2])}">` + inline(h[2]) + `</h${c}>`);
+  · `D` khai TRONG md() ⇒ reset moi lan render mot bai (FR-073 §1 $dedup: state theo FILE).
+  · vong WHILE (khong phai if): heading that ten `foo-1` da chiem cho cung khong va.
+  · dung lai slugGoiY :1326 — KHONG viet ham slug thu hai (M13-R2: hai luat slug = link chet hang loat).
+
+do_do:
+  - lenh: "cd web && node build-fe.mjs && node test/heading-id-anchor.test.js   (TRUOC: 5 ve DO 'heading khong co id' — WL-01M279B08T)"
+    ket_qua: |
+      A ok id=huong-dan-cai-dat · ok id=duong-ong-du-lieu (ca đ)
+      B ok `Foo 1 · Foo · Foo · Foo` ⇒ foo-1 · foo · foo-2 · foo-3 · ok render lai cung hau to
+      C ok hai bai, hai lan md() ⇒ ca hai `huong-dan-cai-dat`, khong -1
+      D ·  N = 29 heading that · ok 29/29 heading: ba ban khop tung ky tu
+      pass · id trên heading == slugGoiY == anchor_py · dedup -1/-2 ổn định · state theo bài · exit 0
+  - lenh: "cd web && node test/heading-id-anchor.test.js --tu-kiem"
+    ket_qua: "pass — JS cat 80 ⇒ CHI heading dai bi neu · JS bo đ→d ⇒ neu DUNG HAI heading co `đ` (`cài đặt` + `Đường ống`) · hai ban y het ⇒ 0 lech"
+  - lenh: "cd web && git diff --numstat -- .../multiwindow.inline.ts"
+    ket_qua: "3 them / 1 bo = 4 dong — duoi tran 8 dong cua rule.md 15 (T03-149 AC2 ve dong)"
+  - lenh: "cd web && node test/page-weight.test.js"
+    ket_qua: |
+      TRUOC noi tran: FAIL gn.js 105591 / 105472 (vuot 119; baseline main 105463 — du 9 byte)
+      SAU noi tran:   ok   gn.js 103 KB (105591 / 106496)
+      Con 3 FAIL: gn.css 107604/106496 · tai dau nang nhat mock/chung-cat 325485/338849 · mock/index.html 278914/273408 — DO NEN, xem đỏ_do.
+  - lenh: "7 cong tran (khuon T03-151 AC1): tab-theo-doi-chung-cat · nap-ba-khung · sinh-transcript-ui · o-nhan-nap · chung-cat-hover · sua-dung-man · mo-ta-va-nut-nap"
+    ket_qua: "SAU: 6 RED · 1 ok. BASELINE (stash sua cua toi, build lai): 6 RED · 1 ok — Y HET. Khong ve nao do them vi luot nay."
+
+đỏ_do:
+  - "6 cong tran + 3 ve page-weight (gn.css, tai dau): DO NEN tren main, do doi chieu bang cach stash 2 file sua cua toi roi build lai — cung 6 RED, cung 3 FAIL. Chu la WO-097/T03-151 (dang mo) + no gn.css cu."
+  - "tu-kiem ca 'bo đ→d' lan dau do OAN: toi ky vong neu DUNG MOT heading, nhung `Hướng dẫn cài đặt` cung co `đ` (`đặt`) ⇒ bo buoc do lam lech CA HAI. Sua KY VONG cua cong (khong sua ham) — mot cong ky vong sai thi do oan dung luc no phai noi that."
+
+quyet_dinh_trong_luot:
+  - "Noi tran gn.js 103→104 KB: chu du an duyet 2026-09-11 khi toi bao so do (du 9 byte, can 128). T03-151 AC1 noi 'khong sua _tran.mjs' — de nen lua chon cho NGUOI, khong tu quyet; ly do + duong tra no (FR-061a §3 doi home-motion ra chunk) ghi trong chinh _tran.mjs."
+  - "KHONG rut byte o cho khac trong multiwindow.inline.ts: la sua ma cua viec khac va pha tran 8 dong cua rule 15."
+  - "KHONG tao anchor.ts: build-fe bien dich tung .inline.ts voi bundle:false ⇒ mot `import` con song sot se chet luc chay (build-fe.mjs:26). Dedup 2 dong nen o lai trong md()."
+
+keo_theo:
+  - "M11: `web/plugins/napvideo/src/napvideo.inline.ts:101` la ban sao THU HAI cua slugGoiY — `--mot-luat` dem duoc 3 cho NFD (2 la slug that, 1 la boDau khac muc dich). T03-149 AC2 viet 'grep normalize(NFD) ⇒ 1' qua tho; de nghi PM doi AC thanh 'dung 1 def slugGoiY' hoac mo don vi M11 dung lai ban chung."
+  - "M13 (o backlog da co tu T13-0): spec AC-2.2 (FROZEN) noi ve 'khop anchor M03 render ra' la AC cua C3 — nay CO cong that (T03-148 ca D). Can FR cap nhat mot dong."
+  - "T03-151 (WO-097): tran gn.js nay 104 KB; neu lay them byte duoc thi ha lai — no van la NO (FR-074 §3)."
+
+tiep_theo: "T03-125 buoc 2 — CHO chu du an duyet SCR-27 (da nop 2026-09-11); ma khong bat dau truoc chu duyet."
