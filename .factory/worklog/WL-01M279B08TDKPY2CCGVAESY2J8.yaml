@@ -1,0 +1,49 @@
+entry: ban-giao
+ulid: 01M279B08TDKPY2CCGVAESY2J8
+ngay: 2026-09-11
+module: M03_web (chu web/test) · M13_truyhoi (huong loi — ban thu ba cua luat anchor)
+don_vi: [T03-148]
+fr: FR-073 A3 (cong BA ban) · M13-R2 · o C3 M03/backlog.md:7 (mo 2026-09-02)
+nhanh: m13 (worktree ../gn-m13), sau merge main 4d1b8c2 (PM da doi T03-148 cua WO-097 → T03-151; WO-097 da commit)
+tieu_de: >-
+  T03-148 — TEST C3: web/test/heading-id-anchor.test.js — bon ca A (id == slugGoiY, ca đ) · B (dedup -1/-2 on dinh)
+  · C (state theo bai) · D (BA ban tren 29 heading kho that: id HTML == slugGoiY == anchor_py qua truyhoi/src/anchor.py).
+  Ham THAT trich tu multiwindow.inline.js bang tach() + new Function. DO truoc T03-149: 'heading khong co id'.
+
+object:
+  - web/test/heading-id-anchor.test.js
+  - .factory/worklog/WL-01M279B08TDKPY2CCGVAESY2J8.yaml
+
+quyet_dinh_trong_luot:
+  - "Doc .inline.js (esbuild) — file KHONG tracked; thieu thi cong tu chay `node build-fe.mjs` (cung cach cac test khac gia dinh ban build)."
+  - "Ban thu ba (anchor_py) goi THANG truyhoi/src/anchor.py qua spawn python (da ton tai) — khong doc sample v3; PYTHON env (mac dinh `python`, anchor.py chi stdlib)."
+  - "Heading kho that = moi ##/### trong kb/*/*.md (export), bo .vN.md — cung nguon voi check_anchor_mot_luat cua M13; N in ra (29), nguong 50 chua dat (Q2 luot 1)."
+  - "--tu-kiem chi soi cap JS↔PY (ban HTML truoc T03-149 null o MOI heading — dua vao la do trang thai chua co ma, khong do phep cham)."
+  - "--mot-luat (T03-149 AC2): dem normalize(\"NFD\") trong web/plugins/**/*.ts + git diff --numstat HEAD~1 cua multiwindow.inline.ts ≤ 8."
+
+do_do:
+  - lenh: "cd web && node test/heading-id-anchor.test.js   (TRUOC T03-149)"
+    ket_qua: |
+      A  FAIL `## Hướng dẫn cài đặt` ⇒ id=huong-dan-cai-dat  id=null (heading không có id)
+         FAIL `### Đường ống dữ liệu` ⇒ id=duong-ong-du-lieu (ca đ)  id=null
+      B  FAIL `Foo 1 · Foo · Foo · Foo` ⇒ foo-1 · foo · foo-2 · foo-3  [null,null,null,null]
+      C  FAIL hai bài, hai lần md() ⇒ cả hai `huong-dan-cai-dat`, không -1
+      D  ·  N = 29 heading thật trong kb/*/*.md — ngưỡng 50 chưa đạt
+         FAIL 29/29 heading: ba bản khớp từng ký tự  `1. Overview` · id HTML=null ≠ slugGoiY=1-overview · …
+      5 lỗi · exit 1 — DO vi LUAT: md() render <h2>/<h3> KHONG id (multiwindow.inline.ts:313). Khong ve nao do vi thieu file.
+  - lenh: "cd web && node test/heading-id-anchor.test.js --tu-kiem"
+    ket_qua: "3/3: JS cat 80 ⇒ CHI heading dai bi neu (anchor_py ≠ slugGoiY) · JS bo đ→d ⇒ CHI `Đường ống…` bi neu · hai ban y het ⇒ 0 lech — pass (sau khi sua tu-kiem chi soi JS↔PY; lan dau tu-kiem do oan vi dem ca ban HTML chua ton tai)"
+  - lenh: "cd web && node test/heading-id-anchor.test.js --mot-luat"
+    ket_qua: |
+      FAIL normalize("NFD") trong web/plugins/**/*.ts ⇒ đúng 1 chỗ — thay 3: multiwindow.inline.ts:1327 (slugGoiY) · multiwindow.inline.ts:1707 (boDau — loc dau de tim, KHONG phai luat slug) · napvideo.inline.ts:101 (slugGoiY ban thu hai, M11).
+      ⇒ T03-149 AC2 'dung 1 cho' KHONG the xanh trong pham vi T03-149: hai cho kia CO SAN, ngoai pham_vi_ghi (napvideo la M11; boDau khac muc dich). Bao PM — xem đỏ_do.
+
+đỏ_do:
+  - "5 ve A-D: chu la md() (M03) — dung dich cua T03-149."
+  - "--mot-luat 3 cho NFD: pre-existing — napvideo.inline.ts:101 (M11, ban sao slugGoiY tu WO-021 era) va multiwindow:1707 boDau (ham loc, khong phai slug). AC2 cua T03-149 viet grep qua tho (dem NFD thay vi dem ham slug). De nghi PM: sua AC2 thanh 'dung 1 def slugGoiY trong web/plugins' hoac mo don vi M11 xoa ban sao napvideo."
+
+khong_lam:
+  - "KHONG cham multiwindow.inline.ts (T03-149)."
+  - "KHONG tao web/test/fixtures (fixture inline trong test + heading kho that)."
+
+tiep_theo: "T03-149 — md() sinh id (≤ 8 dong .ts), rebuild .inline.js, tick o C3."
