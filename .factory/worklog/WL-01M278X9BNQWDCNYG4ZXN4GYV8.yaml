@@ -1,0 +1,32 @@
+entry: ban-giao
+ulid: 01M278X9BNQWDCNYG4ZXN4GYV8
+ngay: 2026-09-11
+module: M03_web
+don_vi: ["T03-125 (buoc 1 — wireframe)"]
+nhanh: m13 (worktree ../gn-m13), sau 1ef92db
+tieu_de: >-
+  SCR-27 — wireframe TIM TOAN VAN vao 05_uiux/wireframes/ (tu ban nhap scratchpad 2026-09-10, bo hau to DRAFT):
+  panel duoi o #q, 4 trang thai, hanh vi sau hanh dong (bang), chu qua chu-giao-dien, byte/cong buoc 2.
+  Trang thai CHO NGUOI DUYET — buoc 2 (ma) KHONG bat dau truoc chu duyet + T03-149 (C3 id heading) xong.
+
+object:
+  - 05_uiux/wireframes/SCR-27-tim-toan-van.md
+  - .factory/worklog/WL-01M278X9BNQWDCNYG4ZXN4GYV8.yaml
+
+doi_so_voi_ban_nhap:
+  - "Header: trang thai CHO NGUOI DUYET + cach duyet (khuon SCR-26); ID SCR-27 da vao task T03-125 (PM sua 2026-09-10)."
+  - "Hang 'bam / Enter': cuon toi <h2/h3 id=anchor> do C3 sinh (T03-148/149) — cung luat slugGoiY + dedup theo bai voi M13; phu thuoc T03-149 truoc buoc 2. Bo nhanh 'chua co id thi cuon line_start'."
+  - "Do 2026-09-11 ghi vao header: /api/tim tren :8787 tra 502 vi :8791 chua chay (van hanh) — buoc 2 can service len."
+
+do_do:
+  - lenh: "ls 05_uiux/wireframes | grep -oE 'SCR-[0-9]+' | sort -n | tail -1"
+    ket_qua: "SCR-26 ⇒ SCR-27 la so tiep, khong trung"
+  - lenh: "wc -l 05_uiux/wireframes/SCR-27-tim-toan-van.md"
+    ket_qua: "117 dong · 7 muc (0 sau bai hoc · 1 hinh dang · 2 bon trang thai · 3 hanh vi · 4 chu · 5 co y khong · 6 byte/cong · 7 cau hoi cho nguoi duyet)"
+
+đỏ_do: "khong co."
+
+cho_NGUOI:
+  - "Chu du an duyet SCR-27 (ba cau hoi §7: panel vs cua so · chip chu de toi da 6 · k mac dinh 20)."
+
+tiep_theo: "DUNG: T03-148/149 cho PM doi so T03-148 (trung) + WO-097 commit (Q1·Q2); T03-125 buoc 2 cho duyet SCR-27 + T03-149."
