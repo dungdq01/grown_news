@@ -626,26 +626,41 @@ def _than_theo_khung(text: str, dem: dict) -> str:
     # `MUC` chỉ bắt `## <1 chữ số>.` — mục 6, 7 vẫn khớp. Giữ luôn TÊN để
     # phát lại mục ngoài khung đúng tên model đặt (`_khung_muc()` không biết
     # tên của một mục nó chưa từng khai).
-    tieu_de: dict[str, str] = {}
+    # WO-098 · DANH SÁCH theo thứ tự, KHÔNG phải từ điển khoá theo số.
+    #
+    # Số mục là do MODEL đặt. Bản trước dùng `noi[so] = …`, nên hai `## 6.` thì
+    # cái sau đè cái trước và chữ của cái trước mất sạch, không một dòng log —
+    # đo trên bài thật: 1008 chữ vào, 907 ra. Càng mở cho model viết tự do
+    # (`WO-077`/`WO-094`) thì trùng số càng dễ, tức lỗi càng hay xảy ra.
     moc = []
     for m in MUC.finditer(tho):
-        moc.append((m.start(), m.group(1)))
-        tieu_de[m.group(1)] = m.group(2).strip()
+        moc.append((m.start(), m.group(1), m.group(2).strip()))
     for m in CON.finditer(tho):
-        so = f"{m.group(1)}.{m.group(2)}"
-        moc.append((m.start(), so))
-        tieu_de[so] = m.group(3).strip()
+        moc.append((m.start(), f"{m.group(1)}.{m.group(2)}", m.group(3).strip()))
     moc.sort()
-    noi: dict[str, str] = {}
-    for k, (vt, so) in enumerate(moc):
+
+    lan: list[list[str]] = []          # [số, tên, chữ] — MỖI lần xuất hiện
+    for k, (vt, so, ten) in enumerate(moc):
         het = moc[k + 1][0] if k + 1 < len(moc) else len(tho)
         khoi = tho[vt:het]
         # Bỏ dòng tiêu đề, giữ phần chữ.
-        noi[so] = khoi.split("\n", 1)[1].strip() if "\n" in khoi else ""
+        chu = khoi.split("\n", 1)[1].strip() if "\n" in khoi else ""
+        lan.append([so, ten, chu])
 
     # Model viết văn xuôi trần (không mục nào) ⇒ toàn văn vào `1`.
-    if not noi:
-        noi = {"1": tho}
+    if not lan:
+        lan = [["1", "", tho]]
+
+    # Ô khung lấy lần xuất hiện ĐẦU TIÊN của số ấy; mọi lần còn lại — kể cả
+    # trùng số với một ô khung — xuống đuôi, không cái nào rơi.
+    dung: set[int] = set()
+
+    def _lay(so: str) -> str:
+        for i, (s_, _t, c_) in enumerate(lan):
+            if s_ == so and i not in dung:
+                dung.add(i)
+                return c_
+        return ""
 
     neo = [str(x["neo"]).split("/")[-1]
            for x in (dem.get("vi_tri") or []) if x.get("neo")]
@@ -659,7 +674,7 @@ def _than_theo_khung(text: str, dem: dict) -> str:
         # regex khác nhau của `validate` (`SECTION_RE` vs `SUB_RE`).
         phan.append(f"{dau} {so}{'' if con else '.'} {ten}")
         phan.append("")
-        chu = noi.get(so, "").strip()
+        chu = _lay(so).strip()
         if not chu:
             # Chỗ trống CÓ NHÃN: người duyệt biết ngay phải viết gì, thay vì
             # đoán xem mục này cố ý ngắn hay model bỏ sót.
@@ -684,18 +699,17 @@ def _than_theo_khung(text: str, dem: dict) -> str:
     #
     # Giữ THỨ TỰ MODEL VIẾT (`moc` đã sort theo vị trí), không sort lại theo
     # số: model đánh số theo mạch bài của nó, và sắp lại là biên tập hộ.
-    trong_khung = {so for so, _ in _khung_muc()}
-    da_ra = set()
-    for _, so in moc:
-        if so in trong_khung or so in da_ra:
+    # Mọi lần xuất hiện CHƯA được ô khung nào dùng — kể cả một `## 6.` thứ hai
+    # hay một `## 3.` lặp lại. Khử trùng theo SỐ (bản trước dùng `da_ra`) chính
+    # là cái nuốt mất mục, nên ở đây khử theo CHỈ SỐ lần xuất hiện.
+    for i, (so, ten, chu) in enumerate(lan):
+        if i in dung:
             continue
-        da_ra.add(so)
         con = "." in so
-        ten = tieu_de.get(so, "")
         phan.append(("###" if con else "##") + " " + so
                     + ("" if con else ".") + (" " + ten if ten else ""))
         phan.append("")
-        phan.append(noi.get(so, "").strip())
+        phan.append(chu.strip())
         phan.append("")
 
     return "\n".join(phan).rstrip() + "\n"

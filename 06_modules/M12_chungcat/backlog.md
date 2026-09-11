@@ -1359,3 +1359,16 @@ dia-chi Q5 (M01) · PyMuPDF-ô: cột `giay_phep` mới có ở model.json ($com
       thấy hai màn nói ngược nhau và câu gợi ý dẫn tới xếp THÊM một việc nữa.
       Sửa: tab Transcript đọc luôn tiến độ việc đang chạy của cùng slug.
       object: `web/plugins/cctab/src/cctab.inline.ts:2213` `veTranscript`
+
+- [ ] **7 cổng lấy fixture từ dữ liệu THẬT trong `kb/` — thước đổi theo kho** —
+      `check_khuon_linh_dong` · `check_danh_muc` · `check_export_dan_xuat` ·
+      `check_fix_url` · `check_media_ddl` · `check_mermaid` · `test_gates`.
+      `WO-098` là hoá đơn: cổng lấy *"bài `phan-tich` đầu tiên tìm thấy"* làm
+      nền; đợt clear đổi file nền và một lỗ có sẵn từ `WO-077` mới lộ ra —
+      tức suốt thời gian trước đó cổng **xanh oan**. Chiều ngược cũng có: cùng
+      cơ chế ấy làm vế 9a **đỏ oan** vì số dẫn xuất của bài nền mới không khớp.
+      Không phải cứ cấm đọc dữ liệu thật — thân bài thật là thứ fixture tí hon
+      không thay được (chú thích của chính vế 9 đã ghi). Việc cần làm là **khai
+      tường minh cái nền**: ghim một bản mẫu trong `chungcat/tests/_mau/`, hoặc
+      ít nhất in ra tên file nền khi đỏ, để lần sau đọc thông báo là biết ngay
+      thước hay vật đổi.

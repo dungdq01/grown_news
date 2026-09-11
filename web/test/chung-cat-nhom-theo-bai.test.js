@@ -36,14 +36,33 @@ const CC = doc("../plugins/chungcat/src/chungcat.inline.js")
 const MW = doc("../plugins/multiwindow/src/scripts/multiwindow.inline.js")
 
 /** Trích nguyên một `function <ten>(…){…}` khỏi bundle bằng phép đếm ngoặc. */
+// Trích một khai báo TỰ CHỨA để `new Function` nạp chạy được. Phải đọc CẢ HAI
+// dạng: `function ten(…) {…}` và `const ten = …;` — `WO-097` đổi vài phép sang
+// dạng mũi tên để lấy lại byte, và một `tach` chỉ biết `function` sẽ trả `null`
+// rồi báo "phép lọc không nằm ở cầu" trong khi nó nằm đó. Thước phải dịch theo
+// code, không được nới vế.
 function tach(src, ten) {
-  const i = src.indexOf("function " + ten + "(")
-  if (i < 0) return null
-  const j = src.indexOf("{", i)
+  const dau = new RegExp(
+    `(?:^|\\n)[\\t ]*((?:async )?(?:function ${ten}\\(|const ${ten} = ))`)
+  const m = dau.exec(src)
+  if (!m) return null
+  const i = m.index + m[0].indexOf(m[1])   // bỏ xuống-dòng + thụt lề
+  if (m[1].includes("function")) {
+    const j = src.indexOf("{", i)
+    let sau = 0
+    for (let k = j; k < src.length; k++) {
+      if (src[k] === "{") sau++
+      else if (src[k] === "}" && --sau === 0) return src.slice(i, k + 1)
+    }
+    return null
+  }
+  // Dạng mũi tên: chạy tới dấu `;` ở độ sâu 0 — hết một câu lệnh.
   let sau = 0
-  for (let k = j; k < src.length; k++) {
-    if (src[k] === "{") sau++
-    else if (src[k] === "}" && --sau === 0) return src.slice(i, k + 1)
+  for (let k = i; k < src.length; k++) {
+    const c = src[k]
+    if ("({[".includes(c)) sau++
+    else if (")}]".includes(c)) sau--
+    else if (c === ";" && sau === 0) return src.slice(i, k + 1)
   }
   return null
 }

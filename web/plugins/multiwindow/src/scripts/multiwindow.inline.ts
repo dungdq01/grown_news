@@ -350,15 +350,9 @@ function mucCua(el) {
  * mạng. Chỉ mục chưa nạp ⇒ trả "" và bên gọi LÙI VỀ SLUG — thấy slug vẫn hơn
  * thấy một khối trống.
  */
-function _timBan(slug) {
-  if (!slug) return null;
-  for (const g of BAI) {
-    for (const b of g?.bans ?? []) {
-      if (b?.slug === slug) return b;
-    }
-  }
-  return null;
-}
+const _timBan = (slug) => (slug
+  ? BAI.flatMap((g) => g?.bans ?? []).find((b) => b?.slug === slug) ?? null
+  : null);
 
 /*
  * WO-092 · HAI LỚP VIỆC — khai MỘT chỗ, hai chunk cùng đọc.
@@ -373,21 +367,18 @@ function _timBan(slug) {
  * DANH SÁCH CHO PHÉP: việc nền THỨ BA ra đời sẽ không tự chen vào trạng thái
  * của người.
  */
-function viecNguoi(v) {
-  // Danh sách nằm TRONG hàm: nó là hằng của đúng một phép, và tách ra thành
-  // một `const` ở tầng module tốn thêm byte trong bundle CHUNG mà không ai
-  // khác đọc. Cổng trích hàm này ra chạy được vì nó tự chứa.
-  const l = String(v?.payload?.loai ?? v?.loai ?? "");
-  return l === "sinh-transcript" || l === "chung-cat-mot-nguon";
-}
+// Danh sách nằm TRONG hàm: nó là hằng của đúng một phép, và tách ra thành một
+// `const` ở tầng module tốn thêm byte trong bundle CHUNG mà không ai khác đọc.
+// Dạng mũi tên + regex thay hai phép so: `gn.js` kịch trần, và 30 byte ở đây
+// là 30 byte trên MỌI trang.
+const viecNguoi = (v) => /^(sinh-transcript|chung-cat-mot-nguon)$/
+  .test(String(v?.payload?.loai ?? v?.loai ?? ""));
 
 /** Việc của MÁY mà HỎNG — lọc trơn là giấu một lỗi thật, nên nó vẫn nổi. */
-const vatHong = (v) =>
-  !viecNguoi(v) && /^(dung|hong)$/.test(String(v?.giai_doan ?? ""));
+const vatHong = (v) => !viecNguoi(v)
+  && /^(dung|hong)$/.test(String(v?.giai_doan ?? ""));
 
-function tenBai(slug) {
-  return String(_timBan(slug)?.title ?? "");
-}
+const tenBai = (slug) => String(_timBan(slug)?.title ?? "");
 
 
 async function nap() {
@@ -1814,9 +1805,8 @@ function capNhin(o, datLai, chon) {
    * các CHẶNG bên trong dòng). Trần im lặng ngừng chạy là thứ không cổng nào
    * bắt được nếu phép đo cũng neo cứng cùng một chuỗi.
    */
-  const sel = chon || ".cd";
   const ds = [];
-  for (const e of o.querySelectorAll(sel)) {
+  for (const e of o.querySelectorAll(chon || ".cd")) {
     e.classList.remove("qua");
     if (!e.classList.contains("off")) ds.push(e);
   }
@@ -1837,7 +1827,7 @@ function capNhin(o, datLai, chon) {
       o.dataset.cap = String((Number(o.dataset.cap) || TRAN_NHIN) + TRAN_NHIN);
       // `sel` phải đi theo: quên nó thì lần bấm thứ hai cắt theo `.cd` trong
       // khi lần đầu cắt theo `.cc-bai` — hai phép cắt trên cùng một lưới.
-      capNhin(o, false, sel);
+      capNhin(o, false, chon);
     };
     o.after(n);
   }

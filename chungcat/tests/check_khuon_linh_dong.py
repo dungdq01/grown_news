@@ -190,14 +190,66 @@ else:
         f = R / "kb" / ten
         if f.exists():
             (tam / ten).write_text(f.read_text(encoding="utf-8"), encoding="utf-8")
-    r = subprocess.run(
-        [sys.executable, str(R / "core" / "src" / "source_distiller" / "validate.py"),
-         str(tam)], capture_output=True, text=True, encoding="utf-8", errors="replace")
+    # `word_count`/`citations_sampled` là SỐ DẪN XUẤT tính cho một thân KHÁC —
+    # ta vừa ghép thân đã sửa vào frontmatter cũ. Không chuẩn hoá thì vế đỏ vì
+    # lệch số đếm chứ không vì phép cấm mục thừa, tức đỏ oan, tức không canh gì
+    # cả (WO-098). Dùng `--fix` của CHÍNH `validate` — tự chế lại bộ đếm ở đây
+    # là mở đường cho xanh oan.
+    VAL = str(R / "core" / "src" / "source_distiller" / "validate.py")
+    subprocess.run([sys.executable, VAL, str(tam), "--fix"],
+                   capture_output=True, text=True, encoding="utf-8",
+                   errors="replace")
+    r = subprocess.run([sys.executable, VAL, str(tam)],
+                       capture_output=True, text=True, encoding="utf-8",
+                       errors="replace")
     ra = ((r.stdout or "") + (r.stderr or "")).strip()
     cuoi = ra.splitlines()[-1] if ra else "(không output)"
     ok("0 lỗi" in ra, "9a · và `validate` THẬT nhận nó",
        "nếu đỏ: `validate` đã thêm phép cấm mục thừa ⇒ phép nới của WO-077 "
        "không còn hợp lệ, phải mở FR chứ không vá tiếp ở đây. " + cuoi)
+
+# ── 10 · Hai mục TRÙNG SỐ — không cái nào được biến mất ───────────────────
+#
+# `WO-098`. Số mục do MODEL đặt, không có gì bảo đảm duy nhất; lấy nó làm khoá
+# từ điển (`noi`, `tieu_de`, `da_ra`) thì mục sau đè mục trước và chữ mất sạch,
+# không một dòng log. Đo trên bài THẬT vì fixture tí hon không có sẵn `## 6.`
+# của riêng nó — đúng lý do lỗi này sống sót tới hôm nay.
+print(f"{NL}10 · Mục trùng số: cả hai phải còn{NL}")
+
+_goc = next((p for p in sorted((R / "kb").rglob("*.md"))
+             if "ho_so: phan-tich" in p.read_text(encoding="utf-8")), None)
+if _goc is None:
+    ok(False, "10 · tìm được một bản `phan-tich` thật để làm nền")
+else:
+    _t = _goc.read_text(encoding="utf-8")
+    _than = _t[_t.index(NL + "---", 3) + len(NL + "---"):].strip()
+    _co6 = re.search(r"^##\s+6\.?\s+(.+)$", _than, re.M)
+    if not _co6:
+        ok(False, "10 · bài nền có sẵn một `## 6.` để gây trùng",
+           "không trùng thì vế này không đo được gì — đổi bài nền")
+    else:
+        _ten_cu = _co6.group(1).strip()
+        _them = (_than + NL * 2 + "## 6. Mục sáu thứ HAI" + NL * 2
+                 + "Sáu bis." + NL * 2 + "## 7. Bảy" + NL * 2 + "Bảy." + NL)
+        _ra = worker._than_theo_khung(_them, DEM)
+
+        ok(_ten_cu in _ra,
+           "10 · mục `## 6.` CỦA BÀI GỐC còn sau khi model thêm một `## 6.` nữa",
+           f"trùng số ⇒ đè mất `{_ten_cu[:40]}`")
+        ok("Mục sáu thứ HAI" in _ra and "Sáu bis." in _ra,
+           "10a · và mục `## 6.` model vừa thêm cũng còn")
+
+        _dem_chu = lambda x: len([w for w in re.split(r"\s+", x) if w])
+        _vao, _rao = _dem_chu(_them), _dem_chu(_ra)
+        ok(_rao >= _vao,
+           f"10b · KHÔNG chữ nào mất (vào {_vao} · ra {_rao})",
+           "phát lại chỉ được thêm tiêu đề, không được bớt chữ")
+
+        _bt = worker._than_theo_khung(_than, DEM)
+        ok(_dem_chu(_bt) >= _dem_chu(_than),
+           f"10c · vẫn bất biến trên thân KHÔNG trùng "
+           f"(vào {_dem_chu(_than)} · ra {_dem_chu(_bt)})",
+           "sửa chỗ trùng mà làm hỏng đường thường thì lỗ hổng chỉ đổi chỗ")
 
 if loi:
     print(f"{NL}{loi} lỗi{NL}")

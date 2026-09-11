@@ -582,3 +582,13 @@ Thay đổi: đính chính `WL-01K9P5WO027.yaml` + `web/test/WORKLOG.md`.
     `core/tests/check_g6b.py`; ID giữ nguyên, chỉ đổi người làm. Dev M13 **không
     chờ**: cổng hết crash nên `T01-52` → `T01-51` → `T13-1` chạy song song.
   - **Ô này chết ở gate của M01**, không phải của M13 — tick bằng commit của `T01-53`.
+
+- [ ] **CLI `khung.py` chết ngay dòng đầu — `NameError: TINH_TUY_O`** —
+      `WO-038` gỡ có chủ ý `TINH_TUY_O`/`TINH_TUY_MAX`/`TINH_TUY_BULLETS` (chú
+      thích ở `core/src/source_distiller/khung.py:60` nói rõ), nhưng khối
+      `if __name__ == "__main__"` ở dòng 111 còn tham chiếu. Chạy
+      `./.venv/Scripts/python.exe core/src/source_distiller/khung.py` là
+      traceback, chưa in được một dòng nào. Không cổng nào bắt: `khung.py`
+      được **import** ở mọi nơi (đường import lành), chỉ đường **chạy thẳng**
+      hỏng — và không cổng nào chạy thẳng nó. Phát hiện 2026-09-11 khi kiểm
+      từng lệnh trước lúc ghi vào `_devops/run.md`.

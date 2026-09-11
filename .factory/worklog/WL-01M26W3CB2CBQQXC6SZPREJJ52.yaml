@@ -1,0 +1,97 @@
+entry: ban-giao
+ulid: 01M26W3CB2CBQQXC6SZPREJJ52
+ngay: 2026-09-11
+module: M03_web
+don_vi: T03-148
+wo: WO-097
+tieu_de: >-
+  Khai lenh chay vao _devops/infra.md — va chinh lenh do bat gn.js vo tran;
+  lay lai byte, sua thuoc `tach`, kem so lieu dot clear du lieu cu
+
+object:
+  - _devops/infra.md
+  - web/plugins/multiwindow/src/scripts/multiwindow.inline.ts
+  - web/test/chung-cat-nhom-theo-bai.test.js
+  - 07_plan/M03_web/tasks/T03-148-lay-lai-byte-va-thuoc-tach.md
+  - .factory/wo/WO-097-lay-lai-byte-sau-dot-chung-cat.md
+
+chi_dao: |
+  *"khai bao cac lenh chay vao @_devops/infra.md"* — va truoc do
+  *"sau khi ban lam xong chung ta clear het data chung cat va transcript cu di,
+  coi nhu vut rac, sau nay theo logic moi"* + *"tai lieu va video thi giu nguyen"*.
+
+infra_md: |
+  8 muc, viet tu lenh DA CHAY THAT trong phien nay chu khong tu tri nho:
+  0 `bash chay.sh` (ba tang + hai worker) · 1 build FE bat buoc · 2 restart LOI
+  va cach dung SACH truoc khi dung DB · 3 chay cong TUNG FILE (khong `npm test`)
+  + 7 do nen da biet · 4 tran byte · 5 phu thuoc ngoai (typst/ffmpeg/yt-dlp)
+  · 6 cho nam du lieu + sao luu + kiem tham chieu treo · 7 bay Python-tren-Windows.
+
+  **Khong ship lenh chua chay.** Chay lai chinh ba lenh chan doan cua tai lieu:
+    §6 tham chieu treo -> `0 tham chieu treo`
+    §7 kiem PNG        -> `15 PNG hong`, TAT CA o `web/_quartz/docs/images/`
+    §4 tran byte       -> `gn.css 104852 | gn.js 105539`  <= VO TRAN
+
+  15 PNG kia da ghi thang vao §7 la **da biet va chap nhan**: khong duong nao
+  phuc vu `_quartz` (chu con dung MOT chu thich o `api/dungchung.mjs:44`), 6 PNG
+  *co* phuc vu da phuc hoi tu `4562dfb`. Nguong bao dong ghi ro: hon 15, hoac
+  mot duong ngoai `_quartz`, la vua pha thu dang dung.
+
+do_do: |
+  Web  : 7 do nen (api-guard · man-tai-lieu · man-video · moc-fe-con-that ·
+         mot-bien-mau · opacity-khong-pha-contrast · page-weight)
+         KHONG mot do moi — dung danh sach §3.
+  do_do: chinh dot WO-092…096 (cau `multiwindow` nhan them 4 phep, khong tra byte).
+
+lay_lai_byte: |
+  105539 -> 105453 (duoi tran 105472 **19 byte**), KHONG dung den `_tran.mjs`:
+    viecNguoi/vatHong sang mui ten        -> 105520
+    bo bien `sel` thua trong `capNhin`    -> 105507
+    _timBan/tenBai sang mui ten           -> 105453
+  Cua that sau restart: `GET /gn.js` = 105463 byte UTF-8 (`.length` 105453 —
+  chenh la ky tu nhieu byte, cong do `.length` nen hai so khong phai mot).
+
+ve_dat_nhat_thuoc_phai_di_theo_code: |
+  Doi sang mui ten lam cong `chung-cat-nhom-theo-bai` DO: helper `tach()` cua no
+  chi biet `function ten(`. Hai duong sai deu bi loai:
+    · noi ve  -> mat luon phep do
+    · giu ma o dang cu de chieu thuoc -> thuoc dieu khien code
+  Sua THUOC. Va do lai thi loi ra `tach` cu con **khong doc duoc `async function`**
+  (`ccNap` chi khop nho `indexOf` tim chuoi con) — mot lo im lang tu truoc.
+
+  Neo moi `(?:^|\n)[\t ]*((?:async )?(?:function ten\(|const ten = ))`.
+  Lan dau toi neo `^…` cung, lam vo ve 7 (`async function ccNap`) — **toi da
+  chan doan nham la "xanh oan co san"**, doc lai file thi day la hong do CHINH
+  neo vua them. Da sua, khong de lai loi phan sai trong tai lieu.
+
+  Chung minh con DO DUOC (4 phep, 3 dang khai bao):
+    viecNguoi (mui ten) · _cau (function) · ccNap (async fn) · ccKpi (function)
+    -> co trich duoc; xoa ten khoi nguon -> ca bon tra `null`.
+
+TDZ_da_kiem_chu_khong_doan: |
+  Doi `function` -> `const` chi an toan neu `_cau()` khong chay luc nap module.
+  Ba cho goi: dong 45 va 67 **trong** `goiChunk` (thut le), dong 2891 o tang
+  module nhung SAU cho khai `_timBan`. Kiem bang chi so chuoi, khong bang mat.
+
+clear_du_lieu_cu_so_lieu_doi_chieu_backup: |
+  Sao luu `_backup/truoc-clear-2026-09-10/` (08:09) roi moi xoa. Doi chieu may:
+                    TRUOC -> SAU
+    bai_viet          3   ->  3   (nhung KHAC slug — xem duoi)
+    media            19   ->  8   (blob transcript cu di theo)
+    nhap_chung_cat    8   ->  2
+    video             9   -> 11   (chu du an them 2 — GIU NGUYEN dung yeu cau)
+    tai_lieu          2   ->  2   (GIU NGUYEN)
+
+  Slug: BI XOA `phan-tich-cai-dat-…-hermes-tren-vps`,
+  `phan-tich-doanh-nghiep-mot-nguoi-…`; GIU bai viet tay `ruflo-bo-khung-…`;
+  MOI SINH sau clear `phan-tich-ecomerce-skill-claude`, `phan-tich-primeagent-github`
+  (viec chay 18:10 va 18:18, tuc **sau** backup 08:09 — day la ket qua cua logic
+  moi, khong phai rac sot lai; da kiem truoc khi dinh xoa them).
+
+  Kiem WO-093 tren cua that: ca hai bai `site 200 · api 200` — tuc **xong la len
+  thang site**, du mot ban con `review_status: draft` trong bang. Con so ay
+  khong chan phuc vu, nen KHONG phai bug; ghi lai de lan sau khong bao dong nham.
+
+con_no: |
+  `ho_so`/`source_type` van cung `phan-tich`/`article` — o backlog M12 dang mo,
+  khong thuoc WO nay.

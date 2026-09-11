@@ -1,0 +1,79 @@
+entry: ban-giao
+ulid: 01M26WXR046QK89FMJRHXJS6C4
+ngay: 2026-09-11
+module: M12_chungcat
+don_vi: T12-41
+wo: WO-098
+tieu_de: >-
+  _than_theo_khung nuot IM LANG muc trung so — mat 108 chu cua bai that;
+  va ve 9a cua cong dang DO OAN
+
+object:
+  - chungcat/src/worker.py
+  - chungcat/tests/check_khuon_linh_dong.py
+  - 07_plan/M12_chungcat/tasks/T12-41-khong-nuot-muc-trung-so.md
+  - .factory/wo/WO-098-than-theo-khung-nuot-muc-trung-so.md
+
+tim_ra_the_nao: |
+  Khong ai bao cao. Cong `check_khuon_linh_dong` do sau dot clear du lieu, va
+  toi suyt ghi no la "nhieu fixture" roi cho qua — vi thong bao la
+  `word_count khai 1008 nhung dem duoc 910`, nghe dung nhu lech so dem.
+
+  Loai gia thuyet do bang mot phep do NGUOC: cho than DUNG khung di qua ham,
+  khong them gi.
+    than goc                          : 1008 chu
+    qua ham, khong them gi            : 1008 chu   <- bat bien
+    them 2 muc (+7 chu)               : 1015 mong doi
+    qua ham                           :  907       <- MAT 108
+  Bat bien tren duong thuong ma mat chu khi co muc them ⇒ khong phai fixture.
+
+nguyen_nhan: |
+  `noi: dict[str, str]` va `tieu_de: dict[str, str]` khoa theo SO MUC. Bai nen
+  moi (sinh sau dot clear) co san `## 6. Huong dan tich hop cho Lap trinh vien`;
+  cong them mot `## 6.` nua ⇒ cai sau de cai truoc, ca khoi 108 chu bien mat,
+  KHONG mot dong log. Vong phat lai muc ngoai khung con `da_ra` — cung khu
+  trung theo so, nen sua moi `noi` van mat.
+
+  So muc la do MODEL dat. Lay no lam khoa tu dien la gia dinh sai tu dau, va no
+  nam dung trong duong ma `WO-077`/`WO-094` vua mo cho model viet tu do —
+  cang tu do thi cang de trung.
+
+vi_sao_lo_nay_song_toi_hom_nay: |
+  Bai nen CU khong co `## 6.` cua rieng no, nen cong xanh. Cong lay
+  `next(p for p in kb/**/*.md if 'ho_so: phan-tich' in ...)` — tuc **phu thuoc
+  am vao mot file du lieu**. Dot clear doi file nen va lo hong lo ra.
+  Ghi lai day nhu mot lop loi: cong doc du lieu that thi du lieu that la mot
+  phan cua thuoc.
+
+sua: |
+  `moc` mang ca TEN; dung `lan: list[[so, ten, chu]]` theo THU TU xuat hien
+  thay cho hai tu dien. O khung lay lan xuat hien DAU TIEN cua so ay va danh
+  dau `dung`; moi lan con lai — ke ca trung so voi mot o khung — xuong duoi,
+  khu trung theo CHI SO chu khong theo so muc.
+
+cong:
+  them: chungcat/tests/check_khuon_linh_dong.py — ve 10 · 10a · 10b · 10c
+  do_truoc: |
+    ve 10  DO: "trung so ⇒ de mat `Huong dan tich hop cho Lap trinh vien`"
+    ve 10b DO: "vao 1077 · ra 964"
+    ve 10c XANH ngay tu dau — co y: no canh duong THUONG khong bi sua hong.
+  xanh_sau: "10b · vao 1077 · ra 1077"
+  ve_9a_het_do_oan: |
+    9a ghep than da sua vao frontmatter cu roi chay `validate` that, nen
+    `word_count`/`citations_sampled` — SO DAN XUAT — luon lech. No do vi lech
+    so dem chu khong vi phep cam muc thua, tuc do oan, tuc khong canh gi ca:
+    dung cai bay ma chinh chu thich cua ve ay da canh bao mot lan.
+    Chuan hoa bang `validate.py --fix` — bo dem CUA CHINH validate. Tu che lai
+    mot bo dem o cong la doi do oan lay xanh oan.
+
+do_do: |
+  M12  : 0 do (truoc khi sua: 1)
+  core : 7 do nen, khong do moi
+  E2E `--mock`: nguyen lieu -> model -> verify -> nhap · 1 dong egress · 0 token
+  do_do: chinh toi — dot clear du lieu lam lo ra lo co san tu `WO-077`.
+
+restart: |
+  `worker.py` doi ⇒ `bash chay.sh` (ba tang + hai worker).
+  LOI 8787 -> 200 · THO 8790/health -> 200 · 2 file `log/worker-*.pid`.
+  Nhan tien ghi vao `_devops/infra.md` §0: `:8790` KHONG co `/khoe`
+  (toi vua go nham va duoc 404) — duong dung la `/health`.
