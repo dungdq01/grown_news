@@ -157,9 +157,13 @@ const CHUNK = {
   // `cctab` KHÔNG có màn nào phát thẻ `<script>` cho nó — `multiwindow` nạp
   // lúc người bấm tab. Nó vẫn phải khai ở đây để `/gn-cctab.js` được phục vụ.
   cctab: join(WEB, "plugins", "cctab", "src", "cctab.inline.js"),
+  // `timkiem` (T03-125 · SCR-27): panel tìm toàn văn, `multiwindow` nạp lúc ô `#q`
+  // NHẬN FOCUS. Người chưa gõ thì không tải một byte nào của nó — `gn.js` vừa phải
+  // nới trần lần thứ năm cho C3, nên màn này không được vào bundle chung.
+  timkiem: join(WEB, "plugins", "timkiem", "src", "timkiem.inline.js"),
 }
 /** Chunk nạp THEO YÊU CẦU — không trang nào xin bằng thẻ, và đó là chủ ý. */
-export const chunkTheoYeuCau = ["cctab"]
+export const chunkTheoYeuCau = ["cctab", "timkiem"]
 const chunkJs = Object.fromEntries(Object.entries(CHUNK)
   .filter(([, f]) => existsSync(f))
   .map(([k, f]) => [k, ["(function(){",

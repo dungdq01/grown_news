@@ -163,3 +163,12 @@ log/*.pid
 # commit M12 2026-09-07 — trạng thái chạy không vào git
 log/                     # nhật ký runtime (worker/api jsonl+out) — không phải nguồn
 chungcat/log/
+
+# M13_truyhoi — DỮ LIỆU DẪN XUẤT của service, sinh lúc chạy (T13-2 · T13-6).
+# `index.sqlite` dựng lại được từ kho bất cứ lúc nào ("mất chỉ mục không mất gì");
+# `tin-hieu.*` là hai bộ đếm vận hành của MÁY ĐANG CHẠY, không phải của repo.
+truyhoi/index.sqlite
+truyhoi/index.sqlite-wal
+truyhoi/index.sqlite-shm
+truyhoi/tin-hieu.json
+truyhoi/tin-hieu.jsonl

@@ -1,8 +1,9 @@
 # SCR-27 · TÌM TOÀN VĂN — nâng ô "Tìm bài, khái niệm, nguồn…" thành truy hồi (T03-125 · bước 1)
 
-> **Trạng thái: CHỜ NGƯỜI DUYỆT TRỌN FLOW — chưa một dòng mã nào của bước 2 (T03-125 AC0).**
-> Nộp 2026-09-11 (dev M13). Duyệt bằng một dòng ghi vào đây (khuôn SCR-26: *"ĐÃ DUYỆT — chủ dự án, <ngày>"*);
-> đổi flow SAU duyệt = mở lại bước 1, không vá giữa code.
+> **Trạng thái: ĐÃ DUYỆT — chủ dự án, 2026-09-11** (nguyên văn: *"1. duyệt SCR - 27"*).
+> Duyệt NGUYÊN BẢN, không kèm sửa ⇒ ba câu hỏi §7 lấy đúng phương án đã vẽ: **panel trượt dưới ô**
+> (không mở cửa sổ riêng) · chip chủ đề **tối đa 6 + ▾** · `k` mặc định **20** do web khai.
+> Đổi flow SAU duyệt = mở lại bước 1, không vá giữa code (bài học M12 số 1).
 > ID: **SCR-27** — task T03-125 đã sửa từ SCR-22 (2026-09-10, `SCR-22-nhip-sinh.md` là của team M12).
 > Dữ liệu thật để dựng: `GET /api/tim?q=…` (T08-35, đã merge main) → `POST truyhoi/truy-hoi` (T13-4) — đo 2026-09-11:
 > `/api/tim` trên `:8787` trả 502 vì service `:8791` chưa chạy (vận hành), kho thật 16 bản ghi index 16/16.

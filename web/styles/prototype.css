@@ -3285,3 +3285,38 @@ border-radius:var(--radius-lg);backdrop-filter:var(--blur-lift)}
   border-color:var(--c-video);color:var(--primary-foreground)}
 .bt-bt button[data-act="cc-tu-tr"]:hover{filter:brightness(1.08);
   border-color:var(--c-video);color:var(--primary-foreground)}
+
+/* ══ T03-125 · SCR-27 — PANEL TÌM TOÀN VĂN ═══════════════════════════
+ * Markup sinh trong chunk `gn-timkiem.js` nên luật phải nằm ở đây: bài học
+ * "menu vô hình". Token-only. `z-index` 39: dưới thanh đầu (40), trên thân trang.
+ * Nhãn HOA (`.tim-so`) khai `--f-ui` + `--tr-lb` NGAY TRONG LUẬT — TYPOGRAPHY luật 3
+ * đo từng luật, không đo thừa kế. Địa chỉ KHÔNG dùng font mono: mono dành cho MÃ thật. */
+.tim-w{position:absolute;left:0;right:0;top:calc(100% + var(--s-3xs));z-index:39;
+  max-height:60vh;overflow:auto;background:var(--card);color:var(--card-foreground);
+  border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--e-3);
+  padding:var(--s-2xs);font-family:var(--f-ui)}
+.tim-p,.tim-ch{margin:0;padding:var(--s-2xs) var(--s-xs);font-size:var(--fs-meta);
+  color:var(--ink-2);line-height:var(--lh-ui)}
+.tim-cho{color:var(--ink-3)}
+.tim-loi{color:var(--destructive)}
+.tim-so{margin:0;padding:var(--s-2xs) var(--s-xs);font-family:var(--f-ui);
+  font-size:var(--fs-micro);color:var(--ink-3);letter-spacing:var(--tr-lb);
+  text-transform:uppercase}
+.tim-ds{display:flex;flex-direction:column}
+.tim-d{display:grid;gap:2px;width:100%;text-align:left;cursor:pointer;color:inherit;
+  padding:var(--s-2xs) var(--s-xs);background:transparent;border:0;
+  border-left:2px solid transparent;border-radius:var(--r-sm)}
+.tim-d:hover,.tim-d[aria-selected="true"]{background:var(--muted)}
+.tim-d[aria-selected="true"]{border-left-color:var(--brand)}
+.tim-bc,.tim-a{font-size:var(--fs-micro);color:var(--ink-3);line-height:var(--lh-tight)}
+.tim-a{font-size:var(--fs-nano)}
+.tim-l{justify-self:start;font-size:var(--fs-nano);color:var(--muted-foreground);
+  border:1px solid var(--line-2);border-radius:var(--r-pill);padding:0 var(--s-2xs)}
+.tim-t{font-size:var(--fs-meta);color:var(--ink);line-height:var(--lh-ui)}
+.tim-t mark{background:var(--brand-bg);color:inherit;border-radius:2px}
+.tim-ch{display:flex;justify-content:space-between;gap:var(--s-xs);
+  font-size:var(--fs-nano);color:var(--ink-3)}
+.tim-lai{font:inherit;font-size:var(--fs-nano);cursor:pointer;color:var(--brand);
+  background:transparent;border:1px solid var(--line-2);border-radius:var(--r-sm);
+  padding:0 var(--s-2xs)}
+.tim-lai:hover{background:var(--muted)}

@@ -1,0 +1,80 @@
+entry: ban-giao
+ulid: 01M27C5Y7DQM8GRZ04Y7GYDT8Z
+ngay: 2026-09-11
+module: M03_web (chu web/plugins · web/render · web/styles) · M13_truyhoi (huong loi)
+don_vi: ["T03-125 (buoc 2)"]
+scr: SCR-27 (DA DUYET — chu du an 2026-09-11, nguyen van *"1. duyet SCR - 27"*)
+fr: FR-072 §1.4 (web goi M13 de TIM) · AC-5.1 · AC-5.2 · M13-R4 · ui_flow §2 · rule.md 15
+nhanh: m13 (worktree ../gn-m13), sau 7bf96c1 (T03-149)
+tieu_de: >-
+  T03-125 buoc 2 — UI TIM TOAN VAN: chunk web/plugins/timkiem (nap khi o #q NHAN FOCUS, 1 dong moc trong
+  multiwindow), panel 4 trang thai + so ban ghi trong pham vi, highlight TU TO tu `body` (0 snippet),
+  bam ⇒ mo cua so doc + nhay id heading (C3), phim ↑↓/Enter/Esc, x-phien cho tin hieu M13.
+  CHAY THAT ca chuoi: web → truyhoi(index that 111 chunk) — go co dau va khong dau ra CUNG ket qua.
+
+object:
+  - web/plugins/timkiem/src/timkiem.inline.ts        # MOI — chunk gn-timkiem.js
+  - web/render/assets.mjs                            # khai CHUNK.timkiem + chunkTheoYeuCau
+  - web/plugins/multiwindow/src/scripts/multiwindow.inline.ts   # +2 dong: capTim (1 dong) + moc focusin (1 dong)
+  - web/styles/prototype.css                         # luat .tim-* token-only
+  - 05_uiux/wireframes/SCR-27-tim-toan-van.md        # ghi chu ky duyet nguyen van + ba cau hoi §7 lay ban da ve
+  - .gitignore                                       # truyhoi/index.sqlite · tin-hieu.* (du lieu dan xuat cua may dang chay)
+  - 07_plan/M03_web/tasks/T03-125-tim-toan-van.test.js  # CONG VIET TRUOC (rule.md 8) — o thu muc task, xem cho_PM
+  - .factory/worklog/WL-01M27C5Y7DQM8GRZ04Y7GYDT8Z.yaml
+
+quyet_dinh_trong_luot:
+  - "Duyet NGUYEN BAN ⇒ ba cau hoi §7 lay dung phuong an da ve: panel truot duoi o (khong cua so rieng) · chip chu de ≤6+▾ · k mac dinh 20 do WEB khai (M13 tu choi request thieu k — AC-5.2)."
+  - "Cau hoi di NGUYEN VAN xuong M13: chuan hoa la viec cua chuan_hoa_tim; lam them o FE la ban thu hai cua mot luat (M13-R1)."
+  - "Highlight TU TO tu `body` day du (bo dau hai phia de so khop), cat CUA SO HIEN THI 220 ky tu — cat hien thi, khong cat du lieu. 0 snippet() (M13-R4)."
+  - "Phep loc the cu (`TIM`/`apLoc`) GIU NGUYEN: loc la thu hep luoi dang xem, tim la truy hoi ca kho — hai viec khac nhau."
+  - "Moc trong multiwindow: 1 dong `capTim` (khuon `capCctab`, xoa lo hua khi loi) + 1 dong `focusin` ⇒ diff 4 dong, duoi tran 5 dong cua T03-125."
+  - "`.env` (gitignored) sinh `KHOA_WEB_TRUYHOI` de chuoi that chay duoc — khoa chieu web→truyhoi theo quy uoc ADR-08 da chot."
+
+do_do:
+  - lenh: "node 07_plan/M03_web/tasks/T03-125-tim-toan-van.test.js   (TRUOC khi co ma)"
+    ket_qua: "FAIL web/plugins/timkiem/src/timkiem.inline.ts tồn tại — T03-125 bước 2 chưa dựng · exit 1 (DO dung ly do)"
+  - lenh: "node 07_plan/M03_web/tasks/T03-125-tim-toan-van.test.js   (SAU)"
+    ket_qua: |
+      1 · chunk: ok khai trong CHUNK · ok trong chunkTheoYeuCau · ok phuc vu /gn-timkiem.js · ok moc ≤5 dong (thay 1) · ok goi khi FOCUS · ok khong vao bundle chung
+      2 · ok cau hoi di nguyen van · ok go `rủi ro`/`rui ro`/`RỦI RO` deu to duoc · ok 0 snippet( · ok body duoc escape truoc khi to
+      3 · ok ĐANG TÌM noi cau · ok hien `12 bản ghi trong phạm vi` · ok 0-ket-qua CO LOC ⇒ goi y noi pham vi · ok 0-ket-qua KHONG loc ⇒ "không có trong kho" · ok loi ⇒ ma + nut thu lai · ok KHONG hien bm25 · ok hien ca `file:A-B` lan `slug:t=` · ok breadcrumb
+      4 · ok goi moTheoSlug · ok scrollIntoView · ok tra id · ok data-i
+      5 · ok ArrowDown/ArrowUp/Enter/Escape · ok AbortController · ok debounce 250 · ok x-phien · ok FE khong tu dem
+      6 · ok 12 class deu co luat trong prototype.css
+      pass · exit 0
+  - lenh: "node 07_plan/M03_web/tasks/T03-125-tim-toan-van.test.js --tu-kiem"
+    ket_qua: "pass — nen (go khong dau to duoc · k di trong query · 5 trang thai) + bo <mark> ⇒ doi ket qua · bo k ⇒ duong mat k · 5 trang thai ra 5 HTML KHAC nhau"
+  - lenh: "CHAY THAT ca chuoi (script scratchpad): truyhoi thuc (index THAT, 111 chunk / 16 tai lieu) tren cong tam ← web thuc tren :8898 voi KHOA_WEB_TRUYHOI ← GET /api/tim"
+    ket_qua: |
+      truyhoi tạm: 59474 · 111 chunk
+      q='rủi ro'    tong=3 trong_pham_vi=16 → article/phan-tich-ecomerce-skill-claude.md:79-82 · article/phan-tich-primeagent-github.md:77-81
+      q='rui ro'    tong=3 trong_pham_vi=16 → CUNG hai dia chi  (AC1: co dau va khong dau ra CUNG ket qua — do THAT, khong mock)
+      q='đường ống' tong=2 trong_pham_vi=16 → repo/ruflo-bo-khung-van-hanh-cho-agent.md:50-67 · :69-82
+      0 kết quả: tong=0 · trong phạm vi 16   (AC3: "không có trong kho", va M13 dem tin hieu)
+  - lenh: "reindex chi muc THAT cua service dang chay"
+    ket_qua: '{"xem":16,"doi":16,"hong":[]} · /health: so_tai_lieu 16 · so_chunk 111 · moc_index 2026-09-11T04:38:04Z'
+  - lenh: "nhom cong FE: chunk-tu-chua · markup-matches-css · token-only · chu-giao-dien · cat-binh-luan-js · man-co-chunk-phai-cat · css-applied · script-runs · four-screens · heading-id-anchor · kho-delta"
+    ket_qua: "11/11 ok. api-guard RED = do NEN (WO-074 ghiKieuMoc), khong doi."
+  - lenh: "node web/test/page-weight.test.js"
+    ket_qua: |
+      ok   gn.js 104 KB (106015 / 106496)  — moc 424 byte, chunk KHONG vao bundle chung
+      FAIL gn.css 107 KB (109416 / 106496) — xem đỏ_do
+      FAIL tai dau nang nhat mock/chung-cat 327767 / 338849 · mock/index.html — do NEN
+
+đỏ_do:
+  - "gn.css: DO NEN tu truoc luot (107604 / 106496 — do tai baseline main). Sau luot 109416: +1812 byte la luat `.tim-*` cua man moi (12 class, token-only, da gop luat de gon). Khong phai cong xanh thanh do; nhung SO tang la cua toi. Khong tu noi tran css (chu du an chi duyet tran js cho C3) — de nghi PM/chu du an gop vao no CSS dang co."
+  - "api-guard `ghiKieuMoc thieu banXuat`: WO-074, do nen."
+  - "markup-matches-css DO mot nhip giua luot (`.tim-so` thieu --f-ui trong CHINH luat · `.tim-a` dung font mono): loi cua toi, sua ngay — TYPOGRAPHY luat 3 do TUNG LUAT, khong do thua ke; mono danh cho MA that, dia chi khong phai ma."
+
+cho_NGUOI:
+  - "RESTART hai tien trinh de /api/tim song tren :8787 → :8791: ca hai doc `.env` GOC REPO luc khoi dong (web/server.mjs:28 · truyhoi api.chay→nap_env). Toi da tao `.env` (gitignored) voi `KHOA_WEB_TRUYHOI`. Chua restart thi /api/tim tra 403 — dung fail-closed, khong phai bug."
+  - "Sau restart: chi muc cua service da co (16 tai lieu · 111 chunk). Go vao o tim tren trang la thay panel."
+
+cho_PM:
+  - "Cong `T03-125-tim-toan-van.test.js` dang o `07_plan/M03_web/tasks/` — `web/test/**` + `web/package.json` KHONG trong pham_vi_ghi T03-125, va check_g6b §5 (R1) doi don vi TEST rieng. Can mot don vi nhu T03-150 de `git mv` + dang ky npm test."
+
+keo_theo:
+  - "M03: gn.css 109416/106496 — no CSS cu + 1812 byte man tim. Can mot don vi 'lay lai byte CSS' hoac noi tran co ly do (khuon _tran.mjs da co cho ghi)."
+  - "M13: `so_ban_ghi_trong_pham_vi` = 16 cho MOI truy van vi FE chua gui facet nao (chip chua noi voi panel) — dung hop dong, nhung khi chip duoc noi thi so phai doi theo; cong da do bang `locHienTai()` doc `aria-pressed`."
+
+tiep_theo: "Het sau muc PM giao. Cho: chu du an restart hai tien trinh; PM mo don vi doi cong T03-125 vao web/test."

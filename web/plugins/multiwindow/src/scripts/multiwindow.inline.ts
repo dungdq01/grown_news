@@ -199,6 +199,7 @@ const capCctab = () => (hua ??= new Promise((xong, hong) => {
   t.onerror = () => { hua = null; hong(new Error("không nạp được tab chưng cất")); };
   document.head.append(t);
 }));
+let huaTim; const capTim = (o) => (huaTim ??= new Promise((xong, hong) => { const t = document.createElement("script"); t.src = "/gn-timkiem.js?v=" + (globalThis.__V_TIMKIEM__ ?? ""); t.onload = () => xong(globalThis.__GN_TIM__); t.onerror = () => { huaTim = null; hong(0); }; document.head.append(t); })).then((m) => m?.bat(o)).catch(() => { huaTim = null; });
 
 async function veTabChungCat(win) {
   /* Thứ tab cần từ multiwindow. Một chiều — chunk ĐỌC, không ghi vào.
@@ -1022,6 +1023,9 @@ function gan() {
     apLoc();
   };
   document.addEventListener("input", khiGo);
+  // T03-125 · MÓC panel tìm toàn văn — nạp chunk lúc ô `#q` NHẬN FOCUS, không lúc tải trang
+  // (rule 15: logic sống ở `web/plugins/timkiem/`, đây chỉ là cầu).
+  document.addEventListener("focusin", (e) => { if (e.target?.id === "q") capTim(e.target); });
   document.addEventListener("click", bam);
   document.addEventListener("mousedown", nhan);
   document.addEventListener("mousemove", di);
