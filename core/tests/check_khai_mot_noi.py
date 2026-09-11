@@ -249,6 +249,59 @@ thu_am("hai màn cùng path", None,
        lambda d: d["man"][3].update(path="/bai-viet/"), "path-trung")
 
 print()
+print("6 · dai-han.json — dải ký tự Hán khai MỘT nơi (FR-077 H1 · H2 · H4 — T01-52 lượt hai)")
+print()
+
+# Tập khai THỨ BA cùng khuôn: hai THỢ (M13 chèn cách khi index · M12 đếm tỉ lệ định tuyến) đọc
+# một bảng ở LÕI, không THỢ nào gõ dải riêng (FR-077 §1.2). Bảng giữ dạng SỐ, không regex.
+DAI_HAN_JSON = R / "core" / "assets" / "dai-han.json"
+KHONG_GOM = ((0x3040, 0x30FF, "Hiragana/Katakana"), (0xAC00, 0xD7AF, "Hangul"))
+
+
+def soi_dai_han(dai):
+    """Danh sách lỗi H1/H2/H4 trên `dai` (list dict đã lột `$comment`, nhưng còn `$vi_sao`)."""
+    loi_dh = []
+    if len(dai) < 4:
+        loi_dh.append(f"H1: chỉ {len(dai)} dải, cần ≥4")
+    for i, d in enumerate(dai):
+        thieu = [k for k in ("tu", "den", "ten") if k not in d]
+        if thieu:
+            loi_dh.append(f"H1: dải {i} thiếu {thieu}")
+            continue
+        if not (isinstance(d["tu"], int) and isinstance(d["den"], int)):
+            loi_dh.append(f"H1: dải {i} `tu`/`den` phải là SỐ codepoint, không phải chuỗi regex")
+        elif d["tu"] > d["den"]:
+            loi_dh.append(f"H1: dải {i} ngược đầu-cuối ({d['tu']:#x} > {d['den']:#x})")
+        for a, b, ten in KHONG_GOM:
+            if isinstance(d.get("tu"), int) and d["tu"] <= b and d["den"] >= a:
+                loi_dh.append(f"H4: dải {i} `{d['ten']}` giao {ten} ({a:#x}–{b:#x}) — không phải chữ Hán")
+    sap = [d for d in dai if isinstance(d.get("tu"), int) and isinstance(d.get("den"), int)]
+    for x, y in zip(sap, sap[1:]):
+        if y["tu"] <= x["den"]:
+            loi_dh.append(f"H2: dải `{x['ten']}` và `{y['ten']}` chồng nhau hoặc không sắp tăng")
+    return loi_dh
+
+
+dh_tho = json.loads(DAI_HAN_JSON.read_text(encoding="utf-8")) if DAI_HAN_JSON.exists() else None
+dh = doc(DAI_HAN_JSON)
+if dh:
+    dai = dh.get("dai") or []
+    loi_dh = soi_dai_han(dai)
+    ok(not loi_dh, f"H1·H2·H4 trên {len(dai)} dải", " · ".join(loi_dh))
+    ok(all("$vi_sao" in d for d in (dh_tho or {}).get("dai", [])), "H1: mỗi dải có `$vi_sao`")
+    ok("nguong_han" not in dh and "nguong" not in dh, "bảng không chứa ngưỡng tỉ lệ (FR-077 §3.2 — ngưỡng sống ở chungcat/assets)")
+    # Ca ÂM trong bộ nhớ — cổng phải ĐỎ ĐƯỢC (không ghi file).
+    goc_dai = json.loads(json.dumps(dai))
+    nguoc = json.loads(json.dumps(goc_dai)); nguoc[0]["tu"], nguoc[0]["den"] = nguoc[0]["den"], nguoc[0]["tu"]
+    ok(any("H1" in x and "ngược" in x for x in soi_dai_han(nguoc)), "ca âm `dải ngược đầu-cuối` bị bắt")
+    giao = json.loads(json.dumps(goc_dai)); giao[1]["tu"] = goc_dai[0]["den"] - 1
+    ok(any("H2" in x for x in soi_dai_han(giao)), "ca âm `hai dải giao nhau` bị bắt")
+    noi = json.loads(json.dumps(goc_dai)); noi.append({"tu": 0x3040, "den": 0x30FF, "ten": "Kana"})
+    ok(any("H4" in x for x in soi_dai_han(noi)), "ca âm `nới sang Hiragana` bị bắt (H4)")
+    chuoi = json.loads(json.dumps(goc_dai)); chuoi[0]["tu"] = "\\u3400"
+    ok(any("SỐ codepoint" in x for x in soi_dai_han(chuoi)), "ca âm `dải ghi bằng chuỗi regex` bị bắt (FR-077 §3.4)")
+
+print()
 if theo_doi:
     print(f"CHỜ · {len(theo_doi)} mục — consumer đấu vào ở C2/C3/C5, CỐ Ý đỏ tới đó:")
     for x in theo_doi:

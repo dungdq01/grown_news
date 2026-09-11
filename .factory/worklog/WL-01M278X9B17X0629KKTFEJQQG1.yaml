@@ -1,0 +1,40 @@
+entry: ban-giao
+ulid: 01M278X9B17X0629KKTFEJQQG1
+ngay: 2026-09-11
+module: M01_core (chu cong) · M13_truyhoi · M12_chungcat (doc bang)
+don_vi: ["T01-52 (luot hai)"]
+fr: FR-077 §2 H1 · H2 · H4 · §3
+nhanh: m13 (worktree ../gn-m13), sau 9331f6d
+tieu_de: >-
+  T01-52 luot hai — check_khai_mot_noi.py §6 dai-han.json: H1 (≥4 dai, du tu/den/ten/$vi_sao, tu ≤ den, dang SO) ·
+  H2 (sap tang, khong chong) · H4 (khong giao Hiragana/Katakana/Hangul) · §3.2 khong nguong · 4 ca AM trong bo nho.
+  Pham vi da noi 2026-09-10 (task file T01-52 co dong check_khai_mot_noi.py). T01-51 AC1 het "xanh rong".
+
+object:
+  - core/tests/check_khai_mot_noi.py     # +§6 (soi_dai_han + 7 ve), truoc phan tong ket; §1–§5 khong doi
+  - .factory/worklog/WL-01M278X9B17X0629KKTFEJQQG1.yaml
+
+do_do:
+  - lenh: "grep -n check_khai_mot_noi 07_plan/M01_core/tasks/T01-52-test-dia-chi-anchor.md"
+    ket_qua: "1 dong trong pham_vi_ghi (NOI 2026-09-10, PM M13) — dieu kien Q1 da dat, viet duoc"
+  - lenh: ".venv/Scripts/python core/tests/check_khai_mot_noi.py"
+    ket_qua: |
+      6 · dai-han.json — dải ký tự Hán khai MỘT nơi (FR-077 H1 · H2 · H4 — T01-52 lượt hai)
+        ok   H1·H2·H4 trên 4 dải
+        ok   H1: mỗi dải có `$vi_sao`
+        ok   bảng không chứa ngưỡng tỉ lệ (FR-077 §3.2 — ngưỡng sống ở chungcat/assets)
+        ok   ca âm `dải ngược đầu-cuối` bị bắt
+        ok   ca âm `hai dải giao nhau` bị bắt
+        ok   ca âm `nới sang Hiragana` bị bắt (H4)
+        ok   ca âm `dải ghi bằng chuỗi regex` bị bắt (FR-077 §3.4)
+      pass · hai tập khai một nơi, mọi tầng đọc bảng khai · exit 0
+  - lenh: "R5 — do truoc/xanh sau"
+    ket_qua: "Bang khai da dung (T01-51) truoc khi cong nay co, nen 'do truoc' KHONG do duoc bang cach xoa file that (CAM). Bang chung do-duoc = 4 ca AM trong bo nho (dai nguoc · giao · noi Kana · chuoi regex) deu bi bat — cung khuon §5 cua chinh cong nay."
+
+đỏ_do: "khong co."
+
+khong_lam:
+  - "KHONG sua core/assets/dai-han.json (FR-077 §3.1: khong doi gia tri dai)."
+  - "KHONG doi §1–§5 cua cong."
+
+tiep_theo: "T03-150 (git mv cong kho-delta vao web/test + npm test)."
