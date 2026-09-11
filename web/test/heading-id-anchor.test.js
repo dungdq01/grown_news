@@ -119,7 +119,11 @@ if (MOT_LUAT) {
     else if (e.name.endsWith(".ts")) readFileSync(p, "utf8").split("\n").forEach((l, i) => { if (l.includes('normalize("NFD")')) nfd.push(`${p.slice(WEB.length + 1)}:${i + 1}`) })
   } }
   quet(join(WEB, "plugins"))
-  ok(nfd.length === 1, `normalize("NFD") trong web/plugins/**/*.ts ⇒ đúng 1 chỗ (một luật slug)`, nfd.join(" · "))
+  // AC2 (PM sửa 2026-09-11): đơn vị này thêm **0 hàm slug mới** — số chỗ SAU bằng ĐÚNG số TRƯỚC (3),
+  // không phải "đúng 1". Ba chỗ có sẵn: slugGoiY (bản chuẩn C3 dùng lại) · boDau (khác mục đích) ·
+  // napvideo bản sao của M11. Đếm gộp cả ba là bắt đơn vị này trả nợ hai chỗ nó không tạo ra.
+  const TRUOC = 3
+  ok(nfd.length === TRUOC, `normalize("NFD") trong web/plugins/**/*.ts ⇒ ${TRUOC} chỗ, ĐÚNG BẰNG trước lượt (0 hàm slug mới)`, nfd.join(" · "))
   const st = spawnSync("git", ["diff", "--numstat", "HEAD~1", "HEAD", "--", TS], { cwd: GOC, encoding: "utf8" }).stdout.trim()
   const [them, bo] = st ? st.split(/\s+/).map(Number) : [0, 0]
   ok(them + bo <= 8, `diff multiwindow.inline.ts ở HEAD ≤ 8 dòng (rule 15)`, `+${them} −${bo}`)
