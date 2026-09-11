@@ -44,6 +44,10 @@ R = Path(__file__).resolve().parents[2]
 ASSETS = R / "core" / "assets"
 TRANG = 200
 TIMEOUT = 5
+# Chỉ ba mime này là VĂN BẢN để chunk theo dòng. Cửa xuất `goc` trả byte nhị phân cho bản ghi có
+# hiện vật (pdf/docx/pptx) — xem `lay_bai_va_goc`. Danh sách hẹp, không đoán theo `startswith("text/")`:
+# `text/csv` hay `text/html` cũng không phải markdown của kho.
+TEXT_MIME = {"text/markdown", "text/plain", "text/x-markdown"}
 
 _LOAI_NGUON = json.loads((ASSETS / "loai-nguon.json").read_text(encoding="utf-8"))["module"]
 _PL_CUA = {l: m["ten"] for m in _LOAI_NGUON for l in m["loai"]}
@@ -271,8 +275,15 @@ def lay_bai_va_goc(row: dict) -> tuple[dict, bytes]:
         raise CuaHong(cua_bai, e.code) from e
     cua_goc = f"/api/xuat/{row['loai']}/{row['slug']}?dang=goc"
     try:
-        goc_b, _ = lay_bytes(cua_goc)
-        return bai, goc_b
+        goc_b, mime = lay_bytes(cua_goc)
+        # WO-100 · `?dang=goc` KHÔNG phải lúc nào cũng là `.md`. Với bản ghi có HIỆN VẬT NHỊ PHÂN
+        # (`tai-lieu`: pdf/docx/pptx), cửa xuất **302 sang cửa media** và trả ĐÚNG BYTE ĐÃ NẠP
+        # (`xuat-dang.json` `$la`) — `urllib` tự theo redirect, nên không nhìn `content-type` là
+        # nuốt cả file PDF vào chỉ mục. Đo 2026-09-11 trên kho thật: một chunk 9739 dòng mở đầu
+        # `%PDF-1.5` hiện thẳng lên panel tìm. Trích text PDF là nợ của M12 (`FR-079`), không phải
+        # việc của M13 — nên nhị phân ⇒ dùng `than`, đúng như bản ghi không có file gốc.
+        if mime.split(";")[0].strip() in TEXT_MIME:
+            return bai, goc_b
     except urllib.error.HTTPError as e:
         if e.code != 422:
             raise CuaHong(cua_goc, e.code) from e

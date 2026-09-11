@@ -1,0 +1,53 @@
+entry: ban-giao
+ulid: 01M280202A3CRSZF0G3FZKF879
+ngay: 2026-09-11
+module: M13_truyhoi
+don_vi: [T13-8, T13-9]
+wo: WO-100
+nhanh: m13 (worktree ../gn-m13), sau 0e28bc7
+tieu_de: >-
+  WO-100 — indexer NUOT file nhi phan cua cua xuat (`?dang=goc` cua `tai-lieu` 302 sang PDF 2.9 MB):
+  ca E moi trong check_ban_ghi_khong_file_goc DO truoc, sua lay_bai_va_goc kiem content-type ⇒ XANH.
+  Chu du an bat duoc bang MAT khi thu panel tim; 21 cong deu xanh truoc do vi fixture giau hon that.
+
+object:
+  - .factory/wo/WO-100-indexer-nuot-file-nhi-phan-cua-cua-xuat.md   # MOI
+  - truyhoi/src/indexer.py                                          # +TEXT_MIME, lay_bai_va_goc kiem mime
+  - truyhoi/tests/_loi_gia.py                                       # kho_mau +ban ghi `tai-lieu-pdf` (goc tra application/pdf)
+  - truyhoi/tests/check_ban_ghi_khong_file_goc.py                   # +ca E (5 ve)
+  - .factory/worklog/WL-01M280202A3CRSZF0G3FZKF879.yaml
+
+do_do:
+  - lenh: "curl -sL :8890/api/xuat/tai-lieu/xgboost-stap-by-step?dang=goc"
+    ket_qua: "302 → /api/articles/media/6714ee19… · application/pdf · 2 976 936 byte · magic `%PDF-1.5` — hop dong DUNG cua LOI (xuat-dang.json dang.goc.$la), M13 la ben gia dinh sai"
+  - lenh: "select ... from chunks where doc_id like 'xgboost%'  (TRUOC)"
+    ket_qua: "('xgboost-stap-by-step', 1, 9739, 'tai-lieu/xgboost-stap-by-step.md:1-9739', 'than', '%PDF-1.5\\n%����\\n643 0 obj…')"
+  - lenh: "python truyhoi/tests/check_ban_ghi_khong_file_goc.py  (ca E, TRUOC khi sua ma)"
+    ket_qua: |
+      ok   ban ghi tai lieu PDF van co chunk (tu `than`)
+      FAIL KHONG chunk nao chua byte nhi phan (`%PDF`/ky tu thay the)   [('tai-lieu-pdf', '%PDF-1.5\n%����\n643 0')]
+      FAIL noi dung chunk la THAN cua ban ghi, khong phai byte file      ['%PDF-1.5\n%����\n643 0 obj\n<< /Linearized ']
+      ok   so dong hop ly · ok PDF KHONG phai hong
+      ⇒ DO dung lop loi, tai hien duoc tren LOI gia.
+  - lenh: "python truyhoi/tests/check_ban_ghi_khong_file_goc.py  (SAU)"
+    ket_qua: "XANH · 422 ⇒ fallback /api/articles · 500/404 ⇒ hong neu slug+cua+ma · kho hon hop 6/6 (ca E 5/5 ok) · tu-kiem 4/4"
+  - lenh: "TRUYHOI_LOI_URL=http://127.0.0.1:8890 python truyhoi/src/indexer.py --day-du"
+    ket_qua: '{"xem":16,"doi":16,"hong":[]} · 111 chunk; chunk xgboost nay: (4 dong, "tai-lieu/xgboost-stap-by-step.md:1-4", "Boosting (tạm dịch: tăng cường) là một kỹ thu…")'
+  - lenh: "curl :8890/api/tim?q=… tren index moi"
+    ket_qua: "q=her ⇒ 0 (dung: kho khong co tu nay; truoc day khop vi rac PDF chua chuoi `Her`) · q=skill 3 · q=hermes 2 · q='rui ro' 3 — moi dia_chi phan giai duoc"
+  - lenh: "21 cong M13 + 21 --tu-kiem"
+    ket_qua: "0 do · 0 do"
+
+đỏ_do: "Loi cua T13-2 (indexer cua toi). Khong phai loi LOI: 302→PDF la hop dong da khai o xuat-dang.json."
+
+hai_lan_cung_mot_lop: >-
+  WO-099 (422 cho ban ghi khong co file goc) va WO-100 (302 sang byte nhi phan) cung mot goc: M13 doc cua xuat
+  MA KHONG DOC HOP DONG CUA NO. `xuat-dang.json` khai ca hai truong hop bang chu, tu truoc. Bai hoc ghi ra:
+  truoc khi goi mot cua cua module khac, doc BANG KHAI cua no — khong doc hinh dang minh tuong (cung cau da ghi
+  o `moTheoSlug` cua M03 sau T03-118, va `_doc_nguon` cua M12 sau T12-24; nay la lan thu ba trong repo).
+
+keo_theo:
+  - "M12 (FR-079 — text PDF theo trang thanh hien vat): khi co, 2 ban ghi `tai-lieu` PDF se index duoc PHAN TEXT qua cung cua §2a, 0 dong ma moi o M13. Hom nay chung chi index duoc `than` (ghi chu ngan) — RAG van mu voi noi dung PDF, dung nhu FR-072 §5 da khai."
+  - "M13 backlog: fixture `_loi_gia.kho_mau()` da them mot ban ghi PDF; con thieu ca `.docx`/`.pptx` (cung 302). Cung mot nhanh ma nen khong mo o rieng."
+
+tiep_theo: "Bao chu du an: reload trang la het rac; ve 'ban nhap da don' KHONG phai loi ma (xem WL cung ngay)."

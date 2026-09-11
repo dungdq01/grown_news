@@ -91,6 +91,11 @@ class LoiGia:
         d = self.kho.get(slug)
         if not d or d["loai"] != loai:
             return 404, None, None
+        # WO-100 · bản ghi CÓ HIỆN VẬT NHỊP PHÂN (tai-lieu: pdf/docx/pptx): cửa xuất `goc` **302 sang cửa media**
+        # và trả ĐÚNG BYTE ĐÃ NẠP (`xuat-dang.json` `$la`) — không phải `.md`. urllib tự theo redirect, nên M13
+        # nuốt cả file PDF nếu không nhìn `content-type`.
+        if d.get("goc_nhi_phan"):
+            return 200, d["goc_nhi_phan"], "application/pdf"
         # WO-099 · bản ghi KHÔNG có file trong kho (video đăng ký bằng URL, FR-075): cửa xuất trả 422
         # đúng thân lỗi của LÕI thật — hợp đồng đúng, M13 phải chịu được.
         if d.get("khong_file_goc"):
@@ -227,6 +232,17 @@ def kho_mau() -> dict:
             "frontmatter": {"title": "WebMCP giả", "category": ["ai-agent"], "concepts": ["mcp"],
                             "review_status": "approved", "url": "https://youtu.be/Wl9tcoVuLjA"},
             "body": "## Tổng quan\n\nWebMCP cho trình duyệt gọi công cụ. Đường ống dữ liệu đi qua tab.\n\n## Rủi ro\n\nQuyền của tab là quyền của agent.\n",
+            "media": {},
+        },
+        # WO-100 · tài liệu PDF: `?dang=goc` trả BYTE PDF (302 → cửa media). Kho thật 2026-09-11 có 2 bản
+        # ghi kiểu này; thiếu nó trong fixture là lý do 21 cổng xanh mà panel tìm hiện `%PDF-1.5`.
+        "tai-lieu-pdf": {
+            "loai": "tai-lieu", "updated_at": "2026-08-29T00:00:00Z",
+            "goc_nhi_phan": b"%PDF-1.5\n%\xe2\xe3\xcf\xd3\n643 0 obj\n<< /Linearized 1 >>\nstream\n\xff\xd8\xff\xe0 r\xe1c nh\xe1\xbb\x8b ph\xc3\xa2n\nendstream\n",
+            "frontmatter": {"title": "XGBoost step by step", "category": ["ai-agent"], "concepts": ["gradient-boosting"],
+                            "review_status": "approved", "url": "kho://tai-lieu/xgboost",
+                            "media": [{"sha256": "a" * 64, "mime": "application/pdf"}]},
+            "body": "## Mục tiêu huấn luyện\n\nHàm mất mát xấp xỉ bậc hai quanh dự đoán hiện tại.\n",
             "media": {},
         },
         "ghi-chu-hoi-thao-rag": {

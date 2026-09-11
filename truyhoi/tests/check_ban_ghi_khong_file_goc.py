@@ -129,6 +129,22 @@ with K.tam("gn_m13_hon_") as tmp, _loi_gia.LoiGia(kho) as loi:
         K.kiem(kq.get("hong") == [], "hong rỗng — 422 KHÔNG phải hỏng", str(kq.get("hong")))
         con.close()
 
+print("\nE · WO-100 · `?dang=goc` trả BYTE NHỊ PHÂN (tài liệu PDF) ⇒ dùng `than`, KHÔNG nuốt file\n")
+with K.tam("gn_m13_pdf_") as tmp, _loi_gia.LoiGia(_loi_gia.kho_mau()) as loi:
+    con, kq = dung(tmp, loi)
+    if isinstance(kq, BaseException):
+        K.kiem(False, "reindex không ném khi cửa xuất trả PDF", f"{type(kq).__name__}: {str(kq)[:80]}")
+    else:
+        rows = con.execute("SELECT body, line_end, dia_chi FROM chunks WHERE doc_id = 'tai-lieu-pdf'").fetchall()
+        K.kiem(rows, "bản ghi tài liệu PDF vẫn có chunk (từ `than`)", "0 chunk")
+        rac = [r for r in con.execute("SELECT doc_id, substr(body,1,20) FROM chunks") if "%PDF" in (r[1] or "") or "�" in (r[1] or "")]
+        K.kiem(not rac, "KHÔNG chunk nào chứa byte nhị phân (`%PDF`/ký tự thay thế) — panel tìm không hiện rác", str(rac[:2]))
+        K.kiem(all("Mục tiêu huấn luyện" in r[0] or "huấn luyện" in r[0] for r in rows),
+               "nội dung chunk là THÂN của bản ghi, không phải byte file", str([r[0][:40] for r in rows]))
+        K.kiem(all((r[1] or 0) < 100 for r in rows), "số dòng hợp lý (thân ngắn), không phải 9739 dòng của một PDF", str([r[1] for r in rows]))
+        K.kiem(kq.get("hong") == [], "PDF KHÔNG phải hỏng — bản ghi vẫn vào chỉ mục", str(kq.get("hong")))
+        con.close()
+
 print("\nD · 422 VÀ /api/articles 404 ⇒ bỏ CÓ NÊU SLUG, bài khác vẫn index\n")
 with K.tam("gn_m13_404d_") as tmp, _loi_gia.LoiGia(_loi_gia.kho_mau()) as loi:
     loi.loi_cua[("bai", "webmcp-gia")] = 404
