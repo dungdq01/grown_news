@@ -1,0 +1,96 @@
+entry: ban-giao
+ulid: 01KB4JBAVIECCHO
+ngay: 2026-09-11
+module: M01_core · M04_ci · M03_web
+don_vi: [T01-56, T01-58, T04-12, T03-152]
+wo: WO-100
+tieu_de: >-
+  Ba viec cho: mo WO-100 (mot su co HAI nguyen nhan doc lap) + bon don vi. Su co worktree
+  da khac phuc; kho THAT khong he han gi.
+
+object:
+  - .factory/wo/WO-100-cong-pha-du-lieu-cua-cay-dang-do.md          # MOI
+  - 07_plan/M01_core/tasks/T01-56-test-cong-khong-pha-cay.md        # MOI — test di dau
+  - 07_plan/M01_core/tasks/T01-58-cong-khong-pha-cay.md             # MOI — sua cong
+  - 07_plan/M04_ci/tasks/T04-12-gitattributes-media-binary.md       # MOI — .gitattributes
+  - 07_plan/M03_web/tasks/T03-152-test-tim-toan-van.md              # MOI — doi cong T03-125
+  - .factory/worklog/WL-01KB4JBAVIECCHO.yaml
+
+MOT_SU_CO_HAI_NGUYEN_NHAN: |
+  Hai o backlog dev M13 mo trong thoat nhu mot loi. Do ky: HAI nguyen nhan DOC LAP,
+  sua mot cai khong chua cai kia:
+    .vtt checkout CRLF (khong co .gitattributes)          <- nguyen nhan B (M04)
+      ⇒ sha256 noi dung ≠ sha256 trong TEN FILE
+      ⇒ dung_lai_db tu choi giua chung ⇒ DB RONG
+      ⇒ xuat_kho coi 16 export la mo coi va XOA
+    check_running.py CHAY THAT hai lenh do tren kb/ cay    <- nguyen nhan A (M01)
+  Khong co A thi B chi lam mot lenh chay tay that bai. Khong co B thi A van la mot cong
+  duoc phep ghi de du lieu. ⇒ WO-100 co HAI ve, hai module, hai don vi.
+
+ve_A_la_LUAT_GOC_o_dang_cong_cu: |
+  check_running.py:50 subprocess.run THUC THI moi lenh liet trong RUNNING.md. Hai lenh
+  o :173-174 khong co co --fix|--ghi|--ky nen nhanh "chi cu phap" (:96) khong bat, va
+  GHI_KHONG_CO (:45) chi co MOT phan tu (07_curate/curate.py).
+  Day la "khong ai duoc so huu thu dung de danh gia minh" o bien the: CONG KHONG DUOC
+  DOI THU NO DO. He qua ngoai mat du lieu: ai chay bo cong cung nhan working tree ban,
+  va `git status` sau do KHONG con phan biet duoc "toi vua sua gi" voi "cong vua sinh
+  gi" — dung cong cu dung de QUY CHU khi may do.
+  VI SAO SONG LAU: tren main no VO HAI (DB va export khop, dung lai ra y het). Chi
+  worktree — noi .vtt checkout CRLF — moi lo.
+
+chon_b_khong_chon_a: |
+  T01-58 chon (b) chay lenh voi KB_DIR tam, KHONG chon (a) them hai lenh vao
+  GHI_KHONG_CO. Ly do: (a) ha dung HAI LENH QUAN TRONG NHAT xuong muc "chi kiem cu
+  phap" — cong con xanh ma khong ai biet dung_lai_db co chay duoc khong. (b) giu nguyen
+  "chay that", chi chay o cho khac. Co che da co san: dung_lai_db.py:37 · xuat_kho.py:33
+  deu doc KB_DIR; do_tai.py:216 da dung dung khuon.
+  AC3 cua T01-58 canh chinh dieu nay: grep dung_lai_db|xuat_kho trong khoi GHI_KHONG_CO
+  phai ra 0 — de khong ai lang le roi ve (a).
+  Va T01-56 ca D chong SUA QUA TAY: lenh DOC van phai chay that; ha moi lenh xuong
+  --help thi cong mat rang va RUNNING.md thanh danh sach khong ai kiem.
+
+ve_B_mot_dong_dong_ca_mot_HO: |
+  `.gitattributes` hom nay RONG noi dung (2 dong comment giu dat, map v29).
+  `kb/_media/** -text` (khong phai `binary`: -text chi tat doi EOL; binary tat ca diff,
+  ma .vtt la van ban that nen mat diff la mat thu huu ich).
+  Mot dong nay dong ca mot HO ca da gap: su co worktree hom nay · check_worklog do 8 ve
+  tren worktree ma xanh tren main · "19 file lech chi vi EOL" luc review nhanh m13.
+  ⚠️ Thi cong xong phai kiem tren CA HAI cay — loi nay VO HINH tren main.
+
+ve_C_cau_sai_RUNNING_md_54: |
+  "Clone moi chua co DB: chay dung_lai_db.py mot lan de dung" — KHONG chay duoc: kb/_media/*
+  bi .gitignore tru vai ngoai le (3/8 file trong git) nen clone sach luon dung o "kho
+  thieu byte". Do HAI LAN doc lap (WL-01M24MFFK9T8... T04-9 · WL-01M27G9E22... hom nay).
+  CHUA mo don vi: RUNNING.md chua co chu trong project_map (cung nhom "con thieu chu" voi
+  03_docs/**, ghi chu v15). Can mot dong cua chu du an ve ai sua. Ghi o WO-100 §3.
+
+viec_1_doi_cong_T03_125: |
+  Cong T03-125-tim-toan-van.test.js (12 523 byte, 09-11 11:34) dang o 07_plan ⇒ KHONG co
+  trong web/package.json lan ci.yml ⇒ 0 rang tu dong. T03-152 doi no vao web/test + npm
+  test, khuon T03-150. AC3 viet theo ban DA SUA cua T03-150: do FILE CUA DON VI NAY,
+  khong do "thu muc het .test.js" — T08-26b van o do dung luat.
+
+do_do:
+  - lenh: "ls 07_plan/*/tasks/*.test.js (tren main va gn-m13)"
+    ket_qua: "main: T08-26b · T08-35(da doi o m13) || gn-m13: T03-125-tim-toan-van.test.js 12523 byte"
+  - lenh: "cat .gitattributes"
+    ket_qua: "2 dong, DEU la comment — 0 luat"
+  - lenh: "grep -n GHI_KHONG_CO core/tests/check_running.py"
+    ket_qua: ":45 mot phan tu ('07_curate/curate.py',)"
+  - lenh: "sed -n 173,174p RUNNING.md"
+    ket_qua: "hai lenh GHI (dung_lai_db · xuat_kho), khong co, khong trong GHI_KHONG_CO"
+  - lenh: "git ls-files kb/_media"
+    ket_qua: "3 file / 8 tren dia ⇒ ve C dung"
+  - lenh: python core/tests/check_g6b.py
+    ket_qua: "T01-56 3/3 · T01-58 4/4 · T04-12 3/3 · T03-152 3/3 ok; khong VONG; 0 loi mang ma cua toi"
+đỏ_do: >
+  Su co worktree gn-m13 (DB rong + 16 export bi xoa): chu la check_running.py (M01) +
+  thieu .gitattributes (M04). ĐÃ KHAC PHUC boi dev M13. Kho THAT cua chu du an khong he
+  han gi (main 16 ban ghi, :8787 binh thuong) — da doi chieu.
+
+khong_lam:
+  - "KHONG sua check_running.py — T01-58, va cong cham no phai la don vi rieng (T01-56)."
+  - "KHONG sua .gitattributes — T04-12, dat M04."
+  - "KHONG sua dung_lai_db.py/xuat_kho.py — chung hanh xu DUNG; loi o nguoi goi va o EOL."
+  - "KHONG dua byte media vao git 'cho tien' — .gitignore:95 chan co chu dich, rule 19 vua chot."
+  - "KHONG mo don vi cho RUNNING.md:54 — file chua co chu, can mot dong cua chu du an."
