@@ -2,9 +2,9 @@
 /**
  * T08-35 — cửa kho-delta cho indexer M13 + proxy /api/tim + gocTho(ten).
  *
- * CỔNG VIẾT TRƯỚC (rule.md mục 8): sống ở thư mục task cho tới khi PM nới
- * `phạm_vi_ghi` T08-35 (web/test/ + package.json) — lúc đó dời sang
- * `web/test/kho-delta.test.js` CÙNG LƯỢT với mã, chỉ đổi dòng import `_api.mjs`.
+ * CỔNG VIẾT TRƯỚC (rule.md mục 8): sinh ở `07_plan/M08_api/tasks/T08-35-kho-delta.test.js`
+ * (19 lỗi → pass, commit cf51668), dời vào đây bằng `git mv` ở T03-150 (đơn vị TEST của M03 —
+ * `web/test/**` là boundary M03) + đăng ký `npm test`. Chỉ đổi dòng import `_api.mjs`.
  *
  * VÌ SAO CỔNG NÀY TỒN TẠI
  * M13 dựng chỉ mục DẪN XUẤT từ kho, và nó KHÔNG được mở `kb/_kho.sqlite`
@@ -29,11 +29,11 @@ import { existsSync, mkdtempSync, readFileSync } from "node:fs"
 import { tmpdir } from "node:os"
 import { join } from "node:path"
 
-import { batServer, dungKho, dungSchema, goi, taoKiem } from "../../../web/test/_api.mjs"
+import { batServer, dungKho, dungSchema, goi, taoKiem } from "./_api.mjs"
 
 const { ok, chot } = taoKiem()
 
-/* Gốc repo: file này sống ở 07_plan/M08_api/tasks/ (viết trước) hoặc web/test/ (sau khi dời). */
+/* Gốc repo: hằng dò hai vị trí giữ lại từ lúc cổng còn ở thư mục task — vô hại, và cổng chạy được cả hai nơi. */
 const GOC = [join(import.meta.dirname, "..", "..", ".."), join(import.meta.dirname, "..", "..")]
   .find((g) => existsSync(join(g, "web", "package.json")))
 const THO_CUA = join(GOC, "web", "api", "tho-cua.mjs")

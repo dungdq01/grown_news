@@ -1,0 +1,33 @@
+entry: ban-giao
+ulid: 01M278X9BBXWZQNG3MRV294C04
+ngay: 2026-09-11
+module: M03_web (chu web/test) · M08_api (cua) · M13_truyhoi (huong loi)
+don_vi: [T03-150]
+nhanh: m13 (worktree ../gn-m13), sau aa9bd5b
+tieu_de: >-
+  T03-150 — git mv 07_plan/M08_api/tasks/T08-35-kho-delta.test.js → web/test/kho-delta.test.js (lich su cong
+  do-truoc theo file), doi MOT dong import ./_api.mjs, dang ky npm test (MOT dong). Cong pass o cho moi, AC3 poke van SKIP co ly do.
+
+object:
+  - web/test/kho-delta.test.js        # R (rename) tu 07_plan/M08_api/tasks/T08-35-kho-delta.test.js — git mv, khong copy
+  - web/package.json                  # +`&& node test/kho-delta.test.js` cuoi scripts.test
+  - .factory/worklog/WL-01M278X9BBXWZQNG3MRV294C04.yaml
+
+do_do:
+  - lenh: "git mv 07_plan/M08_api/tasks/T08-35-kho-delta.test.js web/test/kho-delta.test.js && git status --short"
+    ket_qua: "R  07_plan/M08_api/tasks/T08-35-kho-delta.test.js -> web/test/kho-delta.test.js"
+  - lenh: "cd web && node test/kho-delta.test.js"
+    ket_qua: "SKIP AC3 · endpoint /reindex-poke … chờ PM quyết · pass · kho-delta năm trường · sha_than đổi theo thân · /api/tim mang đúng hai header, khoá ở lại server · gocTho theo tên · exit 0"
+  - lenh: "grep -c kho-delta.test.js web/package.json · node -e JSON.parse(package.json)"
+    ket_qua: "1 · parse ok"
+  - lenh: "ls 07_plan/M08_api/tasks/*.test.js | wc -l"
+    ket_qua: "1 — con `T08-26b-cai-dat.test.js` (cong viet-truoc cua NGUOI KHAC, T08-26b/M18). T03-150 AC3 doi thu muc HET .test.js ⇒ KHONG dat duoc bang don vi nay: file khong thuoc toi, khong doi. Bao PM."
+  - lenh: "cd web && npm test (AC2)"
+    ket_qua: "Khong chay het duoc trong worktree (four-screens can web/site — Quartz, ghi o WL-01M24HQXGV8DV11E55R2HGRMFX). Cong moi dung cuoi chuoi &&; chay tay rieng: pass."
+
+đỏ_do: "api-guard 1 FAIL nen (WO-074 ghiKieuMoc) khong doi."
+
+keo_theo:
+  - "PM: T03-150 AC3 'thu muc het .test.js' vuong `T08-26b-cai-dat.test.js` (M18 cai-dat, cong viet truoc cua nguoi khac, rule_surfaces dang xep CHO cho M18-R5/R6) — can don vi rieng cua chu no doi sang web/test/cai-dat.test.js."
+
+tiep_theo: "SCR-27 → DUNG cho NGUOI duyet; C3 (T03-148/149) DUNG cho PM doi so T03-148 + WO-097 commit (Q1, Q2)."
