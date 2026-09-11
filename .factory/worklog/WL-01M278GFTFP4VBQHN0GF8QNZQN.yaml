@@ -1,0 +1,45 @@
+entry: ban-giao
+ulid: 01M278GFTFP4VBQHN0GF8QNZQN
+ngay: 2026-09-11
+module: M13_truyhoi
+don_vi: [T13-8]
+wo: WO-099
+nhanh: m13 (worktree ../gn-m13), ff tu main ae0aae5
+tieu_de: >-
+  T13-8 — TEST WO-099: check_ban_ghi_khong_file_goc.py (bon ca A 422-fallback · B 500 ⇒ hong · C kho hon hop 6/6 ·
+  D 422+404 ⇒ bo co neu slug) + _loi_gia gieo 422/500/404 theo ban ghi/cua + kho_mau them ban ghi URL-only
+  (fixture NGHEO nhu kho that) + check_golden_du_ca boc HTTPError thanh KET LUAN DO. Ca bon ca DO truoc T13-9.
+
+object:
+  - truyhoi/tests/check_ban_ghi_khong_file_goc.py   # MOI
+  - truyhoi/tests/_loi_gia.py                        # khong_file_goc ⇒ goc() 422 dung than loi that · loi_cua {(goc|bai, slug): ma} · kho_mau +webmcp-gia
+  - truyhoi/tests/check_golden_du_ca.py              # reindex boc HTTPError/URLError ⇒ K.kiem FAIL neu cua+ma; doc kq['hong']; tu-kiem +3 ca 422/500/404 chay chinh cong bang subprocess
+  - .factory/worklog/WL-01M278GFTFP4VBQHN0GF8QNZQN.yaml
+
+hop_dong_ma_cong_doi:   # dieu T13-9 phai cai — chot o day
+  - "indexer.reindex(con, day_du) tra them khoa `hong: list[{slug, cua, ma}]` (rong khi sach); KHONG nem HTTPError ra ngoai."
+  - "422 o /api/xuat/<loai>/<slug>?dang=goc ⇒ lay `than` = body cua GET /api/articles/<loai>/<slug>; chunk theo ##/### tren than do; nguon_van_ban = than; KHONG vao hong."
+  - "Ma khac 2xx/422 o goc, hoac /api/articles loi ⇒ bo ban ghi do, ghi hong (slug, cua = URL cua, ma), tiep ban ghi khac."
+
+do_do:
+  - lenh: ".venv/Scripts/python truyhoi/tests/check_ban_ghi_khong_file_goc.py --tu-kiem"
+    ket_qua: "tu-kiem · 4/4 ca cố-tình-hỏng đều ĐỎ (reindex nem 422 ⇒ ca A do 'chưa fallback' · hong rong ⇒ 'nuốt im lặng' · hong du ⇒ sach · hong sai slug ⇒ do)"
+  - lenh: ".venv/Scripts/python truyhoi/tests/check_ban_ghi_khong_file_goc.py   (TRUOC T13-9, tai ae0aae5)"
+    ket_qua: |
+      A  FAIL bản ghi `webmcp-gia` (422) có chunk than, thân lấy qua /api/articles, không ném, không vào `hong`   reindex NÉM HTTPError: HTTP Error 422: Unprocessable Content — chưa fallback sang /api/articles
+      B  FAIL hong = [{slug: pipeline-basics, cua: …goc…, ma: 500}]   reindex NÉM HTTPError thay vì trả `hong` — traceback, không phải kết luận
+      C  FAIL reindex kho hỗn hợp không ném   HTTPError: HTTP Error 422: Unprocessable Content
+      D  FAIL hong nêu webmcp-gia · cửa /api/articles · mã 404   reindex NÉM HTTPError thay vì trả `hong`
+      ĐỎ — 4 vế · exit 1  — DO vi LUAT (indexer gia dinh moi ban ghi co file goc), dung tai hien WO-099 §1 tren LOI gia.
+  - lenh: ".venv/Scripts/python truyhoi/tests/check_golden_du_ca.py --tu-kiem"
+    ket_qua: "tu-kiem · 11/11 — 5 ca cu + 3 cap (422 khong_file_goc · 500 goc · 404 bai) chay CHINH cong bang subprocess: 'KHÔNG traceback' + 'ĐỎ vì kết luận (exit 1)' ca 3 — ve B cua WO-099 phia CONG da dong (T13-8 AC2)."
+  - lenh: "check_dung_lai_duoc · check_chunk_hien_vat tren kho_mau moi (co webmcp-gia)"
+    ket_qua: "CA HAI traceback HTTPError 422 — fixture ngheo hon lam lo bug that o cong cu; T13-9 phai lam xanh lai (T13-9 AC4)."
+
+đỏ_do: "4 ve do + 2 cong cu traceback: chu la T13-2 (indexer cua toi) — WO-099 'don vi gay ra: T13-2'. Sua o T13-9."
+
+khong_lam:
+  - "KHONG cham truyhoi/src (T13-9)."
+  - "KHONG sua xuat-cua.mjs — 422 la hop dong dung (FR-075, rule 18)."
+
+tiep_theo: "T13-9 — indexer.lay_goc() fallback + hong[]; chay that tren :8787 (16/16)."

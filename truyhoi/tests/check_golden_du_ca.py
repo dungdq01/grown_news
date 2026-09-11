@@ -21,6 +21,7 @@ XANH_KHI 7 ca Việt đạt ở cả hai w_title; zh: soft nói số thật (N<2
 """
 import os
 import sys
+import urllib.error
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
@@ -78,7 +79,23 @@ if K.TU_KIEM:
     K.kiem(any("expect ĐIỂM" in x for x in soi_golden(diem)), "entry expect điểm ⇒ đỏ ngay lúc khai")
     K.kiem(dem_bai_han(["資料管線", "数据", "không Hán", "ひらがな"]) == 2, "đếm bài Hán bằng dải dai-han.json: phồn + giản = 2, kana không tính")
     K.kiem(dat([{"file": "kb/a.md", "anchor": "x", "dia_chi": "a.md:1-2"}], ["kb/a.md#x"]) and not dat([], ["kb/a.md#x"]), "phép đạt/trượt theo địa chỉ")
-    K.tu_kiem_xong(CONG, 5)
+    # T13-8 AC2 · ba mã HTTP từ LÕI (422 · 500 · 404) ⇒ CHÍNH CỔNG NÀY chạy con, phải kết luận ĐỖ, 0 traceback.
+    import subprocess
+    import _loi_gia
+    for ma_gieo, cach in ((422, "khong_file_goc"), (500, "goc"), (404, "bai")):
+        kho = _loi_gia.kho_mau()
+        if cach == "khong_file_goc":
+            for d in kho.values():
+                d["khong_file_goc"] = True          # MỌI bản ghi 422 — indexer chưa fallback thì chết ngay
+        with _loi_gia.LoiGia(kho) as loi:
+            if cach in ("goc", "bai"):
+                loi.loi_cua[(cach, "pipeline-basics")] = ma_gieo
+            r = subprocess.run([sys.executable, __file__], capture_output=True, text=True, encoding="utf-8",
+                               env={**os.environ, "TRUYHOI_LOI_URL": loi.url(), "PYTHONIOENCODING": "utf-8"}, timeout=180)
+        ra = (r.stdout or "") + (r.stderr or "")
+        K.kiem("Traceback" not in ra, f"LÕI gieo {ma_gieo} ({cach}) ⇒ cổng KHÔNG traceback", ra[-300:])
+        K.kiem(r.returncode != 0 and ("FAIL" in ra or "ĐỔ" in ra or "ĐỎ" in ra), f"LÕI gieo {ma_gieo} ⇒ cổng ĐỎ vì kết luận (exit {r.returncode})", ra[-200:])
+    K.tu_kiem_xong(CONG, 11)
 
 print("\n1 · golden.yaml — đủ 7 ca Việt + 4 ca Trung, expect địa chỉ\n")
 g = yaml.safe_load(GOLDEN.read_text(encoding="utf-8"))
@@ -118,7 +135,19 @@ with K.tam("gn_m13_golden_") as tmp:
     with K.env_tam(TRUYHOI_INDEX=str(tmp / "index.sqlite"), TRUYHOI_LOI_URL=LOI_THAT):
         con = db.mo(ghi=True)
         try:
-            indexer.reindex(con, day_du=True)
+            # WO-099 vế B · mọi mã HTTP từ LÕI phải thành KẾT LUẬN ĐỎ (cửa + mã), không traceback.
+            try:
+                ri = indexer.reindex(con, day_du=True)
+            except urllib.error.HTTPError as e:
+                K.kiem(False, "reindex trên kho thật không ném", f"LÕI {e.url} · mã {e.code} — indexer chưa chịu được (WO-099)")
+                K.chot("")
+            except (urllib.error.URLError, OSError) as e:
+                K.kiem(False, "reindex trên kho thật không ném", f"LÕI {LOI_THAT} không trả lời: {e}")
+                K.chot("")
+            hong = ri.get("hong") or []
+            K.kiem(not hong, f"reindex {ri.get('xem')}/{ri.get('xem')} bản ghi, 0 bản ghi hỏng",
+                   " · ".join(f"{h.get('slug')} ← {h.get('cua')} mã {h.get('ma')}" for h in hong))
+            print(f"  ·  reindex: {ri}")
             kq = {}
             for w in (5.0, 10.0):
                 with K.env_tam(TRUYHOI_W_TITLE_VI_EN=str(w)):

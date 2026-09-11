@@ -54,6 +54,8 @@ class LoiGia:
     def __init__(self, kho: dict):
         self.kho = kho
         self.nhan: list[dict] = []     # mọi request đã nhận — để đo M13 gọi gì
+        # WO-099 · gieo LỖI theo cửa: {("goc"|"bai", slug): mã} — 500 (LÕI hỏng) · 404 (bài biến mất).
+        self.loi_cua: dict[tuple[str, str], int] = {}
         self._s = None
         self.cong = None
 
@@ -72,6 +74,8 @@ class LoiGia:
         return 200, {"items": items[offset:offset + limit], "tong": tong, "offset": offset, "limit": limit}
 
     def bai(self, loai, slug):
+        if ("bai", slug) in self.loi_cua:
+            return self.loi_cua[("bai", slug)], {"loi": "LÕI giả: lỗi gieo cho /api/articles"}
         d = self.kho.get(slug)
         if not d or d["loai"] != loai:
             return 404, {"loi": "Không có bài này."}
@@ -82,9 +86,17 @@ class LoiGia:
                      "etag": sha256((d["body"]).encode("utf-8"))[:16], "review_status": fm.get("review_status", "approved")}
 
     def goc(self, loai, slug):
+        if ("goc", slug) in self.loi_cua:
+            return self.loi_cua[("goc", slug)], None, None
         d = self.kho.get(slug)
         if not d or d["loai"] != loai:
             return 404, None, None
+        # WO-099 · bản ghi KHÔNG có file trong kho (video đăng ký bằng URL, FR-075): cửa xuất trả 422
+        # đúng thân lỗi của LÕI thật — hợp đồng đúng, M13 phải chịu được.
+        if d.get("khong_file_goc"):
+            b = json.dumps({"loi": f"bản ghi `{slug}` không có file trong kho — video đăng ký bằng URL thì xem/tải ở nguồn, không có \"File gốc\"."},
+                           ensure_ascii=False).encode("utf-8")
+            return 422, b, "application/json; charset=utf-8"
         fm = dict(d["frontmatter"])
         fm.setdefault("slug", slug)
         fm.setdefault("source_type", loai)
@@ -116,7 +128,7 @@ class LoiGia:
 
             def _tra_byte(self, ma, b, mime):
                 if b is None:
-                    return self._tra_json(ma, {"loi": "không có"})
+                    return self._tra_json(ma, {"loi": "không có" if ma == 404 else "LÕI giả: lỗi gieo"})
                 self.send_response(ma)
                 self.send_header("content-type", mime)
                 self.send_header("content-length", str(len(b)))
@@ -207,6 +219,15 @@ def kho_mau() -> dict:
                             "media": [{"sha256": SHA_VTT, "mime": "text/vtt", "la_dan_xuat": True, "kieu_moc": "transcript"}]},
             "body": "Ghi chú ngắn về video.",
             "media": {SHA_VTT: ("text/vtt", VTT_MAU.encode("utf-8"))},
+        },
+        # WO-099 · video đăng ký bằng URL — KHÔNG có file gốc: `?dang=goc` ⇒ 422, chỉ có `/api/articles`.
+        # Kho thật 2026-09-11: 11/16 bản ghi thuộc loại này. Fixture phải NGHÈO như thật.
+        "webmcp-gia": {
+            "loai": "video", "updated_at": "2026-09-05T00:00:00Z", "khong_file_goc": True,
+            "frontmatter": {"title": "WebMCP giả", "category": ["ai-agent"], "concepts": ["mcp"],
+                            "review_status": "approved", "url": "https://youtu.be/Wl9tcoVuLjA"},
+            "body": "## Tổng quan\n\nWebMCP cho trình duyệt gọi công cụ. Đường ống dữ liệu đi qua tab.\n\n## Rủi ro\n\nQuyền của tab là quyền của agent.\n",
+            "media": {},
         },
         "ghi-chu-hoi-thao-rag": {
             "loai": "tai-lieu", "updated_at": "2026-09-04T00:00:00Z",
