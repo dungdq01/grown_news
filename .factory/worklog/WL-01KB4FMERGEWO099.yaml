@@ -1,0 +1,93 @@
+entry: ban-giao
+ulid: 01KB4FMERGEWO099
+ngay: 2026-09-11
+module: M13_truyhoi (chinh) · M01_core (map) · M03_web (bao ID trung)
+don_vi: [T13-8, T13-9]
+wo: WO-099
+tieu_de: >-
+  MERGE m13 -> main xong (c425b0e) sau nhip ⑤; bump map v32 go chan; lan chay THAT
+  dau tien tren kho that BAT DUOC mot bug M13 -> WO-099 + T13-8/T13-9
+
+object:
+  - "main c425b0e (merge m13, 16 commit, 12 don vi) — da push"
+  - "fe651a6 project_map v32"
+  - .factory/wo/WO-099-indexer-chet-o-ban-ghi-khong-co-file-goc.md
+  - 07_plan/M13_truyhoi/tasks/T13-8-test-ban-ghi-khong-co-file-goc.md
+  - 07_plan/M13_truyhoi/tasks/T13-9-indexer-chiu-422.md
+  - .factory/worklog/WL-01KB4FMERGEWO099.yaml
+
+nhip_5_reviewer: |
+  factory-reviewer cham 16 commit theo R1-R6. Sach: R1 (11/12 don vi) · R2 (khong cho
+  nao tu nhan xong) · R3 cho M13 (20 cong dung TRUOC moi truyhoi/src) · R4/R5/R6
+  (11/11 worklog co object + đỏ_do, DO->XANH cung entry) · FROZEN 57/57.
+  Reviewer TU CHAY LAI bang may: 20 cong · 0 do · 20/20 --tu-kiem chung minh do duoc;
+  dai-han.json khop _DAI_HAN tung so; gocTho het hang chungcat; golden zh khong bia
+  dia chi (expect null + he_chu; N<2 in so that roi exit 0).
+  Hai ghi nhan KHONG chan: T08-35 gop cong+ma mot commit (R3 do bang bien commit,
+  bien do khong co — nhung bang chung DO-truoc co that o WL-01M24HQXGV8DV11E55R2HGRMFX)
+  · cong T08-35 nam o 07_plan, duoc phep bang van xuoi thay vi khai trong pham_vi_ghi.
+  CHAN duy nhat: project_map v31 noi SAI ba cho — viec cua PM.
+
+bump_map_v32: |
+  Do lai tung so tren m13, khong chep loi khai: truyhoi/src = 8 file · truyhoi/tests
+  check_* = 20 · grep -c truyhoi ci.yml = 6 · endpoint moi = POST /truy-hoi ·
+  GET /health · GET /api/kho-delta · GET /api/tim.
+  Sua: M13 +status as-built (ghi ro "CO MA CHAY, khong = DA KY" + liet 5 thu con
+  thieu de dong G6C) · +khoi `api` 4 cua kem chu va hop dong · S3_toolchain.ci het no
+  truyhoi (kem canh bao CHUA tung chay tren runner) · +be mat 20 cong M13 vao cmds ·
+  F6_truy_hoi bo "0 ma".
+  ⚠️ Rule 13: PM-Space giu but map. Toi cham vi merge chan o day va MOI DONG sua deu
+  thuoc M13 — khong cham dong nao cua Space (entity Space · BaiHoc · T01-90). Ghi
+  trong khoi comment v32. CAN BAO PM-Space.
+
+phat_hien_QUAN_TRONG_NHAT: |
+  Chu du an restart :8787 (viec 1). /api/kho-delta -> 200. Chay check_golden_du_ca
+  lan dau tren KHO THAT ⇒ BAT DUOC MOT BUG:
+    /api/xuat/<loai>/<slug>?dang=goc tra 422 cho ban ghi KHONG co file trong kho
+    (video dang ky bang URL — hop dong DUNG cua LOI, FR-075).
+    indexer.py:259 goi cua do cho MOI ban ghi ⇒ nem HTTPError ⇒ cong CRASH.
+  Quy mo do tren kho that: 16 ban ghi · 5 tra 200 · **11 tra 422** ⇒ indexer chet som,
+  2/3 kho KHONG BAO GIO duoc index.
+  VI SAO 20 CONG VAN XANH: chung chay tren kho TAM do chinh test dung — noi MOI ban
+  ghi deu co file. Fixture GIAU HON thuc te ⇒ cong xanh tren mot the gioi khong ton
+  tai. Dung lop #cong-xanh-vi-neo-sai, va la ly do T13-6 (do tren kho that) ton tai.
+  Ve thu hai nang hon: cong CRASH thay vi DO — dung lop WO-084 (check_g6b chet o dong
+  in), LAN THU HAI trong hai ngay.
+  Duong sua co san, 0 cua moi: /api/articles/<loai>/<slug> tra 200 cho dung nhung ban
+  ghi 422 (do), va indexer DA goi no o :260 cho metadata.
+
+id_trung_T03_148_KHONG_phai_cua_toi_sua: |
+  check_g6b to: T03-148 TRUNG — `T03-148-test-heading-id-anchor.md` (cua toi, 09-10
+  08:37, DA COMMIT 805ccd3, 8 cho tro) va `T03-148-lay-lai-byte-va-thuoc-tach.md`
+  (09-11 06:57, CHUA commit, 2 cho tro). File sau ghi de file truoc trong dict cua
+  cong ⇒ mot pham_vi_ghi KHONG duoc kiem (R1 mat dia chi).
+  Theo tien le FR-070/071 va WO-084: doi so ban IT THAM CHIEU NGOAI hon = ban cua
+  team M03 (T03 max = 150 ⇒ lay 151). Toi KHONG tu doi — plan cua nhanh khac
+  (checklist §4). CAN BAO chu M03.
+
+do_do:
+  - lenh: "git merge --no-ff m13 · git push"
+    ket_qua: "main c425b0e · m13 con 0 commit rieng · push OK"
+  - lenh: "6 cong khung tren main sau merge"
+    ket_qua: "check_frozen · g6a · map · ba · rule_surfaces · khai_mot_noi = exit 0"
+  - lenh: "20 cong M13 tren main"
+    ket_qua: "19 xanh · 1 do: check_golden_du_ca (bug WO-099)"
+  - lenh: "curl :8787"
+    ket_qua: "/api/kho-delta 200 · /api/articles/video/webmcp 200 · /api/xuat/video/webmcp?dang=goc 422 · /api/tim 502"
+  - lenh: "dem ban ghi 422 tren kho that"
+    ket_qua: "16 ban ghi · 200: 5 · 422: 11"
+  - lenh: python core/tests/check_map.py
+    ket_qua: "exit 0 — 18 module · 18 thu muc, sau bump v32"
+  - lenh: python core/tests/check_g6b.py
+    ket_qua: "T13-8 3/3 · T13-9 4/4 ok; 1 loi mang ma M13-range = ID TRUNG T03-148 (cua team M03, khong phai cua toi)"
+đỏ_do: >
+  check_golden_du_ca: bug CUA M13 (T13-2 indexer) — quy chu ro rang, khong phai LOI
+  hay moi truong. /api/tim 502: service :8791 CHUA CHAY — van hanh, khong phai bug.
+  ID trung T03-148: team M03 (file 09-11 06:57, chua commit).
+
+khong_lam:
+  - "KHONG sua cua xuat cua LOI — 422 dung hop dong (FR-075), va rule 18 dong bang M01-M12."
+  - "KHONG sua spec/rules M13 (FROZEN) — AC-1.3 noi 'doc kho QUA API cua LOI', khong noi cua nao; day la loi CAI DAT."
+  - "KHONG doi so T03-148 cua team M03 — plan nhanh khac, bao thoi."
+  - "KHONG chay service :8791 — van hanh, chu du an quyet khi nao bat."
+  - "KHONG go 8 o backlog M13 — chung chet o G6C, dung luc."
