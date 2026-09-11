@@ -1,5 +1,19 @@
 # backlog — M08_api (chết ở G6C)
 
+
+## 2026-09-11 · KÉO THEO từ T03-150 — cổng viết-trước còn sống ở `07_plan/`
+
+- [ ] **`07_plan/M08_api/tasks/T08-26b-cai-dat.test.js` chưa dời vào `web/test/`.**
+      `rule.md` mục 8: cổng viết-trước sống ở thư mục task, **dời vào `web/test/` +
+      đăng ký `npm test` CÙNG LƯỢT với mã**. Cổng này của `T08-17b` (bảng `cai_dat`,
+      `M18 §10`, 13 AC) có từ commit gốc `c27859e`; mã chưa thi công nên chưa tới lúc
+      dời — **đúng luật, nhưng phải có tên** để không ai tưởng đã quên.
+      Lộ ra khi `T03-150` AC3 (PM viết) đòi *"thư mục hết .test.js"* — sai phạm vi,
+      đã sửa 2026-09-11 thành đo đúng file của đơn vị đó.
+      Đóng bằng: `T08-17b` thi công, `git mv` cổng vào `web/test/` + `npm test`.
+      · object: `07_plan/M08_api/tasks/T08-26b-cai-dat.test.js`
+      ⇒ **khi T08-17b thi công**
+
 > Nợ do một thay đổi CỤ THỂ vừa gây ra. Không phải TODO, không phải ý tưởng.
 > Ô `[ ]` trỏ artifact có thật; `[x]` phải kèm object (commit · PR · FR id).
 

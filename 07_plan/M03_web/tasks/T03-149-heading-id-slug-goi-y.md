@@ -35,8 +35,19 @@ tiêu_chí:
       reset theo bài, ba bản khớp trên 50 heading kho thật
     cmd: cd web && node test/heading-id-anchor.test.js
   - AC2: `git diff --stat` của multiwindow.inline.ts trong đơn vị này ≤ 8 dòng thay
-      đổi; 0 hàm slug mới (grep `normalize("NFD")` trong web/plugins ⇒ đúng 1 chỗ)
+      đổi; và đơn vị này thêm **0 hàm slug mới** — số chỗ `normalize("NFD")` trong
+      `web/plugins/**/*.ts` SAU lượt bằng ĐÚNG số TRƯỚC lượt (3), không phải "đúng 1"
     cmd: cd web && node test/heading-id-anchor.test.js --mot-luat
+# ⚠️ SỬA AC2 2026-09-11 (PM): bản đầu viết *"grep normalize NFD ⇒ đúng 1 chỗ"* —
+# PHÉP ĐO QUÁ THÔ, dev báo đúng. Đo thật trên `web/plugins/**/*.ts`: BA chỗ, cả ba
+# CÓ TRƯỚC lượt này:
+#   multiwindow.inline.ts:1329  slugGoiY — bản chuẩn, C3 dùng lại
+#   multiwindow.inline.ts:1709  boDau    — KHÁC mục đích (bỏ dấu để so khớp, không
+#                                          cắt 60, không thay [^a-z0-9] — không sinh slug)
+#   napvideo.inline.ts:101      BẢN SAO slugGoiY của M11, giống từng bước kể cả slice(0,60)
+# Một phép đếm gộp cả ba là bắt đơn vị này trả nợ của hai chỗ nó không tạo ra.
+# AC nay đo đúng thứ nó muốn: đơn vị này KHÔNG thêm bản thứ tư.
+# `napvideo.inline.ts:101` là bản sao THẬT của một luật — ô backlog M03 mở lượt này.
   - AC3: page-weight — id trên heading không đẩy gn.js/gn.css qua trần (id sinh lúc
       render client, không vào bundle CSS)
     cmd: cd web && node test/page-weight.test.js

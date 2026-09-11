@@ -27,6 +27,12 @@ tiêu_chí:
   - AC2: `npm test` gọi cổng này — grep tên file trong web/package.json ⇒ 1; và vế AC3
       (poke) vẫn in SKIP kèm lý do, không xanh rỗng (T08-35 AC3 HOÃN, chờ FR)
     cmd: cd web && npm test
-  - AC3: thư mục 07_plan/M08_api/tasks/ hết file .test.js (0) — cổng viết-trước không
-      sống hai chỗ
+  - AC3: cổng CỦA ĐƠN VỊ NÀY không sống hai chỗ — `07_plan/M08_api/tasks/T08-35-kho-delta.test.js`
+      KHÔNG còn tồn tại (git mv, không copy), và `web/test/kho-delta.test.js` có
     cmd: cd web && node test/kho-delta.test.js
+# ⚠️ SỬA AC3 2026-09-11 (PM): bản đầu đòi *"thư mục 07_plan/M08_api/tasks/ hết
+# .test.js (0)"* — SAI PHẠM VI, dev báo đúng. Còn `T08-26b-cai-dat.test.js` (cổng
+# viết-trước của T08-17b, bảng `cai_dat`/M18, có từ commit gốc c27859e) — đơn vị
+# KHÁC, chưa tới lúc dời. AC của một đơn vị chỉ được đo thứ đơn vị đó làm ra; đo
+# cả thư mục là bắt nó chịu trách nhiệm cho việc người khác. `T08-26b` là nợ CÓ
+# TÊN: ô backlog M08 mở lượt này, đóng khi T08-17b thi công.

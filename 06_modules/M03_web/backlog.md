@@ -1,5 +1,30 @@
 # backlog — M03_web (chết ở G6C)
 
+
+## 2026-09-11 · KÉO THEO từ C3 (T03-149) — hai nợ CÓ SẴN mà AC của PM làm lộ
+
+- [ ] **`web/plugins/napvideo/src/napvideo.inline.ts:101` là BẢN SAO của `slugGoiY`.**
+      Giống `multiwindow.inline.ts:1329` **từng bước**, kể cả `.slice(0, 60)` — tức
+      luật sinh slug nay có **hai bản cài** trong `web/plugins/`. Đây chính là lớp lỗi
+      `M13-R2` cấm: hai luật slug khác nhau ⇒ chatbot trích một anchor mà trang render
+      không có, và **chết im lặng vì cả hai phía đều "chạy đúng"**.
+      Hôm nay chưa gãy vì hai bản còn **giống nhau**; nó gãy ở lần đầu ai đó sửa một bản.
+      Lộ ra khi dev chạy `--mot-luat` của `T03-148` (PM viết AC *"grep NFD ⇒ đúng 1 chỗ"*
+      — phép đo quá thô, đã sửa 2026-09-11).
+      Đóng bằng: `napvideo` gọi `slugGoiY` qua cầu `__GN_MW__` (khuôn `chungcat` gọi
+      `capNhin`), hoặc tách `slugGoiY` ra `anchor.ts` cho cả hai import. **Không** đóng
+      bằng cách đồng bộ tay hai bản.
+      · object: `web/plugins/napvideo/src/napvideo.inline.ts:101` ·
+      `web/plugins/multiwindow/src/scripts/multiwindow.inline.ts:1329`
+      ⇒ **đơn vị M03 riêng, chưa mở** (cần ID chẵn của dev chính)
+
+- [ ] **`boDau` (`multiwindow.inline.ts:1709`) trông giống `slugGoiY` nhưng KHÁC mục
+      đích** — bỏ dấu để **so khớp**, không cắt 60, không thay `[^a-z0-9]`. Không phải
+      bản sao, **không** gộp. Ghi ra đây để lần sau ai grep `normalize("NFD")` thấy ba
+      kết quả thì biết cái nào là nợ, cái nào không.
+      · object: `web/plugins/multiwindow/src/scripts/multiwindow.inline.ts:1709`
+      ⇒ **không phải nợ — ô này đóng ngay bằng chính dòng giải thích này**
+
 ## 2026-09-02 · KÉO THEO từ s6/M13 — sơ đồ `file#anchor` chưa có người tiêu thụ
 Phát hiện khi viết `testcases.md` cho M13 (phép thử s6: *viết không nổi testcase
 ⇒ AC mơ hồ*). Worklog: `WL-01K9X2S6DONG`.

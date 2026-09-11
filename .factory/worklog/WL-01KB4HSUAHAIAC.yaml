@@ -1,0 +1,78 @@
+entry: ban-giao
+ulid: 01KB4HSUAHAIAC
+ngay: 2026-09-11
+module: M03_web · M08_api (o backlog) · M13_truyhoi (PM)
+don_vi: [T03-149, T03-150]
+tieu_de: >-
+  Dev bao hai AC vuong — CA HAI la AC cua PM viet SAI PHAM VI, khong phai loi dev.
+  Sua hai AC, mo hai o backlog cho no vua lo, va tra loi "8 commit chua push".
+
+object:
+  - 07_plan/M03_web/tasks/T03-150-test-kho-delta.md   # AC3: "thu muc het .test.js" -> "file CUA DON VI NAY khong song hai cho"
+  - 07_plan/M03_web/tasks/T03-149-heading-id-slug-goi-y.md  # AC2: "grep NFD = 1" -> "SAU luot = TRUOC luot (3)"
+  - 06_modules/M03_web/backlog.md                     # +o napvideo:101 ban sao slugGoiY · +dong giai thich boDau KHONG phai no
+  - 06_modules/M08_api/backlog.md                     # +o T08-26b-cai-dat.test.js chua doi
+  - .factory/worklog/WL-01KB4HSUAHAIAC.yaml
+
+dev_bao_gi: |
+  "T03-150 AC3 vuong T08-26b-cai-dat.test.js cua nguoi khac; T03-149 AC2 grep
+  normalize(NFD) qua tho — dem duoc 3 cho, trong do napvideo.inline.ts:101 la ban sao
+  slugGoiY cua M11. 8 commit chua push, toi khong tu push."
+
+ca_hai_la_LOI_CUA_TOI: |
+  AC3 (T03-150) — toi viet "thu muc 07_plan/M08_api/tasks/ het file .test.js (0)".
+    Do ca THU MUC la bat mot don vi chiu trach nhiem cho viec nguoi khac. Con
+    T08-26b-cai-dat.test.js = cong viet-truoc cua T08-17b (bang `cai_dat`, M18 §10,
+    13 AC), co tu commit goc c27859e, ma CHUA thi cong nen CHUA toi luc doi — dung
+    luat, chi la khong phai viec cua T03-150.
+    Sua: AC3 do dung file cua don vi do — T08-35-kho-delta.test.js KHONG con o
+    07_plan (git mv, khong copy) va web/test/kho-delta.test.js CO.
+  AC2 (T03-149) — toi viet "grep normalize(NFD) trong web/plugins => dung 1 cho".
+    Do that tren *.ts: BA cho, ca ba CO TRUOC luot nay:
+      multiwindow.inline.ts:1329  slugGoiY — ban chuan, C3 dung lai
+      multiwindow.inline.ts:1709  boDau    — KHAC muc dich: bo dau de SO KHOP, khong
+                                             cat 60, khong thay [^a-z0-9] ⇒ khong sinh slug
+      napvideo.inline.ts:101      BAN SAO slugGoiY, giong TUNG BUOC ke ca .slice(0,60)
+    Mot phep dem gop ca ba la bat don vi nay tra no cua hai cho no khong tao ra.
+    Sua: AC2 do "SAU luot = TRUOC luot (3)" — tuc don vi nay khong them ban THU TU.
+  Dev DUNG khi dung lai va bao thay vi tu noi AC cho vua. Day la lan thu ba trong
+  hai ngay mot AC toi viet cho nguoi khac bi neo sai (neo T01-5 · ID trung T04-10 ·
+  hai AC nay) — bai hoc: AC phai do THU DON VI DO LAM RA, khong do trang thai thu muc.
+
+hai_o_backlog_MO: |
+  M03: napvideo.inline.ts:101 la BAN SAO that cua slugGoiY — luat sinh slug nay co HAI
+    ban cai trong web/plugins/. Dung lop M13-R2 cam: hai luat slug ⇒ chatbot trich mot
+    anchor trang khong co, chet IM LANG vi ca hai phia deu "chay dung". Hom nay chua
+    gay vi hai ban con GIONG NHAU; no gay o lan dau ai do sua mot ban.
+    Dong bang: napvideo goi slugGoiY qua cau __GN_MW__ (khuon chungcat goi capNhin),
+    hoac tach slugGoiY ra anchor.ts cho ca hai import. KHONG dong bang dong bo tay.
+  M03 (dong ngay): boDau:1709 KHONG phai no — ghi ra de lan sau ai grep thay 3 ket qua
+    thi biet cai nao la no.
+  M08: T08-26b-cai-dat.test.js chua doi — dong khi T08-17b thi cong.
+
+tra_loi_8_commit_chua_push: |
+  Dev KHONG tu push la dung than trong, nhung rule 17 da cho phep: `m13` LA nhanh cua
+  module, push len origin/m13 khong dung den main. Tra loi: CU PUSH.
+  Doc 8 commit: T13-8 · T13-9 (WO-099 DONG — kho THAT reindex 16/16, hong [], golden
+  7/7 ca Viet DAT lan do that dau tien, zh soft 1/2, 21/21 cong M13 xanh) · T01-52 luot
+  hai · T03-150 · SCR-27 · T03-148 · T03-149 (C3 DONG) · merge main.
+  Day la khoi luong lon va chat luong cao — de no chi song tren mot may la rui ro vo ich.
+
+do_do:
+  - lenh: "ls 07_plan/*/tasks/*.test.js"
+    ket_qua: "1 file: T08-26b-cai-dat.test.js (M08, cong cua T08-17b) — T08-35 da doi di, dev lam dung"
+  - lenh: "grep -rn 'normalize(\"NFD\")' web/plugins/**/*.ts"
+    ket_qua: "3 cho: multiwindow:1329 slugGoiY · multiwindow:1709 boDau · napvideo:101 BAN SAO"
+  - lenh: "so sanh napvideo:101 vs multiwindow:1329"
+    ket_qua: "giong tung buoc, ke ca .slice(0,60) ⇒ ban sao THAT, khong phai trung hop"
+  - lenh: "git log --oneline origin/m13..m13"
+    ket_qua: "8 commit chua push"
+  - lenh: "check_g6b · check_ba · check_g6a sau khi sua AC"
+    ket_qua: "T03-149 4 AC/4 cmd ok · T03-150 3 AC/3 cmd ok · ba exit 0 · g6a exit 0"
+đỏ_do: "khong co do moi trong luot nay"
+
+khong_lam:
+  - "KHONG sua napvideo.inline.ts — o backlog, can mot don vi rieng (ID chan cua dev chinh)."
+  - "KHONG doi T08-26b — cong cua T08-17b, chua toi luc."
+  - "KHONG tu push nhanh m13 — do la nhanh dev dang lam, ho push."
+  - "KHONG merge m13 lan hai — cho dev xong roi chay reviewer."
