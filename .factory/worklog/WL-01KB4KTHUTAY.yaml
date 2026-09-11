@@ -1,0 +1,96 @@
+entry: ban-giao
+ulid: 01KB4KTHUTAY
+ngay: 2026-09-11
+module: M13_truyhoi · M03_web · M08_api
+tieu_de: >-
+  Chu du an giao sau phep thu tay — PM chay bang may: NAM phep do duoc, ca nam DAT.
+  Mot lan toi SUYT TO OAN vi dung sai cong cu; da bat truoc khi mo WO.
+
+object:
+  - "do tren he dang chay: :8787 · :8890 (web m13) · :8791 (truyhoi)"
+  - "index that: 16 tai lieu · 111 chunk (GET :8791/health)"
+  - .factory/worklog/WL-01KB4KTHUTAY.yaml
+
+ket_qua_nam_phep_do_duoc: |
+  1 TIM TRONG TRANSCRIPT — DAT. q='bán lẻ du lịch' va 'agent bán hàng' deu tra
+    ecomerce-skill-claude:t=00:10 / t=00:00 voi nguon_van_ban=hien-vat:text/vtt.
+    Dia chi la MOC THOI GIAN (slug-moc), khong phai so dong. 68/111 chunk tu phu de
+    truoc dot nay vo hinh voi tim kiem.
+  2 KET QUA TRO HEADING (C3) — DAT o ve do duoc bang may: q='dau vao' tra
+    article/phan-tich-ecomerce-skill-claude.md:36-41 kem anchor='3-1-dau-vao'
+    (heading '### 3.1 Đầu vào'). Ve BAM-VA-NHAY la UI, phai nguoi bam.
+  3 PHIM ↑↓/Enter/Esc — KHONG do duoc bang may (UI). Can chu du an bam tay.
+  4 HAI TIN HIEU — DAT. truyhoi/tin-hieu.json: truy_van_0_ket_qua 12->13,
+    go_lai 11->12 sau khi go 1 cau 0-ket-qua + 3 cau khac nhau. tin-hieu.jsonl ghi
+    tung su kien kem moc gio + dai_cau_hoi (khong ghi noi dung cau hoi).
+  5 CHI MUC LECH BAO DUOC — DAT du ba nhip: im lang khi khop (exit 0) · gieo lech
+    sha_than mot ban ghi ⇒ in 'lech: cai-dat-va-thiet-lap-hermes-tren-vps' va
+    EXIT 1 · --day-du ⇒ {xem:16, doi:16, hong:[]} ⇒ kiem lai im lang, exit 0.
+  6 AI GOI DUOC VAO :8791 — DAT 4/4 ca 403: x-aud=truyhoi thieu khoa · x-aud=chungcat ·
+    x-aud=artifact · khong co aud. Chi web mang dung khoa chieu moi qua ⇒ trinh duyet
+    khong bao gio cam khoa do.
+
+TOI_SUYT_TO_OAN_MOT_BUG_KHONG_CO_THAT: |
+  Phep thu 2, lan do dau bang `curl --data-urlencode "q=$q"` trong Git Bash Windows:
+    "Đầu vào" -> 0    "dau vao" -> 3
+    "vào"     -> 0    "vao"     -> 3
+    "bán lẻ"  -> 0    "nội dung" -> 3   (co dau ma VAN ra — nen toi loai gia thuyet
+                                          "moi chuoi co dau deu hong")
+  Toi da viet gan xong mot WO ve "vi pham AC-3.2 va SCR-27 AC1", va dinh noi
+  check_ba_thu_tieng dang XANH OAN.
+  TRUOC KHI MO WO, do them hai buoc — va ca hai lat nguoc ket luan:
+    (a) MATCH THANG tren index, khong qua service: co dau va khong dau ra CUNG so
+        (vao/vào = 19/19 · dau vao/dầu vào = 5/5 · noi dung/nội dung = 24/24 ·
+         ban le/bán lẻ = 4/4) ⇒ indexer + chuan_hoa_tim + FTS5 DUNG.
+    (b) goi lai QUA PROXY bang urllib thay vi curl: MOI cap co dau/khong dau ra
+        CUNG ket qua ("Đầu vào"=20 · "đầu vào"=20 · "vào"=19 = "vao"=19 · "bán lẻ"=20).
+  ⇒ Loi nam o CONG CU CUA TOI (curl + bien shell trong Git Bash Windows), khong o he
+  thong. He KHONG co bug. KHONG mo WO.
+  Dau vet de lan sau doc lai: curl gui %c3%a1n (dung byte) khi dung printf, nhung
+  qua bien shell `$q` thi chuoi bi mangle truoc khi toi curl.
+
+BAI_HOC_dang_ghi_nhat: |
+  Day dung lop loi ma luat `đỏ_do` sinh ra de chan: BAO DO MA CHUA QUY DUOC CHU.
+  Toi da co ba manh moi de nghi ngo chinh minh, va suyt bo qua ca ba:
+    - "nội dung" CO DAU van ra 3 ⇒ gia thuyet "co dau la hong" da SAI ngay tu dau
+    - so match tren index khong khop so qua service ⇒ chenh lech nam o DUONG TRUYEN
+    - mot he da chay 21/21 cong xanh bong do o dung cho AC-3.2 canh ⇒ dang ngo
+  Luat rut ra: TRUOC KHI MO WO CHO MOT BUG DO BANG CONG CU NGOAI, do lai bang MOT
+  CONG CU THU HAI. Mot phep do khong tai hien duoc bang hai duong thi chua phai mot
+  phep do — no la mot quan sat.
+  Neu toi mo WO do: dev mat mot luot di tim bug khong co, va te hon, niem tin vao
+  bao cao cua PM giam — dung thu R6 bao ve.
+
+chua_the_test_va_ly_do_da_XAC_NHAN: |
+  - 4 ca tieng Trung: kho co 1 bai chu Han, can >=2 ⇒ AC-6.3 van soft (dung nhu dev khai)
+  - loc theo space: cho FR-080 ap (T01-90, PM-Space)
+  - /reindex-poke: cho PM quyet (o backlog M13) ⇒ sua bai xong phai tu chay --day-du.
+    Phep thu 5 xac nhan dieu do dung: --kiem-lech bat duoc, --day-du chua duoc.
+  - noi dung PDF: no cua M12 (FR-079), M13 chi index ghi chu ngan cua ban ghi
+
+do_do:
+  - lenh: "curl :8787/api/health · :8791/health · :8890/api/health"
+    ket_qua: "200 · 200 · 200; :8791/health khai duong index + moc + 16 tai lieu + 111 chunk"
+  - lenh: "4 ca POST :8791/truy-hoi voi x-aud khac nhau"
+    ket_qua: "403 · 403 · 403 · 403"
+  - lenh: "MATCH thang tren chunks_fts (8 truy van)"
+    ket_qua: "co dau == khong dau, 4/4 cap"
+  - lenh: "GET :8890/api/tim qua urllib (10 truy van)"
+    ket_qua: "co dau == khong dau, 5/5 cap; transcript tra slug-moc"
+  - lenh: "indexer.py --kiem-lech (im lang -> gieo lech -> --day-du -> im lang)"
+    ket_qua: "exit 0 · 'lech: <slug>' exit 1 · doi 16 hong [] · exit 0"
+  - lenh: "cat truyhoi/tin-hieu.json truoc/sau"
+    ket_qua: "{12,11} -> {13,12}; jsonl ghi tung su kien"
+đỏ_do: >
+  KHONG co do nao thuoc he thong trong luot nay. Mot "do" toi tu tao ra bang cong cu
+  sai (curl + bien shell Git Bash Windows) — quy chu: CONG CU CUA TOI, da bat truoc
+  khi mo WO.
+
+cho_NGUOI:
+  - "Phep thu 3 (phim ↑↓/Enter/Esc trong panel, bam ra ngoai de dong) — chi do duoc bang tay."
+  - "Phep thu 2 ve BAM-VA-NHAY: bam dong tro article/...md:36-41, cua so doc phai cuon toi muc '3.1 Đầu vào', khong dung o dau bai."
+
+khong_lam:
+  - "KHONG mo WO cho 'bug dau tieng Viet' — khong co bug."
+  - "KHONG sua truyhoi/** hay web/api/** — khong co gi de sua."
+  - "KHONG dung curl voi chuoi tieng Viet qua bien shell nua — dung urllib hoac printf."

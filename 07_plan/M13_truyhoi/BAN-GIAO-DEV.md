@@ -93,6 +93,19 @@ họ vì cả hai bên cùng gõ trên `main` và họ `git add -A`.
 - `project_map.yaml`: **PM-Space giữ bút**. Cần bump ⇒ ghi một dòng *"cần bump: …"*
   vào worklog, không `Edit` file.
 
+### 1.4b · Đo một bug bằng CÔNG CỤ THỨ HAI trước khi mở WO
+
+2026-09-11, PM suýt mở một WO tố M13 vi phạm `AC-3.2`: `curl --data-urlencode "q=$q"`
+trong Git Bash Windows cho *"`Đầu vào` → 0, `dau vao` → 3"*. Đo lại bằng hai đường thì
+cả hai lật ngược: `MATCH` thẳng trên index ⇒ có dấu == không dấu (4/4 cặp); gọi lại qua
+proxy bằng `urllib` ⇒ mọi cặp cùng kết quả. **Lỗi ở công cụ đo, hệ không có bug.**
+
+⇒ Bug phát hiện bằng công cụ ngoài (curl · trình duyệt · GUI) thì **đo lại bằng công cụ
+thứ hai** trước khi mở WO. Chênh lệch giữa *gọi qua service* và *gọi thẳng lớp dưới* ⇒
+nghi **đường truyền** trước khi nghi logic.
+Trên Git Bash Windows: **đừng** truyền chuỗi tiếng Việt qua biến shell vào `curl` —
+dùng `python urllib` hoặc `printf`.
+
 ### 1.4 · Cổng và dữ liệu thật
 
 - Test chạy trên **kho tạm** (`KB_DIR`), service giả bind **8895–8899**. `8787` là
