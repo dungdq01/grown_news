@@ -1,5 +1,41 @@
 # backlog — M03_web (chết ở G6C)
 
+## 2026-09-12 · Hai o do duoc khi chay lai `page-weight` sau T04-12
+
+- [ ] **`page-weight` DO CA EOL — cung mot ma nguon cho hai so cach nhau 2,6 KB.**
+      Cong nay doc `styles/prototype.css` tu **dia**, khong chuan hoa EOL. Do cung mot
+      commit, hai cay:
+      · `../gn-m13` (checkout CRLF vi `core.autocrlf=true`): `gn.css` **109448** byte
+      · cung file da doi sang LF:                              `gn.css` **106837** byte
+      ⇒ Chenh **2611 byte** tren mot tran 106496. Tuc mot dev Windows co the DO LAM
+      quang 2,6 KB, con CI Linux thi khong. **Cung ho voi T04-12** (`kb/_media/** -text`)
+      nhung o phia nguon: can `* text=auto eol=lf` trong `.gitattributes`, HOAC cong
+      phai `.replace(/
+/g, "
+")` truoc khi dem byte va noi ro trong chu thich.
+      · object: `web/test/page-weight.test.js` (ham `byte()`) · `web/render/assets.mjs`
+      · Khong tu sua: ngoai `phạm_vi_ghi` cua T03-152/T04-12.
+
+- [ ] **NGUOI phai chon: `gn.css` vuot tran 341 byte vi panel tim (T03-125).**
+      Do dung byte LF (nhu CI se thay): main **104856** / tran **106496** — con **1640**.
+      Khoi `.tim-*` cua T03-125 ton **1981** ⇒ **106837 / 106496, vuot 341 byte**.
+      Da lam het phan minh lam duoc, va do ra so THAT:
+        · bo TOAN BO khoi binh luan CSS (409 byte tho) ⇒ tiet kiem **0 byte** —
+          bundler luoc binh luan. Da tra lai khoi binh luan, ghi phep do vao do.
+        · viet sat dong, gop `.tim-l`/`.tim-lai` ⇒ **10 byte**. Da giu.
+      ⇒ Con lai 341 byte la **khai bao that**: bo tiep = bo giao dien that (vien trai
+        muc dang chon, vien vien nhan loai, `max-height` cuon).
+      **Hai duong, khong duong nao toi duoc tu quyet**:
+        (a) noi `TRAN_KB.css` 104 → 105 kem khoi ly do (tien le: `js` 103 → 104 ngay
+            2026-09-11, chu du an duyet) — **toi KHONG tu noi**: `_tran.mjs` la THUOC
+            do chinh viec toi lam, luat goc cam ben bi danh gia cam but;
+        (b) cat bot giao dien panel tim cho vua 1640 byte — mat tinh nang that.
+      Luu y khi doc CI: `page-weight` **da do san tren main** hai ve khac
+      (`tai dau nang nhat`, `trang chu 64 KB`) — ve `gn.css` nay la ve THU BA.
+      · object: `web/styles/prototype.css` khoi `.tim-*` · `web/test/_tran.mjs:52` ·
+        do: `node web/test/page-weight.test.js` tren ca hai cay, 2026-09-12
+
+
 
 ## 2026-09-12 · KÉO THEO từ `T03-152` — một cổng đã ở đúng chỗ nhưng vẫn 0 răng
 
