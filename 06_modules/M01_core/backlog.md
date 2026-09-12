@@ -1,5 +1,20 @@
 # backlog — M01_core (chết ở G6C)
 
+## 2026-09-12 · `dung_lai_db.py` nuốt im lặng cờ lạ rồi GHI (đo lúc thi công T04-12)
+
+- [ ] **`core/tools/dung_lai_db.py` không có `argparse`.** Gõ
+      `python core/tools/dung_lai_db.py --kiem` (đúng `cmd` mà AC1 của T04-12 ghi) ⇒ nó
+      **bỏ qua cờ** và **dựng lại DB thật**, in `da dung kb\_kho.sqlite · … · media 8`.
+      Người gõ tưởng vừa *kiểm*, thật ra vừa *ghi*. Cùng một lớp với sự cố
+      `check_running.py` ở ô §10 phía dưới: **một lệnh đọc-nghe-như-đọc mà lại viết**.
+      ⇒ Tối thiểu: `argparse` + `parser.parse_args()` (cờ lạ ⇒ exit 2, không chạy gì);
+      tốt hơn: có thật một cờ `--kiem` chỉ ĐỌC — so `sha256(nội dung)` với tên file
+      trong `kb/_media/`, in lệch, exit 1, **không chạm** `kb/_kho.sqlite`.
+      · object: `core/tools/dung_lai_db.py` (0 dòng `argparse`/`sys.argv`) ·
+        `07_plan/M04_ci/tasks/T04-12-…md` AC1 `cmd` · đo 2026-09-12 trên `../gn-m13`
+      · Không tự sửa: ngoài `phạm_vi_ghi` T04-12 (chỉ `.gitattributes`).
+
+
 > Nợ do một thay đổi CỤ THỂ vừa gây ra. Không phải TODO, không phải ý tưởng.
 > Ô `[ ]` trỏ artifact có thật; `[x]` phải kèm object (commit · PR · FR id).
 

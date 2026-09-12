@@ -1,0 +1,83 @@
+entry: ban-giao
+ulid: 01M2A7RHN483271MSS6AFBDPMM
+ngay: 2026-09-12
+module: M04_ci
+don_vi: [T04-12]
+nhanh: m13 (worktree ../gn-m13)
+tieu_de: >-
+  T04-12 — `.gitattributes`: `kb/_media/** -text` (WO-100 ve B). Git tren Windows thoi
+  checkout hien vat ra CRLF ⇒ sha256 noi dung ≠ sha256 trong TEN FILE ⇒ moi ben kiem byte tu choi.
+
+object:
+  - .gitattributes                  # +14 dong: khoi vi-sao + MOT dong luat `kb/_media/** -text`
+  - kb/_media/258f826e…bce69bd.vtt  # ghi lai dung byte tu blob (17782 CRLF -> 17235); KHONG vao commit vi noi dung == blob
+  - kb/_media/c4f6bcfb…1ba39a2.vtt  # ghi lai dung byte tu blob (1815 CRLF -> 1754); nt
+  - 06_modules/M04_ci/backlog.md    # +o: ba `cmd` cua T04-12 khong do thu ba AC noi
+  - 06_modules/M01_core/backlog.md  # +o: dung_lai_db.py nuot im lang co la roi GHI
+  - .factory/worklog/WL-01M2A7RHN483271MSS6AFBDPMM.yaml
+
+do_do:
+
+  - lenh: "python: sha256(noi dung) vs Path(f).stem cho moi file kb/_media — CA HAI CAY"
+    ket_qua: |
+      ../gn-m13  TRUOC: 6 OK · 2 SAI
+                   SAI 258f826e6f886cd8 -> ae81e18d8c229bc5
+                   SAI c4f6bcfbce74792c -> 959b38b2de52beb3
+      Grown_news TRUOC: 10/10 OK
+      ⇒ Dung y nhu task noi: **loi VO HINH tren main**. Main khong hong vi file o day do
+        cong cu sinh ra tai cho, chua he di qua mot luot `git checkout` voi autocrlf=true.
+        Worktree thi co — do la ly do no song lau.
+      ../gn-m13  SAU (ghi lai byte tu `git cat-file blob HEAD:<f>`, ghi nhi phan): 8/8 OK.
+
+  - lenh: "git check-attr -a <2 duong> — AC2, tren ../gn-m13"
+    ket_qua: |
+      kb/_media/258f826e….vtt : text: unset      ← luat co hieu luc
+      RUNNING.md              : (khong in dong nao) ← van chuan hoa EOL nhu cu
+      ⇒ AC2 dat ca hai ve: dung cho can, khong rong qua cho can.
+      Tren cay `Grown_news` (main chua co dong luat): kb/_media/… cung KHONG in dong nao
+        = `text` unspecified = autocrlf toan quyen. Ve nay chi xanh sau khi m13 vao main.
+
+  - lenh: "--tu-kiem: RANG cua dong luat, do bang git that (git checkout-index --prefix= vao repo tam, core.autocrlf=true)"
+    ket_qua: |
+      KHONG co dong luat     checkout ra: size= 1815  sha256=959b38b2de52beb3  != ten file  (HONG)
+      CO kb/_media/** -text  checkout ra: size= 1754  sha256=c4f6bcfbce74792c  == TEN FILE  (OK)
+      goc trong git:         size= 1754  sha256=c4f6bcfbce74792c
+      ⇒ DO-TRUOC-XANH-SAU tren cung mot byte goc, cung mot lenh, khac dung MOT dong.
+        Khong xoa file nao: dung `checkout-index --prefix=` ra thu muc moi.
+
+  - lenh: "git status --porcelain kb/_media (AC3) sau khi ghi lai byte + git add"
+    ket_qua: |
+      rong. `git diff --cached --stat` chi con `.gitattributes | 14 +`.
+      Luu y ky thuat: truoc khi `git add`, status con bao ` M` hai file DU `git diff` rong
+      va `git hash-object <f>` == blob (39b8fcb…) — do index con giu `size` cu (1815/17782).
+      `git update-index --really-refresh` in "needs update" chu khong tu xoa; mot `git add`
+      la sach. Tuc la: **khong can** `--renormalize` (blob trong git von da dung byte),
+      chi can ghi lai file tren dia.
+
+  - lenh: "python core/tools/dung_lai_db.py --kiem   (cmd cua AC1)"
+    ket_qua: "da dung kb\\_kho.sqlite · bai_viet 3 · tai_lieu 2 · video 11 · versions 0 · recycle 0 · media 8 · concepts 5 · loai_nguon 14 · categories 11 · audit 23 · d1077bbd6114d1fc"
+  - lenh: "python core/tests/check_ci_teeth.py   (cmd cua AC2 va AC3)"
+    ket_qua: "pass · 7 luật phá đều đỏ, bản sạch vẫn xanh — S3 có răng"
+
+đỏ_do: "khong co vong do nao quy cho nguoi khac. Hai .vtt SAI sha256 tren worktree la HAU QUA cua chinh lop loi nay (checkout CRLF), khong phai cua mot tac nhan."
+
+CANH_BAO_PM_M04:
+  - |
+    BA `cmd` CUA T04-12 KHONG DO THU BA AC NOI. Ba AC viet dung phep do va toi da do
+    day du bang tay (o tren), nhung `cmd` thi vo can:
+      · AC1 `python core/tools/dung_lai_db.py --kiem` — file do KHONG CO argparse,
+        khong co co `--kiem`. No **nuot im lang** co la roi **DUNG LAI DB THAT** (output
+        o tren la bang chung: no ghi, khong kiem). No cung khong he so sha256 voi ten file.
+        Mot `cmd` doc-nghe-nhu-doc ma lai GHI — **dung ho voi su co `check_running.py`
+        ngay 2026-09-11** da xoa 16 export cua worktree nay.
+      · AC2 + AC3 `python core/tests/check_ci_teeth.py` — `grep -c gitattributes` ⇒ **0**.
+        Cong nay in `pass` y het du co hay khong co dong luat. Xanh vo can cu.
+    ⇒ Hom nay `.gitattributes` DUNG, nhung **khong cong nao canh no**: ai xoa dong luat
+      ngay mai thi ca ba `cmd` van xanh. Da mo o backlog M04 (can mot don vi cong that,
+      kem cach `--tu-kiem` da chay duoc o tren) va o backlog M01 (argparse cho dung_lai_db).
+    KHONG tu sua: `phạm_vi_ghi` cua T04-12 chi co `.gitattributes`.
+
+keo_theo:
+  - "M04: can mot cong S3 that cho T04-12 (so sha256 noi dung vs ten file + check-attr hai ve). O da mo."
+  - "M01: `dung_lai_db.py` them argparse; co `--kiem` chi DOC. O da mo."
+  - "Ve AC2 tren cay `main` chi xanh SAU khi m13 duoc merge — khi do phai chay lai `git check-attr` tren `Grown_news`."

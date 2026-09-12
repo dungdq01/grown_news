@@ -1,2 +1,16 @@
 # Bảng khai thuộc M04_ci (map v29) — nội dung lfs do T04-8 điền.
 # Chỗ giữ đất: check_map đòi đường boundary tồn tại trên đĩa.
+
+# T04-12 · WO-100 vế B — HIỆN VẬT GIỮ NGUYÊN BYTE.
+#
+# Tên file trong `kb/_media/` LÀ `sha256` của chính nội dung nó. Mặc định git trên Windows
+# (`core.autocrlf=true`) checkout `.vtt` ra CRLF ⇒ sha256 nội dung **khác** sha256 trong tên
+# ⇒ mọi bên kiểm byte từ chối. Đo 2026-09-11 trên worktree: `dung_lai_db` dừng giữa chừng
+# để lại DB RỖNG, rồi `xuat_kho` coi 16 file export là mồ côi và xoá chúng.
+#
+# `-text` chứ KHÔNG phải `binary`: `binary` = `-text -diff`, tắt luôn diff — mà `.vtt` là
+# văn bản thật, mất diff là mất một thứ hữu ích khi đọc lịch sử. Kho hiện vật cần **byte
+# nguyên vẹn**, không cần giấu diff.
+#
+# Luật hẹp đúng một thư mục: mọi file khác vẫn được chuẩn hoá EOL như cũ.
+kb/_media/** -text

@@ -1,5 +1,34 @@
 # backlog — M04_ci (chết ở G6C)
 
+## 2026-09-12 · Ba `cmd` của T04-12 không đo thứ ba AC nói (đo lúc thi công T04-12)
+
+- [ ] **`.gitattributes` giờ ĐÚNG, nhưng KHÔNG cổng nào canh nó.** Ba AC của
+      `07_plan/M04_ci/tasks/T04-12-gitattributes-media-binary.md` viết đúng phép đo,
+      nhưng cả ba `cmd` trỏ vào chương trình không làm phép đo đó:
+      · **AC1** `cmd: python core/tools/dung_lai_db.py --kiem` — `dung_lai_db.py`
+        **không có argparse**, không có cờ `--kiem`. Nó **nuốt im lặng** cờ lạ rồi
+        **DỰNG LẠI DB THẬT** (đo: chạy với `--kiem` trên worktree ⇒ in
+        `da dung kb\_kho.sqlite · … · media 8 · d1077bbd6114d1fc`). Một `cmd` mà
+        người đọc tưởng là *kiểm* nhưng thật ra là *GHI* — **đúng họ với sự cố
+        `check_running.py` 2026-09-11** (ô M01 §10). Nó cũng không so `sha256` nội
+        dung với `sha256` trong tên file, là thứ AC1 đòi.
+      · **AC2 · AC3** `cmd: python core/tests/check_ci_teeth.py` — cổng đó
+        `grep -c gitattributes` ⇒ **0**. Nó xanh (`pass · 7 luật phá đều đỏ`) y hệt
+        dù có hay không có dòng `kb/_media/** -text`. Xanh vô căn cứ.
+      ⇒ Ba AC đã được đo **bằng tay** lúc thi công và ghi số vào
+      `WL-01M2A7RHN483271MSS6AFBDPMM`, nhưng phép đo đó **không tự chạy lại**:
+      ai đó xoá dòng luật ngày mai thì mọi cổng vẫn xanh.
+      **Cần một đơn vị M04**: cổng đọc `kb/_media/**` trên đĩa, so `sha256(nội dung)`
+      với `Path(f).stem`, + `git check-attr -a` phải in `text: unset`, + một file ngoài
+      `kb/_media` **vẫn** `text: set` (luật không rộng quá chỗ cần). `--tu-kiem`:
+      checkout blob vào repo tạm `core.autocrlf=true` **không** có dòng luật ⇒ phải ĐỎ
+      (đã chạy được phép này bằng `git checkout-index --prefix=`, số thật:
+      `1815 / 959b38b2…` HỎNG vs `1754 / c4f6bcfb…` OK).
+      · object: `07_plan/M04_ci/tasks/T04-12-…md` ba dòng `cmd` ·
+        `core/tools/dung_lai_db.py` (0 argparse) · `core/tests/check_ci_teeth.py` (0 `gitattributes`)
+      · **Không tự sửa**: `phạm_vi_ghi` của T04-12 chỉ có `.gitattributes`.
+
+
 ## 2026-08-28 · `<freeze-check>` không bắt artifact frozen MỚI thiếu FR (FR-037)
 Phát hiện lúc đóng nhánh B (`WL-01K9NDFR037B10`).
 
