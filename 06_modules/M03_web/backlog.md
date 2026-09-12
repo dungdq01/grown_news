@@ -1,6 +1,18 @@
 # backlog — M03_web (chết ở G6C)
 
 
+## 2026-09-12 · KÉO THEO từ `T03-152` — một cổng đã ở đúng chỗ nhưng vẫn 0 răng
+
+- [ ] **`web/test/heading-id-anchor.test.js` không được `npm test` gọi.** Cổng C3 (`T03-148`,
+      cổng đối chiếu **BA bản** của `FR-073` A3) nằm đúng `web/test/` từ lúc sinh, nhưng
+      `phạm_vi_ghi` của `T03-148` không có `web/package.json` nên không ai đăng ký nó — `grep -c
+      heading-id-anchor web/package.json` ⇒ **0**. Cùng bệnh mà `T03-152` vừa chữa cho cổng tìm:
+      **0 răng tự động**, và nó mục im lặng vì màu xanh cuối cùng của nó nằm trong worklog.
+      Dev đã thêm nhầm nó vào `scripts.test` khi làm `T03-152` rồi **gỡ ra** — đăng ký cổng của
+      đơn vị khác là làm việc của đơn vị khác, đúng lớp lỗi PM vừa sửa hai lần trong `T03-150`
+      và `T03-149`. Cần MỘT đơn vị (hoặc một dòng nới `phạm_vi_ghi` của `T03-148`).
+      · object: `web/test/heading-id-anchor.test.js` · `web/package.json` · `07_plan/M03_web/tasks/T03-148-test-heading-id-anchor.md`
+
 ## 2026-09-11 · KÉO THEO từ C3 (T03-149) — hai nợ CÓ SẴN mà AC của PM làm lộ
 
 - [ ] **`web/plugins/napvideo/src/napvideo.inline.ts:101` là BẢN SAO của `slugGoiY`.**

@@ -2,9 +2,9 @@
 /**
  * T03-125 bước 2 — UI TÌM TOÀN VĂN (SCR-27, chủ dự án duyệt 2026-09-11).
  *
- * CỔNG VIẾT TRƯỚC (rule.md mục 8): sống ở thư mục task cho tới khi có đơn vị TEST dời nó vào
- * `web/test/` + đăng ký `npm test` — `web/test/**` không nằm trong `phạm_vi_ghi` của T03-125, và
- * `check_g6b` §5 (R1) đòi cổng thuộc một đơn vị test riêng (tiền lệ T03-150 cho T08-35).
+ * CỔNG VIẾT TRƯỚC (rule.md mục 8): sinh ở `07_plan/M03_web/tasks/T03-125-tim-toan-van.test.js`
+ * (đỏ "chưa dựng" → pass), dời vào đây bằng `git mv` ở `T03-152` + đăng ký `npm test` — khuôn
+ * `T03-150`. Ở thư mục task nó có **0 răng tự động**: không `package.json`, không `ci.yml` nào gọi.
  *
  * VÌ SAO CỔNG NÀY TỒN TẠI
  * Ô `#q` hôm nay lọc CHUỖI TRÊN DOM đã render (`TIM` + `apLoc()`) — `PRD U6` hứa full-text từ đợt
@@ -22,12 +22,11 @@ import { existsSync, readFileSync } from "node:fs"
 import { execFileSync, spawnSync } from "node:child_process"
 import { join } from "node:path"
 
-/* Cổng sống ở 07_plan/M03_web/tasks/ (viết trước) hoặc web/test/ (sau khi dời). */
-const GOC = [join(import.meta.dirname, "..", "..", ".."), join(import.meta.dirname, "..", "..")]
-  .find((g) => existsSync(join(g, "web", "package.json")))
-const WEB = join(GOC, "web")
-const { taoKiem } = await import(new URL("file://" + join(WEB, "test", "_api.mjs").replace(/\\/g, "/")))
-const { napRender } = await import(new URL("file://" + join(WEB, "test", "_render.mjs").replace(/\\/g, "/")))
+import { taoKiem } from "./_api.mjs"
+import { napRender } from "./_render.mjs"
+
+const WEB = join(import.meta.dirname, "..")
+const GOC = join(WEB, "..")
 
 const { ok, chot } = taoKiem()
 const TU_KIEM = process.argv.includes("--tu-kiem")

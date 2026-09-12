@@ -1,0 +1,45 @@
+entry: ban-giao
+ulid: 01M2A7RHMTZ527MPC5HFEFXMXP
+ngay: 2026-09-12
+module: M03_web
+don_vi: [T03-152]
+nhanh: m13 (worktree ../gn-m13), sau rebase len main 8cd1a69 + push origin/m13
+tieu_de: >-
+  T03-152 — git mv cong T03-125-tim-toan-van.test.js tu 07_plan/M03_web/tasks vao web/test/tim-toan-van.test.js
+  (doi hai dong import sang tuong doi) + dang ky npm test MOT dong. O thu muc task no co 0 rang tu dong.
+
+object:
+  - web/test/tim-toan-van.test.js   # R (rename) tu 07_plan/M03_web/tasks/T03-125-tim-toan-van.test.js — git mv, khong copy
+  - web/package.json                # +`&& node test/tim-toan-van.test.js` cuoi scripts.test
+  - 06_modules/M03_web/backlog.md   # +o keo theo: heading-id-anchor.test.js van 0 rang
+  - .factory/worklog/WL-01M2A7RHMTZ527MPC5HFEFXMXP.yaml
+
+do_do:
+  - lenh: "git mv 07_plan/M03_web/tasks/T03-125-tim-toan-van.test.js web/test/tim-toan-van.test.js"
+    ket_qua: "R  07_plan/M03_web/tasks/T03-125-tim-toan-van.test.js -> web/test/tim-toan-van.test.js (lich su do-truoc di theo file)"
+  - lenh: "sua import (AC1 hoi 'kiem xem cong nay co can khong')"
+    ket_qua: |
+      CAN — nhieu hon T03-150 mot chut. Ban o 07_plan do GOC repo bang cach thu HAI duong roi `await import(file://…)`
+      (vi tu thu muc task khong co duong tuong doi toi _api.mjs). O web/test/ thi dung duoc import tinh:
+        - const GOC = [.., ..].find(...)  →  const WEB = join(import.meta.dirname, ".."); const GOC = join(WEB, "..")
+        - await import(new URL("file://"+…_api.mjs))  →  import { taoKiem } from "./_api.mjs"
+        - await import(new URL("file://"+…_render.mjs)) →  import { napRender } from "./_render.mjs"
+      Doi luon khoi chu thich dau file cho dung noi no dang o.
+  - lenh: "cd web && node test/tim-toan-van.test.js"
+    ket_qua: "pass · chunk theo focus · câu đi nguyên văn, tự tô · 4 trạng thái + số trong phạm vi · bấm mở cửa sổ + nhảy id · phím · class có CSS · exit 0"
+  - lenh: "cd web && node test/tim-toan-van.test.js --tu-kiem"
+    ket_qua: "pass · phep cham do duoc (bo <mark> ⇒ doi ket qua · bo k ⇒ duong mat k · 5 trang thai ra 5 HTML khac nhau)"
+  - lenh: "grep -o 'node test/tim-toan-van.test.js' web/package.json · node -e JSON.parse(package.json)"
+    ket_qua: "1 · ok"
+  - lenh: "ls 07_plan/M03_web/tasks/*.test.js"
+    ket_qua: "No such file — AC3 dat: cong CUA DON VI NAY khong song hai cho"
+
+quyet_dinh_trong_luot:
+  - "Toi da them NHAM `heading-id-anchor.test.js` vao cung chuoi scripts.test roi GO RA: no la cong cua T03-148, khong thuoc pham_vi_ghi T03-152. Dang ky cong cua don vi khac la lam viec cua don vi khac — dung lop loi PM vua sua hai lan (T03-150 AC3 · T03-149 AC2). Mo o backlog M03 thay vi tu lam."
+
+đỏ_do: "khong co."
+
+keo_theo:
+  - "M03 (o backlog vua mo): `web/test/heading-id-anchor.test.js` — cong BA ban cua FR-073 A3 — van KHONG duoc npm test goi (grep ⇒ 0). Cung benh '0 rang tu dong', can mot don vi hoac mot dong noi pham_vi_ghi T03-148."
+
+tiep_theo: "T04-12 (.gitattributes kb/_media/** -text), kiem tren CA HAI cay."
