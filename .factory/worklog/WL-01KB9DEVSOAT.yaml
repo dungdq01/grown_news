@@ -1,0 +1,159 @@
+entry: ban-giao
+ulid: 01KB9DEVSOAT
+ngay: 2026-09-15
+module: M13_truyhoi · M03_web · M01_core
+don_vi: [T03-154, T03-156, T03-158, T03-160, T13-10]
+fr: FR-082
+tieu_de: >-
+  Soat dev + mo them viec: dev chinh da xong 3/3 don vi cua no, dev phu chua dong
+  WO-100 ve A. Mo 5 don vi cho 3 o backlog da chin + FR-082 cho 2 o FROZEN.
+  Mot lan nua toi tu viet mot AC xanh oan — va tu bat truoc khi giao.
+
+object:
+  - 07_plan/M03_web/tasks/T03-154-test-dot-hai-hop-dong.md            # MOI
+  - 07_plan/M03_web/tasks/T03-156-dot-hai-doc-ban-moi-nhat.md         # MOI
+  - 07_plan/M03_web/tasks/T03-158-test-proto-ten-dich-vu-va-cong.md   # MOI
+  - 07_plan/M03_web/tasks/T03-160-sinh-v21-sai-dich-vu-8791.md        # MOI
+  - 07_plan/M13_truyhoi/tasks/T13-10-ui-flow-theo-dia-chi-that.md     # MOI
+  - .factory/fr/FR-082-m13-ac22-het-no-c3-va-reindex-poke.md          # MOI — CHO CHU DU AN
+  - 07_plan/M03_web/_huy/ban-nhap-T03-158-huy.md                      # ban nhap sai, giu lam con tro
+  - .factory/worklog/WL-01KB9DEVSOAT.yaml
+
+soat_dev_do_bang_may: |
+  DEV CHINH — 3/3 don vi toi mo 09-11 DA XONG, do bang vat the chu khong bang loi khai:
+    T03-152  web/test/tim-toan-van.test.js TON TAI · 07_plan/M03_web/tasks het .test.js
+             cua don vi nay (commit 70d85a5)
+    T04-12   .gitattributes co 2 dong khop kb/_media (commit 7667fa3); dev kiem tren CA
+             HAI cay dung nhu canh bao trong task: worktree 2/8 sha lech truoc / 8/8 sau,
+             main 10/10 (loi vo hinh o main)
+    T03-148/149  C3 dong — md() sinh id heading, 29 heading kho that ba ban khop
+    T03-125 buoc 2 + hau kiem CSS (e312c04) — ngoai don vi toi mo
+  Chua push: 0. Nhanh m13 di truoc main 15 commit, DA day len origin.
+
+  DEV PHU — 0/2. WO-100 ve A chua bat dau, do:
+    core/tests/check_running.py:45  GHI_KHONG_CO van dung MOT phan tu ('07_curate/curate.py',)
+    khong co file test moi nao cham check_running
+  ⇒ T01-56 (test di dau) roi T01-58 (sua cong) van la viec ke tiep cua dev phu.
+
+TOI_LAI_VIET_MOT_AC_XANH_OAN_va_tu_bat: |
+  Ban nhap dau cua don vi sua sinh_v21.py khai:
+      cmd: python core/tests/check_dich_vu_cong.py
+  Truoc khi giao, toi chay `ls core/tests/check_dich_vu_cong.py` ⇒ KHONG CO.
+  Mot cmd tro file vang khong bao gio DO duoc ⇒ AC do la XANH OAN TUYET DOI: dev chay,
+  khong thay loi, danh dau xong, trong khi chua do gi.
+  Day la lan thu BA cung lop loi trong du an nay:
+    T13-0 AC2  (09-09) — tro check_nguon_hop_dong.py, cong do khong doc 05_uiux/contracts
+    T03-150 AC3 (09-11) — doi mot THU MUC het .test.js, vuong file cua nguoi khac
+    ban nhap nay (09-15) — tro mot cong KHONG TON TAI
+  Hai lan truoc do nguoi khac hoac chinh toi bat SAU khi giao. Lan nay bat TRUOC.
+  Cach bat: mot lenh duy nhat — `ls` chinh file ma cmd tro toi. Re hon mot luot cua dev.
+  ⇒ Bo sung vao BAN-GIAO-DEV §1.4b: moi `cmd:` moi viet ra phai chay thu MOT lan truoc
+  khi giao; cmd tro file chua ton tai thi don vi phai TACH DOI (cong truoc, ma sau).
+  Da tach: T03-158 (cong, o web/test — KHONG o core/tests vi do la dat M01) + T03-160 (ma).
+
+CONG BAT DUNG ID TRUNG cua chinh toi: |
+  Sau khi ghi de ban nhap thanh file HUY, `check_g6b` bao:
+    "T03-158: ID TRUNG — T03-158-sinh-v21-sai-dich-vu-8791.md va T03-158-test-proto-te..."
+  Day la lan trung ID thu SAU trong tuan, va la lan DAU mot cong bat duoc thay vi mot
+  nguoi. Doi ten file huy ⇒ het trung.
+  Nhung doi ten xong `check_g6b` CRASH: "TypeError: unsupported format string passed to
+  NoneType.__format__" — dung loi WO-084. Tai hien duoc: MOT file .md trong 07_plan/*/tasks/
+  KHONG co truong `verifiability`/`Loai` la du lam cong chet, khong phai ket luan.
+  ⇒ chuyen file huy ra 07_plan/M03_web/_huy/ ⇒ cong chay lai binh thuong, 40 loi.
+  KHONG sua check_g6b — WO-084 la cua dev M12, chu du an da dan "tam thoi ko dong".
+  Repro nay ghi o day de dev M12 dung khi den luot.
+
+ba_o_backlog_DA_CHIN_nen_mo_don_vi: |
+  O 2 (backlog.md:19) trang.mjs:1722 soDotHai() go cung sample.v1.json + M13 con nhan
+    trang_thai "chua dung" trong khi project_map:167 khai as-built va :8791 song
+    ⇒ T03-154 (cong DO truoc) + T03-156 (ma). AC3 cua T03-156 dem "chua dung" phai
+    con DUNG 3 (m14/m15/m16) — ve chong sua qua tay.
+  O 3 (backlog.md:26) sinh_v21.py:216 ghi "chatbot ... cong 8791" trong khi dich-vu.json
+    khai 8788=chatbot, 8791=truyhoi. Truoc luot M13 chi la nhan sai; nay 8791 CO dich vu
+    that ⇒ nguoi doc se khoi dong lai NHAM tien trinh ⇒ T03-158 + T03-160.
+  O 5 (backlog.md:38) ui_flow.md:16 khai dia chi la `file#anchor` bam duoc — thieu dang
+    slug-moc, va "bam duoc" nay dung cho file-dong (sau T03-149) nhung VAN khong dung
+    cho slug-moc ⇒ T13-10.
+
+LOI_HEN_KHONG_CO_RANG_bai_hoc: |
+  O 5 hen "sua o don vi tiep theo cham no (T13-4)". T13-4 da thi cong xong (65c0272) va
+  KHONG cham ui_flow.md — pham_vi_ghi cua no chi co truyhoi/src/**. Loi hen roi im lang.
+  Luat rut ra, ghi vao T13-10: mot o backlog hen "don vi sau se lam" ma don vi sau khong
+  khai file do trong pham_vi_ghi thi loi hen KHONG CO RANG. O backlog la tri nho,
+  pham_vi_ghi moi la quyen ghi. Hen vao mot don vi ⇒ phai sua pham_vi_ghi cua don vi ay
+  CUNG LUC, hoac mo don vi rieng ngay.
+
+hai_o_FROZEN_gop_mot_FR: |
+  FR-082, CHO chu du an:
+   §1 AC-2.2 khai mot mon no DA TRA. Spec:139-140 noi ve "khop anchor M03 render ra" la
+     "AC cua C3, ghi o backlog" — nhung T03-149 + T03-148 ca D da cho no mot cong that
+     (29 heading kho that, BA ban khop). No gia thi nguoi doc sau hoac viet lai mot cong
+     trung chuc nang, hoac ket luan M13 thieu rang.
+     Xin sua DUNG hai cau, 0 AC moi, 0 doi hop dong. KHONG xin doi cmd cua AC-2.2 —
+     cong ba-ban la cua M03, M13 TRO toi chu khong SO HUU (luat goc).
+   §2 /reindex-poke — xin mot QUYET DINH, khong xin mot tinh nang. Ba phuong an A/B/C,
+     PM khuyen nghi A (giu nguyen): kho 16 tai lieu/111 chunk, --day-du duoi 1 giay;
+     poke mua rat it do tuoi ma tra bang MOT CHIEU GOI MOI giua hai module — thu dat
+     nhat trong ADR-08 (moi chieu la mot khoa, mot aud, mot cua phai kiem).
+  Gop mot FR vi ca hai cham cung file FROZEN: moi lan mo spec.md la mot lan ky lai lock,
+  ma check_frozen.py --ky GHI DE TOAN BO lock va khong kiem gi truoc khi ky.
+
+do_do:
+  - lenh: "git log --oneline main..m13 | wc -l · git log origin/m13..m13 | wc -l"
+    ket_qua: "15 chua merge · 0 chua push"
+  - lenh: "ls web/test/tim-toan-van.test.js · grep -c kb/_media .gitattributes (cay gn-m13)"
+    ket_qua: "CO · 2 ⇒ T03-152 va T04-12 da thi cong that"
+  - lenh: "grep -n 'GHI_KHONG_CO = ' core/tests/check_running.py"
+    ket_qua: ":45 mot phan tu ⇒ T01-58 CHUA lam"
+  - lenh: "ls core/tests/check_dich_vu_cong.py"
+    ket_qua: "KHONG CO ⇒ AC toi vua viet la xanh oan, da tach doi truoc khi giao"
+  - lenh: "python core/tests/check_g6b.py"
+    ket_qua: "40 loi, 0 loi mang ma T13 hay T03-15x/16x; 5 don vi moi deu 'ok', 0 VONG"
+  - lenh: "python core/tests/check_g6b.py (luc con file HUY trong tasks/)"
+    ket_qua: "TypeError NoneType.__format__ — tai hien WO-084; file .md thieu truong loai"
+  - lenh: "ls core/tests/check_g6c.py"
+    ket_qua: "KHONG CO — G6C la checklist NGUOI ky, khong co cong may"
+
+đỏ_do: >
+  40 loi G6B tren main: KHONG loi nao thuoc M13 hay 5 don vi luot nay. Quy chu do bang
+  ma don vi — M03 18 · M12 14 · M08 4 · T01-50 2 · T03-129/147/151 ghi ngoai boundary.
+  Da co san tu truoc luot nay; cong vua moc rang chu he khong vua hong.
+  Mot "do" toi tu tao: ID trung T03-158 va crash check_g6b — chu la TOI, da sua trong luot.
+
+cho_NGUOI:
+  - "FR-082 §2: chon A / B / C cho /reindex-poke. PM khuyen nghi A."
+  - "FR-082 §1: duyet sua 2 cau trong spec.md FROZEN."
+  - "Ai so huu 03_docs/** va RUNNING.md — HAI o dang treo vi cung mot ly do: file chua co chu trong project_map."
+  - "Hai video tieng Trung: kho moi co 1 bai chu Han, can >=2 de AC-6.3 het soft."
+  - "Phep thu 3 (phim trong panel) va ve bam-va-nhay cua phep thu 2 — chi do duoc bang tay."
+
+khong_lam:
+  - "KHONG sua check_g6b.py — WO-084 cua dev M12, chu du an dan tam thoi ko dong."
+  - "KHONG sua spec.md/rules.md — FROZEN, cho FR-082 duyet."
+  - "KHONG mo don vi cho o 1 (dinh_tuyen.py dai Han): FR-078 da duyet, viec cua team M12."
+  - "KHONG mo don vi cho o 4 (spec_overview.md:503): 03_docs chua co chu."
+  - "KHONG mo don vi cho o 6 (hai chu nguon): o co dieu kien, chua do duoc lan doc lan nao."
+  - "KHONG xoa ban nhap T03-158 — giu lam con tro de khong ai cap lai ID do."
+
+TRUNG_SO_WO_lan_thu_bay_va_lan_dau_tren_day_WO: |
+  Lo ra khi `git add -A` cua toi vo ca viec chua commit cua nguoi khac trong cay `main`.
+  Toi DA HOAN TAC (`git reset`) va chi them file cua minh — commit ho viec nguoi khac la
+  pha chinh thu R6 bao ve.
+  Do duoc tren dia luc 2026-09-15:
+    WO-099-indexer-chet-o-ban-ghi-khong-co-file-goc.md      <- cua toi (PM M13), DA COMMIT
+    WO-099-noi-cue-khong-cat-trung-bien-resume.md           <- cua team M12, chua commit
+    WO-100-cong-pha-du-lieu-cua-cay-dang-do.md              <- cua toi (PM M13), DA COMMIT
+    WO-100-model-khai-nhan-audio-nhung-tu-choi.md           <- cua team M12, chua commit
+    WO-101-cue-do-cuc-va-ke-thua-rac.md                     <- cua team M12, chua commit
+  HAI so bi hai WO khac nhau cung mang. Day la lan trung dinh danh thu BAY trong tuan, va
+  lan DAU khong phai tren day task ma tren day WO — tuc quy dai chan/le cho task KHONG
+  phu day WO.
+  HE QUA do duoc, khong phai gia dinh: worklog cua toi tro "WO-099" va "WO-100"; worklog
+  cua M12 cung tro hai so ay. Sau khi ca hai ben commit, `grep -l WO-099 .factory/worklog/`
+  tra ve hai chuoi su kien khong lien quan — vet kiem toan tro thanh vet doan mo. Do la
+  mat thu R4 bao ve, khong phai mot phien toai dat ten.
+  KHONG tu doi so cua ai: doi so WO cua M12 la sua bien ghi cua nguoi khac; doi so cua
+  toi thi moi worklog + task file da commit tro sai. Can chu du an phan mot lan cho ca
+  hai day. Da ghi vao muc cho_NGUOI.
+  Nguyen nhan goc van la mot: `check_scope` (T04-90, PM-Space) CHUA cai. No la co che duy
+  nhat trong du an chan duoc lop loi nay bang may. Bay lan trung, bay lan nguoi bat.
