@@ -1,0 +1,147 @@
+entry: ban-giao
+ulid: 01KB9REVIEW2
+ngay: 2026-09-15
+module: M13_truyhoi · M03_web · M04_ci
+tieu_de: >-
+  Reviewer lan hai cho nhanh m13: FAIL, KHONG NEN MERGE. Toi do lai ba diem nang nhat
+  bang duong doc lap — MOT diem doi duoc khung, MOT diem la loi cua chinh toi, va khi
+  chung minh diem ay toi da CHAY MOT LENH GHI len DB kho that.
+
+object:
+  - "reviewer: factory-reviewer tren 15 commit main..m13"
+  - "do doc lap: blob git LF hai nhanh + worktree sach LF o scratchpad"
+  - .factory/worklog/WL-01KB9REVIEW2.yaml
+
+KET_LUAN_CUA_REVIEWER: |
+  verdict FAIL. Ba diem chan (A1 A2 A3), nam diem nang (B1..B5), bon diem nhe (C1..C4).
+  R2 sach: khong cho nao tu khai "xong". R5 dat o ca hai cap bug fix, chung minh bang
+  DIFF chu khong bang worklog. Bang chung chay that manh va la that.
+  Reviewer noi ro: "noi dung ky thuat cua nhanh thi tot; cai hong la BIEN GHI va THUOC DO."
+
+A3_toi_do_lai_HAI_duong_va_XAC_NHAN_SO: |
+  So cua reviewer DUNG. Toi dung lai phep ghep cua web/render/assets.mjs:47-50 tren
+  BLOB GIT (khong doc dia, nen khong dinh CRLF cua Windows):
+      main  gn.css = 104856 byte  (CR trong nguon: 0)  tran 106496 ⇒ duoi 1640
+      m13   gn.css = 106601 byte  (CR trong nguon: 0)  tran 106496 ⇒ VUOT 105
+  Duong thu hai: chay chinh cong tren cay gn-m13 ⇒ FAIL gn.css 106837/106496.
+  Hai duong cung mot chieu ⇒ m13 THAT SU vuot tran CSS.
+  Nguon tang, do theo file: 05_uiux/tokens.css +0 · web/styles/prototype.css +1745 byte
+  (19 dong .tim-*/#q — khoi CSS cua panel tim toan van, SCR-27). Day la chi phi THAT
+  cua mot man moi, khong phai rac.
+
+NHUNG_KHUNG_CUA_A3_SAI_va_do_duoc: |
+  Reviewer viet: "merge lam DO mot cong CI dang XANH". Cau ay SAI, va sai theo huong
+  lam ket luan nang hon su that.
+  Do bang mot worktree SACH tu commit main, ep checkout LF (core.autocrlf false,
+  kiem lai prototype.css CR=0) roi chay chinh cong:
+      ok    gn.css 102 KB (104856 / 106496)
+      ok    tai dau nang nhat 175 KB
+      FAIL  trang chu 64 KB (65667 / 61440 byte)
+      2 loi
+  ⇒ page-weight.test.js DA DO SAN tren main da commit, o mot ve KHAC (trang chu),
+  va do ca voi LF. Buoc ci.yml:252 hom nay DA that bai.
+  Nen menh de dung la: merge KHONG bien mot cong xanh thanh do — no THEM mot ve do
+  thu ba vao mot cong DA do. Khac biet nay doi cach xu: khong phai "chan merge de giu
+  CI xanh" (CI khong xanh), ma la "m13 vuot tran CSS 105 byte, va do la mot quyet dinh
+  cua chu du an: siet hay noi".
+  Toi ghi ro chi tiet nay vi bao cao cua PM phai chiu duoc kiem lai. Reviewer do DUNG
+  con so va SAI trang thai nen; toi lay con so, bo trang thai.
+
+B1_LA_LOI_CUA_CHINH_TOI_va_no_tu_chung_minh: |
+  T04-12 la don vi TOI viet (2026-09-11). Ca ba cmd deu khong do thu AC noi:
+      grep -c add_argument core/tools/dung_lai_db.py            ⇒ 0
+      grep -cE "unlink|INSERT|commit\(\)" core/tools/dung_lai_db.py ⇒ 17
+      grep -ciE "gitattributes|check-attr|_media" core/tests/check_ci_teeth.py ⇒ 0
+  Tuc: AC1 khai `dung_lai_db.py --kiem` — file khong co argparse nen `--kiem` bi NUOT
+  IM LANG va chuong trinh chay nhanh GHI; AC2/AC3 khai check_ci_teeth.py — cong do
+  khong nhac mot chu nao ve gitattributes nen KHONG THE do vi AC nay.
+  `verifiability: hard` ma khong AC nao do duoc ⇒ HARD TRA HINH. Day la lan thu TU
+  cung lop loi tu tay toi trong tuan (T13-0 AC2 · T03-150 AC3 · ban nhap T03-158 ·
+  T04-12). Ba lan truoc la cmd tro SAI CHO; lan nay cmd tro DUNG FILE nhung file ay
+  lam viec KHAC.
+
+TOI_VUA_CHAY_MOT_LENH_GHI_LEN_DB_KHO_THAT: |
+  De chung minh B1, toi chay `python core/tools/dung_lai_db.py --kiem`.
+  No KHONG kiem. No DUNG LAI DB:
+      "da dung kb\\_kho.sqlite · bai_viet 4 · tai_lieu 2 · video 12 · versions 0 ·
+       recycle 0 · media 10 · concepts 5 · loai_nguon 14 · categories 11 · audit 23"
+  Day dung la su co WO-100 ve A, lap lai — va lan nay nguoi gay ra la TOI, bang chinh
+  cai AC toi viet ra de CHUA su co do.
+  KIEM THIET HAI ngay sau khi phat hien, ba phep do:
+    git status --short | grep "^ D\|^D "   ⇒ RONG (khong file nao bi xoa)
+    ls kb/**/*.md ⇒ 18 file · ls kb/_media ⇒ 10 file · kb/_kho.sqlite 3 555 328 byte
+    GET :8787/api/health ⇒ {"api":true} · GET :8791/health ⇒ 16 tai lieu
+  ⇒ KHONG mat gi. Lan truoc no pha vi cay worktree co .vtt checkout CRLF (sha noi dung
+  lech sha trong ten file) nen dung_lai_db dung giua chung; cay `main` nay byte media
+  khop nen no chay tron. DB di tu 16 len 18 ban ghi — hai ban ghi moi la viec CHUA
+  COMMIT cua team M12 (voicestudio) da nam san trong cay, khong phai toi tao ra.
+  BAI HOC, ghi ra vi no dat: mot lenh khai la "kiem" ma khong ai chung minh no chi doc
+  thi no la mot lenh GHI cho toi luc co nguoi chung minh nguoc lai. Truoc khi chay bat
+  ky cmd nao trong mot AC len cay THAT, phai `grep -c add_argument` + doc nhanh GHI.
+  Day chinh xac la ve D cua T01-56 ma toi viet cho dev phu — va toi la nguoi dau tien
+  vi pham no.
+
+A1_A2_toi_KHONG_bac_va_KHONG_tu_xu: |
+  A1 `web/test/_tran.mjs:38` — T03-149 noi TRAN_KB.js 103→104, ngoai pham_vi_ghi khai
+    (multiwindow.inline.ts · anchor.ts · backlog.md). Do lai: main {css:104,js:103},
+    m13 {css:104,js:104} — dung, co doi.
+    Nhung `_tran.mjs` tren m13 GHI DAY DU ly do va so do: gn.js sau T03-151 la
+    105463/105472 (du 9 byte); md() sinh id heading ton 128 byte ⇒ 105591 vuot 119;
+    bon duong lay lai byte cua FR-061a §2 da do BANG 0 tu truoc. Va co dong
+    "LAN NOI THU NAM — js 103 → 104 (T03-149 · C3, chu du an duyet 2026-09-11)".
+    ⇒ Reviewer dung o cho: phep duyet KHONG CO OBJECT (khong FR id, khong commit cua
+    chu du an, khong trich nguyen van). Dev khai that va khai ky, nhung mot cau
+    "chu du an duyet" trong chu thich ma khong co vet la LOI KHAI, khong phai bang chung.
+    Day la LUAT GOC o dang thuan nhat: ben bi do sua thuoc do minh.
+  A2 `web/test/heading-id-anchor.test.js:141-144` — don vi MA (T03-149) sua cong cua
+    don vi TEST (T03-148). Ngoai pham_vi_ghi. check_g6b khong bat duoc vi no doc
+    pham_vi_ghi KHAI trong task file, khong doc DIFF — nen o day khong cong nao dung
+    ngoai reviewer.
+  KHONG tu xu: hai diem nay cham quyen ky cua chu du an (A1) va bien ghi cua dev (A2).
+  Dua ca hai len chu du an kem so do duoc.
+
+B2_cong_C3_co_0_RANG: |
+  web/test/heading-id-anchor.test.js khong co trong web/package.json lan .github/
+  workflows/ci.yml ⇒ cong canh dung lop loi hong-im-lang (id heading M03 ↔ anchor M13)
+  ma khong ai chay. AC3 cua T03-148 la "suite web xanh" ⇒ xanh RONG.
+  Reviewer ghi them mot dieu quan trong hon: ci.yml LIET KE TUNG FILE (29 buoc
+  `node test/...`), KHONG chay `npm test`. Nen kho-delta va tim-toan-van vua duoc
+  T03-150/T03-152 dang ky vao package.json cung CHUA CO RANG O CI.
+  ⇒ chu "da dang ky cong" trong hai don vi ay dung voi may dev, sai voi CI.
+
+do_do:
+  - lenh: "dung lai phep ghep assets.mjs:47-50 tren blob git hai nhanh (python, LF)"
+    ket_qua: "main 104856 · m13 106601 · tran 106496 ⇒ m13 vuot 105 byte"
+  - lenh: "node web/test/page-weight.test.js (cay gn-m13, Windows)"
+    ket_qua: "FAIL gn.css 106837/106496"
+  - lenh: "git worktree --detach main + core.autocrlf false + reset --hard, roi chay cong"
+    ket_qua: "gn.css OK 104856; FAIL trang chu 65667/61440; 2 loi ⇒ cong DA DO san tren main"
+  - lenh: "python -c do tung file css tren blob hai nhanh"
+    ket_qua: "tokens.css +0 · prototype.css +1745 byte (19 dong .tim-*/#q cua SCR-27)"
+  - lenh: "grep -c add_argument core/tools/dung_lai_db.py"
+    ket_qua: "0 ⇒ --kiem bi nuot im lang"
+  - lenh: "python core/tools/dung_lai_db.py --kiem"
+    ket_qua: "DUNG LAI DB that (18 ban ghi). Kiem thiet hai: 0 file bi xoa, hai dich vu song"
+  - lenh: "grep -ciE 'gitattributes|check-attr|_media' core/tests/check_ci_teeth.py"
+    ket_qua: "0 ⇒ AC2/AC3 cua T04-12 khong do duoc"
+  - lenh: "git show main:web/test/_tran.mjs · git show m13:web/test/_tran.mjs"
+    ket_qua: "{css:104,js:103} → {css:104,js:104}"
+
+đỏ_do: >
+  gn.css vuot tran 105 byte: chu la NHANH m13 (khoi CSS panel tim toan van, +1745 byte
+  prototype.css) — chi phi that cua mot man moi, khong phai rac.
+  Ve "trang chu 65667/61440" DO SAN tren main da commit, KHONG phai cua m13 — do tren
+  worktree sach LF. Chua quy duoc chu, thuoc M03, da co san truoc luot nay.
+  T04-12 AC khong do duoc: chu la TOI (PM M13).
+  Lenh ghi vua chay len DB kho: chu la TOI. Khong mat du lieu, da kiem ba phep do.
+
+cho_NGUOI:
+  - "gn.css vuot tran 105 byte. Ba loi ra, can chu du an chon: (a) SIET CSS — cat 105+ byte trong khoi .tim-* hoac cho no thanh chunk rieng nhu gn-timkiem.js; (b) NOI tran css 104→105 KB kem FR co object; (c) hoan merge."
+  - "A1: T03-149 noi TRAN_KB.js 103→104 va _tran.mjs ghi 'chu du an duyet 2026-09-11'. Neu dung thi can mot FR id de cau ay co vet; neu khong thi phai tra tran ve 103."
+  - "Ve 'trang chu 65667/61440' do san tren main — thuoc M03, chua ai mo don vi."
+
+khong_lam:
+  - "KHONG merge m13 luot nay."
+  - "KHONG tu noi tran CSS — do dung la loi reviewer vua bat o A1, lam lai la lap loi."
+  - "KHONG tu sua _tran.mjs hay heading-id-anchor.test.js — bien ghi cua don vi khac."
+  - "KHONG chay lai bat ky cmd nao cua AC len cay THAT truoc khi grep add_argument + nhanh GHI."
